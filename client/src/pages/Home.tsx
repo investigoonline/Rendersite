@@ -9,7 +9,8 @@ import {
   PieChart, 
   FileText, 
   Clock,
-  ChevronRight
+  ChevronRight,
+  CreditCard
 } from "lucide-react";
 
 export default function Home() {
@@ -97,11 +98,11 @@ export default function Home() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Button asChild variant="outline" className="h-auto p-4 flex-col">
-                    <Link href="/calculators">
-                      <Calculator className="h-8 w-8 mb-2 text-primary" />
-                      <span className="font-semibold">Open Calculator</span>
+                    <Link href="/calculators?calculator=net_worth&category=wealth_management">
+                      <PieChart className="h-8 w-8 mb-2 text-primary" />
+                      <span className="font-semibold">Net Worth Calculator</span>
                       <span className="text-xs text-muted-foreground">
-                        Access all financial calculators
+                        Calculate your total net worth
                       </span>
                     </Link>
                   </Button>
@@ -139,6 +140,57 @@ export default function Home() {
               </CardContent>
             </Card>
 
+            {/* Quick Calculators */}
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>Popular Calculators</CardTitle>
+                <p className="text-sm text-muted-foreground">Quick access to frequently used calculators</p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <Button asChild variant="outline" className="h-auto p-3 justify-start">
+                    <Link href="/calculators?calculator=net_worth&category=wealth_management">
+                      <PieChart className="h-5 w-5 mr-3 text-primary" />
+                      <div className="text-left">
+                        <div className="font-medium">Net Worth Calculator</div>
+                        <div className="text-xs text-muted-foreground">Track your wealth</div>
+                      </div>
+                    </Link>
+                  </Button>
+                  
+                  <Button asChild variant="outline" className="h-auto p-3 justify-start">
+                    <Link href="/calculators?calculator=loan_payoff&category=loans_credit">
+                      <CreditCard className="h-5 w-5 mr-3 text-secondary" />
+                      <div className="text-left">
+                        <div className="font-medium">Loan Payoff</div>
+                        <div className="text-xs text-muted-foreground">Debt payoff strategy</div>
+                      </div>
+                    </Link>
+                  </Button>
+                  
+                  <Button asChild variant="outline" className="h-auto p-3 justify-start">
+                    <Link href="/calculators?calculator=mortgage_refinance&category=real_estate">
+                      <TrendingUp className="h-5 w-5 mr-3 text-accent" />
+                      <div className="text-left">
+                        <div className="font-medium">Mortgage Refinance</div>
+                        <div className="text-xs text-muted-foreground">Refinancing analysis</div>
+                      </div>
+                    </Link>
+                  </Button>
+                  
+                  <Button asChild variant="outline" className="h-auto p-3 justify-start">
+                    <Link href="/calculators?calculator=retirement_cost&category=retirement_inflation">
+                      <Clock className="h-5 w-5 mr-3 text-primary" />
+                      <div className="text-left">
+                        <div className="font-medium">Retirement Cost</div>
+                        <div className="text-xs text-muted-foreground">Plan retirement</div>
+                      </div>
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Recent Activity */}
             <Card className="mt-6">
               <CardHeader>
@@ -151,38 +203,44 @@ export default function Home() {
                       action: "Net Worth Calculation",
                       time: "2 hours ago",
                       result: "$1,247,832",
-                      type: "calculation"
+                      type: "calculation",
+                      link: "/calculators?calculator=net_worth&category=wealth_management"
                     },
                     {
                       action: "Retirement Planning Report",
                       time: "1 day ago",
                       result: "Generated PDF",
-                      type: "report"
+                      type: "report",
+                      link: "/calculators?calculator=retirement_cost&category=retirement_inflation"
                     },
                     {
                       action: "Mortgage Refinance Calculator",
                       time: "3 days ago",
                       result: "Save $47,000",
-                      type: "calculation"
+                      type: "calculation",
+                      link: "/calculators?calculator=mortgage_refinance&category=real_estate"
                     }
                   ].map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                          {item.type === 'calculation' ? 
-                            <Calculator className="h-4 w-4 text-primary" /> :
-                            <FileText className="h-4 w-4 text-secondary" />
-                          }
+                    <Link key={index} href={item.link} className="block">
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                            {item.type === 'calculation' ? 
+                              <Calculator className="h-4 w-4 text-primary" /> :
+                              <FileText className="h-4 w-4 text-secondary" />
+                            }
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">{item.action}</p>
+                            <p className="text-sm text-muted-foreground">{item.time}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{item.action}</p>
-                          <p className="text-sm text-muted-foreground">{item.time}</p>
+                        <div className="text-right flex items-center">
+                          <Badge variant="secondary" className="mr-2">{item.result}</Badge>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
                         </div>
                       </div>
-                      <div className="text-right">
-                        <Badge variant="secondary">{item.result}</Badge>
-                      </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </CardContent>

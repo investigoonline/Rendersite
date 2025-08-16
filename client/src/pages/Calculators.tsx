@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -117,9 +118,30 @@ const calculatorCategories = [
 export default function Calculators() {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
+  const [location] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState("wealth_management");
   const [selectedCalculator, setSelectedCalculator] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Handle URL parameters for direct calculator access
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const calculator = urlParams.get('calculator');
+    const category = urlParams.get('category');
+    
+    if (calculator) {
+      setSelectedCalculator(calculator);
+      // Find the category for this calculator
+      const foundCategory = calculatorCategories.find(cat => 
+        cat.calculators.some(calc => calc.id === calculator)
+      );
+      if (foundCategory) {
+        setSelectedCategory(foundCategory.id);
+      }
+    } else if (category) {
+      setSelectedCategory(category);
+    }
+  }, [location]);
 
   // Get user's saved calculations
   const { data: savedCalculations } = useQuery<any[]>({
@@ -139,10 +161,18 @@ export default function Calculators() {
 
   const handleCalculatorSelect = (calculatorId: string) => {
     setSelectedCalculator(calculatorId);
+    // Update URL without page reload
+    const url = new URL(window.location.href);
+    url.searchParams.set('calculator', calculatorId);
+    window.history.pushState({}, '', url.toString());
   };
 
   const handleBackToList = () => {
     setSelectedCalculator(null);
+    // Remove calculator parameter from URL
+    const url = new URL(window.location.href);
+    url.searchParams.delete('calculator');
+    window.history.pushState({}, '', url.toString());
   };
 
   if (selectedCalculator && currentCalculatorData) {
