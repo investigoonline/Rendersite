@@ -1,0 +1,356 @@
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { CreditCard, Save, Download, Mail } from "lucide-react";
+
+const loanPayoffSchema = z.object({
+  principal: z.coerce.number().min(1, "Principal amount is required"),
+  interestRate: z.coerce.number().min(0).max(100, "Interest rate must be between 0 and 100"),
+  currentPayment: z.coerce.number().min(0, "Current payment must be positive"),
+  extraPayment: z.coerce.number().min(0).default(0),
+});
+
+type LoanPayoffForm = z.infer<typeof loanPayoffSchema>;
+
+export default function LoanPayoffCalculator() {
+  const { toast } = useToast();
+  const [results, setResults] = useState<{
+    monthsToPayoff: number;
+    totalInterest: number;
+    totalPayments: number;
+    interestSaved: number;
+    monthsSaved: number;
+  } | null>(null);
+
+  const form = useForm<LoanPayoffForm>({
+    resolver: zodResolver(loanPayoffSchema),
+    defaultValues: {
+      principal: 0,
+      interestRate: 0,
+      currentPayment: 0,
+      extraPayment: 0,
+    },
+  });
+
+  const saveCalculationMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest("POST", "/api/calculations", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Calculation Saved",
+        description: "Your loan payoff calculation has been saved to your account.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save calculation",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const calculatePayoff = (data: LoanPayoffForm) => {
+    const monthlyRate = data.interestRate / 100 / 12;
+    const regularPayment = data.currentPayment;
+    const totalPayment = regularPayment + data.extraPayment;
+
+    // Calculate regular payoff
+    const regularMonths = monthlyRate > 0 
+      ? -Math.log(1 - (data.principal * monthlyRate) / regularPayment) / Math.log(1 + monthlyRate)
+      : data.principal / regularPayment;
+
+    // Calculate with extra payments
+    const acceleratedMonths = monthlyRate > 0 && totalPayment > 0
+      ? -Math.log(1 - (data.principal * monthlyRate) / totalPayment) / Math.log(1 + monthlyRate)
+      : data.principal / totalPayment;
+
+    const regularTotalPayments = regularPayment * regularMonths;
+    const acceleratedTotalPayments = totalPayment * acceleratedMonths;
+
+    setResults({
+      monthsToPayoff: Math.ceil(acceleratedMonths),
+      totalInterest: acceleratedTotalPayments - data.principal,
+      totalPayments: acceleratedTotalPayments,
+      interestSaved: (regularTotalPayments - data.principal) - (acceleratedTotalPayments - data.principal),
+      monthsSaved: Math.ceil(regularMonths - acceleratedMonths),
+    });
+  };
+
+  const handleSave = () => {
+    if (results) {
+      const formData = form.getValues();
+      saveCalculationMutation.mutate({
+        calculatorType: "loan_payoff",
+        category: "loans_credit",
+        inputs: formData,
+        results,
+        saved: true,
+      });
+    }
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(value);
+  };
+
+  return (
+    <Card className="max-w-4xl mx-auto shadow-xl border border-gray-200 overflow-hidden">
+      {/* Calculator Header */}
+      <CardHeader className="gradient-primary text-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-2xl font-bold mb-2 flex items-center">
+              <CreditCard className="mr-3 h-6 w-6" />
+              Loan Payoff Calculator
+            </CardTitle>
+            <p className="text-blue-100">Calculate how extra payments can save you money</p>
+          </div>
+          {results && (
+            <div className="text-right">
+              <div className="text-3xl font-bold font-mono">
+                {results.monthsToPayoff} months
+              </div>
+              <div className="text-sm text-blue-100">Time to Payoff</div>
+            </div>
+          )}
+        </div>
+      </CardHeader>
+
+      <CardContent className="p-8">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(calculatePayoff)} className="space-y-8">
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Loan Details */}
+              <div>
+                <h4 className="text-xl font-semibold text-gray-900 mb-6">Loan Details</h4>
+                
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="principal"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Outstanding Principal Balance</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-500">$</span>
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              className="pl-8 font-mono"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="interestRate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Annual Interest Rate</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              type="number"
+                              step="0.01"
+                              placeholder="0"
+                              className="pr-8 font-mono"
+                              {...field}
+                            />
+                            <span className="absolute right-3 top-3 text-gray-500">%</span>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="currentPayment"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Current Monthly Payment</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-500">$</span>
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              className="pl-8 font-mono"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="extraPayment"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Extra Monthly Payment</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-500">$</span>
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              className="pl-8 font-mono"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Payoff Schedule Preview */}
+              <div>
+                <h4 className="text-xl font-semibold text-gray-900 mb-6">Payoff Benefits</h4>
+                
+                {results ? (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-primary/5 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Time to Payoff</span>
+                        <span className="font-mono font-semibold text-primary">
+                          {results.monthsToPayoff} months
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 bg-secondary/5 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Total Interest</span>
+                        <span className="font-mono font-semibold text-secondary">
+                          {formatCurrency(results.totalInterest)}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 bg-accent/5 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Interest Saved</span>
+                        <span className="font-mono font-semibold text-accent">
+                          {formatCurrency(results.interestSaved)}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 bg-gray-50 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Time Saved</span>
+                        <span className="font-mono font-semibold text-gray-900">
+                          {results.monthsSaved} months
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-8 text-center text-muted-foreground border-2 border-dashed border-gray-300 rounded-lg">
+                    Enter loan details above to see payoff benefits
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Calculate Button */}
+            <div className="flex justify-center">
+              <Button type="submit" size="lg" className="px-8">
+                Calculate Payoff Schedule
+              </Button>
+            </div>
+
+            {/* Results Section */}
+            {results && (
+              <div className="mt-8 pt-8 border-t border-gray-200">
+                <div className="grid md:grid-cols-3 gap-6 mb-8">
+                  <div className="text-center p-6 bg-primary/5 rounded-lg">
+                    <div className="text-2xl font-bold font-mono text-primary mb-2">
+                      {results.monthsToPayoff}
+                    </div>
+                    <div className="text-sm font-medium text-gray-700">Months to Payoff</div>
+                  </div>
+                  <div className="text-center p-6 bg-secondary/5 rounded-lg">
+                    <div className="text-2xl font-bold font-mono text-secondary mb-2">
+                      {formatCurrency(results.interestSaved)}
+                    </div>
+                    <div className="text-sm font-medium text-gray-700">Interest Saved</div>
+                  </div>
+                  <div className="text-center p-6 bg-accent/5 rounded-lg">
+                    <div className="text-2xl font-bold font-mono text-accent mb-2">
+                      {results.monthsSaved}
+                    </div>
+                    <div className="text-sm font-medium text-gray-700">Months Saved</div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+                  <Button
+                    type="button"
+                    onClick={handleSave}
+                    className="flex-1"
+                    disabled={saveCalculationMutation.isPending}
+                  >
+                    <Save className="mr-2 h-4 w-4" />
+                    Save Results
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Export PDF
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="flex-1"
+                  >
+                    <Mail className="mr-2 h-4 w-4" />
+                    Email Results
+                  </Button>
+                </div>
+              </div>
+            )}
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  );
+}
