@@ -199,11 +199,11 @@ export default function Calculators() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-8 sm:mb-12 px-4">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             Financial Calculator Suite
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto mb-6 sm:mb-8">
             Access our complete collection of 32+ professional-grade financial calculators. 
             Make informed decisions with real-time calculations and personalized insights.
           </p>
@@ -221,7 +221,7 @@ export default function Calculators() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12 px-4">
           <Card>
             <CardContent className="p-6 text-center">
               <Calculator className="h-8 w-8 text-primary mx-auto mb-2" />
@@ -249,12 +249,12 @@ export default function Calculators() {
 
         <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="space-y-8">
           {/* Category Tabs */}
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 h-auto">
             {calculatorCategories.map((category) => (
               <TabsTrigger
                 key={category.id}
                 value={category.id}
-                className="text-xs"
+                className="text-xs flex-col h-auto py-2 px-1 sm:px-3"
               >
                 <category.icon className="h-4 w-4 mr-1" />
                 <span className="hidden lg:inline">{category.title.split(' ')[0]}</span>
@@ -274,7 +274,7 @@ export default function Calculators() {
                 <p className="text-muted-foreground">{category.description}</p>
               </div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {category.calculators.map((calculator) => (
                   <Card
                     key={calculator.id}

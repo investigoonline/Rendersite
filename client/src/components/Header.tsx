@@ -46,13 +46,13 @@ export default function Header() {
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <ChartLine className="text-white h-5 w-5" />
+            <Link href="/" className="flex items-center space-x-2 min-w-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+                <ChartLine className="text-white h-4 w-4 sm:h-5 sm:w-5" />
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">Investigoonline</h1>
-                <p className="text-xs text-muted-foreground">by IFS Group</p>
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">Investigoonline</h1>
+                <p className="text-xs text-muted-foreground hidden sm:block">by IFS Group</p>
               </div>
             </Link>
 
@@ -95,21 +95,21 @@ export default function Header() {
             </div>
 
             {/* Auth Buttons */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               {isAuthenticated ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center space-x-2">
+                    <Button variant="ghost" className="flex items-center space-x-2 px-2 sm:px-3">
                       {user?.profileImageUrl ? (
                         <img
                           src={user.profileImageUrl}
                           alt="Profile"
-                          className="w-8 h-8 rounded-full object-cover"
+                          className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover"
                         />
                       ) : (
-                        <User className="h-5 w-5" />
+                        <User className="h-4 w-4 sm:h-5 sm:w-5" />
                       )}
-                      <span className="hidden md:inline">
+                      <span className="hidden lg:inline text-sm truncate max-w-24">
                         {user?.firstName || user?.email}
                       </span>
                     </Button>
@@ -131,12 +131,17 @@ export default function Header() {
                   <Button
                     variant="outline"
                     onClick={() => setGuestModalOpen(true)}
-                    className="hidden md:inline-flex"
+                    className="hidden sm:inline-flex text-xs sm:text-sm px-2 sm:px-4"
+                    size="sm"
                   >
-                    Guest Access
+                    Guest
                   </Button>
-                  <Button onClick={() => setClientModalOpen(true)}>
-                    Client Login
+                  <Button 
+                    onClick={() => setClientModalOpen(true)}
+                    className="text-xs sm:text-sm px-2 sm:px-4"
+                    size="sm"
+                  >
+                    Login
                   </Button>
                 </>
               )}

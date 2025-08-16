@@ -93,13 +93,13 @@ export default function Landing() {
                 </Badge>
               </div>
               
-              <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
                 Your Complete
                 <span className="text-primary block">Financial Intelligence</span>
                 Platform
               </h1>
               
-              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+              <p className="text-lg sm:text-xl text-muted-foreground mb-8 leading-relaxed">
                 Comprehensive financial planning tools, AI-driven insights, and personalized recommendations. 
                 From wealth management to retirement planning - all in one secure platform.
               </p>

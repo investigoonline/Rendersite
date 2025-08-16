@@ -30,65 +30,65 @@ export default function Home() {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center">
-                <Calculator className="h-8 w-8 text-primary" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-muted-foreground">
+                <Calculator className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
+                <div className="ml-3 sm:ml-4 min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
                     Calculations Saved
                   </p>
-                  <p className="text-2xl font-bold">12</p>
+                  <p className="text-xl sm:text-2xl font-bold">12</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center">
-                <TrendingUp className="h-8 w-8 text-secondary" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-muted-foreground">
+                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-secondary flex-shrink-0" />
+                <div className="ml-3 sm:ml-4 min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
                     Net Worth Growth
                   </p>
-                  <p className="text-2xl font-bold">+8.4%</p>
+                  <p className="text-xl sm:text-2xl font-bold">+8.4%</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center">
-                <PieChart className="h-8 w-8 text-accent" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-muted-foreground">
+                <PieChart className="h-6 w-6 sm:h-8 sm:w-8 text-accent flex-shrink-0" />
+                <div className="ml-3 sm:ml-4 min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
                     Portfolio Value
                   </p>
-                  <p className="text-2xl font-bold">$1.2M</p>
+                  <p className="text-xl sm:text-2xl font-bold">$1.2M</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center">
-                <FileText className="h-8 w-8 text-primary" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-muted-foreground">
+                <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
+                <div className="ml-3 sm:ml-4 min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
                     Reports Generated
                   </p>
-                  <p className="text-2xl font-bold">8</p>
+                  <p className="text-xl sm:text-2xl font-bold">8</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Quick Actions */}
           <div className="lg:col-span-2">
             <Card>
@@ -96,7 +96,7 @@ export default function Home() {
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <Button asChild variant="outline" className="h-auto p-4 flex-col">
                     <Link href="/calculators?calculator=net_worth&category=wealth_management">
                       <PieChart className="h-8 w-8 mb-2 text-primary" />
