@@ -108,13 +108,12 @@ export const resources = pgTable("resources", {
 // Contact messages table
 export const contactMessages = pgTable("contact_messages", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  firstName: varchar("first_name", { length: 100 }).notNull(),
-  lastName: varchar("last_name", { length: 100 }).notNull(),
+  name: varchar("name", { length: 200 }).notNull(),
   email: varchar("email", { length: 255 }).notNull(),
   phone: varchar("phone", { length: 20 }),
-  subject: varchar("subject", { length: 255 }),
+  subject: varchar("subject", { length: 255 }).notNull(),
   message: text("message").notNull(),
-  newsletterSubscribe: boolean("newsletter_subscribe").default(false),
+  preferredContact: varchar("preferred_contact").default('email'),
   status: varchar("status").default('new'),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -138,6 +137,8 @@ export const insertGuestAccountSchema = createInsertSchema(guestAccounts).omit({
   id: true,
   createdAt: true,
   lastActivity: true,
+  expiresAt: true,
+  verificationToken: true,
 });
 export const insertCalculationSchema = createInsertSchema(calculations).omit({
   id: true,
