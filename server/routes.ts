@@ -355,9 +355,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid email or password" });
       }
       
-      if (!user.isEmailVerified) {
-        return res.status(400).json({ message: "Please verify your email before logging in" });
-      }
+      // Temporarily bypass email verification
+      // if (!user.isEmailVerified) {
+      //   return res.status(400).json({ message: "Please verify your email before logging in" });
+      // }
       
       // Create session (store user in session)
       (req as any).session.user = {
