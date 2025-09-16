@@ -7,6 +7,7 @@ import {
   netWorthSnapshots,
   type User,
   type UpsertUser,
+  type InsertUserRegistration,
   type GuestAccount,
   type InsertGuestAccount,
   type Calculation,
@@ -20,11 +21,18 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, sql } from "drizzle-orm";
+import bcrypt from "bcryptjs";
 
 export interface IStorage {
   // User operations - Required for Replit Auth
   getUser(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  
+  // Traditional registration operations
+  createUser(user: InsertUserRegistration): Promise<User>;
+  updateUserPassword(userId: string, hashedPassword: string): Promise<void>;
+  verifyUserEmail(userId: string, token: string): Promise<boolean>;
   
   // Guest account operations
   createGuestAccount(guest: InsertGuestAccount): Promise<GuestAccount>;
@@ -61,6 +69,11 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
   async upsertUser(userData: UpsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
@@ -74,6 +87,54 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return user;
+  }
+
+  // Traditional registration operations
+  async createUser(user: InsertUserRegistration): Promise<User> {
+    const hashedPassword = await bcrypt.hash(user.password, 10);
+    const emailVerificationToken = Math.random().toString(36).substring(2, 15) +
+                                  Math.random().toString(36).substring(2, 15);
+
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        password: hashedPassword,
+        authType: "traditional",
+        isEmailVerified: false,
+        emailVerificationToken,
+      })
+      .returning();
+    return newUser;
+  }
+
+  async updateUserPassword(userId: string, hashedPassword: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ 
+        password: hashedPassword,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+  }
+
+  async verifyUserEmail(userId: string, token: string): Promise<boolean> {
+    const [updated] = await db
+      .update(users)
+      .set({ 
+        isEmailVerified: true, 
+        emailVerificationToken: null,
+        updatedAt: new Date(),
+      })
+      .where(and(
+        eq(users.id, userId),
+        eq(users.emailVerificationToken, token)
+      ))
+      .returning();
+    return !!updated;
   }
 
   // Guest account operations

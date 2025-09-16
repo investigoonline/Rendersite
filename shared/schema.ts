@@ -26,13 +26,20 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// User storage table - Required for Replit Auth
+// User storage table - Required for Replit Auth + Traditional Registration
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email").unique(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
+  phone: varchar("phone", { length: 20 }),
+  password: varchar("password", { length: 255 }), // For traditional registration
   profileImageUrl: varchar("profile_image_url"),
+  isEmailVerified: boolean("is_email_verified").default(false),
+  emailVerificationToken: varchar("email_verification_token"),
+  resetPasswordToken: varchar("reset_password_token"),
+  resetPasswordExpires: timestamp("reset_password_expires"),
+  authType: varchar("auth_type").default("replit"), // "replit" or "traditional"
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -133,6 +140,22 @@ export const netWorthSnapshots = pgTable("net_worth_snapshots", {
 
 // Create insert schemas
 export const upsertUserSchema = createInsertSchema(users);
+export const insertUserRegistrationSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  profileImageUrl: true,
+  isEmailVerified: true,
+  emailVerificationToken: true,
+  resetPasswordToken: true,
+  resetPasswordExpires: true,
+  authType: true,
+}).extend({
+  confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
 export const insertGuestAccountSchema = createInsertSchema(guestAccounts).omit({
   id: true,
   createdAt: true,
@@ -160,6 +183,7 @@ export const insertNetWorthSnapshotSchema = createInsertSchema(netWorthSnapshots
 
 // Export types
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
+export type InsertUserRegistration = z.infer<typeof insertUserRegistrationSchema>;
 export type User = typeof users.$inferSelect;
 export type GuestAccount = typeof guestAccounts.$inferSelect;
 export type InsertGuestAccount = z.infer<typeof insertGuestAccountSchema>;
