@@ -300,13 +300,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email already registered" });
       }
       
-      // Check if email exists in guest accounts
+      // Check if email exists in guest accounts (for upgrade flow)
       const existingGuest = await storage.getGuestAccountByEmail(userData.email!);
-      if (existingGuest) {
-        return res.status(400).json({ message: "Email already registered as guest account" });
-      }
       
       const user = await storage.createUser(userData);
+      
+      // If this was a guest account upgrade, delete the guest account after successful registration
+      if (existingGuest) {
+        await storage.deleteGuestAccount(existingGuest.id);
+        console.log(`Guest account ${existingGuest.id} deleted after successful upgrade to full account for email: ${userData.email}`);
+      }
       
       // TODO: Send verification email
       

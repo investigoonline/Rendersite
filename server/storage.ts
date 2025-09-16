@@ -46,6 +46,7 @@ export interface IStorage {
   getGuestAccountByEmail(email: string): Promise<GuestAccount | undefined>;
   verifyGuestAccount(id: string, token: string): Promise<boolean>;
   updateGuestActivity(id: string): Promise<void>;
+  deleteGuestAccount(id: string): Promise<void>;
   cleanupExpiredGuests(): Promise<void>;
   
   // Calculation operations
@@ -192,6 +193,12 @@ export class DatabaseStorage implements IStorage {
     await db
       .update(guestAccounts)
       .set({ lastActivity: new Date() })
+      .where(eq(guestAccounts.id, id));
+  }
+
+  async deleteGuestAccount(id: string): Promise<void> {
+    await db
+      .delete(guestAccounts)
       .where(eq(guestAccounts.id, id));
   }
 
