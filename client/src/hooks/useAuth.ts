@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { User } from "@shared/schema";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, getQueryFn } from "@/lib/queryClient";
 
 interface GuestAccount {
   id: string;
@@ -40,9 +40,13 @@ export function useAuth() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  const { data: user, isLoading } = useQuery<User>({
+  const { data: user, isLoading } = useQuery<User | null>({
     queryKey: ["/api/auth/user"],
+    queryFn: getQueryFn<User | null>({ on401: "returnNull" }),
     retry: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60_000, // 5 minutes
   });
 
   // Determine user type and access level
@@ -60,7 +64,7 @@ export function useAuth() {
     return "none"; // No access
   };
 
-  const hasCalculatorAccess = (categoryId: string) => {
+  const hasCalculatorAccess = useCallback((categoryId: string) => {
     const accessLevel = getAccessLevel();
     if (accessLevel === "full") {
       return true;
@@ -68,7 +72,7 @@ export function useAuth() {
       return categoryId === "vehicle_financing";
     }
     return false;
-  };
+  }, [isRegisteredUser, isGuestUser]);
 
   // Logout function that handles both registered users and guest users
   const logout = async () => {
