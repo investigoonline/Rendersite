@@ -8,6 +8,7 @@ import {
   type User,
   type UpsertUser,
   type InsertUserRegistration,
+  type InsertUserBackend,
   type GuestAccount,
   type InsertGuestAccount,
   type Calculation,
@@ -36,7 +37,7 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   
   // Traditional registration operations
-  createUser(user: InsertUserRegistration): Promise<User>;
+  createUser(user: InsertUserBackend): Promise<User>;
   updateUserPassword(userId: string, hashedPassword: string): Promise<void>;
   verifyUserEmail(userId: string, token: string): Promise<boolean>;
   
@@ -97,7 +98,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Traditional registration operations
-  async createUser(user: InsertUserRegistration): Promise<User> {
+  async createUser(user: InsertUserBackend): Promise<User> {
     const hashedPassword = await bcrypt.hash(user.password!, 10);
     const emailVerificationToken = generateSecureToken();
 

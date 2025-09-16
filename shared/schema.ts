@@ -206,6 +206,7 @@ export const insertNetWorthSnapshotSchema = createInsertSchema(netWorthSnapshots
 // Export types
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
 export type InsertUserRegistration = z.infer<typeof insertUserRegistrationSchema>;
+export type InsertUserBackend = z.infer<typeof insertUserBackendSchema>;
 export type User = typeof users.$inferSelect;
 export type GuestAccount = typeof guestAccounts.$inferSelect;
 export type InsertGuestAccount = z.infer<typeof insertGuestAccountSchema>;
