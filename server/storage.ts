@@ -111,7 +111,7 @@ export class DatabaseStorage implements IStorage {
         phone: user.phone,
         password: hashedPassword,
         authType: "traditional",
-        isEmailVerified: true,
+        isEmailVerified: false,
         emailVerificationToken,
       })
       .returning();
