@@ -5,6 +5,7 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import { 
   insertGuestAccountSchema,
   insertUserRegistrationSchema,
+  insertUserBackendSchema,
   insertCalculationSchema,
   insertContactMessageSchema,
   insertNetWorthSnapshotSchema 
@@ -13,7 +14,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
-// Secure math expression evaluation for captcha
+// Safe arithmetic expression parser for captcha
 function evaluateMathExpression(expression: string): number | null {
   // Remove all whitespace
   const cleaned = expression.replace(/\s/g, '');
@@ -23,15 +24,94 @@ function evaluateMathExpression(expression: string): number | null {
     return null;
   }
   
-  // Parse and evaluate simple math expressions safely
   try {
-    // For now, use Function constructor with strict validation
-    // This is safer than eval() but still needs careful input validation
-    const result = new Function('return ' + cleaned)();
-    return typeof result === 'number' && isFinite(result) ? Math.round(result) : null;
+    return safeArithmeticEvaluator(cleaned);
   } catch {
     return null;
   }
+}
+
+// Safe arithmetic evaluator using recursive descent parser
+function safeArithmeticEvaluator(expression: string): number {
+  let index = 0;
+  
+  function parseNumber(): number {
+    let num = '';
+    while (index < expression.length && /\d/.test(expression[index])) {
+      num += expression[index];
+      index++;
+    }
+    return parseInt(num, 10);
+  }
+  
+  function parseFactor(): number {
+    if (expression[index] === '(') {
+      index++; // skip '('
+      const result = parseExpression();
+      index++; // skip ')'
+      return result;
+    }
+    
+    if (expression[index] === '-') {
+      index++; // skip '-'
+      return -parseFactor();
+    }
+    
+    if (expression[index] === '+') {
+      index++; // skip '+'
+      return parseFactor();
+    }
+    
+    return parseNumber();
+  }
+  
+  function parseTerm(): number {
+    let result = parseFactor();
+    
+    while (index < expression.length && (expression[index] === '*' || expression[index] === '/')) {
+      const operator = expression[index];
+      index++;
+      const rightOperand = parseFactor();
+      
+      if (operator === '*') {
+        result *= rightOperand;
+      } else {
+        if (rightOperand === 0) {
+          throw new Error('Division by zero');
+        }
+        result /= rightOperand;
+      }
+    }
+    
+    return result;
+  }
+  
+  function parseExpression(): number {
+    let result = parseTerm();
+    
+    while (index < expression.length && (expression[index] === '+' || expression[index] === '-')) {
+      const operator = expression[index];
+      index++;
+      const rightOperand = parseTerm();
+      
+      if (operator === '+') {
+        result += rightOperand;
+      } else {
+        result -= rightOperand;
+      }
+    }
+    
+    return result;
+  }
+  
+  const result = parseExpression();
+  
+  // Ensure we've consumed the entire expression
+  if (index !== expression.length) {
+    throw new Error('Invalid expression');
+  }
+  
+  return Math.round(result);
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -192,8 +272,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User registration routes
   app.post('/api/auth/register', async (req, res) => {
     try {
-      const userData = insertUserRegistrationSchema.parse(req.body);
-      const { captcha } = req.body;
+      const { captcha, confirmPassword, ...userFields } = req.body;
+      const userData = insertUserBackendSchema.parse(userFields);
       
       // Server-side captcha validation
       const { question, answer } = captcha;
@@ -227,6 +307,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Error creating user:", error);
+      console.error("Request body:", JSON.stringify(req.body, null, 2));
+      if (error instanceof Error) {
+        console.error("Error message:", error.message);
+        console.error("Error stack:", error.stack);
+      }
       res.status(500).json({ message: "Failed to create user account" });
     }
   });

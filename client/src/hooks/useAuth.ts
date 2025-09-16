@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import type { User } from "@shared/schema";
+import { apiRequest } from "@/lib/queryClient";
 
 interface GuestAccount {
   id: string;
@@ -72,8 +73,25 @@ export function useAuth() {
   // Logout function that handles both registered users and guest users
   const logout = async () => {
     if (isRegisteredUser) {
-      // For registered users, redirect to server logout endpoint
-      window.location.href = "/api/logout";
+      try {
+        // Check if user is Replit authenticated (has specific identifier)
+        if (user?.authType === "replit") {
+          // For Replit users, redirect to Replit logout endpoint
+          window.location.href = "/api/logout";
+        } else {
+          // For traditional users, call the traditional logout endpoint
+          await apiRequest("POST", "/api/auth/logout");
+          // Clear user query cache after successful logout
+          queryClient.removeQueries({ queryKey: ["/api/auth/user"] });
+          // Redirect to home page
+          window.location.href = "/";
+        }
+      } catch (error) {
+        console.error("Logout failed:", error);
+        // Force logout by clearing cache and redirecting
+        queryClient.removeQueries({ queryKey: ["/api/auth/user"] });
+        window.location.href = "/";
+      }
     } else if (isGuestUser) {
       // For guest users, clear localStorage and update state
       localStorage.removeItem("guestAccount");

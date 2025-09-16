@@ -55,7 +55,7 @@ export default function ClientLoginModal({ open, onOpenChange }: ClientLoginModa
 
   const loginMutation = useMutation({
     mutationFn: async (data: LoginForm) => {
-      return apiRequest("/api/auth/login", "POST", {
+      return apiRequest("POST", "/api/auth/login", {
         ...data,
         captcha,
       });
