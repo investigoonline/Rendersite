@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { Captcha } from "@/components/Captcha";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertUserRegistrationSchema } from "@shared/schema";
+import { useAuth } from "@/hooks/useAuth";
 
 // Create a form schema that includes confirm password
 const registrationFormSchema = z.object({
@@ -31,6 +32,8 @@ type RegistrationForm = z.infer<typeof registrationFormSchema>;
 export default function Register() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { isGuestUser, guestAccount } = useAuth();
   const [captcha, setCaptcha] = useState({ question: "", answer: "" });
 
   const form = useForm<RegistrationForm>({
@@ -54,10 +57,27 @@ export default function Register() {
       });
     },
     onSuccess: () => {
-      toast({
-        title: "Registration Successful",
-        description: "Please check your email to verify your account before logging in.",
-      });
+      // Check if this was a guest account upgrade
+      const wasGuestUpgrade = isGuestUser && guestAccount;
+      
+      if (wasGuestUpgrade) {
+        // Clear guest account from localStorage since it's been deleted on backend
+        localStorage.removeItem("guestAccount");
+        
+        // Clear React Query cache to force auth state refresh
+        queryClient.removeQueries({ queryKey: ["/api/auth/user"] });
+        
+        toast({
+          title: "Account Upgraded Successfully!",
+          description: "You've successfully upgraded from guest access to a full account. Please check your email to verify your account before logging in.",
+        });
+      } else {
+        toast({
+          title: "Registration Successful",
+          description: "Please check your email to verify your account before logging in.",
+        });
+      }
+      
       setLocation("/");
     },
     onError: (error: any) => {
