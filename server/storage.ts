@@ -91,16 +91,16 @@ export class DatabaseStorage implements IStorage {
 
   // Traditional registration operations
   async createUser(user: InsertUserRegistration): Promise<User> {
-    const hashedPassword = await bcrypt.hash(user.password, 10);
+    const hashedPassword = await bcrypt.hash(user.password!, 10);
     const emailVerificationToken = Math.random().toString(36).substring(2, 15) +
                                   Math.random().toString(36).substring(2, 15);
 
     const [newUser] = await db
       .insert(users)
       .values({
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        email: user.email!,
+        firstName: user.firstName!,
+        lastName: user.lastName!,
         phone: user.phone,
         password: hashedPassword,
         authType: "traditional",
