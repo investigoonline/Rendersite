@@ -260,8 +260,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email not found in guest accounts" });
       }
       
-      if (!guest.verified) {
-        return res.status(400).json({ message: "Guest account not verified" });
+      // Check if guest account has expired
+      if (guest.expiresAt && new Date() > guest.expiresAt) {
+        return res.status(400).json({ message: "Guest account has expired" });
       }
       
       // Update last activity
