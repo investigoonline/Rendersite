@@ -15,7 +15,7 @@ import ClientLoginModal from "./modals/ClientLoginModal";
 
 export default function Header() {
   const [location] = useLocation();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isGuestUser, isRegisteredUser, logout } = useAuth();
   const [guestModalOpen, setGuestModalOpen] = useState(false);
   const [clientModalOpen, setClientModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -99,7 +99,7 @@ export default function Header() {
               {isAuthenticated ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center space-x-2 px-2 sm:px-3">
+                    <Button variant="ghost" className="flex items-center space-x-2 px-2 sm:px-3" data-testid="user-menu">
                       {user?.profileImageUrl ? (
                         <img
                           src={user.profileImageUrl}
@@ -111,18 +111,28 @@ export default function Header() {
                       )}
                       <span className="hidden lg:inline text-sm truncate max-w-24">
                         {user?.firstName || user?.email}
+                        {isGuestUser && <span className="text-xs text-muted-foreground"> (Guest)</span>}
                       </span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    {isRegisteredUser && (
+                      <>
+                        <DropdownMenuItem>
+                          <Link href="/dashboard" data-testid="link-dashboard">Dashboard</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Link href="/profile" data-testid="link-profile">Profile</Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    {isGuestUser && (
+                      <DropdownMenuItem>
+                        <Link href="/register" data-testid="link-upgrade-account">Upgrade to Full Account</Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem>
-                      <Link href="/dashboard">Dashboard</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Link href="/profile">Profile</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <a href="/api/logout">Logout</a>
+                      <button onClick={logout} className="w-full text-left" data-testid="button-logout">Logout</button>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -133,6 +143,7 @@ export default function Header() {
                     onClick={() => setGuestModalOpen(true)}
                     className="hidden sm:inline-flex text-xs sm:text-sm px-2 sm:px-4"
                     size="sm"
+                    data-testid="button-guest-access"
                   >
                     Guest
                   </Button>
@@ -140,9 +151,20 @@ export default function Header() {
                     onClick={() => setClientModalOpen(true)}
                     className="text-xs sm:text-sm px-2 sm:px-4"
                     size="sm"
+                    data-testid="button-login"
                   >
                     Login
                   </Button>
+                  <Link href="/register">
+                    <Button 
+                      variant="default"
+                      className="text-xs sm:text-sm px-2 sm:px-4"
+                      size="sm"
+                      data-testid="button-register"
+                    >
+                      Register
+                    </Button>
+                  </Link>
                 </>
               )}
 
@@ -178,7 +200,39 @@ export default function Header() {
                         </Link>
                       ))}
                     </div>
-                    {!isAuthenticated && (
+                    {isAuthenticated ? (
+                      <div className="border-t pt-4 space-y-2">
+                        {isRegisteredUser && (
+                          <>
+                            <Button variant="outline" className="w-full" asChild>
+                              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-link-dashboard">
+                                Dashboard
+                              </Link>
+                            </Button>
+                            <Button variant="outline" className="w-full" asChild>
+                              <Link href="/profile" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-link-profile">
+                                Profile
+                              </Link>
+                            </Button>
+                          </>
+                        )}
+                        {isGuestUser && (
+                          <Button variant="outline" className="w-full" asChild>
+                            <Link href="/register" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-link-upgrade">
+                              Upgrade to Full Account
+                            </Link>
+                          </Button>
+                        )}
+                        <Button 
+                          variant="destructive" 
+                          className="w-full" 
+                          onClick={logout}
+                          data-testid="mobile-button-logout"
+                        >
+                          Logout
+                        </Button>
+                      </div>
+                    ) : (
                       <div className="border-t pt-4 space-y-2">
                         <Button
                           variant="outline"
@@ -187,17 +241,29 @@ export default function Header() {
                             setGuestModalOpen(true);
                             setMobileMenuOpen(false);
                           }}
+                          data-testid="mobile-button-guest"
                         >
                           Guest Access
                         </Button>
                         <Button
+                          variant="outline"
                           className="w-full"
                           onClick={() => {
                             setClientModalOpen(true);
                             setMobileMenuOpen(false);
                           }}
+                          data-testid="mobile-button-login"
                         >
-                          Client Login
+                          Login
+                        </Button>
+                        <Button
+                          className="w-full"
+                          asChild
+                          data-testid="mobile-button-register"
+                        >
+                          <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                            Register
+                          </Link>
                         </Button>
                       </div>
                     )}

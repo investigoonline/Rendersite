@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import type { User } from "@shared/schema";
 
@@ -11,6 +11,8 @@ interface GuestAccount {
 }
 
 export function useAuth() {
+  const queryClient = useQueryClient();
+
   // Initialize guest account synchronously to avoid timing issues
   const initializeGuestAccount = () => {
     try {
@@ -67,6 +69,22 @@ export function useAuth() {
     return false;
   };
 
+  // Logout function that handles both registered users and guest users
+  const logout = async () => {
+    if (isRegisteredUser) {
+      // For registered users, redirect to server logout endpoint
+      window.location.href = "/api/logout";
+    } else if (isGuestUser) {
+      // For guest users, clear localStorage and update state
+      localStorage.removeItem("guestAccount");
+      setGuestAccount(null);
+      // Clear user query cache to ensure clean state
+      queryClient.removeQueries({ queryKey: ["/api/auth/user"] });
+      // Redirect to home page
+      window.location.href = "/";
+    }
+  };
+
   return {
     user,
     guestAccount,
@@ -76,5 +94,6 @@ export function useAuth() {
     isGuestUser,
     accessLevel: getAccessLevel(),
     hasCalculatorAccess,
+    logout,
   };
 }
