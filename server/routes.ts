@@ -11,6 +11,28 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
+
+// Secure math expression evaluation for captcha
+function evaluateMathExpression(expression: string): number | null {
+  // Remove all whitespace
+  const cleaned = expression.replace(/\s/g, '');
+  
+  // Only allow digits, +, -, *, /, and parentheses
+  if (!/^[\d+\-*/()]+$/.test(cleaned)) {
+    return null;
+  }
+  
+  // Parse and evaluate simple math expressions safely
+  try {
+    // For now, use Function constructor with strict validation
+    // This is safer than eval() but still needs careful input validation
+    const result = new Function('return ' + cleaned)();
+    return typeof result === 'number' && isFinite(result) ? Math.round(result) : null;
+  } catch {
+    return null;
+  }
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -134,10 +156,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, captcha } = req.body;
       
-      // Simple math captcha validation
+      // Server-side captcha validation
       const { question, answer } = captcha;
-      const expectedAnswer = eval(question.replace(/\s/g, ''));
-      if (parseInt(answer) !== expectedAnswer) {
+      const expectedAnswer = evaluateMathExpression(question);
+      if (expectedAnswer === null || parseInt(answer) !== expectedAnswer) {
         return res.status(400).json({ message: "Invalid captcha" });
       }
       
@@ -173,10 +195,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userData = insertUserRegistrationSchema.parse(req.body);
       const { captcha } = req.body;
       
-      // Simple math captcha validation
+      // Server-side captcha validation
       const { question, answer } = captcha;
-      const expectedAnswer = eval(question.replace(/\s/g, ''));
-      if (parseInt(answer) !== expectedAnswer) {
+      const expectedAnswer = evaluateMathExpression(question);
+      if (expectedAnswer === null || parseInt(answer) !== expectedAnswer) {
         return res.status(400).json({ message: "Invalid captcha" });
       }
       
@@ -214,10 +236,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password, captcha } = req.body;
       
-      // Simple math captcha validation
+      // Server-side captcha validation
       const { question, answer } = captcha;
-      const expectedAnswer = eval(question.replace(/\s/g, ''));
-      if (parseInt(answer) !== expectedAnswer) {
+      const expectedAnswer = evaluateMathExpression(question);
+      if (expectedAnswer === null || parseInt(answer) !== expectedAnswer) {
         return res.status(400).json({ message: "Invalid captcha" });
       }
       

@@ -22,6 +22,12 @@ import {
 import { db } from "./db";
 import { eq, desc, and, gte, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
+
+// Generate secure random token
+function generateSecureToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
 
 export interface IStorage {
   // User operations - Required for Replit Auth
@@ -92,8 +98,7 @@ export class DatabaseStorage implements IStorage {
   // Traditional registration operations
   async createUser(user: InsertUserRegistration): Promise<User> {
     const hashedPassword = await bcrypt.hash(user.password!, 10);
-    const emailVerificationToken = Math.random().toString(36).substring(2, 15) +
-                                  Math.random().toString(36).substring(2, 15);
+    const emailVerificationToken = generateSecureToken();
 
     const [newUser] = await db
       .insert(users)
@@ -142,8 +147,7 @@ export class DatabaseStorage implements IStorage {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 30); // 30-day expiration
 
-    const verificationToken = Math.random().toString(36).substring(2, 15) +
-                            Math.random().toString(36).substring(2, 15);
+    const verificationToken = generateSecureToken();
 
     const [guestAccount] = await db
       .insert(guestAccounts)

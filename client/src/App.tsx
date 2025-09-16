@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/Layout";
 import Landing from "@/pages/Landing";
 import Home from "@/pages/Home";
+import Register from "@/pages/Register";
 import Calculators from "@/pages/Calculators";
 import Resources from "@/pages/Resources";
 import About from "@/pages/About";
@@ -26,6 +27,7 @@ function Router() {
     <Layout>
       <Switch>
         {/* Public routes available to everyone */}
+        <Route path="/register" component={Register} />
         <Route path="/calculators" component={Calculators} />
         <Route path="/resources" component={Resources} />
         <Route path="/about" component={About} />
