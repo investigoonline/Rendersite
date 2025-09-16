@@ -125,7 +125,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.session?.user) {
         const user = await storage.getUser(req.session.user.id);
         if (user) {
-          return res.json(user);
+          return res.json({ ...user, authType: "traditional" });
         }
       }
       
@@ -134,8 +134,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const userId = req.user.claims.sub;
         const user = await storage.getUser(userId);
         if (user) {
-          return res.json(user);
+          return res.json({ ...user, authType: "replit" });
         }
+        
+        // For Replit users, create a virtual user object with claims data
+        const replitUser = {
+          id: userId,
+          email: req.user.claims.email || `${userId}@replit.com`,
+          firstName: req.user.claims.first_name || req.user.claims.name?.split(' ')[0] || 'User',
+          lastName: req.user.claims.last_name || req.user.claims.name?.split(' ').slice(1).join(' ') || '',
+          isEmailVerified: true,
+          authType: "replit"
+        };
+        return res.json(replitUser);
       }
       
       res.status(401).json({ message: "Unauthorized" });
