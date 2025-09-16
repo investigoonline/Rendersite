@@ -355,10 +355,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid email or password" });
       }
       
-      // Skip email verification in development mode for easier testing
-      if (!user.isEmailVerified && process.env.NODE_ENV !== 'development') {
-        return res.status(400).json({ message: "Please verify your email before logging in" });
-      }
+      // Email verification removed - users can login immediately after registration
       
       // Create session (store user in session)
       (req as any).session.user = {
