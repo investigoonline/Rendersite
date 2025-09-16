@@ -116,32 +116,63 @@ const calculatorCategories = [
 ];
 
 export default function Calculators() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isGuestUser, isRegisteredUser, hasCalculatorAccess, accessLevel } = useAuth();
   const { toast } = useToast();
   const [location] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState("wealth_management");
   const [selectedCalculator, setSelectedCalculator] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Handle URL parameters for direct calculator access
+  // Synchronize selectedCategory with user access level to prevent empty tabs
+  useEffect(() => {
+    // Only update if current category is not accessible
+    if (!hasCalculatorAccess(selectedCategory)) {
+      const defaultCategory = isGuestUser ? "vehicle_financing" : "wealth_management";
+      setSelectedCategory(defaultCategory);
+    }
+  }, [isGuestUser, hasCalculatorAccess, selectedCategory]);
+
+  // Handle URL parameters for direct calculator access with access control
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const calculator = urlParams.get('calculator');
     const category = urlParams.get('category');
     
     if (calculator) {
-      setSelectedCalculator(calculator);
       // Find the category for this calculator
       const foundCategory = calculatorCategories.find(cat => 
         cat.calculators.some(calc => calc.id === calculator)
       );
-      if (foundCategory) {
+      
+      // Check if user has access to this calculator's category
+      if (foundCategory && hasCalculatorAccess(foundCategory.id)) {
+        setSelectedCalculator(calculator);
         setSelectedCategory(foundCategory.id);
+      } else {
+        // Redirect to accessible default category if no access
+        setSelectedCategory(isGuestUser ? "vehicle_financing" : "wealth_management");
+        toast({
+          title: "Access Restricted",
+          description: isGuestUser 
+            ? "Guest users have access to Vehicle Financing calculators only. Create a full account for access to all calculators."
+            : "You need to log in to access this calculator.",
+          variant: "destructive",
+        });
       }
-    } else if (category) {
+    } else if (category && hasCalculatorAccess(category)) {
       setSelectedCategory(category);
+    } else if (category) {
+      // Set default accessible category if user doesn't have access
+      setSelectedCategory(isGuestUser ? "vehicle_financing" : "wealth_management");
+      toast({
+        title: "Access Restricted",
+        description: isGuestUser 
+          ? "Guest users have access to Vehicle Financing calculators only."
+          : "You need to log in to access this category.",
+        variant: "destructive",
+      });
     }
-  }, [location]);
+  }, [location, isGuestUser, hasCalculatorAccess]);
 
   // Get user's saved calculations
   const { data: savedCalculations } = useQuery<any[]>({
@@ -149,7 +180,12 @@ export default function Calculators() {
     enabled: isAuthenticated,
   });
 
-  const filteredCategories = calculatorCategories.filter(category =>
+  // Filter categories based on access control and search term
+  const accessibleCategories = calculatorCategories.filter(category => 
+    hasCalculatorAccess(category.id)
+  );
+
+  const filteredCategories = accessibleCategories.filter(category =>
     category.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     category.calculators.some(calc => 
       calc.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -225,15 +261,21 @@ export default function Calculators() {
           <Card>
             <CardContent className="p-6 text-center">
               <Calculator className="h-8 w-8 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-900">32+</div>
-              <div className="text-sm text-muted-foreground">Total Calculators</div>
+              <div className="text-2xl font-bold text-gray-900">
+                {accessibleCategories.reduce((total, cat) => total + cat.calculators.length, 0)}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {accessLevel === "limited" ? "Available" : "Total"} Calculators
+              </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-6 text-center">
               <PieChart className="h-8 w-8 text-secondary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-900">8</div>
-              <div className="text-sm text-muted-foreground">Categories</div>
+              <div className="text-2xl font-bold text-gray-900">{accessibleCategories.length}</div>
+              <div className="text-sm text-muted-foreground">
+                {accessLevel === "limited" ? "Available" : "Total"} Categories
+              </div>
             </CardContent>
           </Card>
           <Card>
@@ -249,12 +291,18 @@ export default function Calculators() {
 
         <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="space-y-8">
           {/* Category Tabs */}
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 h-auto">
-            {calculatorCategories.map((category) => (
+          <TabsList className={`grid w-full h-auto ${
+            accessibleCategories.length === 1 ? 'grid-cols-1' :
+            accessibleCategories.length <= 2 ? 'grid-cols-2' :
+            accessibleCategories.length <= 4 ? 'grid-cols-2 sm:grid-cols-4' :
+            'grid-cols-2 sm:grid-cols-4 lg:grid-cols-8'
+          }`}>
+            {accessibleCategories.map((category) => (
               <TabsTrigger
                 key={category.id}
                 value={category.id}
                 className="text-xs flex-col h-auto py-2 px-1 sm:px-3"
+                data-testid={`tab-${category.id}`}
               >
                 <category.icon className="h-4 w-4 mr-1" />
                 <span className="hidden lg:inline">{category.title.split(' ')[0]}</span>
@@ -263,7 +311,7 @@ export default function Calculators() {
           </TabsList>
 
           {/* Category Content */}
-          {calculatorCategories.map((category) => (
+          {accessibleCategories.map((category) => (
             <TabsContent key={category.id} value={category.id} className="space-y-6">
               <div className="text-center">
                 <Badge className="mb-4">
@@ -302,8 +350,35 @@ export default function Calculators() {
           ))}
         </Tabs>
 
-        {/* Access Notice for Guests */}
-        {!isAuthenticated && (
+        {/* Access Notice based on user type */}
+        {isGuestUser && (
+          <Card className="mt-12 border-secondary/20 bg-secondary/5">
+            <CardContent className="p-8 text-center">
+              <Car className="h-12 w-12 text-secondary mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Guest Access - Vehicle Financing Only
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                You currently have access to 2 Vehicle Financing calculators. 
+                Create a full account to unlock all 32+ calculators across 8 categories.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button onClick={() => window.location.href = "/register"} data-testid="button-upgrade-guest">
+                  Upgrade to Full Access
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => window.location.href = "/api/login"}
+                  data-testid="button-login-guest"
+                >
+                  Login Existing Account
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
+        {!isAuthenticated && !isGuestUser && (
           <Card className="mt-12 border-primary/20 bg-primary/5">
             <CardContent className="p-8 text-center">
               <Calculator className="h-12 w-12 text-primary mx-auto mb-4" />
@@ -311,17 +386,18 @@ export default function Calculators() {
                 Full Calculator Access Available
               </h3>
               <p className="text-muted-foreground mb-6">
-                Get unlimited access to all calculators, save your results, and export professional reports.
+                Get unlimited access to all 32+ calculators, save your results, and export professional reports.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button onClick={() => window.location.href = "/api/login"}>
-                  Login to Full Account
+                <Button onClick={() => window.location.href = "/register"} data-testid="button-register-full">
+                  Create Full Account
                 </Button>
                 <Button 
                   variant="outline"
-                  onClick={() => toast({ title: "Guest Access", description: "Guest signup modal would open here" })}
+                  onClick={() => window.location.href = "/api/login"}
+                  data-testid="button-login-full"
                 >
-                  Start Free Trial
+                  Login Existing Account
                 </Button>
               </div>
             </CardContent>
