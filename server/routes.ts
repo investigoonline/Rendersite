@@ -16,6 +16,26 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
+// Middleware to check if user has required role
+async function requireRole(req: any, res: any, roles: string[]): Promise<boolean> {
+  const userId = req.session?.user?.id || req.user?.claims?.sub;
+  
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized - Please log in" });
+    return false;
+  }
+
+  for (const role of roles) {
+    const hasRole = await storage.checkUserHasRole(userId, role);
+    if (hasRole) {
+      return true;
+    }
+  }
+
+  res.status(403).json({ message: "Forbidden - Insufficient permissions" });
+  return false;
+}
+
 // Safe arithmetic expression parser for captcha
 function evaluateMathExpression(expression: string): number | null {
   // Remove all whitespace
@@ -547,6 +567,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/users/:userId/roles', async (req, res) => {
     try {
+      // Only super_admin can assign roles
+      const authorized = await requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
       const roleData = insertUserRoleSchema.parse({
         userId: req.params.userId,
         roleId: req.body.roleId,
@@ -561,6 +585,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete('/api/users/:userId/roles/:roleId', async (req, res) => {
     try {
+      // Only super_admin can remove roles
+      const authorized = await requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
       await storage.removeUserRole(req.params.userId, req.params.roleId);
       res.json({ message: "Role removed successfully" });
     } catch (error) {
@@ -609,6 +637,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/content', async (req, res) => {
     try {
+      // Only super_admin and content_manager can create content
+      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
+      if (!authorized) return;
+
       const contentData = insertPageContentSchema.parse(req.body);
       const content = await storage.createPageContent(contentData);
       res.json(content);
@@ -620,6 +652,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/content/:id', async (req, res) => {
     try {
+      // Only super_admin and content_manager can update content
+      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
+      if (!authorized) return;
+
       const content = await storage.updatePageContent(req.params.id, req.body);
       res.json(content);
     } catch (error) {
@@ -630,6 +666,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete('/api/content/:id', async (req, res) => {
     try {
+      // Only super_admin and content_manager can delete content
+      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
+      if (!authorized) return;
+
       await storage.deletePageContent(req.params.id);
       res.json({ message: "Content deleted successfully" });
     } catch (error) {

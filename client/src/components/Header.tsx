@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +20,19 @@ export default function Header() {
   const [guestModalOpen, setGuestModalOpen] = useState(false);
   const [clientModalOpen, setClientModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Check if user has content management access
+  const { data: hasContentAccess } = useQuery({
+    queryKey: ['/api/users', user?.id, 'content-access'],
+    enabled: !!user?.id && isRegisteredUser,
+    queryFn: async () => {
+      const [contentManagerCheck, superAdminCheck] = await Promise.all([
+        fetch(`/api/users/${user?.id}/has-role/content_manager`).then(r => r.json()),
+        fetch(`/api/users/${user?.id}/has-role/super_admin`).then(r => r.json())
+      ]);
+      return contentManagerCheck.hasRole || superAdminCheck.hasRole;
+    }
+  });
 
   const navigation = [
     { name: "Home", href: "/" },
@@ -124,6 +138,11 @@ export default function Header() {
                         <DropdownMenuItem>
                           <Link href="/profile" data-testid="link-profile">Profile</Link>
                         </DropdownMenuItem>
+                        {hasContentAccess && (
+                          <DropdownMenuItem>
+                            <Link href="/content-management" data-testid="link-content-management">Content Management</Link>
+                          </DropdownMenuItem>
+                        )}
                       </>
                     )}
                     {isGuestUser && (
@@ -212,6 +231,13 @@ export default function Header() {
                                 Profile
                               </Link>
                             </Button>
+                            {hasContentAccess && (
+                              <Button variant="outline" className="w-full" asChild>
+                                <Link href="/content-management" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-link-content-management">
+                                  Content Management
+                                </Link>
+                              </Button>
+                            )}
                           </>
                         )}
                         {isGuestUser && (
