@@ -78,18 +78,11 @@ export function useAuth() {
   const logout = async () => {
     if (isRegisteredUser) {
       try {
-        // Check if user is Replit authenticated (has specific identifier)
-        if (user?.authType === "replit") {
-          // For Replit users, redirect to Replit logout endpoint
-          window.location.href = "/api/logout";
-        } else {
-          // For traditional users, call the traditional logout endpoint
-          await apiRequest("POST", "/api/auth/logout");
-          // Clear user query cache after successful logout
-          queryClient.removeQueries({ queryKey: ["/api/auth/user"] });
-          // Redirect to home page
-          window.location.href = "/";
-        }
+        await apiRequest("POST", "/api/auth/logout");
+        // Clear user query cache after successful logout
+        queryClient.removeQueries({ queryKey: ["/api/auth/user"] });
+        // Redirect to home page
+        window.location.href = "/";
       } catch (error) {
         console.error("Logout failed:", error);
         // Force logout by clearing cache and redirecting

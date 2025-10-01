@@ -22,9 +22,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
 import { Captcha } from "@/components/Captcha";
-import { User, ExternalLink } from "lucide-react";
+import { User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -63,7 +62,7 @@ export default function ClientLoginModal({ open, onOpenChange }: ClientLoginModa
     onSuccess: () => {
       toast({
         title: "Login Successful",
-        description: "Welcome back!",
+        description: "Welcome back to your account!",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       onOpenChange(false);
@@ -74,22 +73,17 @@ export default function ClientLoginModal({ open, onOpenChange }: ClientLoginModa
     onError: (error: any) => {
       toast({
         title: "Login Failed",
-        description: error.message || "Invalid email or password. Please try again.",
+        description: error.message || "The email or password you entered is incorrect. Please try again.",
         variant: "destructive",
       });
     },
   });
 
-  const handleReplitLogin = () => {
-    // Redirect to Replit Auth login (backend will handle redirect back to home)
-    window.location.href = "/api/login";
-  };
-
   const onSubmit = (data: LoginForm) => {
     if (!captcha.question || !captcha.answer) {
       toast({
-        title: "Captcha Required",
-        description: "Please complete the security check.",
+        title: "Security Check Required",
+        description: "Please complete the security verification to continue.",
         variant: "destructive",
       });
       return;
@@ -172,27 +166,7 @@ export default function ClientLoginModal({ open, onOpenChange }: ClientLoginModa
             </form>
           </Form>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <Separator />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or</span>
-            </div>
-          </div>
-
-          {/* Replit Auth Login */}
-          <Button
-            variant="outline"
-            onClick={handleReplitLogin}
-            className="w-full"
-            data-testid="button-replit-login"
-          >
-            <ExternalLink className="h-4 w-4 mr-2" />
-            Login with Replit
-          </Button>
-
-          <div className="text-center text-sm">
+          <div className="text-center text-sm mt-4">
             <span className="text-muted-foreground">Don't have an account? </span>
             <Link href="/register">
               <Button

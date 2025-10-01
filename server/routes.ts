@@ -135,13 +135,9 @@ function safeArithmeticEvaluator(expression: string): number {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
-
   // Auth routes
   app.get('/api/auth/user', async (req: any, res) => {
     try {
-      // Check for traditional authentication first
       if (req.session?.user) {
         const user = await storage.getUser(req.session.user.id);
         if (user) {
@@ -149,50 +145,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Then check for Replit authentication
-      if (req.user?.claims?.sub) {
-        const userId = req.user.claims.sub;
-        const user = await storage.getUser(userId);
-        if (user) {
-          return res.json({ ...user, authType: "replit" });
-        }
-        
-        // For Replit users, create a virtual user object with claims data
-        const replitUser = {
-          id: userId,
-          email: req.user.claims.email || `${userId}@replit.com`,
-          firstName: req.user.claims.first_name || req.user.claims.name?.split(' ')[0] || 'User',
-          lastName: req.user.claims.last_name || req.user.claims.name?.split(' ').slice(1).join(' ') || '',
-          isEmailVerified: true,
-          authType: "replit"
-        };
-        return res.json(replitUser);
-      }
-      
-      res.status(401).json({ message: "Unauthorized" });
+      res.status(401).json({ message: "Please log in to access this resource" });
     } catch (error) {
       console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
+      res.status(500).json({ message: "Unable to retrieve user information at this time" });
     }
   });
 
-  // Traditional logout route
+  // Logout route
   app.post('/api/auth/logout', async (req: any, res) => {
     try {
       if (req.session?.user) {
         req.session.destroy((err: any) => {
           if (err) {
             console.error("Error destroying session:", err);
-            return res.status(500).json({ message: "Failed to logout" });
+            return res.status(500).json({ message: "Unable to complete logout. Please try again" });
           }
-          res.json({ message: "Logged out successfully" });
+          res.json({ message: "You have been successfully logged out" });
         });
       } else {
-        res.json({ message: "Already logged out" });
+        res.json({ message: "You are already logged out" });
       }
     } catch (error) {
       console.error("Error during logout:", error);
-      res.status(500).json({ message: "Failed to logout" });
+      res.status(500).json({ message: "Unable to complete logout. Please try again" });
     }
   });
 
