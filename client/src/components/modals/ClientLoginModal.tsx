@@ -69,6 +69,7 @@ export default function ClientLoginModal({ open, onOpenChange }: ClientLoginModa
       onOpenChange(false);
       form.reset();
       setCaptcha({ question: "", answer: "" });
+      window.location.href = "/";
     },
     onError: (error: any) => {
       toast({
@@ -80,7 +81,7 @@ export default function ClientLoginModal({ open, onOpenChange }: ClientLoginModa
   });
 
   const handleReplitLogin = () => {
-    // Redirect to Replit Auth login
+    // Redirect to Replit Auth login (backend will handle redirect back to home)
     window.location.href = "/api/login";
   };
 

@@ -101,8 +101,8 @@ export default function GuestAccessModal({ open, onOpenChange }: GuestAccessModa
       onOpenChange(false);
       loginForm.reset();
       setCaptcha({ question: "", answer: "" });
-      // Reload page to update auth state
-      window.location.reload();
+      // Redirect to home page
+      window.location.href = "/";
     },
     onError: (error: any) => {
       toast({
