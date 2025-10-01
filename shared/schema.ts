@@ -15,7 +15,7 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Session storage table - Required for Replit Auth
+// Session storage table
 export const sessions = pgTable(
   "sessions",
   {
@@ -35,21 +35,21 @@ export const userRoleEnum = pgEnum('user_role', [
   'client'
 ]);
 
-// User storage table - Required for Replit Auth + Traditional Registration
+// User storage table
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email").unique(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   phone: varchar("phone", { length: 20 }),
-  password: varchar("password", { length: 255 }), // For traditional registration
+  password: varchar("password", { length: 255 }),
   profileImageUrl: varchar("profile_image_url"),
   role: userRoleEnum("role").default('client'),
   isEmailVerified: boolean("is_email_verified").default(false),
   emailVerificationToken: varchar("email_verification_token"),
   resetPasswordToken: varchar("reset_password_token"),
   resetPasswordExpires: timestamp("reset_password_expires"),
-  authType: varchar("auth_type").default("replit"), // "replit" or "traditional"
+  authType: varchar("auth_type").default("traditional"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
