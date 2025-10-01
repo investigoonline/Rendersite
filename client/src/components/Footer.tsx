@@ -1,7 +1,33 @@
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { ChartLine, Linkedin, Twitter, Facebook } from "lucide-react";
+import type { PageContent } from "@shared/schema";
 
 export default function Footer() {
+  // Fetch footer content
+  const { data: footerContent } = useQuery<PageContent[]>({
+    queryKey: ['/api/content', 'footer'],
+    queryFn: async () => {
+      const res = await fetch('/api/content?page=footer', {
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch footer: ${res.statusText}`);
+      }
+      return res.json();
+    },
+  });
+
+  // Helper to get content by section
+  const getSection = (sectionName: string) => {
+    return footerContent?.find(c => c.section === sectionName);
+  };
+
+  const companyDetails = getSection('footer_company_details')?.content as any;
+  const platformLinks = getSection('footer_platform')?.content as any;
+  const resourcesLinks = getSection('footer_resources')?.content as any;
+  const companyLinks = getSection('footer_company')?.content as any;
+
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -13,59 +39,91 @@ export default function Footer() {
                 <ChartLine className="text-white h-4 w-4" />
               </div>
               <div>
-                <h3 className="text-lg font-bold">Investigoonline</h3>
+                <h3 className="text-lg font-bold" data-testid="text-footer-company-name">
+                  {companyDetails?.name || 'Investigoonline'}
+                </h3>
                 <p className="text-xs text-gray-400">by IFS Group</p>
               </div>
             </div>
-            <p className="text-gray-400 text-sm mb-4">
-              Professional financial planning platform powered by 40+ years of IFS Group expertise.
+            <p className="text-gray-400 text-sm mb-4" data-testid="text-footer-tagline">
+              {companyDetails?.tagline || 'Professional financial planning platform powered by 40+ years of IFS Group expertise.'}
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-linkedin">
                 <Linkedin className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-twitter">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-facebook">
                 <Facebook className="h-5 w-5" />
               </a>
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Platform Links */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Platform</h4>
+            <h4 className="text-lg font-semibold mb-4" data-testid="text-footer-platform-title">
+              {platformLinks?.title || 'Platform'}
+            </h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/calculators" className="text-gray-400 hover:text-white transition-colors">Financial Calculators</Link></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Guest Access</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Client Login</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Mobile App</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">API Documentation</a></li>
+              {platformLinks?.links?.map((link: any, index: number) => (
+                <li key={index}>
+                  {link.href.startsWith('/') ? (
+                    <Link href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-platform-${index}`}>
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-platform-${index}`}>
+                      {link.label}
+                    </a>
+                  )}
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Resources */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Resources</h4>
+            <h4 className="text-lg font-semibold mb-4" data-testid="text-footer-resources-title">
+              {resourcesLinks?.title || 'Resources'}
+            </h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/resources?type=article" className="text-gray-400 hover:text-white transition-colors">Articles & Insights</Link></li>
-              <li><Link href="/resources?type=video" className="text-gray-400 hover:text-white transition-colors">Video Library</Link></li>
-              <li><Link href="/resources?type=newsletter" className="text-gray-400 hover:text-white transition-colors">Market Newsletters</Link></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">FAQ Database</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
+              {resourcesLinks?.links?.map((link: any, index: number) => (
+                <li key={index}>
+                  {link.href.startsWith('/') ? (
+                    <Link href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-resources-${index}`}>
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-resources-${index}`}>
+                      {link.label}
+                    </a>
+                  )}
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Company */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Company</h4>
+            <h4 className="text-lg font-semibold mb-4" data-testid="text-footer-company-title">
+              {companyLinks?.title || 'Company'}
+            </h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/about" className="text-gray-400 hover:text-white transition-colors">About IFS Group</Link></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Leadership Team</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Careers</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Press & Media</a></li>
-              <li><Link href="/contact" className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
+              {companyLinks?.links?.map((link: any, index: number) => (
+                <li key={index}>
+                  {link.href.startsWith('/') ? (
+                    <Link href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-company-${index}`}>
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-company-${index}`}>
+                      {link.label}
+                    </a>
+                  )}
+                </li>
+              ))}
             </ul>
           </div>
         </div>
