@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,9 +13,42 @@ import {
   ChevronRight,
   CreditCard
 } from "lucide-react";
+import type { PageContent } from "@shared/schema";
 
 export default function Home() {
   const { user } = useAuth();
+
+  // Fetch home page content
+  const { data: homeContent } = useQuery<PageContent[]>({
+    queryKey: ['/api/content', 'home'],
+  });
+
+  // Extract content sections
+  const heroContent = homeContent?.find(c => c.section === 'home_hero')?.content as { title?: string; subtitle?: string } | undefined;
+  const statsContent = homeContent?.find(c => c.section === 'home_stats')?.content as { stats?: Array<{ icon: string; label: string; value: string }> } | undefined;
+
+  // Helper to get icon component by name
+  const getIcon = (iconName: string) => {
+    const icons: Record<string, any> = {
+      Calculator,
+      TrendingUp,
+      PieChart,
+      FileText,
+      Clock,
+      CreditCard,
+    };
+    return icons[iconName] || Calculator;
+  };
+
+  // Default stats if no content is loaded
+  const defaultStats = [
+    { icon: "Calculator", label: "Calculations Saved", value: "12" },
+    { icon: "TrendingUp", label: "Net Worth Growth", value: "+8.4%" },
+    { icon: "PieChart", label: "Portfolio Value", value: "$1.2M" },
+    { icon: "FileText", label: "Reports Generated", value: "8" }
+  ];
+
+  const stats = statsContent?.stats || defaultStats;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -22,70 +56,35 @@ export default function Home() {
         {/* Welcome Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            Welcome back, {user?.firstName || user?.email}
+            {heroContent?.title || `Welcome back, ${user?.firstName || user?.email}`}
           </h1>
           <p className="text-muted-foreground mt-2">
-            Manage your financial planning and track your progress.
+            {heroContent?.subtitle || "Manage your financial planning and track your progress."}
           </p>
         </div>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
-          <Card>
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center">
-                <Calculator className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
-                <div className="ml-3 sm:ml-4 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
-                    Calculations Saved
-                  </p>
-                  <p className="text-xl sm:text-2xl font-bold">12</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center">
-                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-secondary flex-shrink-0" />
-                <div className="ml-3 sm:ml-4 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
-                    Net Worth Growth
-                  </p>
-                  <p className="text-xl sm:text-2xl font-bold">+8.4%</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center">
-                <PieChart className="h-6 w-6 sm:h-8 sm:w-8 text-accent flex-shrink-0" />
-                <div className="ml-3 sm:ml-4 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
-                    Portfolio Value
-                  </p>
-                  <p className="text-xl sm:text-2xl font-bold">$1.2M</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center">
-                <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
-                <div className="ml-3 sm:ml-4 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
-                    Reports Generated
-                  </p>
-                  <p className="text-xl sm:text-2xl font-bold">8</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {stats.map((stat, index) => {
+            const IconComponent = getIcon(stat.icon);
+            const colorClass = index % 3 === 0 ? 'text-primary' : index % 3 === 1 ? 'text-secondary' : 'text-accent';
+            
+            return (
+              <Card key={index}>
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center">
+                    <IconComponent className={`h-6 w-6 sm:h-8 sm:w-8 ${colorClass} flex-shrink-0`} />
+                    <div className="ml-3 sm:ml-4 min-w-0">
+                      <p className="text-xs sm:text-sm font-medium text-muted-foreground">
+                        {stat.label}
+                      </p>
+                      <p className="text-xl sm:text-2xl font-bold">{stat.value}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
