@@ -607,6 +607,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Bootstrap super admin (one-time setup)
+  app.post('/api/bootstrap', async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+      
+      // Call bootstrap method which checks if super_admin already exists
+      const user = await storage.bootstrapSuperAdmin(email);
+      
+      res.json({ 
+        message: "Super admin bootstrapped successfully",
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName
+        }
+      });
+    } catch (error: any) {
+      console.error("Error bootstrapping super admin:", error);
+      res.status(400).json({ message: error.message || "Failed to bootstrap super admin" });
+    }
+  });
+
+  // Admin routes for user management
+  app.get('/api/admin/users', async (req, res) => {
+    try {
+      // Only super_admin can view all users
+      const authorized = await requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const users = await storage.getAllUsersWithRoles();
+      
+      // Remove sensitive data
+      const sanitizedUsers = users.map(user => ({
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        authType: user.authType,
+        isEmailVerified: user.isEmailVerified,
+        createdAt: user.createdAt,
+        roles: user.roles
+      }));
+      
+      res.json(sanitizedUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
   // Content management routes
   app.get('/api/content', async (req, res) => {
     try {
