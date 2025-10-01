@@ -13,7 +13,15 @@ import { Shield, Save, Plus, Trash2, Edit, Lock, Users } from "lucide-react";
 import type { PageContent, User, Role } from "@shared/schema";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FormRenderer } from "@/components/FormRenderer";
-import { getSectionSchema } from "@shared/contentSchemas";
+import { getSectionSchema, pageSections } from "@shared/contentSchemas";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -50,6 +58,8 @@ export default function ContentManagement() {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [formData, setFormData] = useState<any>({});
   const [mainTab, setMainTab] = useState("content");
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [selectedSectionType, setSelectedSectionType] = useState<string>("");
 
   // Check if user has content manager or super admin role
   const { data: hasAccess, isLoading: checkingAccess } = useQuery({
@@ -236,6 +246,19 @@ export default function ContentManagement() {
     setFormData({});
   };
 
+  const handleCreateSection = async (data: any) => {
+    await createContentMutation.mutateAsync({
+      page: selectedPage,
+      section: selectedSectionType,
+      content: data,
+      published: true,
+      createdBy: user?.id,
+      updatedBy: user?.id,
+    });
+    setShowCreateDialog(false);
+    setSelectedSectionType("");
+  };
+
   if (checkingAccess) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -312,6 +335,90 @@ export default function ContentManagement() {
                 <TabsTrigger value="contact" data-testid="tab-contact">Contact</TabsTrigger>
                 <TabsTrigger value="resources" data-testid="tab-resources">Resources</TabsTrigger>
               </TabsList>
+
+              {/* Add Section Button */}
+              <div className="flex justify-between items-center">
+                <h2 className="text-lg font-semibold">Content Sections</h2>
+                <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                  <DialogTrigger asChild>
+                    <Button data-testid="button-add-section">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Section
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Add New Content Section</DialogTitle>
+                      <DialogDescription>
+                        Select a section type for the {selectedPage} page and fill in the content.
+                      </DialogDescription>
+                    </DialogHeader>
+                    
+                    {!selectedSectionType ? (
+                      <div className="space-y-2">
+                        <Label>Select Section Type</Label>
+                        <div className="grid grid-cols-1 gap-2">
+                          {pageSections[selectedPage]?.map((sectionType) => {
+                            const schema = getSectionSchema(sectionType);
+                            // Check if section already exists
+                            const exists = pageContent?.some(s => s.section === sectionType);
+                            
+                            return (
+                              <Button
+                                key={sectionType}
+                                variant="outline"
+                                className="justify-start h-auto py-3 px-4"
+                                onClick={() => setSelectedSectionType(sectionType)}
+                                disabled={exists && !schema?.allowMultiple}
+                                data-testid={`button-section-type-${sectionType}`}
+                              >
+                                <div className="text-left">
+                                  <div className="font-semibold">{schema?.label || sectionType}</div>
+                                  <div className="text-sm text-muted-foreground">
+                                    {schema?.description || 'No description'}
+                                  </div>
+                                  {exists && !schema?.allowMultiple && (
+                                    <div className="text-xs text-yellow-600 mt-1">Already exists</div>
+                                  )}
+                                </div>
+                              </Button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedSectionType("")}
+                          className="mb-4"
+                          data-testid="button-back"
+                        >
+                          ← Back to section types
+                        </Button>
+                        {(() => {
+                          const schema = getSectionSchema(selectedSectionType);
+                          if (!schema) return <div>Schema not found</div>;
+                          
+                          return (
+                            <FormRenderer
+                              schema={schema}
+                              defaultValues={{}}
+                              onSubmit={handleCreateSection}
+                              onCancel={() => {
+                                setShowCreateDialog(false);
+                                setSelectedSectionType("");
+                              }}
+                              isSubmitting={createContentMutation.isPending}
+                            />
+                          );
+                        })()}
+                      </div>
+                    )}
+                  </DialogContent>
+                </Dialog>
+              </div>
 
               {/* Content Sections */}
               {isLoading ? (
