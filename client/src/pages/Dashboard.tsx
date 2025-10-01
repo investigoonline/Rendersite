@@ -1,9 +1,12 @@
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, UserCheck, Calculator, FileText } from "lucide-react";
-import type { PageContent, LoginHistory } from "@shared/schema";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Users, UserCheck, Calculator, FileText, Shield } from "lucide-react";
+import type { PageContent, LoginHistory, User } from "@shared/schema";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface DashboardStats {
   guestUserCount: number;
@@ -12,8 +15,13 @@ interface DashboardStats {
   totalResources: number;
 }
 
+interface UserWithRoles extends User {
+  roles: any[];
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
+  const { toast } = useToast();
 
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
     queryKey: ['/api/admin/dashboard-stats'],
@@ -25,6 +33,33 @@ export default function Dashboard() {
 
   const { data: loginHistory } = useQuery<LoginHistory[]>({
     queryKey: ['/api/admin/login-history'],
+  });
+
+  const { data: allUsers, isLoading: usersLoading } = useQuery<UserWithRoles[]>({
+    queryKey: ['/api/admin/users'],
+  });
+
+  const updateRoleMutation = useMutation({
+    mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
+      return apiRequest(`/api/admin/users/${userId}/role`, {
+        method: 'PUT',
+        body: JSON.stringify({ role }),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      toast({
+        title: "Success",
+        description: "User role updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update user role",
+        variant: "destructive",
+      });
+    },
   });
 
   // Helper to get content by section
@@ -109,6 +144,85 @@ export default function Dashboard() {
             );
           })}
         </div>
+
+        {/* Role Management */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Shield className="h-5 w-5 mr-2 text-primary" />
+              Role Management
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {usersLoading ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : allUsers && allUsers.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium text-gray-700" data-testid="header-name">Name</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-700" data-testid="header-email">Email</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-700" data-testid="header-auth-type">Auth Type</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-700" data-testid="header-role">Role</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allUsers.map((u, index) => (
+                      <tr key={u.id} className="border-b hover:bg-gray-50" data-testid={`user-row-${index}`}>
+                        <td className="py-3 px-4" data-testid={`user-name-${index}`}>
+                          {u.firstName} {u.lastName}
+                        </td>
+                        <td className="py-3 px-4" data-testid={`user-email-${index}`}>
+                          {u.email}
+                        </td>
+                        <td className="py-3 px-4" data-testid={`user-authtype-${index}`}>
+                          <Badge variant="outline">{u.authType}</Badge>
+                        </td>
+                        <td className="py-3 px-4" data-testid={`user-role-${index}`}>
+                          <Select
+                            value={u.role || 'client'}
+                            onValueChange={(role) => {
+                              updateRoleMutation.mutate({ userId: u.id, role });
+                            }}
+                            disabled={updateRoleMutation.isPending}
+                          >
+                            <SelectTrigger className="w-[200px]" data-testid={`select-role-${index}`}>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="super_admin" data-testid={`role-option-super-admin-${index}`}>
+                                Super Admin
+                              </SelectItem>
+                              <SelectItem value="content_manager" data-testid={`role-option-content-manager-${index}`}>
+                                Content Manager
+                              </SelectItem>
+                              <SelectItem value="guest_user" data-testid={`role-option-guest-user-${index}`}>
+                                Guest User
+                              </SelectItem>
+                              <SelectItem value="preferred_client" data-testid={`role-option-preferred-client-${index}`}>
+                                Preferred Client
+                              </SelectItem>
+                              <SelectItem value="client" data-testid={`role-option-client-${index}`}>
+                                Client
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">
+                No users to display
+              </p>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Login History */}
         <Card className="mb-8">
