@@ -54,24 +54,6 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Guest account types enum
-export const guestTypeEnum = pgEnum('guest_type', ['basic', 'enhanced', 'guided']);
-
-// Guest accounts table
-export const guestAccounts = pgTable("guest_accounts", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  phone: varchar("phone", { length: 20 }),
-  guestType: guestTypeEnum("guest_type").default('basic'),
-  verified: boolean("verified").default(false),
-  verificationToken: varchar("verification_token"),
-  referralCode: varchar("referral_code"),
-  advisorId: varchar("advisor_id"),
-  expiresAt: timestamp("expires_at").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-  lastActivity: timestamp("last_activity").defaultNow(),
-});
-
 // Calculator categories enum
 export const calculatorCategoryEnum = pgEnum('calculator_category', [
   'wealth_management',
@@ -88,7 +70,6 @@ export const calculatorCategoryEnum = pgEnum('calculator_category', [
 export const calculations = pgTable("calculations", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id"),
-  guestId: uuid("guest_id"),
   calculatorType: varchar("calculator_type").notNull(),
   category: calculatorCategoryEnum("category").notNull(),
   inputs: jsonb("inputs").notNull(),
@@ -139,7 +120,6 @@ export const contactMessages = pgTable("contact_messages", {
 export const netWorthSnapshots = pgTable("net_worth_snapshots", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id"),
-  guestId: uuid("guest_id"),
   totalAssets: decimal("total_assets", { precision: 15, scale: 2 }),
   totalLiabilities: decimal("total_liabilities", { precision: 15, scale: 2 }),
   netWorth: decimal("net_worth", { precision: 15, scale: 2 }),
@@ -169,7 +149,6 @@ export const userRoles = pgTable("user_roles", {
 export const loginHistory = pgTable("login_history", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id"),
-  guestId: uuid("guest_id"),
   email: varchar("email", { length: 255 }).notNull(),
   loginAt: timestamp("login_at").defaultNow(),
   ipAddress: varchar("ip_address"),
@@ -280,13 +259,7 @@ export const insertUserBackendSchema = createInsertSchema(users).omit({
   lastName: z.string().min(1, "Last name is required"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
-export const insertGuestAccountSchema = createInsertSchema(guestAccounts).omit({
-  id: true,
-  createdAt: true,
-  lastActivity: true,
-  expiresAt: true,
-  verificationToken: true,
-});
+
 export const insertCalculationSchema = createInsertSchema(calculations).omit({
   id: true,
   createdAt: true,
@@ -327,8 +300,6 @@ export type UpsertUser = z.infer<typeof upsertUserSchema>;
 export type InsertUserRegistration = z.infer<typeof insertUserRegistrationSchema>;
 export type InsertUserBackend = z.infer<typeof insertUserBackendSchema>;
 export type User = typeof users.$inferSelect;
-export type GuestAccount = typeof guestAccounts.$inferSelect;
-export type InsertGuestAccount = z.infer<typeof insertGuestAccountSchema>;
 export type Calculation = typeof calculations.$inferSelect;
 export type InsertCalculation = z.infer<typeof insertCalculationSchema>;
 export type Resource = typeof resources.$inferSelect;
