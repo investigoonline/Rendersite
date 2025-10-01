@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,12 +14,22 @@ import {
   Calendar,
   Phone
 } from "lucide-react";
+import type { PageContent } from "@shared/schema";
 
-const services = [
+interface ServiceContent {
+  id: string;
+  title: string;
+  icon: string;
+  description: string;
+  features: string[];
+  color: string;
+}
+
+const defaultServices: ServiceContent[] = [
   {
     id: "investment_management",
     title: "Investment Management",
-    icon: TrendingUp,
+    icon: "TrendingUp",
     description: "Professional portfolio management with institutional-grade strategies and ongoing oversight.",
     features: [
       "Diversification & asset allocation",
@@ -32,7 +43,7 @@ const services = [
   {
     id: "strategic_planning",
     title: "Strategic Financial Planning",
-    icon: FileText,
+    icon: "FileText",
     description: "Comprehensive financial strategies tailored to your life goals and circumstances.",
     features: [
       "Retirement planning strategies",
@@ -46,7 +57,7 @@ const services = [
   {
     id: "legacy_planning",
     title: "Legacy Planning",
-    icon: Users,
+    icon: "Users",
     description: "Preserve and transfer your wealth according to your values and family goals.",
     features: [
       "Estate planning documents review",
@@ -62,7 +73,7 @@ const services = [
   {
     id: "risk_management",
     title: "Risk Management",
-    icon: Shield,
+    icon: "Shield",
     description: "Protect your assets and family with comprehensive insurance and risk analysis.",
     features: [
       "Asset protection strategies",
@@ -76,7 +87,7 @@ const services = [
   {
     id: "special_situations",
     title: "Special Situations Planning",
-    icon: PiggyBank,
+    icon: "PiggyBank",
     description: "Specialized financial guidance for unique life circumstances and transitions.",
     features: [
       "Divorce financial planning and income replacement",
@@ -90,7 +101,7 @@ const services = [
   {
     id: "account_aggregation",
     title: "Account Aggregation",
-    icon: Database,
+    icon: "Database",
     description: "Centralized view and management of all your financial accounts and documents.",
     features: [
       "View all bank and brokerage accounts in one secure place",
@@ -105,6 +116,97 @@ const services = [
 ];
 
 export default function Services() {
+  // Fetch services content with proper query parameter
+  const { data: servicesContent, isLoading, isError } = useQuery<PageContent[]>({
+    queryKey: ['/api/content', 'services'],
+    queryFn: async () => {
+      const res = await fetch('/api/content?page=services', {
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch services: ${res.statusText}`);
+      }
+      return res.json();
+    },
+  });
+
+  // Helper to get icon component by name with type safety
+  type ServiceIcon = 'TrendingUp' | 'Shield' | 'PiggyBank' | 'FileText' | 'Users' | 'Database';
+  
+  const iconMap: Record<ServiceIcon, typeof TrendingUp> = {
+    TrendingUp,
+    Shield,
+    PiggyBank,
+    FileText,
+    Users,
+    Database,
+  };
+  
+  const getIcon = (iconName: string) => {
+    if (iconName in iconMap) {
+      return iconMap[iconName as ServiceIcon];
+    }
+    console.warn(`Unknown icon name: ${iconName}, falling back to FileText`);
+    return FileText;
+  };
+
+  // Extract and transform services from database content with validation
+  let services: ServiceContent[] = defaultServices;
+  
+  if (servicesContent && servicesContent.length > 0) {
+    try {
+      const parsedServices = servicesContent
+        .map(content => content.content as ServiceContent)
+        .filter(service => service && service.id && service.title);
+      
+      if (parsedServices.length > 0) {
+        services = parsedServices;
+      }
+    } catch (error) {
+      console.error("Error parsing services content:", error);
+    }
+  }
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded w-64 mx-auto mb-4"></div>
+              <div className="h-12 bg-gray-200 rounded w-96 mx-auto mb-4"></div>
+              <div className="h-6 bg-gray-200 rounded w-full max-w-3xl mx-auto"></div>
+            </div>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <Card key={i} className="h-full">
+                <CardContent className="p-6">
+                  <div className="animate-pulse">
+                    <div className="h-12 w-12 bg-gray-200 rounded-lg mb-4"></div>
+                    <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-full mb-4"></div>
+                    <div className="space-y-2">
+                      <div className="h-3 bg-gray-200 rounded w-full"></div>
+                      <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+                      <div className="h-3 bg-gray-200 rounded w-4/6"></div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state (but still render with default content)
+  if (isError) {
+    console.error("Failed to load services content, using default content");
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -156,12 +258,14 @@ export default function Services() {
 
         {/* Services Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-12 sm:mb-16 px-4">
-          {services.map((service, index) => (
+          {services.map((service, index) => {
+            const IconComponent = getIcon(service.icon);
+            return (
             <Card key={service.id} className="hover:shadow-lg transition-shadow h-full">
               <CardHeader>
                 <div className="flex items-center space-x-3 mb-4">
                   <div className={`w-12 h-12 bg-${service.color}/10 rounded-lg flex items-center justify-center`}>
-                    <service.icon className={`h-6 w-6 text-${service.color}`} />
+                    <IconComponent className={`h-6 w-6 text-${service.color}`} />
                   </div>
                   <div>
                     <CardTitle className="text-xl">{service.title}</CardTitle>
@@ -184,7 +288,8 @@ export default function Services() {
                 </Button>
               </CardContent>
             </Card>
-          ))}
+            );
+          })}
         </div>
 
         {/* Process Section */}
