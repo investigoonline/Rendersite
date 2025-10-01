@@ -1,0 +1,285 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Plus, Trash2, GripVertical } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { UseFormReturn } from "react-hook-form";
+import * as LucideIcons from "lucide-react";
+import { iconOptions, colorOptions } from "@shared/contentSchemas";
+
+interface ArrayFieldEditorProps {
+  form: UseFormReturn<any>;
+  fieldName: string;
+  label: string;
+  help?: string;
+}
+
+export function ArrayFieldEditor({ form, fieldName, label, help }: ArrayFieldEditorProps) {
+  const values = form.watch(fieldName) || [];
+
+  const addItem = () => {
+    const newItem = getDefaultItemForField(fieldName);
+    form.setValue(fieldName, [...values, newItem]);
+  };
+
+  const removeItem = (index: number) => {
+    const newValues = values.filter((_: any, i: number) => i !== index);
+    form.setValue(fieldName, newValues);
+  };
+
+  const updateItem = (index: number, field: string, value: any) => {
+    const newValues = [...values];
+    if (typeof newValues[index] === 'string') {
+      // Simple string array
+      newValues[index] = value;
+    } else {
+      // Object array
+      newValues[index] = { ...newValues[index], [field]: value };
+    }
+    form.setValue(fieldName, newValues);
+  };
+
+  const moveItem = (index: number, direction: 'up' | 'down') => {
+    const newValues = [...values];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex >= 0 && newIndex < newValues.length) {
+      [newValues[index], newValues[newIndex]] = [newValues[newIndex], newValues[index]];
+      form.setValue(fieldName, newValues);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <div>
+          <Label className="text-base font-semibold">{label}</Label>
+          {help && <p className="text-sm text-muted-foreground mt-1">{help}</p>}
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={addItem}
+          data-testid={`button-add-${fieldName}`}
+        >
+          <Plus className="h-4 w-4 mr-1" />
+          Add Item
+        </Button>
+      </div>
+
+      <div className="space-y-3">
+        {values.length === 0 && (
+          <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
+            No items yet. Click "Add Item" to get started.
+          </div>
+        )}
+        
+        {values.map((item: any, index: number) => (
+          <Card key={index} className="relative">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <GripVertical className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium">
+                    Item {index + 1}
+                  </CardTitle>
+                </div>
+                <div className="flex gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => moveItem(index, 'up')}
+                    disabled={index === 0}
+                    data-testid={`button-move-up-${fieldName}-${index}`}
+                  >
+                    ↑
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => moveItem(index, 'down')}
+                    disabled={index === values.length - 1}
+                    data-testid={`button-move-down-${fieldName}-${index}`}
+                  >
+                    ↓
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeItem(index)}
+                    data-testid={`button-remove-${fieldName}-${index}`}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {renderItemFields(fieldName, item, index, updateItem)}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function getDefaultItemForField(fieldName: string): any {
+  // Stats items
+  if (fieldName === 'stats') {
+    return { label: '', value: '', description: '', icon: 'Target' };
+  }
+  
+  // Features (simple string array)
+  if (fieldName === 'features') {
+    return '';
+  }
+  
+  // Contact content (simple string array)
+  if (fieldName === 'content') {
+    return '';
+  }
+  
+  // Footer links
+  if (fieldName === 'links') {
+    return { label: '', href: '' };
+  }
+  
+  // Default to empty string
+  return '';
+}
+
+function renderItemFields(
+  fieldName: string,
+  item: any,
+  index: number,
+  updateItem: (index: number, field: string, value: any) => void
+) {
+  // Simple string array (features, content)
+  if (typeof item === 'string' || fieldName === 'features' || fieldName === 'content') {
+    return (
+      <div>
+        <Input
+          value={typeof item === 'string' ? item : ''}
+          onChange={(e) => updateItem(index, '', e.target.value)}
+          placeholder={`Enter ${fieldName === 'features' ? 'feature' : 'content line'}`}
+          data-testid={`input-${fieldName}-${index}`}
+        />
+      </div>
+    );
+  }
+
+  // Stats items
+  if (fieldName === 'stats') {
+    return (
+      <>
+        <div>
+          <Label className="text-sm">Label</Label>
+          <Input
+            value={item.label || ''}
+            onChange={(e) => updateItem(index, 'label', e.target.value)}
+            placeholder="e.g., Years of Excellence"
+            data-testid={`input-${fieldName}-${index}-label`}
+          />
+        </div>
+        <div>
+          <Label className="text-sm">Value</Label>
+          <Input
+            value={item.value || ''}
+            onChange={(e) => updateItem(index, 'value', e.target.value)}
+            placeholder="e.g., 40+"
+            data-testid={`input-${fieldName}-${index}-value`}
+          />
+        </div>
+        <div>
+          <Label className="text-sm">Description</Label>
+          <Textarea
+            value={item.description || ''}
+            onChange={(e) => updateItem(index, 'description', e.target.value)}
+            placeholder="Brief description..."
+            rows={2}
+            data-testid={`textarea-${fieldName}-${index}-description`}
+          />
+        </div>
+        <div>
+          <Label className="text-sm">Icon</Label>
+          <Select
+            value={item.icon || 'Target'}
+            onValueChange={(value) => updateItem(index, 'icon', value)}
+          >
+            <SelectTrigger data-testid={`select-${fieldName}-${index}-icon`}>
+              <SelectValue>
+                {item.icon && (
+                  <div className="flex items-center gap-2">
+                    {(() => {
+                      const IconComponent = (LucideIcons as any)[item.icon];
+                      return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
+                    })()}
+                    <span>{item.icon}</span>
+                  </div>
+                )}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {iconOptions.map((option) => {
+                const IconComponent = (LucideIcons as any)[option.value];
+                return (
+                  <SelectItem key={option.value} value={option.value}>
+                    <div className="flex items-center gap-2">
+                      {IconComponent && <IconComponent className="h-4 w-4" />}
+                      <span>{option.label}</span>
+                    </div>
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+      </>
+    );
+  }
+
+  // Footer links
+  if (fieldName === 'links') {
+    return (
+      <>
+        <div>
+          <Label className="text-sm">Label</Label>
+          <Input
+            value={item.label || ''}
+            onChange={(e) => updateItem(index, 'label', e.target.value)}
+            placeholder="e.g., About Us"
+            data-testid={`input-${fieldName}-${index}-label`}
+          />
+        </div>
+        <div>
+          <Label className="text-sm">URL</Label>
+          <Input
+            value={item.href || ''}
+            onChange={(e) => updateItem(index, 'href', e.target.value)}
+            placeholder="e.g., /about"
+            data-testid={`input-${fieldName}-${index}-href`}
+          />
+        </div>
+      </>
+    );
+  }
+
+  // Default fallback
+  return (
+    <div>
+      <pre className="text-xs">{JSON.stringify(item, null, 2)}</pre>
+    </div>
+  );
+}
