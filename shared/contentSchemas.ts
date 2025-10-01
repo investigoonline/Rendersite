@@ -175,6 +175,46 @@ const footerCompanyDetailsSchema = z.object({
   email: z.string().email().max(100),
 });
 
+// Page Header Schemas
+const pageHeaderSchema = z.object({
+  badge: z.string().min(1).max(50).optional(),
+  title: z.string().min(1).max(200),
+  description: z.string().min(1).max(500),
+});
+
+// Services Stats Schema
+const servicesStatsSchema = z.object({
+  stats: z.array(z.object({
+    icon: z.string().min(1),
+    value: z.string().min(1).max(50),
+    label: z.string().min(1).max(100),
+  })).length(4),
+});
+
+// Home Quick Actions Schema
+const homeQuickActionsSchema = z.object({
+  actions: z.array(z.object({
+    icon: z.string().min(1),
+    title: z.string().min(1).max(100),
+    description: z.string().min(1).max(200),
+    href: z.string().min(1).max(200),
+    color: z.string().min(1),
+  })).min(1).max(6),
+});
+
+// Home Calculators Schema
+const homeCalculatorsSchema = z.object({
+  title: z.string().min(1).max(100),
+  description: z.string().min(1).max(300),
+  calculators: z.array(z.object({
+    icon: z.string().min(1),
+    title: z.string().min(1).max(100),
+    description: z.string().min(1).max(200),
+    href: z.string().min(1).max(200),
+    color: z.string().min(1),
+  })).min(1).max(6),
+});
+
 // UI Metadata for each schema
 export const contentSchemas: Record<string, SectionSchema> = {
   home_hero: {
@@ -477,6 +517,60 @@ export const contentSchemas: Record<string, SectionSchema> = {
       description: { label: 'Description', control: 'textarea', rows: 2 },
     },
   },
+  contact_header: {
+    schema: pageHeaderSchema,
+    label: 'Contact Page Header',
+    description: 'Contact page title and description',
+    uiMeta: {
+      title: { label: 'Page Title', control: 'text', placeholder: 'Get in Touch' },
+      description: { label: 'Page Description', control: 'textarea', rows: 3 },
+    },
+  },
+  services_header: {
+    schema: pageHeaderSchema,
+    label: 'Services Page Header',
+    description: 'Services page title, badge, and description',
+    uiMeta: {
+      badge: { label: 'Badge Text (optional)', control: 'text', placeholder: 'Professional Services' },
+      title: { label: 'Page Title', control: 'text', placeholder: 'Comprehensive Financial Services' },
+      description: { label: 'Page Description', control: 'textarea', rows: 3 },
+    },
+  },
+  services_stats: {
+    schema: servicesStatsSchema,
+    label: 'Services Overview Stats',
+    description: '4 key statistics displayed on services page',
+    uiMeta: {
+      stats: { label: 'Statistics (4 items)', control: 'text' },
+    },
+  },
+  resources_header: {
+    schema: pageHeaderSchema,
+    label: 'Resources Page Header',
+    description: 'Resources page title and description',
+    uiMeta: {
+      title: { label: 'Page Title', control: 'text', placeholder: 'Resource Library' },
+      description: { label: 'Page Description', control: 'textarea', rows: 3 },
+    },
+  },
+  home_quick_actions: {
+    schema: homeQuickActionsSchema,
+    label: 'Home Quick Actions',
+    description: 'Quick action buttons on home page',
+    uiMeta: {
+      actions: { label: 'Quick Actions', control: 'text' },
+    },
+  },
+  home_calculators: {
+    schema: homeCalculatorsSchema,
+    label: 'Home Popular Calculators',
+    description: 'Popular calculator links on home page',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'Popular Calculators' },
+      description: { label: 'Section Description', control: 'text', placeholder: 'Quick access to frequently used calculators' },
+      calculators: { label: 'Calculators', control: 'text' },
+    },
+  },
   footer_company: {
     schema: footerLinksSchema,
     label: 'Company Links',
@@ -520,9 +614,10 @@ export const contentSchemas: Record<string, SectionSchema> = {
 
 // Page to sections mapping
 export const pageSections: Record<string, string[]> = {
-  home: ['home_hero', 'home_stats'],
-  services: ['services_investment', 'services_strategic', 'services_legacy', 'services_risk', 'services_special', 'services_aggregation'],
+  home: ['home_hero', 'home_stats', 'home_quick_actions', 'home_calculators'],
+  services: ['services_header', 'services_stats', 'services_investment', 'services_strategic', 'services_legacy', 'services_risk', 'services_special', 'services_aggregation'],
   contact: [
+    'contact_header',
     'contact_office', 
     'contact_phone', 
     'contact_email',
@@ -534,7 +629,7 @@ export const pageSections: Record<string, string[]> = {
     'contact_prospective_clients',
     'contact_current_clients'
   ],
-  resources: ['resources_articles', 'resources_videos', 'resources_newsletters', 'resources_flipbooks', 'resources_faq'],
+  resources: ['resources_header', 'resources_articles', 'resources_videos', 'resources_newsletters', 'resources_flipbooks', 'resources_faq'],
   footer: ['footer_company', 'footer_platform', 'footer_resources', 'footer_company_details'],
 };
 
