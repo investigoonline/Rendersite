@@ -28,50 +28,6 @@ interface ResourceType {
   description: string;
 }
 
-const defaultResourceTypes: ResourceType[] = [
-  {
-    id: "article",
-    name: "Articles",
-    icon: "FileText",
-    description: "Expert insights on market trends, investment strategies, and financial planning.",
-  },
-  {
-    id: "video",
-    name: "Videos",
-    icon: "Video",
-    description: "Video tutorials and webinars covering essential financial concepts.",
-  },
-  {
-    id: "newsletter",
-    name: "Newsletters",
-    icon: "Mail",
-    description: "Weekly market updates and quarterly financial outlooks.",
-  },
-  {
-    id: "flipbook",
-    name: "Flipbooks",
-    icon: "Book",
-    description: "Interactive brochures and comprehensive planning guides.",
-  },
-  {
-    id: "faq",
-    name: "FAQ",
-    icon: "HelpCircle",
-    description: "Searchable answers to common financial planning questions.",
-  },
-];
-
-const categories = [
-  "Market Analysis",
-  "Investment Strategy",
-  "Retirement Planning",
-  "Tax Planning",
-  "Estate Planning",
-  "Risk Management",
-  "Financial Education",
-  "Economic Outlook",
-];
-
 export default function Resources() {
   const { toast } = useToast();
   const [selectedType, setSelectedType] = useState("article");
@@ -111,22 +67,19 @@ export default function Resources() {
     return FileText;
   };
 
-  // Extract resource types from database content
-  let resourceTypes: ResourceType[] = defaultResourceTypes;
-  
-  if (resourceTypesContent && resourceTypesContent.length > 0) {
-    try {
-      const parsedTypes = resourceTypesContent
-        .map(content => content.content as ResourceType)
-        .filter(type => type && type.id && type.name);
-      
-      if (parsedTypes.length > 0) {
-        resourceTypes = parsedTypes;
-      }
-    } catch (error) {
-      console.error("Error parsing resource types content:", error);
-    }
-  }
+  // Helper to get content by section
+  const getSection = (sectionName: string) => {
+    return resourceTypesContent?.find(c => c.section === sectionName);
+  };
+
+  // Extract sections
+  const pageHeader = getSection('resources_header')?.content as any;
+
+  // Extract resource types from database content (excluding header)
+  const resourceTypes: ResourceType[] = resourceTypesContent
+    ?.filter(c => c.section !== 'resources_header')
+    .map(content => content.content as ResourceType)
+    .filter(type => type && type.id && type.name) || [];
 
   const { data: resources, isLoading } = useQuery({
     queryKey: ["/api/resources", selectedType, selectedCategory],
@@ -175,15 +128,16 @@ export default function Resources() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Resource Library
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-            Educational content, tools, and resources to help you make informed financial decisions.
-            Stay updated with market trends and expert insights.
-          </p>
-        </div>
+        {pageHeader && (
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              {pageHeader.title}
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+              {pageHeader.description}
+            </p>
+          </div>
+        )}
 
         {/* Search and Filters */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
@@ -196,18 +150,6 @@ export default function Resources() {
               className="pl-10"
             />
           </div>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md bg-white text-sm"
-          >
-            <option value="">All Categories</option>
-            {categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
         </div>
 
         <Tabs value={selectedType} onValueChange={setSelectedType} className="space-y-8">
@@ -229,7 +171,6 @@ export default function Resources() {
             <TabsContent key={type.id} value={type.id} className="space-y-6">
               <div className="text-center">
                 <Badge className="mb-4">
-                  <type.icon className="h-4 w-4 mr-1" />
                   {type.name}
                 </Badge>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">{type.name}</h2>
@@ -283,7 +224,10 @@ export default function Resources() {
               ) : (
                 <Card>
                   <CardContent className="p-12 text-center">
-                    <type.icon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    {(() => {
+                      const IconComponent = getIcon(type.icon);
+                      return <IconComponent className="h-12 w-12 text-muted-foreground mx-auto mb-4" />;
+                    })()}
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       No {type.name} Found
                     </h3>

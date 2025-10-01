@@ -53,6 +53,7 @@ export default function Contact() {
     ['contact_office', 'contact_phone', 'contact_email'].includes(c.section)
   ) || [];
 
+  const pageHeader = getSection('contact_header')?.content as any;
   const formHeader = getSection('contact_form_header')?.content as any;
   const quickActions = getSection('contact_quick_actions')?.content as any;
   const supportFeatures = getSection('contact_support_features')?.content as any;
@@ -73,15 +74,16 @@ export default function Contact() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Get in Touch
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Ready to take control of your financial future? Start with a free consultation 
-            or reach out to our expert team for personalized assistance.
-          </p>
-        </div>
+        {pageHeader && (
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              {pageHeader.title}
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              {pageHeader.description}
+            </p>
+          </div>
+        )}
 
         {/* Contact Methods */}
         {contactMethods.length > 0 && (

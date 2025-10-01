@@ -23,9 +23,16 @@ export default function Home() {
     queryKey: ['/api/content', 'home'],
   });
 
+  // Helper to get content by section
+  const getSection = (sectionName: string) => {
+    return homeContent?.find(c => c.section === sectionName);
+  };
+
   // Extract content sections
-  const heroContent = homeContent?.find(c => c.section === 'home_hero')?.content as { title?: string; subtitle?: string } | undefined;
-  const statsContent = homeContent?.find(c => c.section === 'home_stats')?.content as { stats?: Array<{ icon: string; label: string; value: string }> } | undefined;
+  const heroContent = getSection('home_hero')?.content as any;
+  const statsContent = getSection('home_stats')?.content as any;
+  const quickActionsContent = getSection('home_quick_actions')?.content as any;
+  const calculatorsContent = getSection('home_calculators')?.content as any;
 
   // Helper to get icon component by name
   const getIcon = (iconName: string) => {
@@ -40,15 +47,7 @@ export default function Home() {
     return icons[iconName] || Calculator;
   };
 
-  // Default stats if no content is loaded
-  const defaultStats = [
-    { icon: "Calculator", label: "Calculations Saved", value: "12" },
-    { icon: "TrendingUp", label: "Net Worth Growth", value: "+8.4%" },
-    { icon: "PieChart", label: "Portfolio Value", value: "$1.2M" },
-    { icon: "FileText", label: "Reports Generated", value: "8" }
-  ];
-
-  const stats = statsContent?.stats || defaultStats;
+  const stats = statsContent?.stats || [];
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -65,7 +64,7 @@ export default function Home() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
-          {stats.map((stat, index) => {
+          {stats.map((stat: any, index: number) => {
             const IconComponent = getIcon(stat.icon);
             const colorClass = index % 3 === 0 ? 'text-primary' : index % 3 === 1 ? 'text-secondary' : 'text-accent';
             
@@ -89,162 +88,61 @@ export default function Home() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Quick Actions */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <Button asChild variant="outline" className="h-auto p-4 flex-col">
-                    <Link href="/calculators?calculator=net_worth&category=wealth_management">
-                      <PieChart className="h-8 w-8 mb-2 text-primary" />
-                      <span className="font-semibold">Net Worth Calculator</span>
-                      <span className="text-xs text-muted-foreground">
-                        Calculate your total net worth
-                      </span>
-                    </Link>
-                  </Button>
+          {quickActionsContent?.actions && (
+            <div className="lg:col-span-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Quick Actions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    {quickActionsContent.actions.map((action: any, index: number) => {
+                      const IconComponent = getIcon(action.icon);
+                      return (
+                        <Button key={index} asChild variant="outline" className="h-auto p-4 flex-col">
+                          <Link href={action.href}>
+                            <IconComponent className={`h-8 w-8 mb-2 ${action.color}`} />
+                            <span className="font-semibold">{action.title}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {action.description}
+                            </span>
+                          </Link>
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
 
-                  <Button asChild variant="outline" className="h-auto p-4 flex-col">
-                    <Link href="/resources">
-                      <FileText className="h-8 w-8 mb-2 text-secondary" />
-                      <span className="font-semibold">Browse Resources</span>
-                      <span className="text-xs text-muted-foreground">
-                        Articles, videos, and guides
-                      </span>
-                    </Link>
-                  </Button>
-
-                  <Button asChild variant="outline" className="h-auto p-4 flex-col">
-                    <Link href="/portfolio">
-                      <PieChart className="h-8 w-8 mb-2 text-accent" />
-                      <span className="font-semibold">View Portfolio</span>
-                      <span className="text-xs text-muted-foreground">
-                        Track your investments
-                      </span>
-                    </Link>
-                  </Button>
-
-                  <Button asChild variant="outline" className="h-auto p-4 flex-col">
-                    <Link href="/reports">
-                      <TrendingUp className="h-8 w-8 mb-2 text-primary" />
-                      <span className="font-semibold">Generate Report</span>
-                      <span className="text-xs text-muted-foreground">
-                        Financial analysis reports
-                      </span>
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Quick Calculators */}
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle>Popular Calculators</CardTitle>
-                <p className="text-sm text-muted-foreground">Quick access to frequently used calculators</p>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <Button asChild variant="outline" className="h-auto p-3 justify-start">
-                    <Link href="/calculators?calculator=net_worth&category=wealth_management">
-                      <PieChart className="h-5 w-5 mr-3 text-primary" />
-                      <div className="text-left">
-                        <div className="font-medium">Net Worth Calculator</div>
-                        <div className="text-xs text-muted-foreground">Track your wealth</div>
-                      </div>
-                    </Link>
-                  </Button>
-                  
-                  <Button asChild variant="outline" className="h-auto p-3 justify-start">
-                    <Link href="/calculators?calculator=loan_payoff&category=loans_credit">
-                      <CreditCard className="h-5 w-5 mr-3 text-secondary" />
-                      <div className="text-left">
-                        <div className="font-medium">Loan Payoff</div>
-                        <div className="text-xs text-muted-foreground">Debt payoff strategy</div>
-                      </div>
-                    </Link>
-                  </Button>
-                  
-                  <Button asChild variant="outline" className="h-auto p-3 justify-start">
-                    <Link href="/calculators?calculator=mortgage_refinance&category=real_estate">
-                      <TrendingUp className="h-5 w-5 mr-3 text-accent" />
-                      <div className="text-left">
-                        <div className="font-medium">Mortgage Refinance</div>
-                        <div className="text-xs text-muted-foreground">Refinancing analysis</div>
-                      </div>
-                    </Link>
-                  </Button>
-                  
-                  <Button asChild variant="outline" className="h-auto p-3 justify-start">
-                    <Link href="/calculators?calculator=retirement_cost&category=retirement_inflation">
-                      <Clock className="h-5 w-5 mr-3 text-primary" />
-                      <div className="text-left">
-                        <div className="font-medium">Retirement Cost</div>
-                        <div className="text-xs text-muted-foreground">Plan retirement</div>
-                      </div>
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Recent Activity */}
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {[
-                    {
-                      action: "Net Worth Calculation",
-                      time: "2 hours ago",
-                      result: "$1,247,832",
-                      type: "calculation",
-                      link: "/calculators?calculator=net_worth&category=wealth_management"
-                    },
-                    {
-                      action: "Retirement Planning Report",
-                      time: "1 day ago",
-                      result: "Generated PDF",
-                      type: "report",
-                      link: "/calculators?calculator=retirement_cost&category=retirement_inflation"
-                    },
-                    {
-                      action: "Mortgage Refinance Calculator",
-                      time: "3 days ago",
-                      result: "Save $47,000",
-                      type: "calculation",
-                      link: "/calculators?calculator=mortgage_refinance&category=real_estate"
-                    }
-                  ].map((item, index) => (
-                    <Link key={index} href={item.link} className="block">
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                            {item.type === 'calculation' ? 
-                              <Calculator className="h-4 w-4 text-primary" /> :
-                              <FileText className="h-4 w-4 text-secondary" />
-                            }
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-900">{item.action}</p>
-                            <p className="text-sm text-muted-foreground">{item.time}</p>
-                          </div>
-                        </div>
-                        <div className="text-right flex items-center">
-                          <Badge variant="secondary" className="mr-2">{item.result}</Badge>
-                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              {/* Popular Calculators */}
+              {calculatorsContent?.calculators && (
+                <Card className="mt-6">
+                  <CardHeader>
+                    <CardTitle>{calculatorsContent.title}</CardTitle>
+                    <p className="text-sm text-muted-foreground">{calculatorsContent.description}</p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {calculatorsContent.calculators.map((calc: any, index: number) => {
+                        const IconComponent = getIcon(calc.icon);
+                        return (
+                          <Button key={index} asChild variant="outline" className="h-auto p-3 justify-start">
+                            <Link href={calc.href}>
+                              <IconComponent className={`h-5 w-5 mr-3 ${calc.color}`} />
+                              <div className="text-left">
+                                <div className="font-medium">{calc.title}</div>
+                                <div className="text-xs text-muted-foreground">{calc.description}</div>
+                              </div>
+                            </Link>
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
 
           {/* Sidebar */}
           <div className="space-y-6">

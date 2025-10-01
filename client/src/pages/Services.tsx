@@ -25,96 +25,6 @@ interface ServiceContent {
   color: string;
 }
 
-const defaultServices: ServiceContent[] = [
-  {
-    id: "investment_management",
-    title: "Investment Management",
-    icon: "TrendingUp",
-    description: "Professional portfolio management with institutional-grade strategies and ongoing oversight.",
-    features: [
-      "Diversification & asset allocation",
-      "Tax-efficient investing",
-      "Quarterly performance reports",
-      "Monthly statements & yearly reviews",
-      "Online account access"
-    ],
-    color: "primary"
-  },
-  {
-    id: "strategic_planning",
-    title: "Strategic Financial Planning",
-    icon: "FileText",
-    description: "Comprehensive financial strategies tailored to your life goals and circumstances.",
-    features: [
-      "Retirement planning strategies",
-      "Pension optimization",
-      "Stock options planning",
-      "Education funding strategies",
-      "Goal-based financial planning"
-    ],
-    color: "secondary"
-  },
-  {
-    id: "legacy_planning",
-    title: "Legacy Planning",
-    icon: "Users",
-    description: "Preserve and transfer your wealth according to your values and family goals.",
-    features: [
-      "Estate planning documents review",
-      "Beneficiary review and updates",
-      "Philanthropic planning",
-      "Charitable trust strategies",
-      "Private foundations",
-      "Trust management services",
-      "Business succession/exit planning"
-    ],
-    color: "accent"
-  },
-  {
-    id: "risk_management",
-    title: "Risk Management",
-    icon: "Shield",
-    description: "Protect your assets and family with comprehensive insurance and risk analysis.",
-    features: [
-      "Asset protection strategies",
-      "Life insurance analysis & review",
-      "Disability insurance analysis & review",
-      "Personal liability insurance review",
-      "Long-Term Care insurance planning"
-    ],
-    color: "primary"
-  },
-  {
-    id: "special_situations",
-    title: "Special Situations Planning",
-    icon: "PiggyBank",
-    description: "Specialized financial guidance for unique life circumstances and transitions.",
-    features: [
-      "Divorce financial planning and income replacement",
-      "Foundation and endowment guidance",
-      "Financial windfall planning",
-      "Structured settlements",
-      "Special Needs Trusts - asset management"
-    ],
-    color: "secondary"
-  },
-  {
-    id: "account_aggregation",
-    title: "Account Aggregation",
-    icon: "Database",
-    description: "Centralized view and management of all your financial accounts and documents.",
-    features: [
-      "View all bank and brokerage accounts in one secure place",
-      "Balance sheet/Net worth statements",
-      "Financial goals/plans tracking",
-      "Asset allocation strategy oversight",
-      "Tax documents, trusts, wills and other private records",
-      "Insurance policies and coverages management"
-    ],
-    color: "accent"
-  }
-];
-
 export default function Services() {
   // Fetch services content with proper query parameter
   const { data: servicesContent, isLoading, isError } = useQuery<PageContent[]>({
@@ -150,22 +60,20 @@ export default function Services() {
     return FileText;
   };
 
-  // Extract and transform services from database content with validation
-  let services: ServiceContent[] = defaultServices;
+  // Helper to get content by section
+  const getSection = (sectionName: string) => {
+    return servicesContent?.find(c => c.section === sectionName);
+  };
+
+  // Extract sections
+  const pageHeader = getSection('services_header')?.content as any;
+  const statsData = getSection('services_stats')?.content as any;
   
-  if (servicesContent && servicesContent.length > 0) {
-    try {
-      const parsedServices = servicesContent
-        .map(content => content.content as ServiceContent)
-        .filter(service => service && service.id && service.title);
-      
-      if (parsedServices.length > 0) {
-        services = parsedServices;
-      }
-    } catch (error) {
-      console.error("Error parsing services content:", error);
-    }
-  }
+  // Extract services (excluding header and stats sections)
+  const services: ServiceContent[] = servicesContent
+    ?.filter(c => !['services_header', 'services_stats'].includes(c.section))
+    .map(content => content.content as ServiceContent)
+    .filter(service => service && service.id && service.title) || [];
 
   // Show loading state
   if (isLoading) {
@@ -211,50 +119,40 @@ export default function Services() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12 sm:mb-16 px-4">
-          <Badge className="bg-primary/10 text-primary border-primary/20 mb-4 sm:mb-6">
-            Professional Services
-          </Badge>
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 sm:mb-6">
-            Comprehensive Financial Services
-          </h1>
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto">
-            Our full-service approach addresses every aspect of your financial life, 
-            from investment management to legacy planning, with 40+ years of expertise.
-          </p>
-        </div>
+        {pageHeader && (
+          <div className="text-center mb-12 sm:mb-16 px-4">
+            {pageHeader.badge && (
+              <Badge className="bg-primary/10 text-primary border-primary/20 mb-4 sm:mb-6">
+                {pageHeader.badge}
+              </Badge>
+            )}
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 sm:mb-6">
+              {pageHeader.title}
+            </h1>
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto">
+              {pageHeader.description}
+            </p>
+          </div>
+        )}
 
         {/* Services Overview Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-12 sm:mb-16 px-4">
-          <Card>
-            <CardContent className="p-3 sm:p-6 text-center">
-              <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-primary mx-auto mb-2" />
-              <div className="text-xl sm:text-2xl font-bold text-gray-900">6</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Service Areas</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-3 sm:p-6 text-center">
-              <Users className="h-6 w-6 sm:h-8 sm:w-8 text-secondary mx-auto mb-2" />
-              <div className="text-xl sm:text-2xl font-bold text-gray-900">40+</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Years Experience</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-3 sm:p-6 text-center">
-              <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-accent mx-auto mb-2" />
-              <div className="text-xl sm:text-2xl font-bold text-gray-900">100%</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Fiduciary Standard</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-3 sm:p-6 text-center">
-              <Database className="h-6 w-6 sm:h-8 sm:w-8 text-primary mx-auto mb-2" />
-              <div className="text-xl sm:text-2xl font-bold text-gray-900">24/7</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Account Access</div>
-            </CardContent>
-          </Card>
-        </div>
+        {statsData?.stats && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-12 sm:mb-16 px-4">
+            {statsData.stats.map((stat: any, index: number) => {
+              const StatIcon = getIcon(stat.icon);
+              const colorClass = index % 3 === 0 ? 'text-primary' : index % 3 === 1 ? 'text-secondary' : 'text-accent';
+              return (
+                <Card key={index}>
+                  <CardContent className="p-3 sm:p-6 text-center">
+                    <StatIcon className={`h-6 w-6 sm:h-8 sm:w-8 ${colorClass} mx-auto mb-2`} />
+                    <div className="text-xl sm:text-2xl font-bold text-gray-900">{stat.value}</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">{stat.label}</div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
 
         {/* Services Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-12 sm:mb-16 px-4">
