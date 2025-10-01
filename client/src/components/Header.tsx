@@ -34,6 +34,17 @@ export default function Header() {
     }
   });
 
+  // Check if user is super admin
+  const { data: isSuperAdmin } = useQuery({
+    queryKey: ['/api/users', user?.id, 'super-admin'],
+    enabled: !!user?.id && isRegisteredUser,
+    queryFn: async () => {
+      const response = await fetch(`/api/users/${user?.id}/has-role/super_admin`);
+      const data = await response.json();
+      return data.hasRole;
+    }
+  });
+
   const navigation = [
     { name: "Home", href: "/" },
     { name: "About Us", href: "/about" },
@@ -133,11 +144,16 @@ export default function Header() {
                     {isRegisteredUser && (
                       <>
                         <DropdownMenuItem>
-                          <Link href="/dashboard" data-testid="link-dashboard">Dashboard</Link>
+                          <Link href="/" data-testid="link-home">Home</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Link href="/profile" data-testid="link-profile">Profile</Link>
                         </DropdownMenuItem>
+                        {isSuperAdmin && (
+                          <DropdownMenuItem>
+                            <Link href="/admin-dashboard" data-testid="link-admin-dashboard">Admin Dashboard</Link>
+                          </DropdownMenuItem>
+                        )}
                         {hasContentAccess && (
                           <DropdownMenuItem>
                             <Link href="/content-management" data-testid="link-content-management">Content Management</Link>
@@ -222,8 +238,8 @@ export default function Header() {
                         {isRegisteredUser && (
                           <>
                             <Button variant="outline" className="w-full" asChild>
-                              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-link-dashboard">
-                                Dashboard
+                              <Link href="/" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-link-home">
+                                Home
                               </Link>
                             </Button>
                             <Button variant="outline" className="w-full" asChild>
@@ -231,6 +247,13 @@ export default function Header() {
                                 Profile
                               </Link>
                             </Button>
+                            {isSuperAdmin && (
+                              <Button variant="outline" className="w-full" asChild>
+                                <Link href="/admin-dashboard" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-link-admin-dashboard">
+                                  Admin Dashboard
+                                </Link>
+                              </Button>
+                            )}
                             {hasContentAccess && (
                               <Button variant="outline" className="w-full" asChild>
                                 <Link href="/content-management" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-link-content-management">

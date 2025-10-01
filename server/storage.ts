@@ -619,12 +619,13 @@ export class DatabaseStorage implements IStorage {
       .limit(limit);
 
     const allActivity = [...recentCalculations, ...recentGuests, ...recentContacts]
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .filter(item => item.timestamp !== null)
+      .sort((a, b) => new Date(b.timestamp!).getTime() - new Date(a.timestamp!).getTime())
       .slice(0, limit)
       .map(item => ({
         type: item.type,
         description: item.description,
-        timestamp: item.timestamp.toISOString(),
+        timestamp: item.timestamp!.toISOString(),
       }));
 
     return allActivity;
