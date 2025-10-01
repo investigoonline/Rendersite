@@ -8,7 +8,9 @@ import {
   insertUserBackendSchema,
   insertCalculationSchema,
   insertContactMessageSchema,
-  insertNetWorthSnapshotSchema 
+  insertNetWorthSnapshotSchema,
+  insertUserRoleSchema,
+  insertPageContentSchema
 } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -505,6 +507,134 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error during cleanup:", error);
       res.status(500).json({ message: "Cleanup failed" });
+    }
+  });
+
+  // Role management routes
+  app.get('/api/roles', async (req, res) => {
+    try {
+      const roles = await storage.getRoles();
+      res.json(roles);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+      res.status(500).json({ message: "Failed to fetch roles" });
+    }
+  });
+
+  app.get('/api/roles/:id', async (req, res) => {
+    try {
+      const role = await storage.getRole(req.params.id);
+      if (!role) {
+        return res.status(404).json({ message: "Role not found" });
+      }
+      res.json(role);
+    } catch (error) {
+      console.error("Error fetching role:", error);
+      res.status(500).json({ message: "Failed to fetch role" });
+    }
+  });
+
+  // User-Role management routes
+  app.get('/api/users/:userId/roles', async (req, res) => {
+    try {
+      const userRoles = await storage.getUserRoles(req.params.userId);
+      res.json(userRoles);
+    } catch (error) {
+      console.error("Error fetching user roles:", error);
+      res.status(500).json({ message: "Failed to fetch user roles" });
+    }
+  });
+
+  app.post('/api/users/:userId/roles', async (req, res) => {
+    try {
+      const roleData = insertUserRoleSchema.parse({
+        userId: req.params.userId,
+        roleId: req.body.roleId,
+      });
+      const userRole = await storage.assignRoleToUser(roleData.userId, roleData.roleId);
+      res.json(userRole);
+    } catch (error: any) {
+      console.error("Error assigning role:", error);
+      res.status(500).json({ message: error.message || "Failed to assign role" });
+    }
+  });
+
+  app.delete('/api/users/:userId/roles/:roleId', async (req, res) => {
+    try {
+      await storage.removeUserRole(req.params.userId, req.params.roleId);
+      res.json({ message: "Role removed successfully" });
+    } catch (error) {
+      console.error("Error removing role:", error);
+      res.status(500).json({ message: "Failed to remove role" });
+    }
+  });
+
+  app.get('/api/users/:userId/has-role/:roleName', async (req, res) => {
+    try {
+      const hasRole = await storage.checkUserHasRole(req.params.userId, req.params.roleName);
+      res.json({ hasRole });
+    } catch (error) {
+      console.error("Error checking user role:", error);
+      res.status(500).json({ message: "Failed to check user role" });
+    }
+  });
+
+  // Content management routes
+  app.get('/api/content', async (req, res) => {
+    try {
+      const { page, section } = req.query;
+      const content = await storage.getPageContent(
+        page as string,
+        section as string | undefined
+      );
+      res.json(content);
+    } catch (error) {
+      console.error("Error fetching content:", error);
+      res.status(500).json({ message: "Failed to fetch content" });
+    }
+  });
+
+  app.get('/api/content/:id', async (req, res) => {
+    try {
+      const content = await storage.getPageContentById(req.params.id);
+      if (!content) {
+        return res.status(404).json({ message: "Content not found" });
+      }
+      res.json(content);
+    } catch (error) {
+      console.error("Error fetching content:", error);
+      res.status(500).json({ message: "Failed to fetch content" });
+    }
+  });
+
+  app.post('/api/content', async (req, res) => {
+    try {
+      const contentData = insertPageContentSchema.parse(req.body);
+      const content = await storage.createPageContent(contentData);
+      res.json(content);
+    } catch (error: any) {
+      console.error("Error creating content:", error);
+      res.status(500).json({ message: error.message || "Failed to create content" });
+    }
+  });
+
+  app.patch('/api/content/:id', async (req, res) => {
+    try {
+      const content = await storage.updatePageContent(req.params.id, req.body);
+      res.json(content);
+    } catch (error) {
+      console.error("Error updating content:", error);
+      res.status(500).json({ message: "Failed to update content" });
+    }
+  });
+
+  app.delete('/api/content/:id', async (req, res) => {
+    try {
+      await storage.deletePageContent(req.params.id);
+      res.json({ message: "Content deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting content:", error);
+      res.status(500).json({ message: "Failed to delete content" });
     }
   });
 
