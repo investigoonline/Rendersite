@@ -19,36 +19,44 @@ import {
   Eye,
   Calendar,
 } from "lucide-react";
+import type { PageContent } from "@shared/schema";
 
-const resourceTypes = [
+interface ResourceType {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+}
+
+const defaultResourceTypes: ResourceType[] = [
   {
     id: "article",
     name: "Articles",
-    icon: FileText,
+    icon: "FileText",
     description: "Expert insights on market trends, investment strategies, and financial planning.",
   },
   {
     id: "video",
     name: "Videos",
-    icon: Video,
+    icon: "Video",
     description: "Video tutorials and webinars covering essential financial concepts.",
   },
   {
     id: "newsletter",
     name: "Newsletters",
-    icon: Mail,
+    icon: "Mail",
     description: "Weekly market updates and quarterly financial outlooks.",
   },
   {
     id: "flipbook",
     name: "Flipbooks",
-    icon: Book,
+    icon: "Book",
     description: "Interactive brochures and comprehensive planning guides.",
   },
   {
     id: "faq",
     name: "FAQ",
-    icon: HelpCircle,
+    icon: "HelpCircle",
     description: "Searchable answers to common financial planning questions.",
   },
 ];
@@ -69,6 +77,56 @@ export default function Resources() {
   const [selectedType, setSelectedType] = useState("article");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+
+  // Fetch resource types content
+  const { data: resourceTypesContent } = useQuery<PageContent[]>({
+    queryKey: ['/api/content', 'resources'],
+    queryFn: async () => {
+      const res = await fetch('/api/content?page=resources', {
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch resources: ${res.statusText}`);
+      }
+      return res.json();
+    },
+  });
+
+  // Helper to get icon component by name with type safety
+  type ResourceIcon = 'FileText' | 'Video' | 'Mail' | 'Book' | 'HelpCircle';
+  
+  const iconMap: Record<ResourceIcon, typeof FileText> = {
+    FileText,
+    Video,
+    Mail,
+    Book,
+    HelpCircle,
+  };
+  
+  const getIcon = (iconName: string): typeof FileText => {
+    if (iconName in iconMap) {
+      return iconMap[iconName as ResourceIcon];
+    }
+    console.warn(`Unknown icon name: ${iconName}, falling back to FileText`);
+    return FileText;
+  };
+
+  // Extract resource types from database content
+  let resourceTypes: ResourceType[] = defaultResourceTypes;
+  
+  if (resourceTypesContent && resourceTypesContent.length > 0) {
+    try {
+      const parsedTypes = resourceTypesContent
+        .map(content => content.content as ResourceType)
+        .filter(type => type && type.id && type.name);
+      
+      if (parsedTypes.length > 0) {
+        resourceTypes = parsedTypes;
+      }
+    } catch (error) {
+      console.error("Error parsing resource types content:", error);
+    }
+  }
 
   const { data: resources, isLoading } = useQuery({
     queryKey: ["/api/resources", selectedType, selectedCategory],
@@ -155,12 +213,15 @@ export default function Resources() {
         <Tabs value={selectedType} onValueChange={setSelectedType} className="space-y-8">
           {/* Resource Type Tabs */}
           <TabsList className="grid w-full grid-cols-5">
-            {resourceTypes.map((type) => (
+            {resourceTypes.map((type) => {
+              const IconComponent = getIcon(type.icon);
+              return (
               <TabsTrigger key={type.id} value={type.id} className="flex items-center gap-1">
-                <type.icon className="h-4 w-4" />
+                <IconComponent className="h-4 w-4" />
                 <span className="hidden sm:inline">{type.name}</span>
               </TabsTrigger>
-            ))}
+              );
+            })}
           </TabsList>
 
           {/* Content for each resource type */}

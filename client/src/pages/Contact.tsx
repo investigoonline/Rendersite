@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,22 +15,30 @@ import {
   Globe,
   Shield,
 } from "lucide-react";
+import type { PageContent } from "@shared/schema";
 
-const contactMethods = [
+interface ContactMethod {
+  icon: string;
+  title: string;
+  content: string[];
+  color: string;
+}
+
+const defaultContactMethods: ContactMethod[] = [
   {
-    icon: MapPin,
+    icon: "MapPin",
     title: "Office Location",
     content: ["IFS Group Headquarters", "Linköping, Sweden", "Global Financial Services"],
     color: "text-primary",
   },
   {
-    icon: Phone,
+    icon: "Phone",
     title: "Phone Support",
     content: ["+1 (555) 123-4567", "Mon-Fri: 8AM - 6PM EST", "24/7 Emergency Support"],
     color: "text-secondary",
   },
   {
-    icon: Mail,
+    icon: "Mail",
     title: "Email Support",
     content: ["support@investigoonline.com", "Response within 24 hours", "Priority client support"],
     color: "text-accent",
@@ -57,6 +66,54 @@ const supportFeatures = [
 export default function Contact() {
   const [activeTab, setActiveTab] = useState("general");
 
+  // Fetch contact content with proper query parameter
+  const { data: contactContent, isLoading } = useQuery<PageContent[]>({
+    queryKey: ['/api/content', 'contact'],
+    queryFn: async () => {
+      const res = await fetch('/api/content?page=contact', {
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch contact: ${res.statusText}`);
+      }
+      return res.json();
+    },
+  });
+
+  // Helper to get icon component by name with type safety
+  type ContactIcon = 'MapPin' | 'Phone' | 'Mail';
+  
+  const iconMap: Record<ContactIcon, typeof MapPin> = {
+    MapPin,
+    Phone,
+    Mail,
+  };
+  
+  const getIcon = (iconName: string) => {
+    if (iconName in iconMap) {
+      return iconMap[iconName as ContactIcon];
+    }
+    console.warn(`Unknown icon name: ${iconName}, falling back to Mail`);
+    return Mail;
+  };
+
+  // Extract and transform contact methods from database content
+  let contactMethods: ContactMethod[] = defaultContactMethods;
+  
+  if (contactContent && contactContent.length > 0) {
+    try {
+      const parsedMethods = contactContent
+        .map(content => content.content as ContactMethod)
+        .filter(method => method && method.title && method.content);
+      
+      if (parsedMethods.length > 0) {
+        contactMethods = parsedMethods;
+      }
+    } catch (error) {
+      console.error("Error parsing contact content:", error);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -73,10 +130,12 @@ export default function Contact() {
 
         {/* Contact Methods */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
-          {contactMethods.map((method, index) => (
+          {contactMethods.map((method, index) => {
+            const IconComponent = getIcon(method.icon);
+            return (
             <Card key={index} className="text-center hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
-                <method.icon className={`h-12 w-12 ${method.color} mx-auto mb-4`} />
+                <IconComponent className={`h-12 w-12 ${method.color} mx-auto mb-4`} />
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">{method.title}</h3>
                 <div className="space-y-1">
                   {method.content.map((line, lineIndex) => (
@@ -90,7 +149,8 @@ export default function Contact() {
                 </div>
               </CardContent>
             </Card>
-          ))}
+            );
+          })}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
