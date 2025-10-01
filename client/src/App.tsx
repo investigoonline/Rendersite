@@ -39,6 +39,7 @@ function Router() {
         <Route path="/location" component={Location} />
         <Route path="/disclosures" component={Disclosures} />
         <Route path="/custodian" component={Custodian} />
+        <Route path="/dashboard" component={ContentManagement} />
         <Route path="/content-management" component={ContentManagement} />
         
         {/* Home route - Landing for guests, Dashboard for authenticated users */}
