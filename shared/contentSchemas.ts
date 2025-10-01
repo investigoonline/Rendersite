@@ -253,6 +253,85 @@ const dashboardSystemStatusSchema = z.object({
   operationalBadge: z.string().min(1).max(50),
 });
 
+// About Page Schemas
+const aboutHeaderSchema = z.object({
+  badge: z.string().min(1).max(50),
+  title: z.string().min(1).max(200),
+  description: z.string().min(1).max(500),
+});
+
+const aboutStatsSchema = z.object({
+  stats: z.array(z.object({
+    icon: z.string().min(1),
+    value: z.string().min(1).max(50),
+    label: z.string().min(1).max(100),
+    color: z.string().min(1),
+  })).length(4),
+});
+
+const aboutStorySchema = z.object({
+  title: z.string().min(1).max(100),
+  paragraphs: z.array(z.string().min(1).max(1000)).min(1).max(5),
+});
+
+const aboutMissionVisionSchema = z.object({
+  title: z.string().min(1).max(100),
+  missionTitle: z.string().min(1).max(100),
+  missionText: z.string().min(1).max(500),
+  missionIcon: z.string().min(1),
+  visionTitle: z.string().min(1).max(100),
+  visionText: z.string().min(1).max(500),
+  visionIcon: z.string().min(1),
+});
+
+const aboutValuesSchema = z.object({
+  title: z.string().min(1).max(100),
+  values: z.array(z.object({
+    icon: z.string().min(1),
+    title: z.string().min(1).max(100),
+    description: z.string().min(1).max(300),
+  })).length(4),
+});
+
+const aboutLeadershipSchema = z.object({
+  title: z.string().min(1).max(100),
+  leaders: z.array(z.object({
+    name: z.string().min(1).max(100),
+    title: z.string().min(1).max(100),
+    description: z.string().min(1).max(300),
+  })).min(1).max(10),
+});
+
+const aboutHeadquartersSchema = z.object({
+  icon: z.string().min(1),
+  title: z.string().min(1).max(100),
+  subtitle: z.string().min(1).max(200),
+  description: z.string().min(1).max(1000),
+});
+
+const aboutInnovationSchema = z.object({
+  icon: z.string().min(1),
+  title: z.string().min(1).max(100),
+  description: z.string().min(1).max(1000),
+  features: z.array(z.string().min(1).max(200)).min(1).max(10),
+});
+
+const aboutSecuritySchema = z.object({
+  icon: z.string().min(1),
+  title: z.string().min(1).max(100),
+  description: z.string().min(1).max(1000),
+  features: z.array(z.string().min(1).max(200)).min(1).max(10),
+});
+
+const aboutCtaSchema = z.object({
+  title: z.string().min(1).max(200),
+  description: z.string().min(1).max(500),
+  primaryButtonText: z.string().min(1).max(50),
+  primaryButtonHref: z.string().min(1).max(200),
+  secondaryButtonText: z.string().min(1).max(50),
+  secondaryButtonHref: z.string().min(1).max(200),
+});
+
 // UI Metadata for each schema
 export const contentSchemas: Record<string, SectionSchema> = {
   home_hero: {
@@ -701,6 +780,111 @@ export const contentSchemas: Record<string, SectionSchema> = {
       operationalBadge: { label: 'Operational Badge Text', control: 'text', placeholder: 'Operational' },
     },
   },
+  about_header: {
+    schema: aboutHeaderSchema,
+    label: 'About Page Header',
+    description: 'About page badge, title, and description',
+    uiMeta: {
+      badge: { label: 'Badge Text', control: 'text', placeholder: 'IFS Group' },
+      title: { label: 'Page Title', control: 'text', placeholder: 'Trusted Financial Intelligence Since 1983' },
+      description: { label: 'Page Description', control: 'textarea', rows: 3 },
+    },
+  },
+  about_stats: {
+    schema: aboutStatsSchema,
+    label: 'Company Statistics',
+    description: '4 key company statistics',
+    uiMeta: {
+      stats: { label: 'Statistics (4 items)', control: 'text' },
+    },
+  },
+  about_story: {
+    schema: aboutStorySchema,
+    label: 'Company Story',
+    description: 'Company history and story paragraphs',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'Our Story' },
+      paragraphs: { label: 'Story Paragraphs', control: 'text' },
+    },
+  },
+  about_mission_vision: {
+    schema: aboutMissionVisionSchema,
+    label: 'Mission & Vision',
+    description: 'Company mission and vision statements',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'Mission & Vision' },
+      missionTitle: { label: 'Mission Title', control: 'text', placeholder: 'Our Mission' },
+      missionText: { label: 'Mission Text', control: 'textarea', rows: 3 },
+      missionIcon: { label: 'Mission Icon', control: 'select', options: iconOptions },
+      visionTitle: { label: 'Vision Title', control: 'text', placeholder: 'Our Vision' },
+      visionText: { label: 'Vision Text', control: 'textarea', rows: 3 },
+      visionIcon: { label: 'Vision Icon', control: 'select', options: iconOptions },
+    },
+  },
+  about_values: {
+    schema: aboutValuesSchema,
+    label: 'Company Values',
+    description: '4 core company values',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'Our Values' },
+      values: { label: 'Values (4 items)', control: 'text' },
+    },
+  },
+  about_leadership: {
+    schema: aboutLeadershipSchema,
+    label: 'Leadership Team',
+    description: 'Leadership team members',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'Leadership Team' },
+      leaders: { label: 'Team Members', control: 'text' },
+    },
+  },
+  about_headquarters: {
+    schema: aboutHeadquartersSchema,
+    label: 'Global Headquarters',
+    description: 'Company headquarters information',
+    uiMeta: {
+      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      title: { label: 'Section Title', control: 'text', placeholder: 'Global Headquarters' },
+      subtitle: { label: 'Subtitle', control: 'text', placeholder: 'Linköping, Sweden • Serving clients worldwide' },
+      description: { label: 'Description', control: 'textarea', rows: 4 },
+    },
+  },
+  about_innovation: {
+    schema: aboutInnovationSchema,
+    label: 'Innovation & Technology',
+    description: 'Technology and innovation section',
+    uiMeta: {
+      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      title: { label: 'Section Title', control: 'text', placeholder: 'Innovation at Our Core' },
+      description: { label: 'Description', control: 'textarea', rows: 3 },
+      features: { label: 'Innovation Features', control: 'text' },
+    },
+  },
+  about_security: {
+    schema: aboutSecuritySchema,
+    label: 'Security & Compliance',
+    description: 'Security and compliance section',
+    uiMeta: {
+      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      title: { label: 'Section Title', control: 'text', placeholder: 'Security & Compliance' },
+      description: { label: 'Description', control: 'textarea', rows: 3 },
+      features: { label: 'Security Features', control: 'text' },
+    },
+  },
+  about_cta: {
+    schema: aboutCtaSchema,
+    label: 'Call to Action',
+    description: 'Final CTA section with buttons',
+    uiMeta: {
+      title: { label: 'CTA Title', control: 'text', placeholder: 'Ready to Experience the Future of Financial Planning?' },
+      description: { label: 'CTA Description', control: 'textarea', rows: 2 },
+      primaryButtonText: { label: 'Primary Button Text', control: 'text', placeholder: 'Explore Our Platform' },
+      primaryButtonHref: { label: 'Primary Button Link', control: 'text', placeholder: '/calculators' },
+      secondaryButtonText: { label: 'Secondary Button Text', control: 'text', placeholder: 'Contact Our Team' },
+      secondaryButtonHref: { label: 'Secondary Button Link', control: 'text', placeholder: '/contact' },
+    },
+  },
 };
 
 // Page to sections mapping
@@ -721,6 +905,7 @@ export const pageSections: Record<string, string[]> = {
     'contact_current_clients'
   ],
   resources: ['resources_header', 'resources_articles', 'resources_videos', 'resources_newsletters', 'resources_flipbooks', 'resources_faq'],
+  about: ['about_header', 'about_stats', 'about_story', 'about_mission_vision', 'about_values', 'about_leadership', 'about_headquarters', 'about_innovation', 'about_security', 'about_cta'],
   dashboard: ['dashboard_header', 'dashboard_stats', 'dashboard_user_distribution', 'dashboard_engagement', 'dashboard_system_status'],
   footer: ['footer_company', 'footer_platform', 'footer_resources', 'footer_company_details'],
 };
