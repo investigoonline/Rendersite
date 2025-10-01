@@ -215,6 +215,44 @@ const homeCalculatorsSchema = z.object({
   })).min(1).max(6),
 });
 
+// Dashboard Schemas
+const dashboardHeaderSchema = z.object({
+  title: z.string().min(1).max(100),
+  description: z.string().min(1).max(300),
+});
+
+const dashboardStatsSchema = z.object({
+  stats: z.array(z.object({
+    label: z.string().min(1).max(100),
+    icon: z.string().min(1),
+    color: z.string().min(1),
+  })).length(4),
+});
+
+const dashboardUserDistributionSchema = z.object({
+  title: z.string().min(1).max(100),
+  guestLabel: z.string().min(1).max(100),
+  clientsLabel: z.string().min(1).max(100),
+  totalLabel: z.string().min(1).max(100),
+});
+
+const dashboardEngagementSchema = z.object({
+  title: z.string().min(1).max(100),
+  calculationsLabel: z.string().min(1).max(100),
+  resourcesLabel: z.string().min(1).max(100),
+  avgLabel: z.string().min(1).max(100),
+});
+
+const dashboardSystemStatusSchema = z.object({
+  title: z.string().min(1).max(100),
+  databaseLabel: z.string().min(1).max(100),
+  apiLabel: z.string().min(1).max(100),
+  statusLabel: z.string().min(1).max(100),
+  healthyBadge: z.string().min(1).max(50),
+  onlineBadge: z.string().min(1).max(50),
+  operationalBadge: z.string().min(1).max(50),
+});
+
 // UI Metadata for each schema
 export const contentSchemas: Record<string, SectionSchema> = {
   home_hero: {
@@ -610,6 +648,59 @@ export const contentSchemas: Record<string, SectionSchema> = {
       email: { label: 'Email', control: 'text', placeholder: 'contact@ifsgroup.com' },
     },
   },
+  dashboard_header: {
+    schema: dashboardHeaderSchema,
+    label: 'Dashboard Header',
+    description: 'Admin dashboard page header',
+    uiMeta: {
+      title: { label: 'Page Title', control: 'text', placeholder: 'System Admin Dashboard' },
+      description: { label: 'Page Description', control: 'text', placeholder: 'Overview of platform metrics and user activity' },
+    },
+  },
+  dashboard_stats: {
+    schema: dashboardStatsSchema,
+    label: 'Dashboard Statistics',
+    description: '4 stat cards displayed on admin dashboard',
+    uiMeta: {
+      stats: { label: 'Statistics (4 items)', control: 'text' },
+    },
+  },
+  dashboard_user_distribution: {
+    schema: dashboardUserDistributionSchema,
+    label: 'User Distribution Card',
+    description: 'User distribution statistics card',
+    uiMeta: {
+      title: { label: 'Card Title', control: 'text', placeholder: 'User Distribution' },
+      guestLabel: { label: 'Guest Users Label', control: 'text', placeholder: 'Guest Users' },
+      clientsLabel: { label: 'Active Clients Label', control: 'text', placeholder: 'Active Clients' },
+      totalLabel: { label: 'Total Label', control: 'text', placeholder: 'Total Users' },
+    },
+  },
+  dashboard_engagement: {
+    schema: dashboardEngagementSchema,
+    label: 'Platform Engagement Card',
+    description: 'Platform engagement statistics card',
+    uiMeta: {
+      title: { label: 'Card Title', control: 'text', placeholder: 'Platform Engagement' },
+      calculationsLabel: { label: 'Calculations Label', control: 'text', placeholder: 'Calculations' },
+      resourcesLabel: { label: 'Resources Label', control: 'text', placeholder: 'Resources' },
+      avgLabel: { label: 'Average Label', control: 'text', placeholder: 'Avg per User' },
+    },
+  },
+  dashboard_system_status: {
+    schema: dashboardSystemStatusSchema,
+    label: 'System Status Card',
+    description: 'System status information card',
+    uiMeta: {
+      title: { label: 'Card Title', control: 'text', placeholder: 'System Status' },
+      databaseLabel: { label: 'Database Label', control: 'text', placeholder: 'Database' },
+      apiLabel: { label: 'API Label', control: 'text', placeholder: 'API' },
+      statusLabel: { label: 'Platform Status Label', control: 'text', placeholder: 'Platform Status' },
+      healthyBadge: { label: 'Healthy Badge Text', control: 'text', placeholder: 'Healthy' },
+      onlineBadge: { label: 'Online Badge Text', control: 'text', placeholder: 'Online' },
+      operationalBadge: { label: 'Operational Badge Text', control: 'text', placeholder: 'Operational' },
+    },
+  },
 };
 
 // Page to sections mapping
@@ -630,6 +721,7 @@ export const pageSections: Record<string, string[]> = {
     'contact_current_clients'
   ],
   resources: ['resources_header', 'resources_articles', 'resources_videos', 'resources_newsletters', 'resources_flipbooks', 'resources_faq'],
+  dashboard: ['dashboard_header', 'dashboard_stats', 'dashboard_user_distribution', 'dashboard_engagement', 'dashboard_system_status'],
   footer: ['footer_company', 'footer_platform', 'footer_resources', 'footer_company_details'],
 };
 
