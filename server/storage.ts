@@ -93,6 +93,7 @@ export interface IStorage {
   checkUserHasRole(userId: string, roleName: string): Promise<boolean>;
   getAllUsersWithRoles(): Promise<Array<User & { roles: Role[] }>>;
   bootstrapSuperAdmin(email: string): Promise<User>;
+  updateUserRole(userId: string, roleName: string): Promise<User>;
   
   // Content operations
   getPageContent(page: string, section?: string): Promise<PageContent[]>;
@@ -511,6 +512,23 @@ export class DatabaseStorage implements IStorage {
     await this.assignRoleToUser(user.id, superAdminRole.id);
     
     return user;
+  }
+
+  async updateUserRole(userId: string, roleName: string): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({
+        role: roleName as any,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (!updatedUser) {
+      throw new Error('User not found');
+    }
+    
+    return updatedUser;
   }
 
   // Content operations
