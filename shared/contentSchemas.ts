@@ -44,6 +44,10 @@ export const iconOptions = [
   { label: 'Dollar Sign', value: 'DollarSign' },
   { label: 'Percent', value: 'Percent' },
   { label: 'PiggyBank', value: 'PiggyBank' },
+  { label: 'Clock', value: 'Clock' },
+  { label: 'Calendar', value: 'Calendar' },
+  { label: 'Message Circle', value: 'MessageCircle' },
+  { label: 'Building', value: 'Building' },
 ];
 
 // Color options
@@ -92,6 +96,58 @@ const contactMethodSchema = z.object({
   title: z.string().min(1).max(100),
   content: z.array(z.string()).min(1).max(5),
   color: z.string().min(1),
+});
+
+const contactFormHeaderSchema = z.object({
+  title: z.string().min(1).max(100),
+  description: z.string().min(1).max(300),
+});
+
+const quickActionSchema = z.object({
+  icon: z.string().min(1),
+  label: z.string().min(1).max(100),
+});
+
+const contactQuickActionsSchema = z.object({
+  title: z.string().min(1).max(100),
+  actions: z.array(quickActionSchema).min(1).max(5),
+});
+
+const supportFeatureSchema = z.object({
+  icon: z.string().min(1),
+  title: z.string().min(1).max(100),
+  description: z.string().min(1).max(300),
+});
+
+const contactSupportFeaturesSchema = z.object({
+  title: z.string().min(1).max(100),
+  features: z.array(supportFeatureSchema).min(1).max(5),
+});
+
+const businessHoursSchema = z.object({
+  title: z.string().min(1).max(100),
+  monday_friday: z.string().min(1).max(100),
+  saturday: z.string().min(1).max(100),
+  sunday: z.string().min(1).max(100),
+  emergency: z.string().min(1).max(100),
+});
+
+const officeInfoItemSchema = z.object({
+  icon: z.string().min(1),
+  title: z.string().min(1).max(100),
+  details: z.array(z.string()).min(1).max(5),
+});
+
+const contactOfficeInfoSchema = z.object({
+  title: z.string().min(1).max(100),
+  items: z.array(officeInfoItemSchema).min(1).max(5),
+});
+
+const clientSectionSchema = z.object({
+  title: z.string().min(1).max(100),
+  description: z.string().min(1).max(500),
+  benefits: z.array(z.string()).min(1).max(10),
+  buttonText: z.string().min(1).max(50),
 });
 
 // Resources Page Schemas
@@ -296,6 +352,76 @@ export const contentSchemas: Record<string, SectionSchema> = {
       color: { label: 'Color Theme', control: 'select', options: colorOptions },
     },
   },
+  contact_form_header: {
+    schema: contactFormHeaderSchema,
+    label: 'Contact Form Header',
+    description: 'Header text for the contact form section',
+    uiMeta: {
+      title: { label: 'Form Title', control: 'text', placeholder: 'Send us a Message' },
+      description: { label: 'Form Description', control: 'textarea', rows: 2, placeholder: 'Fill out the form...' },
+    },
+  },
+  contact_quick_actions: {
+    schema: contactQuickActionsSchema,
+    label: 'Quick Actions',
+    description: 'Quick action buttons for contact page',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'Quick Actions' },
+      actions: { label: 'Action Buttons', control: 'text' },
+    },
+  },
+  contact_support_features: {
+    schema: contactSupportFeaturesSchema,
+    label: 'Support Features',
+    description: 'Why choose our support section',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'Why Choose Our Support' },
+      features: { label: 'Features', control: 'text' },
+    },
+  },
+  contact_business_hours: {
+    schema: businessHoursSchema,
+    label: 'Business Hours',
+    description: 'Business hours information',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'Business Hours' },
+      monday_friday: { label: 'Monday-Friday', control: 'text', placeholder: '8:00 AM - 6:00 PM EST' },
+      saturday: { label: 'Saturday', control: 'text', placeholder: '9:00 AM - 2:00 PM EST' },
+      sunday: { label: 'Sunday', control: 'text', placeholder: 'Closed' },
+      emergency: { label: 'Emergency Support', control: 'text', placeholder: '24/7' },
+    },
+  },
+  contact_office_info: {
+    schema: contactOfficeInfoSchema,
+    label: 'Office Information',
+    description: 'Detailed office location and global presence',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'Office Information' },
+      items: { label: 'Office Items', control: 'text' },
+    },
+  },
+  contact_prospective_clients: {
+    schema: clientSectionSchema,
+    label: 'Prospective Clients Section',
+    description: 'Information for prospective clients',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'For Prospective Clients' },
+      description: { label: 'Description', control: 'textarea', rows: 3 },
+      benefits: { label: 'Benefits List', control: 'text' },
+      buttonText: { label: 'Button Text', control: 'text', placeholder: 'Schedule Free Consultation' },
+    },
+  },
+  contact_current_clients: {
+    schema: clientSectionSchema,
+    label: 'Current Clients Section',
+    description: 'Information for current clients',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'For Current Clients' },
+      description: { label: 'Description', control: 'textarea', rows: 3 },
+      benefits: { label: 'Benefits List', control: 'text' },
+      buttonText: { label: 'Button Text', control: 'text', placeholder: 'Access Client Portal' },
+    },
+  },
   resources_articles: {
     schema: resourceTypeSchema,
     label: 'Articles Resource Type',
@@ -396,7 +522,18 @@ export const contentSchemas: Record<string, SectionSchema> = {
 export const pageSections: Record<string, string[]> = {
   home: ['home_hero', 'home_stats'],
   services: ['services_investment', 'services_strategic', 'services_legacy', 'services_risk', 'services_special', 'services_aggregation'],
-  contact: ['contact_office', 'contact_phone', 'contact_email'],
+  contact: [
+    'contact_office', 
+    'contact_phone', 
+    'contact_email',
+    'contact_form_header',
+    'contact_quick_actions',
+    'contact_support_features',
+    'contact_business_hours',
+    'contact_office_info',
+    'contact_prospective_clients',
+    'contact_current_clients'
+  ],
   resources: ['resources_articles', 'resources_videos', 'resources_newsletters', 'resources_flipbooks', 'resources_faq'],
   footer: ['footer_company', 'footer_platform', 'footer_resources', 'footer_company_details'],
 };
