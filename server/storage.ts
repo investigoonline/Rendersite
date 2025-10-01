@@ -5,6 +5,9 @@ import {
   resources,
   contactMessages,
   netWorthSnapshots,
+  roles,
+  userRoles,
+  pageContent,
   type User,
   type UpsertUser,
   type InsertUserRegistration,
@@ -19,6 +22,12 @@ import {
   type InsertContactMessage,
   type NetWorthSnapshot,
   type InsertNetWorthSnapshot,
+  type Role,
+  type InsertRole,
+  type UserRole,
+  type InsertUserRole,
+  type PageContent,
+  type InsertPageContent,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, sql } from "drizzle-orm";
@@ -68,6 +77,24 @@ export interface IStorage {
   // Net worth operations
   saveNetWorthSnapshot(snapshot: InsertNetWorthSnapshot): Promise<NetWorthSnapshot>;
   getNetWorthHistory(userId?: string, guestId?: string): Promise<NetWorthSnapshot[]>;
+  
+  // Role operations
+  getRoles(): Promise<Role[]>;
+  getRole(id: string): Promise<Role | undefined>;
+  getRoleByName(name: string): Promise<Role | undefined>;
+  
+  // User-Role operations
+  assignRoleToUser(userId: string, roleId: string): Promise<UserRole>;
+  getUserRoles(userId: string): Promise<(UserRole & { role: Role })[]>;
+  removeUserRole(userId: string, roleId: string): Promise<void>;
+  checkUserHasRole(userId: string, roleName: string): Promise<boolean>;
+  
+  // Content operations
+  getPageContent(page: string, section?: string): Promise<PageContent[]>;
+  getPageContentById(id: string): Promise<PageContent | undefined>;
+  createPageContent(content: InsertPageContent): Promise<PageContent>;
+  updatePageContent(id: string, content: Partial<InsertPageContent>): Promise<PageContent>;
+  deletePageContent(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -337,6 +364,118 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(netWorthSnapshots)
       .orderBy(desc(netWorthSnapshots.createdAt));
+  }
+
+  // Role operations
+  async getRoles(): Promise<Role[]> {
+    return db.select().from(roles).orderBy(roles.displayName);
+  }
+
+  async getRole(id: string): Promise<Role | undefined> {
+    const [role] = await db.select().from(roles).where(eq(roles.id, id));
+    return role;
+  }
+
+  async getRoleByName(name: string): Promise<Role | undefined> {
+    const [role] = await db.select().from(roles).where(eq(roles.name, name as any));
+    return role;
+  }
+
+  // User-Role operations
+  async assignRoleToUser(userId: string, roleId: string): Promise<UserRole> {
+    const [userRole] = await db
+      .insert(userRoles)
+      .values({ userId, roleId })
+      .returning();
+    return userRole;
+  }
+
+  async getUserRoles(userId: string): Promise<(UserRole & { role: Role })[]> {
+    const result = await db
+      .select({
+        id: userRoles.id,
+        userId: userRoles.userId,
+        roleId: userRoles.roleId,
+        assignedAt: userRoles.assignedAt,
+        role: roles,
+      })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(eq(userRoles.userId, userId));
+    
+    return result as (UserRole & { role: Role })[];
+  }
+
+  async removeUserRole(userId: string, roleId: string): Promise<void> {
+    await db
+      .delete(userRoles)
+      .where(and(
+        eq(userRoles.userId, userId),
+        eq(userRoles.roleId, roleId)
+      ));
+  }
+
+  async checkUserHasRole(userId: string, roleName: string): Promise<boolean> {
+    const result = await db
+      .select({ id: userRoles.id })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(and(
+        eq(userRoles.userId, userId),
+        eq(roles.name, roleName as any)
+      ))
+      .limit(1);
+    
+    return result.length > 0;
+  }
+
+  // Content operations
+  async getPageContent(page: string, section?: string): Promise<PageContent[]> {
+    let whereConditions = [eq(pageContent.page, page)];
+    
+    if (section) {
+      whereConditions.push(eq(pageContent.section, section as any));
+    }
+    
+    return db
+      .select()
+      .from(pageContent)
+      .where(and(...whereConditions))
+      .orderBy(pageContent.section);
+  }
+
+  async getPageContentById(id: string): Promise<PageContent | undefined> {
+    const [content] = await db
+      .select()
+      .from(pageContent)
+      .where(eq(pageContent.id, id));
+    return content;
+  }
+
+  async createPageContent(content: InsertPageContent): Promise<PageContent> {
+    const [created] = await db
+      .insert(pageContent)
+      .values(content)
+      .returning();
+    return created;
+  }
+
+  async updatePageContent(id: string, content: Partial<InsertPageContent>): Promise<PageContent> {
+    const [updated] = await db
+      .update(pageContent)
+      .set({
+        ...content,
+        updatedAt: new Date(),
+      })
+      .where(eq(pageContent.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deletePageContent(id: string): Promise<void> {
+    await db
+      .delete(pageContent)
+      .where(eq(pageContent.id, id));
   }
 }
 

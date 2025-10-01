@@ -47,6 +47,15 @@ export const users = pgTable("users", {
 // Guest account types enum
 export const guestTypeEnum = pgEnum('guest_type', ['basic', 'enhanced', 'guided']);
 
+// User roles enum
+export const userRoleEnum = pgEnum('user_role', [
+  'super_admin',
+  'content_manager',
+  'guest_user',
+  'preferred_client',
+  'client'
+]);
+
 // Guest accounts table
 export const guestAccounts = pgTable("guest_accounts", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -138,6 +147,61 @@ export const netWorthSnapshots = pgTable("net_worth_snapshots", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Roles table
+export const roles = pgTable("roles", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: userRoleEnum("name").notNull().unique(),
+  displayName: varchar("display_name", { length: 100 }).notNull(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User-Roles cross-reference table
+export const userRoles = pgTable("user_roles", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  roleId: uuid("role_id").notNull(),
+  assignedAt: timestamp("assigned_at").defaultNow(),
+});
+
+// Page content sections enum
+export const contentSectionEnum = pgEnum('content_section', [
+  'home_hero',
+  'home_stats',
+  'home_quick_actions',
+  'home_calculators',
+  'footer_company',
+  'footer_platform',
+  'footer_resources',
+  'footer_company_details',
+  'services_investment',
+  'services_strategic',
+  'services_legacy',
+  'services_risk',
+  'services_special',
+  'services_aggregation',
+  'contact_office',
+  'contact_phone',
+  'contact_email',
+  'resources_articles',
+  'resources_videos',
+  'resources_newsletters',
+  'resources_flipbooks',
+  'resources_faq'
+]);
+
+// Content management table
+export const pageContent = pgTable("page_content", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  page: varchar("page", { length: 50 }).notNull(),
+  section: contentSectionEnum("section").notNull(),
+  content: jsonb("content").notNull(),
+  published: boolean("published").default(true),
+  updatedBy: varchar("updated_by"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Create insert schemas
 export const upsertUserSchema = createInsertSchema(users);
 export const insertUserRegistrationSchema = createInsertSchema(users).omit({
@@ -202,6 +266,19 @@ export const insertNetWorthSnapshotSchema = createInsertSchema(netWorthSnapshots
   id: true,
   createdAt: true,
 });
+export const insertRoleSchema = createInsertSchema(roles).omit({
+  id: true,
+  createdAt: true,
+});
+export const insertUserRoleSchema = createInsertSchema(userRoles).omit({
+  id: true,
+  assignedAt: true,
+});
+export const insertPageContentSchema = createInsertSchema(pageContent).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 
 // Export types
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
@@ -218,3 +295,9 @@ export type ContactMessage = typeof contactMessages.$inferSelect;
 export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
 export type NetWorthSnapshot = typeof netWorthSnapshots.$inferSelect;
 export type InsertNetWorthSnapshot = z.infer<typeof insertNetWorthSnapshotSchema>;
+export type Role = typeof roles.$inferSelect;
+export type InsertRole = z.infer<typeof insertRoleSchema>;
+export type UserRole = typeof userRoles.$inferSelect;
+export type InsertUserRole = z.infer<typeof insertUserRoleSchema>;
+export type PageContent = typeof pageContent.$inferSelect;
+export type InsertPageContent = z.infer<typeof insertPageContentSchema>;
