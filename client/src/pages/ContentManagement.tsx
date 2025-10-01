@@ -9,9 +9,25 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Shield, Save, Plus, Trash2, Edit, Lock } from "lucide-react";
-import type { PageContent } from "@shared/schema";
+import { Shield, Save, Plus, Trash2, Edit, Lock, Users } from "lucide-react";
+import type { PageContent, User, Role } from "@shared/schema";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 interface ContentSection {
   id: string;
@@ -21,12 +37,17 @@ interface ContentSection {
   published: boolean;
 }
 
+interface UserWithRoles extends User {
+  roles: Role[];
+}
+
 export default function ContentManagement() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [selectedPage, setSelectedPage] = useState("home");
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [formData, setFormData] = useState<any>({});
+  const [mainTab, setMainTab] = useState("content");
 
   // Check if user has content manager or super admin role
   const { data: hasAccess, isLoading: checkingAccess } = useQuery({
@@ -41,10 +62,49 @@ export default function ContentManagement() {
     }
   });
 
+  // Check if user is specifically a super admin
+  const { data: isSuperAdmin } = useQuery({
+    queryKey: ['/api/users', user?.id, 'has-role', 'super_admin'],
+    enabled: !!user?.id && hasAccess === true,
+    queryFn: async () => {
+      const res = await fetch(`/api/users/${user?.id}/has-role/super_admin`);
+      const data = await res.json();
+      return data.hasRole;
+    }
+  });
+
   // Fetch page content
   const { data: pageContent, isLoading } = useQuery<PageContent[]>({
     queryKey: ['/api/content', selectedPage],
-    enabled: hasAccess === true,
+    enabled: hasAccess === true && mainTab === "content",
+  });
+
+  // Fetch all users with roles (for super admins only)
+  const { data: allUsers, isLoading: loadingUsers } = useQuery<UserWithRoles[]>({
+    queryKey: ['/api/admin/users'],
+    enabled: isSuperAdmin === true && mainTab === "users",
+    queryFn: async () => {
+      const res = await fetch('/api/admin/users', {
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch users');
+      }
+      return res.json();
+    },
+  });
+
+  // Fetch all available roles
+  const { data: availableRoles } = useQuery<Role[]>({
+    queryKey: ['/api/roles'],
+    enabled: isSuperAdmin === true && mainTab === "users",
+    queryFn: async () => {
+      const res = await fetch('/api/roles');
+      if (!res.ok) {
+        throw new Error('Failed to fetch roles');
+      }
+      return res.json();
+    },
   });
 
   // Update content mutation
@@ -112,6 +172,48 @@ export default function ContentManagement() {
     },
   });
 
+  // Assign role mutation
+  const assignRoleMutation = useMutation({
+    mutationFn: async ({ userId, roleId }: { userId: string; roleId: string }) => {
+      return apiRequest("POST", `/api/users/${userId}/roles`, { roleId });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Role assigned successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to assign role",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Remove role mutation
+  const removeRoleMutation = useMutation({
+    mutationFn: async ({ userId, roleId }: { userId: string; roleId: string }) => {
+      return apiRequest("DELETE", `/api/users/${userId}/roles/${roleId}`, {});
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Role removed successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to remove role",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleEdit = (section: PageContent) => {
     setEditingSection(section.id);
     setFormData(section.content);
@@ -173,34 +275,53 @@ export default function ContentManagement() {
         <div className="mb-8">
           <div className="flex items-center space-x-3 mb-2">
             <Shield className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold text-gray-900">Content Management System</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
           </div>
           <p className="text-muted-foreground">
-            Manage all website content from this central dashboard. Changes are reflected immediately on the front end.
+            {isSuperAdmin 
+              ? "Manage website content and user roles from this central dashboard." 
+              : "Manage all website content from this central dashboard. Changes are reflected immediately on the front end."}
           </p>
         </div>
 
-        {/* Page Selection Tabs */}
-        <Tabs value={selectedPage} onValueChange={setSelectedPage} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
-            <TabsTrigger value="home" data-testid="tab-home">Home</TabsTrigger>
-            <TabsTrigger value="footer" data-testid="tab-footer">Footer</TabsTrigger>
-            <TabsTrigger value="services" data-testid="tab-services">Services</TabsTrigger>
-            <TabsTrigger value="contact" data-testid="tab-contact">Contact</TabsTrigger>
-            <TabsTrigger value="resources" data-testid="tab-resources">Resources</TabsTrigger>
+        {/* Main Tabs - Content and User Roles */}
+        <Tabs value={mainTab} onValueChange={setMainTab} className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="content" data-testid="tab-content">
+              <Shield className="h-4 w-4 mr-2" />
+              Content Management
+            </TabsTrigger>
+            {isSuperAdmin && (
+              <TabsTrigger value="users" data-testid="tab-users">
+                <Users className="h-4 w-4 mr-2" />
+                User Roles
+              </TabsTrigger>
+            )}
           </TabsList>
 
-          {/* Content Sections */}
-          {isLoading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Loading content...</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {pageContent && pageContent.length > 0 ? (
-                pageContent.map((section) => (
-                  <Card key={section.id} data-testid={`content-section-${section.section}`}>
+          {/* Content Management Tab */}
+          <TabsContent value="content" className="space-y-6">
+            {/* Page Selection Tabs */}
+            <Tabs value={selectedPage} onValueChange={setSelectedPage} className="space-y-6">
+              <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
+                <TabsTrigger value="home" data-testid="tab-home">Home</TabsTrigger>
+                <TabsTrigger value="footer" data-testid="tab-footer">Footer</TabsTrigger>
+                <TabsTrigger value="services" data-testid="tab-services">Services</TabsTrigger>
+                <TabsTrigger value="contact" data-testid="tab-contact">Contact</TabsTrigger>
+                <TabsTrigger value="resources" data-testid="tab-resources">Resources</TabsTrigger>
+              </TabsList>
+
+              {/* Content Sections */}
+              {isLoading ? (
+                <div className="text-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">Loading content...</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {pageContent && pageContent.length > 0 ? (
+                    pageContent.map((section) => (
+                      <Card key={section.id} data-testid={`content-section-${section.section}`}>
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <div>
@@ -298,18 +419,123 @@ export default function ContentManagement() {
                           </pre>
                         </div>
                       )}
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <Alert>
-                  <AlertDescription>
-                    No content sections found for this page. Create your first content section using the form below.
-                  </AlertDescription>
-                </Alert>
+                        </CardContent>
+                      </Card>
+                    ))
+                  ) : (
+                    <Alert>
+                      <AlertDescription>
+                        No content sections found for this page. Create your first content section using the form below.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
               )}
-            </div>
-          )}
+            </Tabs>
+          </TabsContent>
+
+          {/* User Roles Management Tab */}
+          <TabsContent value="users" className="space-y-6">
+            {loadingUsers ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Loading users...</p>
+              </div>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle>User Role Management</CardTitle>
+                  <CardDescription>
+                    Assign and manage roles for all users in the system
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Auth Type</TableHead>
+                        <TableHead>Current Roles</TableHead>
+                        <TableHead>Assign Role</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {allUsers?.map((userItem) => (
+                        <TableRow key={userItem.id} data-testid={`user-row-${userItem.id}`}>
+                          <TableCell className="font-medium">{userItem.email}</TableCell>
+                          <TableCell>
+                            {userItem.firstName} {userItem.lastName}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{userItem.authType}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-wrap gap-1">
+                              {userItem.roles && userItem.roles.length > 0 ? (
+                                userItem.roles.map((role) => (
+                                  <Badge
+                                    key={role.id}
+                                    variant="default"
+                                    className="flex items-center gap-1"
+                                    data-testid={`role-badge-${role.name}`}
+                                  >
+                                    {role.displayName}
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-4 w-4 p-0 hover:bg-transparent"
+                                      onClick={() => {
+                                        if (confirm(`Remove ${role.displayName} role from ${userItem.email}?`)) {
+                                          removeRoleMutation.mutate({
+                                            userId: userItem.id,
+                                            roleId: role.id,
+                                          });
+                                        }
+                                      }}
+                                      data-testid={`button-remove-role-${role.name}`}
+                                    >
+                                      ×
+                                    </Button>
+                                  </Badge>
+                                ))
+                              ) : (
+                                <span className="text-muted-foreground text-sm">No roles assigned</span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Select
+                              onValueChange={(roleId) => {
+                                assignRoleMutation.mutate({ userId: userItem.id, roleId });
+                              }}
+                              data-testid={`select-assign-role-${userItem.id}`}
+                            >
+                              <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Assign role..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {availableRoles?.map((role) => (
+                                  <SelectItem
+                                    key={role.id}
+                                    value={role.id}
+                                    disabled={userItem.roles?.some((r) => r.id === role.id)}
+                                    data-testid={`option-role-${role.name}`}
+                                  >
+                                    {role.displayName}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
         </Tabs>
       </div>
     </div>
