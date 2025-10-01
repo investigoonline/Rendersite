@@ -137,35 +137,33 @@ export default function Header() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <>
-                  <Button
-                    variant="outline"
-                    onClick={() => setGuestModalOpen(true)}
-                    className="hidden sm:inline-flex text-xs sm:text-sm px-2 sm:px-4"
-                    size="sm"
-                    data-testid="button-guest-access"
-                  >
-                    Guest
-                  </Button>
-                  <Button 
-                    onClick={() => setClientModalOpen(true)}
-                    className="text-xs sm:text-sm px-2 sm:px-4"
-                    size="sm"
-                    data-testid="button-login"
-                  >
-                    Login
-                  </Button>
-                  <Link href="/register">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
                     <Button 
                       variant="default"
                       className="text-xs sm:text-sm px-2 sm:px-4"
                       size="sm"
-                      data-testid="button-register"
+                      data-testid="button-access-menu"
                     >
-                      Register
+                      <User className="h-4 w-4 mr-1" />
+                      Access
+                      <ChevronDown className="ml-1 h-4 w-4" />
                     </Button>
-                  </Link>
-                </>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem onClick={() => setGuestModalOpen(true)} data-testid="menu-guest-access">
+                      Guest Access
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setClientModalOpen(true)} data-testid="menu-login">
+                      Login
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild data-testid="menu-register">
+                      <Link href="/register" className="w-full">
+                        Register
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
 
               {/* Mobile menu button */}
@@ -234,9 +232,10 @@ export default function Header() {
                       </div>
                     ) : (
                       <div className="border-t pt-4 space-y-2">
+                        <p className="text-sm font-medium text-gray-900 mb-2">Account Access</p>
                         <Button
                           variant="outline"
-                          className="w-full"
+                          className="w-full justify-start"
                           onClick={() => {
                             setGuestModalOpen(true);
                             setMobileMenuOpen(false);
@@ -247,7 +246,7 @@ export default function Header() {
                         </Button>
                         <Button
                           variant="outline"
-                          className="w-full"
+                          className="w-full justify-start"
                           onClick={() => {
                             setClientModalOpen(true);
                             setMobileMenuOpen(false);
@@ -257,7 +256,8 @@ export default function Header() {
                           Login
                         </Button>
                         <Button
-                          className="w-full"
+                          variant="default"
+                          className="w-full justify-start"
                           asChild
                           data-testid="mobile-button-register"
                         >
