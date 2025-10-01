@@ -652,6 +652,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         authType: user.authType,
         isEmailVerified: user.isEmailVerified,
         createdAt: user.createdAt,
+        role: user.role,
         roles: user.roles
       }));
       
@@ -659,6 +660,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching users:", error);
       res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // Update user role - super_admin only
+  app.put('/api/admin/users/:userId/role', async (req, res) => {
+    try {
+      // Only super_admin can update user roles
+      const authorized = await requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const { userId } = req.params;
+      const { role } = req.body;
+
+      if (!role) {
+        return res.status(400).json({ message: "Role is required" });
+      }
+
+      // Validate role is one of the valid enum values
+      const validRoles = ['super_admin', 'content_manager', 'guest_user', 'preferred_client', 'client'];
+      if (!validRoles.includes(role)) {
+        return res.status(400).json({ message: "Invalid role" });
+      }
+
+      const updatedUser = await storage.updateUserRole(userId, role);
+      
+      res.json({
+        message: "User role updated successfully",
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          firstName: updatedUser.firstName,
+          lastName: updatedUser.lastName,
+          role: updatedUser.role,
+        }
+      });
+    } catch (error: any) {
+      console.error("Error updating user role:", error);
+      res.status(500).json({ message: error.message || "Failed to update user role" });
     }
   });
 
