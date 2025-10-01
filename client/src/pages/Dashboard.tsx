@@ -9,7 +9,6 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 interface DashboardStats {
-  guestUserCount: number;
   activeClients: number;
   totalCalculations: number;
   totalResources: number;
@@ -95,7 +94,6 @@ export default function Dashboard() {
   // Map stat labels to actual data
   const getStatValue = (label: string): number => {
     const labelLower = label.toLowerCase();
-    if (labelLower.includes('guest')) return stats?.guestUserCount || 0;
     if (labelLower.includes('client') || labelLower.includes('active')) return stats?.activeClients || 0;
     if (labelLower.includes('calculation')) return stats?.totalCalculations || 0;
     if (labelLower.includes('resource')) return stats?.totalResources || 0;
