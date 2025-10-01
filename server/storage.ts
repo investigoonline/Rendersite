@@ -97,6 +97,13 @@ export interface IStorage {
   createPageContent(content: InsertPageContent): Promise<PageContent>;
   updatePageContent(id: string, content: Partial<InsertPageContent>): Promise<PageContent>;
   deletePageContent(id: string): Promise<void>;
+  
+  // Admin dashboard operations
+  getGuestUserCount(): Promise<number>;
+  getActiveClientsCount(): Promise<number>;
+  getTotalCalculationsCount(): Promise<number>;
+  getTotalResourcesCount(): Promise<number>;
+  getRecentActivity(limit: number): Promise<Array<{ type: string; description: string; timestamp: string }>>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -546,6 +553,81 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(pageContent)
       .where(eq(pageContent.id, id));
+  }
+
+  // Admin dashboard operations
+  async getGuestUserCount(): Promise<number> {
+    const result = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(guestAccounts)
+      .where(eq(guestAccounts.verified, true));
+    return result[0]?.count || 0;
+  }
+
+  async getActiveClientsCount(): Promise<number> {
+    const result = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(users)
+      .where(eq(users.role, 'client'));
+    return result[0]?.count || 0;
+  }
+
+  async getTotalCalculationsCount(): Promise<number> {
+    const result = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(calculations);
+    return result[0]?.count || 0;
+  }
+
+  async getTotalResourcesCount(): Promise<number> {
+    const result = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(resources)
+      .where(eq(resources.published, true));
+    return result[0]?.count || 0;
+  }
+
+  async getRecentActivity(limit: number): Promise<Array<{ type: string; description: string; timestamp: string }>> {
+    const recentCalculations = await db
+      .select({
+        type: sql<string>`'Calculation'`,
+        description: calculations.calculatorType,
+        timestamp: calculations.createdAt,
+      })
+      .from(calculations)
+      .orderBy(desc(calculations.createdAt))
+      .limit(limit);
+
+    const recentGuests = await db
+      .select({
+        type: sql<string>`'Guest Signup'`,
+        description: guestAccounts.email,
+        timestamp: guestAccounts.createdAt,
+      })
+      .from(guestAccounts)
+      .orderBy(desc(guestAccounts.createdAt))
+      .limit(limit);
+
+    const recentContacts = await db
+      .select({
+        type: sql<string>`'Contact Message'`,
+        description: contactMessages.subject,
+        timestamp: contactMessages.createdAt,
+      })
+      .from(contactMessages)
+      .orderBy(desc(contactMessages.createdAt))
+      .limit(limit);
+
+    const allActivity = [...recentCalculations, ...recentGuests, ...recentContacts]
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, limit)
+      .map(item => ({
+        type: item.type,
+        description: item.description,
+        timestamp: item.timestamp.toISOString(),
+      }));
+
+    return allActivity;
   }
 }
 

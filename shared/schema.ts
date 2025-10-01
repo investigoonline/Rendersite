@@ -26,6 +26,15 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
+// User roles enum
+export const userRoleEnum = pgEnum('user_role', [
+  'super_admin',
+  'content_manager',
+  'guest_user',
+  'preferred_client',
+  'client'
+]);
+
 // User storage table - Required for Replit Auth + Traditional Registration
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -35,6 +44,7 @@ export const users = pgTable("users", {
   phone: varchar("phone", { length: 20 }),
   password: varchar("password", { length: 255 }), // For traditional registration
   profileImageUrl: varchar("profile_image_url"),
+  role: userRoleEnum("role").default('client'),
   isEmailVerified: boolean("is_email_verified").default(false),
   emailVerificationToken: varchar("email_verification_token"),
   resetPasswordToken: varchar("reset_password_token"),
@@ -46,15 +56,6 @@ export const users = pgTable("users", {
 
 // Guest account types enum
 export const guestTypeEnum = pgEnum('guest_type', ['basic', 'enhanced', 'guided']);
-
-// User roles enum
-export const userRoleEnum = pgEnum('user_role', [
-  'super_admin',
-  'content_manager',
-  'guest_user',
-  'preferred_client',
-  'client'
-]);
 
 // Guest accounts table
 export const guestAccounts = pgTable("guest_accounts", {

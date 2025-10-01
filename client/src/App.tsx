@@ -19,6 +19,7 @@ import Location from "@/pages/Location";
 import Disclosures from "@/pages/Disclosures";
 import Custodian from "@/pages/Custodian";
 import ContentManagement from "@/pages/ContentManagement";
+import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -39,7 +40,7 @@ function Router() {
         <Route path="/location" component={Location} />
         <Route path="/disclosures" component={Disclosures} />
         <Route path="/custodian" component={Custodian} />
-        <Route path="/dashboard" component={ContentManagement} />
+        <Route path="/admin-dashboard" component={Dashboard} />
         <Route path="/content-management" component={ContentManagement} />
         
         {/* Home route - Landing for guests, Dashboard for authenticated users */}

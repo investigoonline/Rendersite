@@ -662,6 +662,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Dashboard statistics for super_admin
+  app.get('/api/admin/dashboard-stats', async (req, res) => {
+    try {
+      // Only super_admin can view dashboard stats
+      const authorized = await requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const [guestUserCount, activeClients, totalCalculations, totalResources] = await Promise.all([
+        storage.getGuestUserCount(),
+        storage.getActiveClientsCount(),
+        storage.getTotalCalculationsCount(),
+        storage.getTotalResourcesCount(),
+      ]);
+
+      const recentActivity = await storage.getRecentActivity(10);
+
+      res.json({
+        guestUserCount,
+        activeClients,
+        totalCalculations,
+        totalResources,
+        recentActivity,
+      });
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      res.status(500).json({ message: "Failed to fetch dashboard statistics" });
+    }
+  });
+
   // Content management routes
   app.get('/api/content', async (req, res) => {
     try {
