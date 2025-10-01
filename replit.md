@@ -51,6 +51,17 @@ The application follows a monorepo structure with separate client and server dir
 - **View Tracking**: Analytics for resource engagement
 - **Storage**: Database-driven content management
 
+### Content Management System (CMS)
+- **Role-Based Access**: Super Admins and Content Managers can manage all website content
+- **Schema-Driven Forms**: Content editing uses Zod schemas with UI metadata for type-safe validation
+- **Form Controls**: Text fields, textareas, numbers, dropdowns, switches, icon pickers, and array editors
+- **Dynamic Sections**: Content organized by page (home, services, contact, resources, footer)
+- **Add Section Feature**: Content managers can create new sections from predefined types per page
+- **Section Types**: Heroes, stats, features, service lists, contact methods, resource highlights
+- **Icon Integration**: Lucide React icons selectable via dropdown with type-safe mappings
+- **Array Management**: ArrayFieldEditor handles repeatable content (stats, features, links) with add/remove/reorder
+- **Security**: All CMS endpoints protected with requireRole middleware for super_admin and content_manager roles
+
 ## External Dependencies
 
 ### Database Services

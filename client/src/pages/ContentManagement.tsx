@@ -89,6 +89,15 @@ export default function ContentManagement() {
   const { data: pageContent, isLoading } = useQuery<PageContent[]>({
     queryKey: ['/api/content', selectedPage],
     enabled: hasAccess === true && mainTab === "content",
+    queryFn: async () => {
+      const res = await fetch(`/api/content?page=${selectedPage}`, {
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch content');
+      }
+      return res.json();
+    },
   });
 
   // Fetch all users with roles (for super admins only)
