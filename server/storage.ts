@@ -542,12 +542,12 @@ export class DatabaseStorage implements IStorage {
       .limit(limit);
 
     const allActivity = [...recentCalculations, ...recentUserSignups, ...recentContacts]
-      .filter(item => item.timestamp !== null)
+      .filter(item => item.timestamp !== null && item.description !== null)
       .sort((a, b) => new Date(b.timestamp!).getTime() - new Date(a.timestamp!).getTime())
       .slice(0, limit)
       .map(item => ({
         type: item.type,
-        description: item.description,
+        description: item.description!,
         timestamp: item.timestamp!.toISOString(),
       }));
 
