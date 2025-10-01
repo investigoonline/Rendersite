@@ -16,10 +16,10 @@ import crypto from "crypto";
 
 // Middleware to check if user has required role
 async function requireRole(req: any, res: any, roles: string[]): Promise<boolean> {
-  const userId = req.session?.user?.id || req.user?.claims?.sub;
+  const userId = req.session?.user?.id;
   
   if (!userId) {
-    res.status(401).json({ message: "Unauthorized - Please log in" });
+    res.status(401).json({ message: "You must be logged in to access this resource" });
     return false;
   }
 
@@ -30,7 +30,7 @@ async function requireRole(req: any, res: any, roles: string[]): Promise<boolean
     }
   }
 
-  res.status(403).json({ message: "Forbidden - Insufficient permissions" });
+  res.status(403).json({ message: "You do not have permission to access this resource" });
   return false;
 }
 
@@ -182,13 +182,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { question, answer } = captcha;
       const expectedAnswer = evaluateMathExpression(question);
       if (expectedAnswer === null || parseInt(answer) !== expectedAnswer) {
-        return res.status(400).json({ message: "Invalid captcha" });
+        return res.status(400).json({ message: "Security verification failed. Please try again" });
       }
       
       // Check if email already exists
       const existingUser = await storage.getUserByEmail(userData.email!);
       if (existingUser) {
-        return res.status(400).json({ message: "Email already registered" });
+        return res.status(400).json({ message: "An account with this email address already exists" });
       }
       
       const user = await storage.createUser(userData);
@@ -209,7 +209,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("Error message:", error.message);
         console.error("Error stack:", error.stack);
       }
-      res.status(500).json({ message: "Failed to create user account" });
+      res.status(500).json({ message: "We're unable to create your account at this time. Please try again later" });
     }
   });
 
@@ -222,19 +222,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { question, answer } = captcha;
       const expectedAnswer = evaluateMathExpression(question);
       if (expectedAnswer === null || parseInt(answer) !== expectedAnswer) {
-        return res.status(400).json({ message: "Invalid captcha" });
+        return res.status(400).json({ message: "Security verification failed. Please try again" });
       }
       
       // Find user by email
       const user = await storage.getUserByEmail(email);
       if (!user || user.authType !== "traditional") {
-        return res.status(400).json({ message: "Invalid email or password" });
+        return res.status(400).json({ message: "The email or password you entered is incorrect" });
       }
       
       // Verify password
       const isValidPassword = await bcrypt.compare(password, user.password!);
       if (!isValidPassword) {
-        return res.status(400).json({ message: "Invalid email or password" });
+        return res.status(400).json({ message: "The email or password you entered is incorrect" });
       }
       
       // Email verification removed - users can login immediately after registration
@@ -257,7 +257,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Error during login:", error);
-      res.status(500).json({ message: "Failed to login" });
+      res.status(500).json({ message: "We're unable to log you in at this time. Please try again later" });
     }
   });
 
@@ -270,7 +270,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(calculation);
     } catch (error) {
       console.error("Error saving calculation:", error);
-      res.status(500).json({ message: "Failed to save calculation" });
+      res.status(500).json({ message: "We're unable to save your calculation at this time" });
     }
   });
 
@@ -281,7 +281,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(calculations);
     } catch (error) {
       console.error("Error fetching calculations:", error);
-      res.status(500).json({ message: "Failed to fetch calculations" });
+      res.status(500).json({ message: "We're unable to retrieve your calculations at this time" });
     }
   });
 
@@ -289,12 +289,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const calculation = await storage.getCalculation(req.params.id);
       if (!calculation) {
-        return res.status(404).json({ message: "Calculation not found" });
+        return res.status(404).json({ message: "The calculation you're looking for could not be found" });
       }
       res.json(calculation);
     } catch (error) {
       console.error("Error fetching calculation:", error);
-      res.status(500).json({ message: "Failed to fetch calculation" });
+      res.status(500).json({ message: "We're unable to retrieve this calculation at this time" });
     }
   });
 
@@ -309,7 +309,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(resources);
     } catch (error) {
       console.error("Error fetching resources:", error);
-      res.status(500).json({ message: "Failed to fetch resources" });
+      res.status(500).json({ message: "We're unable to load resources at this time" });
     }
   });
 
@@ -317,7 +317,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const resource = await storage.getResource(req.params.id);
       if (!resource) {
-        return res.status(404).json({ message: "Resource not found" });
+        return res.status(404).json({ message: "The resource you're looking for could not be found" });
       }
       
       // Increment view count
@@ -326,7 +326,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(resource);
     } catch (error) {
       console.error("Error fetching resource:", error);
-      res.status(500).json({ message: "Failed to fetch resource" });
+      res.status(500).json({ message: "We're unable to load this resource at this time" });
     }
   });
 
@@ -338,10 +338,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // TODO: Send notification email to admin
       
-      res.json({ message: "Message sent successfully" });
+      res.json({ message: "Your message has been sent successfully. We'll get back to you soon" });
     } catch (error) {
       console.error("Error sending contact message:", error);
-      res.status(500).json({ message: "Failed to send message" });
+      res.status(500).json({ message: "We're unable to send your message at this time. Please try again later" });
     }
   });
 
@@ -353,7 +353,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(snapshot);
     } catch (error) {
       console.error("Error saving net worth snapshot:", error);
-      res.status(500).json({ message: "Failed to save net worth snapshot" });
+      res.status(500).json({ message: "We're unable to save your net worth data at this time" });
     }
   });
 
@@ -364,7 +364,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(history);
     } catch (error) {
       console.error("Error fetching net worth history:", error);
-      res.status(500).json({ message: "Failed to fetch net worth history" });
+      res.status(500).json({ message: "We're unable to retrieve your net worth history at this time" });
     }
   });
 
@@ -375,7 +375,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(roles);
     } catch (error) {
       console.error("Error fetching roles:", error);
-      res.status(500).json({ message: "Failed to fetch roles" });
+      res.status(500).json({ message: "We're unable to load role information at this time" });
     }
   });
 
@@ -383,12 +383,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const role = await storage.getRole(req.params.id);
       if (!role) {
-        return res.status(404).json({ message: "Role not found" });
+        return res.status(404).json({ message: "The requested role could not be found" });
       }
       res.json(role);
     } catch (error) {
       console.error("Error fetching role:", error);
-      res.status(500).json({ message: "Failed to fetch role" });
+      res.status(500).json({ message: "We're unable to retrieve role information at this time" });
     }
   });
 
@@ -399,7 +399,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(userRoles);
     } catch (error) {
       console.error("Error fetching user roles:", error);
-      res.status(500).json({ message: "Failed to fetch user roles" });
+      res.status(500).json({ message: "We're unable to retrieve user role information at this time" });
     }
   });
 
@@ -417,7 +417,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(userRole);
     } catch (error: any) {
       console.error("Error assigning role:", error);
-      res.status(500).json({ message: error.message || "Failed to assign role" });
+      res.status(500).json({ message: error.message || "We're unable to assign this role at this time" });
     }
   });
 
@@ -428,10 +428,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!authorized) return;
 
       await storage.removeUserRole(req.params.userId, req.params.roleId);
-      res.json({ message: "Role removed successfully" });
+      res.json({ message: "The role has been successfully removed" });
     } catch (error) {
       console.error("Error removing role:", error);
-      res.status(500).json({ message: "Failed to remove role" });
+      res.status(500).json({ message: "We're unable to remove this role at this time" });
     }
   });
 
@@ -441,7 +441,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ hasRole });
     } catch (error) {
       console.error("Error checking user role:", error);
-      res.status(500).json({ message: "Failed to check user role" });
+      res.status(500).json({ message: "We're unable to verify user permissions at this time" });
     }
   });
 
@@ -451,14 +451,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { email } = req.body;
       
       if (!email) {
-        return res.status(400).json({ message: "Email is required" });
+        return res.status(400).json({ message: "Email address is required to create an administrator account" });
       }
       
       // Call bootstrap method which checks if super_admin already exists
       const user = await storage.bootstrapSuperAdmin(email);
       
       res.json({ 
-        message: "Super admin bootstrapped successfully",
+        message: "Administrator account has been created successfully",
         user: {
           id: user.id,
           email: user.email,
@@ -468,7 +468,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("Error bootstrapping super admin:", error);
-      res.status(400).json({ message: error.message || "Failed to bootstrap super admin" });
+      res.status(400).json({ message: error.message || "We're unable to create the administrator account at this time" });
     }
   });
 
@@ -497,7 +497,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(sanitizedUsers);
     } catch (error) {
       console.error("Error fetching users:", error);
-      res.status(500).json({ message: "Failed to fetch users" });
+      res.status(500).json({ message: "We're unable to retrieve user information at this time" });
     }
   });
 
@@ -512,19 +512,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { role } = req.body;
 
       if (!role) {
-        return res.status(400).json({ message: "Role is required" });
+        return res.status(400).json({ message: "Please specify a role for this user" });
       }
 
       // Validate role is one of the valid enum values
       const validRoles = ['super_admin', 'content_manager', 'guest_user', 'preferred_client', 'client'];
       if (!validRoles.includes(role)) {
-        return res.status(400).json({ message: "Invalid role" });
+        return res.status(400).json({ message: "The specified role is not valid" });
       }
 
       const updatedUser = await storage.updateUserRole(userId, role);
       
       res.json({
-        message: "User role updated successfully",
+        message: "User role has been updated successfully",
         user: {
           id: updatedUser.id,
           email: updatedUser.email,
@@ -535,7 +535,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("Error updating user role:", error);
-      res.status(500).json({ message: error.message || "Failed to update user role" });
+      res.status(500).json({ message: error.message || "We're unable to update the user role at this time" });
     }
   });
 
@@ -562,7 +562,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
-      res.status(500).json({ message: "Failed to fetch dashboard statistics" });
+      res.status(500).json({ message: "We're unable to load dashboard statistics at this time" });
     }
   });
 
@@ -579,7 +579,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(history);
     } catch (error) {
       console.error("Error fetching login history:", error);
-      res.status(500).json({ message: "Failed to fetch login history" });
+      res.status(500).json({ message: "We're unable to retrieve login history at this time" });
     }
   });
 
@@ -594,7 +594,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(content);
     } catch (error) {
       console.error("Error fetching content:", error);
-      res.status(500).json({ message: "Failed to fetch content" });
+      res.status(500).json({ message: "We're unable to load the content at this time" });
     }
   });
 
@@ -602,12 +602,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const content = await storage.getPageContentById(req.params.id);
       if (!content) {
-        return res.status(404).json({ message: "Content not found" });
+        return res.status(404).json({ message: "The requested content could not be found" });
       }
       res.json(content);
     } catch (error) {
       console.error("Error fetching content:", error);
-      res.status(500).json({ message: "Failed to fetch content" });
+      res.status(500).json({ message: "We're unable to load the content at this time" });
     }
   });
 
@@ -622,7 +622,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(content);
     } catch (error: any) {
       console.error("Error creating content:", error);
-      res.status(500).json({ message: error.message || "Failed to create content" });
+      res.status(500).json({ message: error.message || "We're unable to create this content at this time" });
     }
   });
 
@@ -636,7 +636,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(content);
     } catch (error) {
       console.error("Error updating content:", error);
-      res.status(500).json({ message: "Failed to update content" });
+      res.status(500).json({ message: "We're unable to update this content at this time" });
     }
   });
 
@@ -647,10 +647,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!authorized) return;
 
       await storage.deletePageContent(req.params.id);
-      res.json({ message: "Content deleted successfully" });
+      res.json({ message: "Content has been deleted successfully" });
     } catch (error) {
       console.error("Error deleting content:", error);
-      res.status(500).json({ message: "Failed to delete content" });
+      res.status(500).json({ message: "We're unable to delete this content at this time" });
     }
   });
 
