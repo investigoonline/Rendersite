@@ -1,6 +1,5 @@
 import {
   users,
-  guestAccounts,
   calculations,
   resources,
   contactMessages,
@@ -13,8 +12,6 @@ import {
   type UpsertUser,
   type InsertUserRegistration,
   type InsertUserBackend,
-  type GuestAccount,
-  type InsertGuestAccount,
   type Calculation,
   type InsertCalculation,
   type Resource,
@@ -53,18 +50,9 @@ export interface IStorage {
   updateUserPassword(userId: string, hashedPassword: string): Promise<void>;
   verifyUserEmail(userId: string, token: string): Promise<boolean>;
   
-  // Guest account operations
-  createGuestAccount(guest: InsertGuestAccount): Promise<GuestAccount>;
-  getGuestAccount(id: string): Promise<GuestAccount | undefined>;
-  getGuestAccountByEmail(email: string): Promise<GuestAccount | undefined>;
-  verifyGuestAccount(id: string, token: string): Promise<boolean>;
-  updateGuestActivity(id: string): Promise<void>;
-  deleteGuestAccount(id: string): Promise<void>;
-  cleanupExpiredGuests(): Promise<void>;
-  
   // Calculation operations
   saveCalculation(calculation: InsertCalculation): Promise<Calculation>;
-  getCalculations(userId?: string, guestId?: string): Promise<Calculation[]>;
+  getCalculations(userId?: string): Promise<Calculation[]>;
   getCalculation(id: string): Promise<Calculation | undefined>;
   
   // Resource operations
@@ -79,7 +67,7 @@ export interface IStorage {
   
   // Net worth operations
   saveNetWorthSnapshot(snapshot: InsertNetWorthSnapshot): Promise<NetWorthSnapshot>;
-  getNetWorthHistory(userId?: string, guestId?: string): Promise<NetWorthSnapshot[]>;
+  getNetWorthHistory(userId?: string): Promise<NetWorthSnapshot[]>;
   
   // Role operations
   getRoles(): Promise<Role[]>;
@@ -103,7 +91,6 @@ export interface IStorage {
   deletePageContent(id: string): Promise<void>;
   
   // Admin dashboard operations
-  getGuestUserCount(): Promise<number>;
   getActiveClientsCount(): Promise<number>;
   getTotalCalculationsCount(): Promise<number>;
   getTotalResourcesCount(): Promise<number>;
@@ -188,71 +175,6 @@ export class DatabaseStorage implements IStorage {
     return !!updated;
   }
 
-  // Guest account operations
-  async createGuestAccount(guest: InsertGuestAccount): Promise<GuestAccount> {
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 30); // 30-day expiration
-
-    const verificationToken = generateSecureToken();
-
-    const [guestAccount] = await db
-      .insert(guestAccounts)
-      .values({
-        ...guest,
-        expiresAt,
-        verificationToken,
-      })
-      .returning();
-    return guestAccount;
-  }
-
-  async getGuestAccount(id: string): Promise<GuestAccount | undefined> {
-    const [guest] = await db
-      .select()
-      .from(guestAccounts)
-      .where(eq(guestAccounts.id, id));
-    return guest;
-  }
-
-  async getGuestAccountByEmail(email: string): Promise<GuestAccount | undefined> {
-    const [guest] = await db
-      .select()
-      .from(guestAccounts)
-      .where(eq(guestAccounts.email, email));
-    return guest;
-  }
-
-  async verifyGuestAccount(id: string, token: string): Promise<boolean> {
-    const [updated] = await db
-      .update(guestAccounts)
-      .set({ verified: true, verificationToken: null })
-      .where(and(
-        eq(guestAccounts.id, id),
-        eq(guestAccounts.verificationToken, token)
-      ))
-      .returning();
-    return !!updated;
-  }
-
-  async updateGuestActivity(id: string): Promise<void> {
-    await db
-      .update(guestAccounts)
-      .set({ lastActivity: new Date() })
-      .where(eq(guestAccounts.id, id));
-  }
-
-  async deleteGuestAccount(id: string): Promise<void> {
-    await db
-      .delete(guestAccounts)
-      .where(eq(guestAccounts.id, id));
-  }
-
-  async cleanupExpiredGuests(): Promise<void> {
-    await db
-      .delete(guestAccounts)
-      .where(sql`${guestAccounts.expiresAt} < ${new Date()}`);
-  }
-
   // Calculation operations
   async saveCalculation(calculation: InsertCalculation): Promise<Calculation> {
     const [saved] = await db
@@ -262,20 +184,12 @@ export class DatabaseStorage implements IStorage {
     return saved;
   }
 
-  async getCalculations(userId?: string, guestId?: string): Promise<Calculation[]> {
-    let whereConditions = [];
-    
+  async getCalculations(userId?: string): Promise<Calculation[]> {
     if (userId) {
-      whereConditions.push(eq(calculations.userId, userId));
-    } else if (guestId) {
-      whereConditions.push(eq(calculations.guestId, guestId));
-    }
-    
-    if (whereConditions.length > 0) {
       return db
         .select()
         .from(calculations)
-        .where(and(...whereConditions))
+        .where(eq(calculations.userId, userId))
         .orderBy(desc(calculations.createdAt));
     }
     
@@ -360,20 +274,12 @@ export class DatabaseStorage implements IStorage {
     return saved;
   }
 
-  async getNetWorthHistory(userId?: string, guestId?: string): Promise<NetWorthSnapshot[]> {
-    let whereConditions = [];
-    
+  async getNetWorthHistory(userId?: string): Promise<NetWorthSnapshot[]> {
     if (userId) {
-      whereConditions.push(eq(netWorthSnapshots.userId, userId));
-    } else if (guestId) {
-      whereConditions.push(eq(netWorthSnapshots.guestId, guestId));
-    }
-    
-    if (whereConditions.length > 0) {
       return db
         .select()
         .from(netWorthSnapshots)
-        .where(and(...whereConditions))
+        .where(eq(netWorthSnapshots.userId, userId))
         .orderBy(desc(netWorthSnapshots.createdAt));
     }
     
@@ -581,13 +487,6 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Admin dashboard operations
-  async getGuestUserCount(): Promise<number> {
-    const result = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(guestAccounts);
-    return result[0]?.count || 0;
-  }
-
   async getActiveClientsCount(): Promise<number> {
     const result = await db
       .select({ count: sql<number>`count(*)::int` })
@@ -622,14 +521,14 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(calculations.createdAt))
       .limit(limit);
 
-    const recentGuests = await db
+    const recentUserSignups = await db
       .select({
-        type: sql<string>`'Guest Signup'`,
-        description: guestAccounts.email,
-        timestamp: guestAccounts.createdAt,
+        type: sql<string>`'User Signup'`,
+        description: users.email,
+        timestamp: users.createdAt,
       })
-      .from(guestAccounts)
-      .orderBy(desc(guestAccounts.createdAt))
+      .from(users)
+      .orderBy(desc(users.createdAt))
       .limit(limit);
 
     const recentContacts = await db
@@ -642,7 +541,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(contactMessages.createdAt))
       .limit(limit);
 
-    const allActivity = [...recentCalculations, ...recentGuests, ...recentContacts]
+    const allActivity = [...recentCalculations, ...recentUserSignups, ...recentContacts]
       .filter(item => item.timestamp !== null)
       .sort((a, b) => new Date(b.timestamp!).getTime() - new Date(a.timestamp!).getTime())
       .slice(0, limit)
