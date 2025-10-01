@@ -12,6 +12,8 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Shield, Save, Plus, Trash2, Edit, Lock, Users } from "lucide-react";
 import type { PageContent, User, Role } from "@shared/schema";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { FormRenderer } from "@/components/FormRenderer";
+import { getSectionSchema } from "@shared/contentSchemas";
 import {
   Table,
   TableBody,
@@ -333,27 +335,7 @@ export default function ContentManagement() {
                           </CardDescription>
                         </div>
                         <div className="flex items-center space-x-2">
-                          {editingSection === section.id ? (
-                            <>
-                              <Button
-                                size="sm"
-                                onClick={() => handleSave(section.id)}
-                                disabled={updateContentMutation.isPending}
-                                data-testid="button-save"
-                              >
-                                <Save className="h-4 w-4 mr-1" />
-                                Save
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={handleCancel}
-                                data-testid="button-cancel"
-                              >
-                                Cancel
-                              </Button>
-                            </>
-                          ) : (
+                          {editingSection !== section.id && (
                             <>
                               <Button
                                 size="sm"
@@ -383,38 +365,67 @@ export default function ContentManagement() {
                     </CardHeader>
                     <CardContent>
                       {editingSection === section.id ? (
-                        <div className="space-y-4">
-                          {Object.keys(formData).map((key) => (
-                            <div key={key}>
-                              <Label htmlFor={key} className="capitalize">
-                                {key.replace(/_/g, ' ')}
-                              </Label>
-                              {typeof formData[key] === 'string' && formData[key].length > 100 ? (
-                                <Textarea
-                                  id={key}
-                                  value={formData[key]}
-                                  onChange={(e) =>
-                                    setFormData({ ...formData, [key]: e.target.value })
-                                  }
-                                  rows={4}
-                                  data-testid={`input-${key}`}
-                                />
-                              ) : (
-                                <Input
-                                  id={key}
-                                  value={formData[key]?.toString() || ''}
-                                  onChange={(e) =>
-                                    setFormData({ ...formData, [key]: e.target.value })
-                                  }
-                                  data-testid={`input-${key}`}
-                                />
-                              )}
-                            </div>
-                          ))}
-                        </div>
+                        (() => {
+                          const sectionSchema = getSectionSchema(section.section);
+                          if (!sectionSchema) {
+                            return (
+                              <div className="space-y-4">
+                                <Alert>
+                                  <AlertDescription>
+                                    No schema found for this section. Using simple editor.
+                                  </AlertDescription>
+                                </Alert>
+                                {Object.keys(formData).map((key) => (
+                                  <div key={key}>
+                                    <Label htmlFor={key} className="capitalize">
+                                      {key.replace(/_/g, ' ')}
+                                    </Label>
+                                    {typeof formData[key] === 'string' && formData[key].length > 100 ? (
+                                      <Textarea
+                                        id={key}
+                                        value={formData[key]}
+                                        onChange={(e) =>
+                                          setFormData({ ...formData, [key]: e.target.value })
+                                        }
+                                        rows={4}
+                                        data-testid={`input-${key}`}
+                                      />
+                                    ) : (
+                                      <Input
+                                        id={key}
+                                        value={formData[key]?.toString() || ''}
+                                        onChange={(e) =>
+                                          setFormData({ ...formData, [key]: e.target.value })
+                                        }
+                                        data-testid={`input-${key}`}
+                                      />
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            );
+                          }
+                          return (
+                            <FormRenderer
+                              schema={sectionSchema}
+                              defaultValues={formData}
+                              onSubmit={(data) => {
+                                updateContentMutation.mutate({
+                                  id: section.id,
+                                  data: {
+                                    content: data,
+                                    updatedBy: user?.id,
+                                  },
+                                });
+                              }}
+                              onCancel={handleCancel}
+                              isSubmitting={updateContentMutation.isPending}
+                            />
+                          );
+                        })()
                       ) : (
                         <div className="prose max-w-none">
-                          <pre className="bg-gray-100 p-4 rounded-md overflow-auto">
+                          <pre className="bg-gray-100 p-4 rounded-md overflow-auto text-xs">
                             {JSON.stringify(section.content, null, 2)}
                           </pre>
                         </div>
