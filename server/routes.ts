@@ -3,7 +3,6 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { 
-  insertGuestAccountSchema,
   insertUserRegistrationSchema,
   insertUserBackendSchema,
   insertCalculationSchema,
@@ -198,111 +197,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Guest account routes
-  app.post('/api/guest/signup', async (req, res) => {
-    try {
-      const guestData = insertGuestAccountSchema.parse(req.body);
-      
-      // Check if email already exists
-      const existing = await storage.getGuestAccountByEmail(guestData.email);
-      if (existing) {
-        return res.status(400).json({ message: "Email already registered" });
-      }
-      
-      const guest = await storage.createGuestAccount(guestData);
-      
-      // TODO: Send verification email
-      
-      res.json({ 
-        id: guest.id, 
-        email: guest.email,
-        expiresAt: guest.expiresAt,
-        verified: guest.verified 
-      });
-    } catch (error) {
-      console.error("Error creating guest account:", error);
-      res.status(500).json({ message: "Failed to create guest account" });
-    }
-  });
-
-  app.post('/api/guest/verify', async (req, res) => {
-    try {
-      const { id, token } = req.body;
-      const verified = await storage.verifyGuestAccount(id, token);
-      
-      if (verified) {
-        res.json({ message: "Account verified successfully" });
-      } else {
-        res.status(400).json({ message: "Invalid verification token" });
-      }
-    } catch (error) {
-      console.error("Error verifying guest account:", error);
-      res.status(500).json({ message: "Failed to verify account" });
-    }
-  });
-
-  app.get('/api/guest/:id', async (req, res) => {
-    try {
-      const guest = await storage.getGuestAccount(req.params.id);
-      if (!guest) {
-        return res.status(404).json({ message: "Guest account not found" });
-      }
-      
-      // Update last activity
-      await storage.updateGuestActivity(guest.id);
-      
-      res.json({
-        id: guest.id,
-        email: guest.email,
-        guestType: guest.guestType,
-        verified: guest.verified,
-        expiresAt: guest.expiresAt,
-      });
-    } catch (error) {
-      console.error("Error fetching guest account:", error);
-      res.status(500).json({ message: "Failed to fetch guest account" });
-    }
-  });
-
-  // Guest login route - check if email exists in guest accounts
-  app.post('/api/guest/login', async (req, res) => {
-    try {
-      const { email, captcha } = req.body;
-      
-      // Server-side captcha validation
-      const { question, answer } = captcha;
-      const expectedAnswer = evaluateMathExpression(question);
-      if (expectedAnswer === null || parseInt(answer) !== expectedAnswer) {
-        return res.status(400).json({ message: "Invalid captcha" });
-      }
-      
-      // Check if email exists in guest accounts
-      const guest = await storage.getGuestAccountByEmail(email);
-      if (!guest) {
-        return res.status(400).json({ message: "Email not found in guest accounts" });
-      }
-      
-      // Check if guest account has expired
-      if (guest.expiresAt && new Date() > guest.expiresAt) {
-        return res.status(400).json({ message: "Guest account has expired" });
-      }
-      
-      // Update last activity
-      await storage.updateGuestActivity(guest.id);
-      
-      res.json({
-        id: guest.id,
-        email: guest.email,
-        guestType: guest.guestType,
-        verified: guest.verified,
-        expiresAt: guest.expiresAt,
-      });
-    } catch (error) {
-      console.error("Error during guest login:", error);
-      res.status(500).json({ message: "Failed to login" });
-    }
-  });
-
   // User registration routes
   app.post('/api/auth/register', async (req, res) => {
     try {
@@ -322,16 +216,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email already registered" });
       }
       
-      // Check if email exists in guest accounts (for upgrade flow)
-      const existingGuest = await storage.getGuestAccountByEmail(userData.email!);
-      
       const user = await storage.createUser(userData);
-      
-      // If this was a guest account upgrade, delete the guest account after successful registration
-      if (existingGuest) {
-        await storage.deleteGuestAccount(existingGuest.id);
-        console.log(`Guest account ${existingGuest.id} deleted after successful upgrade to full account for email: ${userData.email}`);
-      }
       
       // TODO: Send verification email
       
@@ -406,11 +291,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const calculationData = insertCalculationSchema.parse(req.body);
       
-      // Validate that either userId or guestId is provided
-      if (!calculationData.userId && !calculationData.guestId) {
-        return res.status(400).json({ message: "Either userId or guestId must be provided" });
-      }
-      
       const calculation = await storage.saveCalculation(calculationData);
       res.json(calculation);
     } catch (error) {
@@ -421,11 +301,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/calculations', async (req, res) => {
     try {
-      const { userId, guestId } = req.query;
-      const calculations = await storage.getCalculations(
-        userId as string, 
-        guestId as string
-      );
+      const { userId } = req.query;
+      const calculations = await storage.getCalculations(userId as string);
       res.json(calculations);
     } catch (error) {
       console.error("Error fetching calculations:", error);
@@ -507,26 +384,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/networth/history', async (req, res) => {
     try {
-      const { userId, guestId } = req.query;
-      const history = await storage.getNetWorthHistory(
-        userId as string, 
-        guestId as string
-      );
+      const { userId } = req.query;
+      const history = await storage.getNetWorthHistory(userId as string);
       res.json(history);
     } catch (error) {
       console.error("Error fetching net worth history:", error);
       res.status(500).json({ message: "Failed to fetch net worth history" });
-    }
-  });
-
-  // Utility routes
-  app.post('/api/guest/cleanup', async (req, res) => {
-    try {
-      await storage.cleanupExpiredGuests();
-      res.json({ message: "Cleanup completed" });
-    } catch (error) {
-      console.error("Error during cleanup:", error);
-      res.status(500).json({ message: "Cleanup failed" });
     }
   });
 
@@ -708,8 +571,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const authorized = await requireRole(req, res, ['super_admin']);
       if (!authorized) return;
 
-      const [guestUserCount, activeClients, totalCalculations, totalResources] = await Promise.all([
-        storage.getGuestUserCount(),
+      const [activeClients, totalCalculations, totalResources] = await Promise.all([
         storage.getActiveClientsCount(),
         storage.getTotalCalculationsCount(),
         storage.getTotalResourcesCount(),
@@ -718,7 +580,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const recentActivity = await storage.getRecentActivity(10);
 
       res.json({
-        guestUserCount,
         activeClients,
         totalCalculations,
         totalResources,
