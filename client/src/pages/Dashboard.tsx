@@ -275,21 +275,21 @@ export default function Dashboard() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">
-                    {userDistContent?.guestLabel || 'Guest Users'}
-                  </span>
-                  <span className="font-medium">{stats?.guestUserCount || 0}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">
                     {userDistContent?.clientsLabel || 'Active Clients'}
                   </span>
                   <span className="font-medium">{stats?.activeClients || 0}</span>
                 </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">
+                    Total Calculations
+                  </span>
+                  <span className="font-medium">{stats?.totalCalculations || 0}</span>
+                </div>
                 <div className="flex justify-between items-center pt-2 border-t">
                   <span className="text-sm font-medium">
-                    {userDistContent?.totalLabel || 'Total Users'}
+                    Total Resources
                   </span>
-                  <span className="font-bold">{(stats?.guestUserCount || 0) + (stats?.activeClients || 0)}</span>
+                  <span className="font-bold">{stats?.totalResources || 0}</span>
                 </div>
               </div>
             </CardContent>
@@ -320,8 +320,8 @@ export default function Dashboard() {
                     {engagementContent?.avgLabel || 'Avg per User'}
                   </span>
                   <span className="font-bold">
-                    {stats && (stats.guestUserCount + stats.activeClients) > 0
-                      ? Math.round(stats.totalCalculations / (stats.guestUserCount + stats.activeClients))
+                    {stats && stats.activeClients > 0
+                      ? Math.round(stats.totalCalculations / stats.activeClients)
                       : 0}
                   </span>
                 </div>
