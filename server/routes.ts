@@ -691,6 +691,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Login history for super_admin
+  app.get('/api/admin/login-history', async (req, res) => {
+    try {
+      // Only super_admin can view login history
+      const authorized = await requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const limit = parseInt(req.query.limit as string) || 50;
+      const history = await storage.getLoginHistory(limit);
+
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching login history:", error);
+      res.status(500).json({ message: "Failed to fetch login history" });
+    }
+  });
+
   // Content management routes
   app.get('/api/content', async (req, res) => {
     try {

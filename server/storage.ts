@@ -8,6 +8,7 @@ import {
   roles,
   userRoles,
   pageContent,
+  loginHistory,
   type User,
   type UpsertUser,
   type InsertUserRegistration,
@@ -28,6 +29,8 @@ import {
   type InsertUserRole,
   type PageContent,
   type InsertPageContent,
+  type LoginHistory,
+  type InsertLoginHistory,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, sql } from "drizzle-orm";
@@ -104,6 +107,10 @@ export interface IStorage {
   getTotalCalculationsCount(): Promise<number>;
   getTotalResourcesCount(): Promise<number>;
   getRecentActivity(limit: number): Promise<Array<{ type: string; description: string; timestamp: string }>>;
+  
+  // Login history operations
+  createLoginHistory(login: InsertLoginHistory): Promise<LoginHistory>;
+  getLoginHistory(limit?: number): Promise<LoginHistory[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -629,6 +636,24 @@ export class DatabaseStorage implements IStorage {
       }));
 
     return allActivity;
+  }
+
+  // Login history operations
+  async createLoginHistory(login: InsertLoginHistory): Promise<LoginHistory> {
+    const [history] = await db
+      .insert(loginHistory)
+      .values(login)
+      .returning();
+    return history;
+  }
+
+  async getLoginHistory(limit: number = 50): Promise<LoginHistory[]> {
+    const history = await db
+      .select()
+      .from(loginHistory)
+      .orderBy(desc(loginHistory.loginAt))
+      .limit(limit);
+    return history;
   }
 }
 
