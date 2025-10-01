@@ -165,6 +165,17 @@ export const userRoles = pgTable("user_roles", {
   assignedAt: timestamp("assigned_at").defaultNow(),
 });
 
+// Login history table
+export const loginHistory = pgTable("login_history", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id"),
+  guestId: uuid("guest_id"),
+  email: varchar("email", { length: 255 }).notNull(),
+  loginAt: timestamp("login_at").defaultNow(),
+  ipAddress: varchar("ip_address"),
+  userAgent: varchar("user_agent"),
+});
+
 // Page content sections enum
 export const contentSectionEnum = pgEnum('content_section', [
   'home_hero',
@@ -199,7 +210,12 @@ export const contentSectionEnum = pgEnum('content_section', [
   'resources_videos',
   'resources_newsletters',
   'resources_flipbooks',
-  'resources_faq'
+  'resources_faq',
+  'dashboard_header',
+  'dashboard_stats',
+  'dashboard_user_distribution',
+  'dashboard_engagement',
+  'dashboard_system_status'
 ]);
 
 // Content management table
@@ -291,6 +307,10 @@ export const insertPageContentSchema = createInsertSchema(pageContent).omit({
   createdAt: true,
   updatedAt: true,
 });
+export const insertLoginHistorySchema = createInsertSchema(loginHistory).omit({
+  id: true,
+  loginAt: true,
+});
 
 // Export types
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
@@ -313,3 +333,5 @@ export type UserRole = typeof userRoles.$inferSelect;
 export type InsertUserRole = z.infer<typeof insertUserRoleSchema>;
 export type PageContent = typeof pageContent.$inferSelect;
 export type InsertPageContent = z.infer<typeof insertPageContentSchema>;
+export type LoginHistory = typeof loginHistory.$inferSelect;
+export type InsertLoginHistory = z.infer<typeof insertLoginHistorySchema>;
