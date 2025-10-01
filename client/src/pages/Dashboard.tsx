@@ -20,7 +20,7 @@ export default function Dashboard() {
   });
 
   const { data: dashboardContent } = useQuery<PageContent[]>({
-    queryKey: ['/api/content', 'dashboard'],
+    queryKey: ['/api/content?page=dashboard'],
   });
 
   const { data: loginHistory } = useQuery<LoginHistory[]>({

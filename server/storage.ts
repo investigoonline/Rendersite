@@ -566,8 +566,7 @@ export class DatabaseStorage implements IStorage {
   async getGuestUserCount(): Promise<number> {
     const result = await db
       .select({ count: sql<number>`count(*)::int` })
-      .from(guestAccounts)
-      .where(eq(guestAccounts.verified, true));
+      .from(guestAccounts);
     return result[0]?.count || 0;
   }
 

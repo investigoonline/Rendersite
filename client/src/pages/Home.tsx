@@ -20,7 +20,7 @@ export default function Home() {
 
   // Fetch home page content
   const { data: homeContent } = useQuery<PageContent[]>({
-    queryKey: ['/api/content', 'home'],
+    queryKey: ['/api/content?page=home'],
   });
 
   // Helper to get content by section
