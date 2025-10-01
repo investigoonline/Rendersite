@@ -88,6 +88,8 @@ export interface IStorage {
   getUserRoles(userId: string): Promise<(UserRole & { role: Role })[]>;
   removeUserRole(userId: string, roleId: string): Promise<void>;
   checkUserHasRole(userId: string, roleName: string): Promise<boolean>;
+  getAllUsersWithRoles(): Promise<Array<User & { roles: Role[] }>>;
+  bootstrapSuperAdmin(email: string): Promise<User>;
   
   // Content operations
   getPageContent(page: string, section?: string): Promise<PageContent[]>;
@@ -427,6 +429,74 @@ export class DatabaseStorage implements IStorage {
       .limit(1);
     
     return result.length > 0;
+  }
+
+  async getAllUsersWithRoles(): Promise<Array<User & { roles: Role[] }>> {
+    // Get all users
+    const allUsers = await db.select().from(users);
+    
+    // For each user, get their roles
+    const usersWithRoles = await Promise.all(
+      allUsers.map(async (user) => {
+        const userRoleRecords = await this.getUserRoles(user.id);
+        return {
+          ...user,
+          roles: userRoleRecords.map(ur => ur.role),
+        };
+      })
+    );
+    
+    return usersWithRoles;
+  }
+
+  async bootstrapSuperAdmin(email: string): Promise<User> {
+    // Check if any super_admin exists
+    const existingSuperAdmins = await db
+      .select({ id: userRoles.id })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(eq(roles.name, 'super_admin'))
+      .limit(1);
+    
+    if (existingSuperAdmins.length > 0) {
+      throw new Error('A super admin already exists. Cannot bootstrap.');
+    }
+    
+    // Get or create the user
+    let user = await this.getUserByEmail(email);
+    if (!user) {
+      // Create user with minimal data
+      const [newUser] = await db
+        .insert(users)
+        .values({
+          email,
+          firstName: 'Super',
+          lastName: 'Admin',
+          authType: 'replit',
+          isEmailVerified: true,
+        })
+        .returning();
+      user = newUser;
+    }
+    
+    // Ensure super_admin role exists
+    let superAdminRole = await this.getRoleByName('super_admin');
+    if (!superAdminRole) {
+      const [newRole] = await db
+        .insert(roles)
+        .values({
+          name: 'super_admin',
+          displayName: 'Super Admin',
+          description: 'Full system access and user management',
+        })
+        .returning();
+      superAdminRole = newRole;
+    }
+    
+    // Assign super_admin role
+    await this.assignRoleToUser(user.id, superAdminRole.id);
+    
+    return user;
   }
 
   // Content operations
