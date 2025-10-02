@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,29 +20,9 @@ export default function Header() {
   const [clientModalOpen, setClientModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Check if user has content management access
-  const { data: hasContentAccess } = useQuery({
-    queryKey: ['/api/users', user?.id, 'content-access'],
-    enabled: !!user?.id && isRegisteredUser,
-    queryFn: async () => {
-      const [contentManagerCheck, superAdminCheck] = await Promise.all([
-        fetch(`/api/users/${user?.id}/has-role/content_manager`).then(r => r.json()),
-        fetch(`/api/users/${user?.id}/has-role/super_admin`).then(r => r.json())
-      ]);
-      return contentManagerCheck.hasRole || superAdminCheck.hasRole;
-    }
-  });
-
-  // Check if user is super admin
-  const { data: isSuperAdmin } = useQuery({
-    queryKey: ['/api/users', user?.id, 'super-admin'],
-    enabled: !!user?.id && isRegisteredUser,
-    queryFn: async () => {
-      const response = await fetch(`/api/users/${user?.id}/has-role/super_admin`);
-      const data = await response.json();
-      return data.hasRole;
-    }
-  });
+  // Check roles directly from user object (more efficient and reliable)
+  const isSuperAdmin = user?.role === 'super_admin';
+  const hasContentAccess = user?.role === 'super_admin' || user?.role === 'content_manager';
 
   const navigation = [
     { name: "Home", href: "/" },
