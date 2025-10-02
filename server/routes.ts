@@ -614,6 +614,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Role permission routes
+  app.get('/api/admin/role-permissions', async (req, res) => {
+    try {
+      const authorized = await requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const permissions = await storage.getRolePermissions();
+      res.json(permissions);
+    } catch (error) {
+      console.error("Error fetching role permissions:", error);
+      res.status(500).json({ message: "Unable to fetch role permissions" });
+    }
+  });
+
+  app.post('/api/admin/role-permissions', async (req, res) => {
+    try {
+      const authorized = await requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const { permissions } = req.body;
+      
+      if (!Array.isArray(permissions)) {
+        return res.status(400).json({ message: "Permissions must be an array" });
+      }
+
+      await storage.setRolePermissions(permissions);
+      res.json({ message: "Permissions updated successfully" });
+    } catch (error) {
+      console.error("Error updating role permissions:", error);
+      res.status(500).json({ message: "Unable to update role permissions" });
+    }
+  });
+
   // Content management routes
   app.get('/api/content', async (req, res) => {
     try {

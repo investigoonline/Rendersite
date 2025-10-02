@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import type { RolePermission } from "@shared/schema";
 
 interface Permission {
   resource: string;
@@ -84,7 +87,82 @@ const defaultPermissions: Record<string, string[]> = {
 export default function RolesManagementDesign1() {
   const { toast } = useToast();
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["CALCULATORS"]));
-  const [rolePermissions, setRolePermissions] = useState<Record<string, string[]>>(defaultPermissions);
+  const [rolePermissions, setRolePermissions] = useState<Record<string, string[]>>({});
+
+  // Fetch permissions from database
+  const { data: dbPermissions, isLoading } = useQuery<RolePermission[]>({
+    queryKey: ['/api/admin/role-permissions'],
+  });
+
+  // Initialize permissions from database
+  useEffect(() => {
+    if (dbPermissions) {
+      const permissionsMap: Record<string, string[]> = {};
+      
+      // Initialize with empty arrays for all roles
+      roles.forEach(role => {
+        permissionsMap[role.id] = [];
+      });
+
+      // Populate from database
+      dbPermissions.forEach(perm => {
+        if (!permissionsMap[perm.role]) {
+          permissionsMap[perm.role] = [];
+        }
+        permissionsMap[perm.role].push(perm.resourceId);
+      });
+
+      setRolePermissions(permissionsMap);
+    } else {
+      // Use default permissions if nothing in database
+      setRolePermissions(defaultPermissions);
+    }
+  }, [dbPermissions]);
+
+  // Save mutation
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      // Convert rolePermissions to database format
+      const permissionsArray: any[] = [];
+      
+      Object.entries(rolePermissions).forEach(([roleId, resources]) => {
+        resources.forEach(resourceId => {
+          // Determine resource type
+          let resourceType = 'page';
+          const permission = permissions.find(p => p.resource === resourceId);
+          if (permission) {
+            if (permission.type === 'calculator') {
+              resourceType = 'calculator';
+            } else if (permission.type === 'category') {
+              resourceType = 'calculator_category';
+            }
+          }
+
+          permissionsArray.push({
+            role: roleId,
+            resourceType,
+            resourceId,
+          });
+        });
+      });
+
+      return apiRequest('POST', '/api/admin/role-permissions', { permissions: permissionsArray });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/role-permissions'] });
+      toast({
+        title: "Permissions Saved",
+        description: "Role permissions have been updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save permissions",
+        variant: "destructive",
+      });
+    },
+  });
 
   const toggleCategory = (category: string) => {
     const newExpanded = new Set(expandedCategories);
@@ -111,10 +189,7 @@ export default function RolesManagementDesign1() {
   };
 
   const handleSave = () => {
-    toast({
-      title: "Permissions Saved",
-      description: "Role permissions have been updated successfully",
-    });
+    saveMutation.mutate();
   };
 
   const renderPermissionRow = (permission: Permission, level: number = 0): JSX.Element => {
@@ -160,14 +235,26 @@ export default function RolesManagementDesign1() {
 
   const topLevelPermissions = permissions.filter(p => !p.parentId);
 
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="p-8">
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>Design 1: Hierarchical Matrix View</span>
-          <Button onClick={handleSave} data-testid="button-save-design1">
+          <Button onClick={handleSave} disabled={saveMutation.isPending} data-testid="button-save-design1">
             <Save className="h-4 w-4 mr-2" />
-            Save Changes
+            {saveMutation.isPending ? "Saving..." : "Save Changes"}
           </Button>
         </CardTitle>
       </CardHeader>
@@ -193,9 +280,9 @@ export default function RolesManagementDesign1() {
           <Button variant="outline" data-testid="button-bulk-actions">
             Bulk Actions
           </Button>
-          <Button onClick={handleSave} data-testid="button-save-changes">
+          <Button onClick={handleSave} disabled={saveMutation.isPending} data-testid="button-save-changes">
             <Save className="h-4 w-4 mr-2" />
-            Save All Changes
+            {saveMutation.isPending ? "Saving..." : "Save All Changes"}
           </Button>
         </div>
       </CardContent>

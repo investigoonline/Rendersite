@@ -145,6 +145,24 @@ export const userRoles = pgTable("user_roles", {
   assignedAt: timestamp("assigned_at").defaultNow(),
 });
 
+// Resource types enum for permissions
+export const resourceTypePermissionEnum = pgEnum('resource_type_permission', [
+  'page',
+  'calculator',
+  'calculator_category',
+  'resource_type'
+]);
+
+// Role permissions table - stores which roles have access to which resources
+export const rolePermissions = pgTable("role_permissions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  role: userRoleEnum("role").notNull(),
+  resourceType: resourceTypePermissionEnum("resource_type").notNull(),
+  resourceId: varchar("resource_id", { length: 100 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Login history table
 export const loginHistory = pgTable("login_history", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -294,9 +312,16 @@ export const insertLoginHistorySchema = createInsertSchema(loginHistory).omit({
   id: true,
   loginAt: true,
 });
+export const insertRolePermissionSchema = createInsertSchema(rolePermissions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 
 // Export types
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
+export type RolePermission = typeof rolePermissions.$inferSelect;
+export type InsertRolePermission = z.infer<typeof insertRolePermissionSchema>;
 export type InsertUserRegistration = z.infer<typeof insertUserRegistrationSchema>;
 export type InsertUserBackend = z.infer<typeof insertUserBackendSchema>;
 export type User = typeof users.$inferSelect;

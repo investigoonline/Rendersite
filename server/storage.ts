@@ -8,6 +8,7 @@ import {
   userRoles,
   pageContent,
   loginHistory,
+  rolePermissions,
   type User,
   type UpsertUser,
   type InsertUserRegistration,
@@ -28,6 +29,8 @@ import {
   type InsertPageContent,
   type LoginHistory,
   type InsertLoginHistory,
+  type RolePermission,
+  type InsertRolePermission,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, sql } from "drizzle-orm";
@@ -99,6 +102,11 @@ export interface IStorage {
   // Login history operations
   createLoginHistory(login: InsertLoginHistory): Promise<LoginHistory>;
   getLoginHistory(limit?: number): Promise<LoginHistory[]>;
+  
+  // Role permission operations
+  getRolePermissions(): Promise<RolePermission[]>;
+  setRolePermissions(permissions: InsertRolePermission[]): Promise<void>;
+  deleteAllRolePermissions(): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -570,6 +578,28 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(loginHistory.loginAt))
       .limit(limit);
     return history;
+  }
+
+  // Role permission operations
+  async getRolePermissions(): Promise<RolePermission[]> {
+    const permissions = await db
+      .select()
+      .from(rolePermissions);
+    return permissions;
+  }
+
+  async setRolePermissions(permissions: InsertRolePermission[]): Promise<void> {
+    // Delete existing permissions
+    await db.delete(rolePermissions);
+    
+    // Insert new permissions
+    if (permissions.length > 0) {
+      await db.insert(rolePermissions).values(permissions);
+    }
+  }
+
+  async deleteAllRolePermissions(): Promise<void> {
+    await db.delete(rolePermissions);
   }
 }
 
