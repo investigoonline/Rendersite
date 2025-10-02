@@ -137,6 +137,9 @@ function safeArithmeticEvaluator(expression: string): number {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Trust proxy - required for production deployments
+  app.set('trust proxy', 1);
+  
   // Setup session middleware
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
   const pgStore = connectPg(session);
@@ -147,6 +150,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     tableName: "sessions",
   });
   
+  const isProduction = process.env.NODE_ENV === "production";
+  
   app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
     store: sessionStore,
@@ -154,8 +159,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isProduction,
+      sameSite: isProduction ? 'lax' : 'lax',
       maxAge: sessionTtl,
+      path: '/',
     },
   }));
 

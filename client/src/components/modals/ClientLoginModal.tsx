@@ -59,16 +59,23 @@ export default function ClientLoginModal({ open, onOpenChange }: ClientLoginModa
         captcha,
       });
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast({
         title: "Login Successful",
         description: "Welcome back to your account!",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       onOpenChange(false);
       form.reset();
       setCaptcha({ question: "", answer: "" });
-      window.location.href = "/";
+      
+      // Invalidate and refetch user data before redirecting
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/auth/user"] });
+      
+      // Small delay to ensure session is fully established
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 100);
     },
     onError: (error: any) => {
       toast({
