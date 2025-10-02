@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Layout from "@/components/Layout";
 import Landing from "@/pages/Landing";
 import Home from "@/pages/Home";
@@ -40,8 +41,20 @@ function Router() {
         <Route path="/location" component={Location} />
         <Route path="/disclosures" component={Disclosures} />
         <Route path="/custodian" component={Custodian} />
-        <Route path="/admin-dashboard" component={Dashboard} />
-        <Route path="/content-management" component={ContentManagement} />
+        
+        {/* Protected routes - Super Admin only */}
+        <Route path="/admin-dashboard">
+          <ProtectedRoute allowedRoles={['super_admin']}>
+            <Dashboard />
+          </ProtectedRoute>
+        </Route>
+        
+        {/* Protected routes - Super Admin and Content Manager */}
+        <Route path="/content-management">
+          <ProtectedRoute allowedRoles={['super_admin', 'content_manager']}>
+            <ContentManagement />
+          </ProtectedRoute>
+        </Route>
         
         {/* Home route - Landing for guests, Dashboard for authenticated users */}
         <Route path="/">
