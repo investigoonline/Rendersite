@@ -270,12 +270,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Email verification removed - users can login immediately after registration
       
-      // Create session (store user in session)
+      // Create session (store user in session including role)
       (req as any).session.user = {
         id: user.id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        role: user.role,
         authType: user.authType,
       };
       
@@ -291,6 +292,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
+          role: user.role,
           authType: user.authType,
         });
       });
