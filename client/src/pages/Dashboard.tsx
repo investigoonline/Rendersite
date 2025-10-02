@@ -42,8 +42,11 @@ export default function Dashboard() {
     mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
       return apiRequest('PUT', `/api/admin/users/${userId}/role`, { role });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+    onSuccess: async () => {
+      // Invalidate and refetch to ensure UI updates immediately
+      await queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      await queryClient.refetchQueries({ queryKey: ['/api/admin/users'] });
+      
       toast({
         title: "Success",
         description: "User role updated successfully",
