@@ -61,29 +61,10 @@ export default function ContentManagement() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedSectionType, setSelectedSectionType] = useState<string>("");
 
-  // Check if user has content manager or super admin role
-  const { data: hasAccess, isLoading: checkingAccess } = useQuery({
-    queryKey: ['/api/users', user?.id, 'has-role', 'content_manager'],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const [contentManagerCheck, superAdminCheck] = await Promise.all([
-        fetch(`/api/users/${user?.id}/has-role/content_manager`).then(r => r.json()),
-        fetch(`/api/users/${user?.id}/has-role/super_admin`).then(r => r.json())
-      ]);
-      return contentManagerCheck.hasRole || superAdminCheck.hasRole;
-    }
-  });
-
-  // Check if user is specifically a super admin
-  const { data: isSuperAdmin } = useQuery({
-    queryKey: ['/api/users', user?.id, 'has-role', 'super_admin'],
-    enabled: !!user?.id && hasAccess === true,
-    queryFn: async () => {
-      const res = await fetch(`/api/users/${user?.id}/has-role/super_admin`);
-      const data = await res.json();
-      return data.hasRole;
-    }
-  });
+  // Check roles directly from user object (consistent with Header and ProtectedRoute)
+  const hasAccess = user?.role === 'super_admin' || user?.role === 'content_manager';
+  const isSuperAdmin = user?.role === 'super_admin';
+  const checkingAccess = false;
 
   // Fetch page content
   const { data: pageContent, isLoading } = useQuery<PageContent[]>({

@@ -16,24 +16,21 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
-// Middleware to check if user has required role
-async function requireRole(req: any, res: any, roles: string[]): Promise<boolean> {
-  const userId = req.session?.user?.id;
+// Middleware to check if user has required role (using session data for consistency)
+function requireRole(req: any, res: any, roles: string[]): boolean {
+  const userRole = req.session?.user?.role;
   
-  if (!userId) {
+  if (!req.session?.user?.id) {
     res.status(401).json({ message: "You must be logged in to access this resource" });
     return false;
   }
 
-  for (const role of roles) {
-    const hasRole = await storage.checkUserHasRole(userId, role);
-    if (hasRole) {
-      return true;
-    }
+  if (!userRole || !roles.includes(userRole)) {
+    res.status(403).json({ message: "You do not have permission to access this resource" });
+    return false;
   }
 
-  res.status(403).json({ message: "You do not have permission to access this resource" });
-  return false;
+  return true;
 }
 
 // Safe arithmetic expression parser for captcha
