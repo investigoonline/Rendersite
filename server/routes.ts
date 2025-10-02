@@ -279,12 +279,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         authType: user.authType,
       };
       
-      res.json({
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        authType: user.authType,
+      // Explicitly save session before sending response (critical for production)
+      (req as any).session.save((err: any) => {
+        if (err) {
+          console.error("Error saving session:", err);
+          return res.status(500).json({ message: "We're unable to complete your login at this time. Please try again" });
+        }
+        
+        res.json({
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          authType: user.authType,
+        });
       });
     } catch (error) {
       console.error("Error during login:", error);

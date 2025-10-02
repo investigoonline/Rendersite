@@ -6,6 +6,21 @@ InvestigooOnline is a financial planning platform built by IFS Group that provid
 
 Preferred communication style: Simple, everyday language.
 
+# Recent Changes
+
+## Production Login Fix (October 2025)
+- **Critical Fix**: Added explicit `session.save()` callback in login route to ensure session persists before response
+- **Issue**: In production, sessions weren't saving to database before redirect, causing login failures
+- **Solution**: Wrap response in `session.save()` callback to guarantee session persistence
+- **Impact**: Login now works reliably in both development and production environments
+
+## Roles Management System (October 2025)
+- **Database Schema**: Created `role_permissions` table with resource-based access control
+- **API Endpoints**: GET/POST `/api/admin/role-permissions` for reading and updating permissions
+- **Matrix View**: Hierarchical permission matrix with expandable categories and role checkboxes
+- **Database Integration**: Permissions persist across sessions, fully integrated with PostgreSQL
+- **Resource Types**: Pages, calculators, calculator categories, and resource types
+
 # System Architecture
 
 ## Full-Stack Architecture
