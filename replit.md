@@ -8,6 +8,13 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## User Role Persistence Fix (October 2025)
+- **Critical Fix**: Added `role` field to session data and login response
+- **Issue**: When user roles were updated in database, changes weren't reflected after logout/login
+- **Root Cause**: Login route only stored id, email, name, authType in session - role was missing
+- **Solution**: Include `role: user.role` in both session storage and login response
+- **Impact**: Role changes now persist correctly across login sessions
+
 ## Production Login Fix (October 2025)
 - **Critical Fix**: Added explicit `session.save()` callback in login route to ensure session persists before response
 - **Issue**: In production, sessions weren't saving to database before redirect, causing login failures
