@@ -1,0 +1,204 @@
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronRight, Save } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+interface Permission {
+  resource: string;
+  type: 'page' | 'calculator' | 'category';
+  parentId?: string;
+  icon?: string;
+}
+
+const permissions: Permission[] = [
+  { resource: "Home (Landing/Dashboard)", type: "page", icon: "🏠" },
+  { resource: "Register", type: "page", icon: "📝" },
+  { resource: "Resources", type: "page", icon: "📊" },
+  { resource: "About", type: "page", icon: "ℹ️" },
+  { resource: "Contact", type: "page", icon: "📧" },
+  { resource: "Services", type: "page", icon: "🛠️" },
+  { resource: "FAQ", type: "page", icon: "❓" },
+  { resource: "Become Client", type: "page", icon: "👥" },
+  { resource: "Location", type: "page", icon: "📍" },
+  { resource: "Disclosures", type: "page", icon: "📋" },
+  { resource: "Custodian", type: "page", icon: "🏦" },
+  { resource: "Content Management", type: "page", icon: "⚙️" },
+  { resource: "Admin Dashboard", type: "page", icon: "🎛️" },
+  { resource: "CALCULATORS", type: "category", icon: "🧮" },
+  { resource: "Wealth Management", type: "category", parentId: "CALCULATORS", icon: "💰" },
+  { resource: "Total Net Worth", type: "calculator", parentId: "Wealth Management" },
+  { resource: "Income to Debt Ratio", type: "calculator", parentId: "Wealth Management" },
+  { resource: "Loans & Credit Cards", type: "category", parentId: "CALCULATORS", icon: "💳" },
+  { resource: "Loan Payoff Calculator", type: "calculator", parentId: "Loans & Credit Cards" },
+  { resource: "Credit Card Debt", type: "calculator", parentId: "Loans & Credit Cards" },
+  { resource: "Real Estate & Housing", type: "category", parentId: "CALCULATORS", icon: "🏡" },
+  { resource: "Home Affordability", type: "calculator", parentId: "Real Estate & Housing" },
+  { resource: "Mortgage Refinancing", type: "calculator", parentId: "Real Estate & Housing" },
+  { resource: "Mortgage Acceleration", type: "calculator", parentId: "Real Estate & Housing" },
+  { resource: "Vehicle Financing", type: "category", parentId: "CALCULATORS", icon: "🚗" },
+  { resource: "Lease Payment", type: "calculator", parentId: "Vehicle Financing" },
+  { resource: "Car Affordability", type: "calculator", parentId: "Vehicle Financing" },
+  { resource: "Retirement & Inflation", type: "category", parentId: "CALCULATORS", icon: "🏦" },
+  { resource: "Cost of Retirement", type: "calculator", parentId: "Retirement & Inflation" },
+  { resource: "Required Minimum Distributions", type: "calculator", parentId: "Retirement & Inflation" },
+  { resource: "Impact of Inflation", type: "calculator", parentId: "Retirement & Inflation" },
+  { resource: "Estate Planning", type: "category", parentId: "CALCULATORS", icon: "📜" },
+  { resource: "Estate Tax Calculator", type: "calculator", parentId: "Estate Planning" },
+  { resource: "Tax Planning Tools", type: "calculator", parentId: "Estate Planning" },
+  { resource: "Taxes & IRAs", type: "category", parentId: "CALCULATORS", icon: "💼" },
+  { resource: "Federal Income Tax", type: "calculator", parentId: "Taxes & IRAs" },
+  { resource: "IRA Eligibility", type: "calculator", parentId: "Taxes & IRAs" },
+  { resource: "Roth IRA Conversion", type: "calculator", parentId: "Taxes & IRAs" },
+  { resource: "Credit & Debt Management", type: "category", parentId: "CALCULATORS", icon: "📈" },
+  { resource: "Credit Score Impact", type: "calculator", parentId: "Credit & Debt Management" },
+  { resource: "Debt Consolidation", type: "calculator", parentId: "Credit & Debt Management" },
+];
+
+const roles = [
+  { id: "super_admin", name: "Super Admin" },
+  { id: "content_manager", name: "Content Manager" },
+  { id: "guest_user", name: "Guest User" },
+  { id: "preferred_client", name: "Preferred Client" },
+  { id: "client", name: "Client" },
+];
+
+// Default permissions mapping
+const defaultPermissions: Record<string, string[]> = {
+  "super_admin": permissions.map(p => p.resource),
+  "content_manager": [
+    "Home (Landing/Dashboard)", "Register", "Resources", "About", "Contact", 
+    "Services", "FAQ", "Become Client", "Location", "Disclosures", "Custodian", 
+    "Content Management"
+  ],
+  "guest_user": [
+    "Home (Landing/Dashboard)", "Register", "Resources", "About", "Contact",
+    "Services", "FAQ", "Become Client", "Location", "Disclosures", "Custodian",
+    "CALCULATORS", "Vehicle Financing", "Lease Payment", "Car Affordability"
+  ],
+  "preferred_client": permissions.filter(p => p.resource !== "Content Management" && p.resource !== "Admin Dashboard").map(p => p.resource),
+  "client": permissions.filter(p => p.resource !== "Content Management" && p.resource !== "Admin Dashboard").map(p => p.resource),
+};
+
+export default function RolesManagementDesign1() {
+  const { toast } = useToast();
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["CALCULATORS"]));
+  const [rolePermissions, setRolePermissions] = useState<Record<string, string[]>>(defaultPermissions);
+
+  const toggleCategory = (category: string) => {
+    const newExpanded = new Set(expandedCategories);
+    if (newExpanded.has(category)) {
+      newExpanded.delete(category);
+    } else {
+      newExpanded.add(category);
+    }
+    setExpandedCategories(newExpanded);
+  };
+
+  const togglePermission = (roleId: string, resource: string) => {
+    setRolePermissions(prev => {
+      const current = prev[roleId] || [];
+      const newPermissions = current.includes(resource)
+        ? current.filter(r => r !== resource)
+        : [...current, resource];
+      return { ...prev, [roleId]: newPermissions };
+    });
+  };
+
+  const hasPermission = (roleId: string, resource: string) => {
+    return rolePermissions[roleId]?.includes(resource) || false;
+  };
+
+  const handleSave = () => {
+    toast({
+      title: "Permissions Saved",
+      description: "Role permissions have been updated successfully",
+    });
+  };
+
+  const renderPermissionRow = (permission: Permission, level: number = 0): JSX.Element => {
+    const isCategory = permission.type === "category";
+    const isExpanded = expandedCategories.has(permission.resource);
+    const children = permissions.filter(p => p.parentId === permission.resource);
+
+    return (
+      <>
+        <tr key={permission.resource} className="border-b hover:bg-gray-50" data-testid={`permission-row-${permission.resource}`}>
+          <td className="py-3 px-4" style={{ paddingLeft: `${level * 2 + 1}rem` }}>
+            <div className="flex items-center">
+              {isCategory && children.length > 0 && (
+                <button
+                  onClick={() => toggleCategory(permission.resource)}
+                  className="mr-2"
+                  data-testid={`toggle-category-${permission.resource}`}
+                >
+                  {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                </button>
+              )}
+              {!isCategory && children.length === 0 && <span className="mr-6"></span>}
+              <span className={isCategory ? "font-semibold" : ""}>
+                {permission.icon && <span className="mr-2">{permission.icon}</span>}
+                {permission.resource}
+              </span>
+            </div>
+          </td>
+          {roles.map(role => (
+            <td key={role.id} className="py-3 px-4 text-center" data-testid={`permission-${permission.resource}-${role.id}`}>
+              <Checkbox
+                checked={hasPermission(role.id, permission.resource)}
+                onCheckedChange={() => togglePermission(role.id, permission.resource)}
+                data-testid={`checkbox-${permission.resource}-${role.id}`}
+              />
+            </td>
+          ))}
+        </tr>
+        {isCategory && isExpanded && children.map(child => renderPermissionRow(child, level + 1))}
+      </>
+    );
+  };
+
+  const topLevelPermissions = permissions.filter(p => !p.parentId);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <span>Design 1: Hierarchical Matrix View</span>
+          <Button onClick={handleSave} data-testid="button-save-design1">
+            <Save className="h-4 w-4 mr-2" />
+            Save Changes
+          </Button>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b bg-gray-100">
+                <th className="text-left py-3 px-4 font-medium text-gray-700">Resource</th>
+                {roles.map(role => (
+                  <th key={role.id} className="text-center py-3 px-4 font-medium text-gray-700 min-w-[100px]" data-testid={`header-${role.id}`}>
+                    {role.name}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {topLevelPermissions.map(permission => renderPermissionRow(permission))}
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-6 flex gap-4">
+          <Button variant="outline" data-testid="button-bulk-actions">
+            Bulk Actions
+          </Button>
+          <Button onClick={handleSave} data-testid="button-save-changes">
+            <Save className="h-4 w-4 mr-2" />
+            Save All Changes
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
