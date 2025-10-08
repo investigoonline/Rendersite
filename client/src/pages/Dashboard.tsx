@@ -6,13 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Users, UserCheck, Calculator, FileText, Shield, Settings } from "lucide-react";
+import { Users, UserCheck, Calculator, FileText, Shield, Settings, History } from "lucide-react";
 import type { PageContent, LoginHistory, User } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import RolesManagementDesign1 from "@/components/roles/RolesManagementDesign1";
 import RolesManagementDesign2 from "@/components/roles/RolesManagementDesign2";
 import RolesManagementDesign3 from "@/components/roles/RolesManagementDesign3";
+import ContentHistoryTab from "@/components/ContentHistoryTab";
 
 interface DashboardStats {
   activeClients: number;
@@ -152,7 +153,7 @@ export default function Dashboard() {
 
         {/* Management Tabs */}
         <Tabs defaultValue="users" className="mb-8">
-          <TabsList className="grid w-full grid-cols-2 max-w-[400px]">
+          <TabsList className="grid w-full grid-cols-3 max-w-[600px]">
             <TabsTrigger value="users" data-testid="tab-user-management">
               <Users className="h-4 w-4 mr-2" />
               User Management
@@ -160,6 +161,10 @@ export default function Dashboard() {
             <TabsTrigger value="roles" data-testid="tab-roles-management">
               <Settings className="h-4 w-4 mr-2" />
               Roles Management
+            </TabsTrigger>
+            <TabsTrigger value="history" data-testid="tab-content-history">
+              <History className="h-4 w-4 mr-2" />
+              Content History
             </TabsTrigger>
           </TabsList>
 
@@ -284,6 +289,11 @@ export default function Dashboard() {
               {selectedDesign === "design2" && <RolesManagementDesign2 />}
               {selectedDesign === "design3" && <RolesManagementDesign3 />}
             </div>
+          </TabsContent>
+
+          {/* Content History Tab */}
+          <TabsContent value="history" className="mt-6">
+            <ContentHistoryTab />
           </TabsContent>
         </Tabs>
 
