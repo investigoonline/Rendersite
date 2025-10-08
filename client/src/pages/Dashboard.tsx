@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import RolesManagementDesign1 from "@/components/roles/RolesManagementDesign1";
 import RolesManagementDesign2 from "@/components/roles/RolesManagementDesign2";
 import RolesManagementDesign3 from "@/components/roles/RolesManagementDesign3";
+import SystemRestore from "@/components/SystemRestore";
 
 interface DashboardStats {
   activeClients: number;
@@ -152,7 +153,7 @@ export default function Dashboard() {
 
         {/* Management Tabs */}
         <Tabs defaultValue="users" className="mb-8">
-          <TabsList className="grid w-full grid-cols-2 max-w-[400px]">
+          <TabsList className="grid w-full grid-cols-3 max-w-[600px]">
             <TabsTrigger value="users" data-testid="tab-user-management">
               <Users className="h-4 w-4 mr-2" />
               User Management
@@ -160,6 +161,10 @@ export default function Dashboard() {
             <TabsTrigger value="roles" data-testid="tab-roles-management">
               <Settings className="h-4 w-4 mr-2" />
               Roles Management
+            </TabsTrigger>
+            <TabsTrigger value="restore" data-testid="tab-system-restore">
+              <Shield className="h-4 w-4 mr-2" />
+              System Restore
             </TabsTrigger>
           </TabsList>
 
@@ -284,6 +289,11 @@ export default function Dashboard() {
               {selectedDesign === "design2" && <RolesManagementDesign2 />}
               {selectedDesign === "design3" && <RolesManagementDesign3 />}
             </div>
+          </TabsContent>
+
+          {/* System Restore Tab */}
+          <TabsContent value="restore" className="mt-6">
+            <SystemRestore />
           </TabsContent>
         </Tabs>
 
