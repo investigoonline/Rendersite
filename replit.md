@@ -21,16 +21,6 @@ Preferred communication style: Simple, everyday language.
 - **Solution**: Wrap response in `session.save()` callback to guarantee session persistence
 - **Impact**: Login now works reliably in both development and production environments
 
-## Content Version Control System (October 2025)
-- **History Table**: Created `page_content_history` table to track all content changes
-- **Automatic Tracking**: All content create/update/delete operations automatically save to history
-- **Change Metadata**: Captures before/after content, change type, user ID, timestamp
-- **Restore Functionality**: Super Admins can restore any previous version from history
-- **UI Dashboard Tab**: Content History tab in Admin Dashboard shows all changes with restore buttons
-- **API Endpoints**: 
-  - GET `/api/content-history` - Fetch all content history (filterable by page/section)
-  - POST `/api/content-history/:id/restore` - Restore content from a specific history entry
-
 ## Roles Management System (October 2025)
 - **Database Schema**: Created `role_permissions` table with resource-based access control
 - **API Endpoints**: GET/POST `/api/admin/role-permissions` for reading and updating permissions
