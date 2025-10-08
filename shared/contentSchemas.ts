@@ -63,21 +63,33 @@ export const colorOptions = [
 
 // Home Page Schemas
 const homeHeroSchema = z.object({
-  title: z.string().min(1).max(200),
-  subtitle: z.string().min(1).max(300),
+  badge1: z.string().min(1).max(100),
+  badge1Icon: z.string().min(1),
+  badge2: z.string().min(1).max(100),
+  badge2Icon: z.string().min(1),
+  titlePart1: z.string().min(1).max(100),
+  titleHighlight: z.string().min(1).max(100),
+  titlePart2: z.string().min(1).max(100),
+  subtitle: z.string().min(1).max(500),
   primaryCTA: z.string().min(1).max(50),
   secondaryCTA: z.string().min(1).max(50),
 });
 
 const homeStatsItemSchema = z.object({
-  label: z.string().min(1).max(100),
   value: z.string().min(1).max(50),
-  description: z.string().min(1).max(200),
-  icon: z.string().min(1),
+  label: z.string().min(1).max(100),
 });
 
 const homeStatsSchema = z.object({
-  stats: z.array(homeStatsItemSchema).min(1).max(6),
+  stats: z.array(homeStatsItemSchema).min(3).max(3),
+});
+
+const homePortfolioSchema = z.object({
+  title: z.string().min(1).max(100),
+  growthPercent: z.string().min(1).max(20),
+  totalNetWorth: z.string().min(1).max(50),
+  monthlyIncome: z.string().min(1).max(50),
+  debtRatio: z.string().min(1).max(20),
 });
 
 // Services Page Schemas
@@ -337,28 +349,56 @@ export const contentSchemas: Record<string, SectionSchema> = {
   home_hero: {
     schema: homeHeroSchema,
     label: 'Hero Section',
-    description: 'Main hero section with title, subtitle, and call-to-action buttons',
+    description: 'Main hero section with badges, styled title, subtitle, and call-to-action buttons',
     uiMeta: {
-      title: {
-        label: 'Main Title',
+      badge1: {
+        label: 'First Badge Text',
         control: 'text',
-        placeholder: 'Your Trusted Financial Planning Partner',
+        placeholder: 'AI-Powered Platform',
+      },
+      badge1Icon: {
+        label: 'First Badge Icon',
+        control: 'icon',
+      },
+      badge2: {
+        label: 'Second Badge Text',
+        control: 'text',
+        placeholder: '32+ Calculators',
+      },
+      badge2Icon: {
+        label: 'Second Badge Icon',
+        control: 'icon',
+      },
+      titlePart1: {
+        label: 'Title Part 1 (before highlight)',
+        control: 'text',
+        placeholder: 'Your Complete',
+      },
+      titleHighlight: {
+        label: 'Title Highlighted Part (blue)',
+        control: 'text',
+        placeholder: 'Financial Intelligence',
+      },
+      titlePart2: {
+        label: 'Title Part 2 (after highlight)',
+        control: 'text',
+        placeholder: 'Platform',
       },
       subtitle: {
         label: 'Subtitle',
         control: 'textarea',
-        rows: 3,
-        placeholder: 'Comprehensive wealth management and financial advisory services...',
+        rows: 4,
+        placeholder: 'Comprehensive financial planning tools, AI-driven insights, and personalized recommendations...',
       },
       primaryCTA: {
         label: 'Primary Button Text',
         control: 'text',
-        placeholder: 'Get Started',
+        placeholder: 'Start Free Trial',
       },
       secondaryCTA: {
         label: 'Secondary Button Text',
         control: 'text',
-        placeholder: 'Learn More',
+        placeholder: 'Explore Calculators',
       },
     },
   },
@@ -371,6 +411,38 @@ export const contentSchemas: Record<string, SectionSchema> = {
       stats: {
         label: 'Statistics',
         control: 'text', // This will be handled specially as array
+      },
+    },
+  },
+  home_portfolio: {
+    schema: homePortfolioSchema,
+    label: 'Portfolio Overview',
+    description: 'Portfolio summary card showing financial metrics',
+    uiMeta: {
+      title: {
+        label: 'Card Title',
+        control: 'text',
+        placeholder: 'Portfolio Overview',
+      },
+      growthPercent: {
+        label: 'Growth Percentage',
+        control: 'text',
+        placeholder: '+12.4%',
+      },
+      totalNetWorth: {
+        label: 'Total Net Worth',
+        control: 'text',
+        placeholder: '$1,247,832',
+      },
+      monthlyIncome: {
+        label: 'Monthly Income',
+        control: 'text',
+        placeholder: '$8,450',
+      },
+      debtRatio: {
+        label: 'Debt Ratio',
+        control: 'text',
+        placeholder: '18.2%',
       },
     },
   },
@@ -889,7 +961,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
 
 // Page to sections mapping
 export const pageSections: Record<string, string[]> = {
-  home: ['home_hero', 'home_stats', 'home_quick_actions', 'home_calculators'],
+  home: ['home_hero', 'home_stats', 'home_portfolio'],
   services: ['services_header', 'services_stats', 'services_investment', 'services_strategic', 'services_legacy', 'services_risk', 'services_special', 'services_aggregation'],
   contact: [
     'contact_header',

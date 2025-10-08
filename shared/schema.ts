@@ -177,6 +177,7 @@ export const loginHistory = pgTable("login_history", {
 export const contentSectionEnum = pgEnum('content_section', [
   'home_hero',
   'home_stats',
+  'home_portfolio',
   'home_quick_actions',
   'home_calculators',
   'footer_company',
