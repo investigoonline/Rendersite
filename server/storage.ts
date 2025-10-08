@@ -7,6 +7,7 @@ import {
   roles,
   userRoles,
   pageContent,
+  pageContentHistory,
   loginHistory,
   rolePermissions,
   type User,
@@ -27,6 +28,8 @@ import {
   type InsertUserRole,
   type PageContent,
   type InsertPageContent,
+  type PageContentHistory,
+  type InsertPageContentHistory,
   type LoginHistory,
   type InsertLoginHistory,
   type RolePermission,
@@ -92,6 +95,11 @@ export interface IStorage {
   createPageContent(content: InsertPageContent): Promise<PageContent>;
   updatePageContent(id: string, content: Partial<InsertPageContent>): Promise<PageContent>;
   deletePageContent(id: string): Promise<void>;
+  
+  // Page content history operations
+  createPageContentHistory(history: InsertPageContentHistory): Promise<PageContentHistory>;
+  getPageContentHistory(contentId?: string, limit?: number): Promise<PageContentHistory[]>;
+  restorePageContentFromHistory(historyId: string): Promise<PageContent>;
   
   // Admin dashboard operations
   getActiveClientsCount(): Promise<number>;
@@ -492,6 +500,54 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(pageContent)
       .where(eq(pageContent.id, id));
+  }
+
+  // Page content history operations
+  async createPageContentHistory(history: InsertPageContentHistory): Promise<PageContentHistory> {
+    const [created] = await db
+      .insert(pageContentHistory)
+      .values(history)
+      .returning();
+    return created;
+  }
+
+  async getPageContentHistory(contentId?: string, limit: number = 50): Promise<PageContentHistory[]> {
+    const query = db
+      .select()
+      .from(pageContentHistory)
+      .orderBy(desc(pageContentHistory.createdAt))
+      .limit(limit);
+
+    if (contentId) {
+      return query.where(eq(pageContentHistory.contentId, contentId));
+    }
+
+    return query;
+  }
+
+  async restorePageContentFromHistory(historyId: string): Promise<PageContent> {
+    // Get the history record
+    const [historyRecord] = await db
+      .select()
+      .from(pageContentHistory)
+      .where(eq(pageContentHistory.id, historyId));
+
+    if (!historyRecord) {
+      throw new Error("History record not found");
+    }
+
+    // Update the current content with the historical content
+    const [restored] = await db
+      .update(pageContent)
+      .set({
+        content: historyRecord.content,
+        published: historyRecord.published,
+        updatedAt: new Date(),
+      })
+      .where(eq(pageContent.id, historyRecord.contentId))
+      .returning();
+
+    return restored;
   }
 
   // Admin dashboard operations

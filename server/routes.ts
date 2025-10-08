@@ -685,11 +685,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/content', async (req, res) => {
     try {
       // Only super_admin and content_manager can create content
-      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
+      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
       if (!authorized) return;
 
       const contentData = insertPageContentSchema.parse(req.body);
       const content = await storage.createPageContent(contentData);
+      
+      // Save to history
+      await storage.createPageContentHistory({
+        contentId: content.id,
+        page: content.page,
+        section: content.section,
+        content: content.content,
+        published: content.published || false,
+        changedBy: req.session.user.email,
+        changeType: 'create',
+      });
+      
       res.json(content);
     } catch (error: any) {
       console.error("Error creating content:", error);
@@ -700,10 +712,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/content/:id', async (req, res) => {
     try {
       // Only super_admin and content_manager can update content
-      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
+      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
       if (!authorized) return;
 
       const content = await storage.updatePageContent(req.params.id, req.body);
+      
+      // Save to history
+      await storage.createPageContentHistory({
+        contentId: content.id,
+        page: content.page,
+        section: content.section,
+        content: content.content,
+        published: content.published || false,
+        changedBy: req.session.user.email,
+        changeType: 'update',
+      });
+      
       res.json(content);
     } catch (error) {
       console.error("Error updating content:", error);
@@ -714,14 +738,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/content/:id', async (req, res) => {
     try {
       // Only super_admin and content_manager can delete content
-      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
+      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
       if (!authorized) return;
+
+      // Get content before deleting for history
+      const contentToDelete = await storage.getPageContentById(req.params.id);
+      if (contentToDelete) {
+        // Save to history
+        await storage.createPageContentHistory({
+          contentId: contentToDelete.id,
+          page: contentToDelete.page,
+          section: contentToDelete.section,
+          content: contentToDelete.content,
+          published: contentToDelete.published || false,
+          changedBy: req.session.user.email,
+          changeType: 'delete',
+        });
+      }
 
       await storage.deletePageContent(req.params.id);
       res.json({ message: "Content has been deleted successfully" });
     } catch (error) {
       console.error("Error deleting content:", error);
       res.status(500).json({ message: "We're unable to delete this content at this time" });
+    }
+  });
+
+  // Page content history routes (super admin only)
+  app.get('/api/admin/content-history', async (req, res) => {
+    try {
+      const authorized = requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const contentId = req.query.contentId as string | undefined;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      
+      const history = await storage.getPageContentHistory(contentId, limit);
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching content history:", error);
+      res.status(500).json({ message: "Unable to fetch content history" });
+    }
+  });
+
+  app.post('/api/admin/content-history/:historyId/restore', async (req, res) => {
+    try {
+      const authorized = requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const restored = await storage.restorePageContentFromHistory(req.params.historyId);
+      
+      // Save restoration action to history
+      await storage.createPageContentHistory({
+        contentId: restored.id,
+        page: restored.page,
+        section: restored.section,
+        content: restored.content,
+        published: restored.published || false,
+        changedBy: req.session.user.email,
+        changeType: 'update',
+      });
+      
+      res.json({ message: "Content restored successfully", content: restored });
+    } catch (error) {
+      console.error("Error restoring content:", error);
+      res.status(500).json({ message: "Unable to restore content" });
     }
   });
 
