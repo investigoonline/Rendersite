@@ -685,11 +685,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/content', async (req, res) => {
     try {
       // Only super_admin and content_manager can create content
-      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
+      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
       if (!authorized) return;
 
+      const userId = (req as any).session.user.id;
       const contentData = insertPageContentSchema.parse(req.body);
-      const content = await storage.createPageContent(contentData);
+      const content = await storage.createPageContent(contentData, userId);
       res.json(content);
     } catch (error: any) {
       console.error("Error creating content:", error);
@@ -700,10 +701,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/content/:id', async (req, res) => {
     try {
       // Only super_admin and content_manager can update content
-      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
+      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
       if (!authorized) return;
 
-      const content = await storage.updatePageContent(req.params.id, req.body);
+      const userId = (req as any).session.user.id;
+      const content = await storage.updatePageContent(req.params.id, req.body, userId);
       res.json(content);
     } catch (error) {
       console.error("Error updating content:", error);
@@ -714,14 +716,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/content/:id', async (req, res) => {
     try {
       // Only super_admin and content_manager can delete content
-      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
+      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
       if (!authorized) return;
 
-      await storage.deletePageContent(req.params.id);
+      const userId = (req as any).session.user.id;
+      await storage.deletePageContent(req.params.id, userId);
       res.json({ message: "Content has been deleted successfully" });
     } catch (error) {
       console.error("Error deleting content:", error);
       res.status(500).json({ message: "We're unable to delete this content at this time" });
+    }
+  });
+
+  // Content history endpoints
+  app.get('/api/content-history', async (req, res) => {
+    try {
+      const authorized = requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const { contentId, page } = req.query;
+      const history = await storage.getContentHistory(
+        contentId as string | undefined,
+        page as string | undefined
+      );
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching content history:", error);
+      res.status(500).json({ message: "Unable to retrieve content history at this time" });
+    }
+  });
+
+  app.post('/api/content-history/:historyId/restore', async (req, res) => {
+    try {
+      const authorized = requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const userId = (req as any).session.user.id;
+      const content = await storage.restoreContentFromHistory(req.params.historyId, userId);
+      res.json(content);
+    } catch (error: any) {
+      console.error("Error restoring content:", error);
+      res.status(500).json({ message: error.message || "Unable to restore content at this time" });
     }
   });
 

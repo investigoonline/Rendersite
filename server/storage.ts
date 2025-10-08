@@ -7,6 +7,7 @@ import {
   roles,
   userRoles,
   pageContent,
+  pageContentHistory,
   loginHistory,
   rolePermissions,
   type User,
@@ -89,9 +90,13 @@ export interface IStorage {
   // Content operations
   getPageContent(page: string, section?: string): Promise<PageContent[]>;
   getPageContentById(id: string): Promise<PageContent | undefined>;
-  createPageContent(content: InsertPageContent): Promise<PageContent>;
-  updatePageContent(id: string, content: Partial<InsertPageContent>): Promise<PageContent>;
-  deletePageContent(id: string): Promise<void>;
+  createPageContent(content: InsertPageContent, userId: string): Promise<PageContent>;
+  updatePageContent(id: string, content: Partial<InsertPageContent>, userId: string): Promise<PageContent>;
+  deletePageContent(id: string, userId: string): Promise<void>;
+  
+  // Content history operations
+  getContentHistory(contentId?: string, page?: string): Promise<any[]>;
+  restoreContentFromHistory(historyId: string, userId: string): Promise<PageContent>;
   
   // Admin dashboard operations
   getActiveClientsCount(): Promise<number>;
@@ -468,15 +473,30 @@ export class DatabaseStorage implements IStorage {
     return content;
   }
 
-  async createPageContent(content: InsertPageContent): Promise<PageContent> {
+  async createPageContent(content: InsertPageContent, userId: string): Promise<PageContent> {
     const [created] = await db
       .insert(pageContent)
       .values(content)
       .returning();
+    
+    // Save to history
+    await db.insert(pageContentHistory).values({
+      contentId: created.id,
+      page: created.page,
+      section: created.section,
+      oldContent: null,
+      newContent: created.content,
+      changeType: 'create',
+      changedBy: userId,
+    });
+    
     return created;
   }
 
-  async updatePageContent(id: string, content: Partial<InsertPageContent>): Promise<PageContent> {
+  async updatePageContent(id: string, content: Partial<InsertPageContent>, userId: string): Promise<PageContent> {
+    // Get old content first
+    const oldContent = await this.getPageContentById(id);
+    
     const [updated] = await db
       .update(pageContent)
       .set({
@@ -485,13 +505,92 @@ export class DatabaseStorage implements IStorage {
       })
       .where(eq(pageContent.id, id))
       .returning();
+    
+    // Save to history
+    if (oldContent) {
+      await db.insert(pageContentHistory).values({
+        contentId: updated.id,
+        page: updated.page,
+        section: updated.section,
+        oldContent: oldContent.content,
+        newContent: updated.content,
+        changeType: 'update',
+        changedBy: userId,
+      });
+    }
+    
     return updated;
   }
 
-  async deletePageContent(id: string): Promise<void> {
+  async deletePageContent(id: string, userId: string): Promise<void> {
+    // Get content before deleting
+    const content = await this.getPageContentById(id);
+    
+    if (content) {
+      // Save to history
+      await db.insert(pageContentHistory).values({
+        contentId: content.id,
+        page: content.page,
+        section: content.section,
+        oldContent: content.content,
+        newContent: null,
+        changeType: 'delete',
+        changedBy: userId,
+      });
+    }
+    
     await db
       .delete(pageContent)
       .where(eq(pageContent.id, id));
+  }
+
+  // Content history operations
+  async getContentHistory(contentId?: string, page?: string): Promise<any[]> {
+    let query = db.select().from(pageContentHistory).orderBy(desc(pageContentHistory.changedAt));
+    
+    if (contentId) {
+      query = query.where(eq(pageContentHistory.contentId, contentId)) as any;
+    } else if (page) {
+      query = query.where(eq(pageContentHistory.page, page)) as any;
+    }
+    
+    const history = await query;
+    
+    // Get user info for each change
+    const historyWithUsers = await Promise.all(
+      history.map(async (h) => {
+        const user = await this.getUser(h.changedBy);
+        return {
+          ...h,
+          changedByName: user ? `${user.firstName} ${user.lastName}` : 'Unknown User',
+          changedByEmail: user?.email || '',
+        };
+      })
+    );
+    
+    return historyWithUsers;
+  }
+
+  async restoreContentFromHistory(historyId: string, userId: string): Promise<PageContent> {
+    const [history] = await db
+      .select()
+      .from(pageContentHistory)
+      .where(eq(pageContentHistory.id, historyId));
+    
+    if (!history) {
+      throw new Error('History entry not found');
+    }
+    
+    if (!history.oldContent) {
+      throw new Error('Cannot restore from a create operation');
+    }
+    
+    // Update the content with the old content from history
+    return this.updatePageContent(
+      history.contentId,
+      { content: history.oldContent },
+      userId
+    );
   }
 
   // Admin dashboard operations
