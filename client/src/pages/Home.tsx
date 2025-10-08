@@ -55,10 +55,10 @@ export default function Home() {
         {/* Welcome Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            {heroContent?.title || `Welcome back, ${user?.firstName || user?.email}`}
+            {heroContent?.title || "Welcome to InvestigooOnline"}
           </h1>
           <p className="text-muted-foreground mt-2">
-            {heroContent?.subtitle || "Manage your financial planning and track your progress."}
+            {heroContent?.subtitle || "Your comprehensive financial planning platform with expert tools and resources"}
           </p>
         </div>
 
@@ -144,84 +144,53 @@ export default function Home() {
             </div>
           )}
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Account Status */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Account Status</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Plan</span>
-                    <Badge>Premium Client</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Member Since</span>
-                    <span className="text-sm font-medium">Jan 2024</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Last Login</span>
-                    <div className="flex items-center text-sm font-medium">
-                      <Clock className="h-3 w-3 mr-1" />
-                      Today
+          {/* Sidebar - Only shown if authenticated */}
+          {user && (
+            <div className="space-y-6">
+              {/* Account Status */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Account Status</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Plan</span>
+                      <Badge>{user.role === 'super_admin' ? 'Super Admin' : user.role === 'content_manager' ? 'Content Manager' : user.role === 'preferred_client' ? 'Preferred Client' : 'Client'}</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Email</span>
+                      <span className="text-sm font-medium">{user.email}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Last Login</span>
+                      <div className="flex items-center text-sm font-medium">
+                        <Clock className="h-3 w-3 mr-1" />
+                        Today
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            {/* Market Updates */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Market Updates</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="p-3 bg-secondary/5 rounded-lg">
-                    <h4 className="font-medium text-secondary mb-1">
-                      S&P 500 Reaches New High
-                    </h4>
-                    <p className="text-xs text-muted-foreground">
-                      Market continues upward trend with strong earnings reports.
-                    </p>
-                  </div>
-                  <div className="p-3 bg-primary/5 rounded-lg">
-                    <h4 className="font-medium text-primary mb-1">
-                      Fed Rate Decision
-                    </h4>
-                    <p className="text-xs text-muted-foreground">
-                      Interest rates held steady, supporting market stability.
-                    </p>
-                  </div>
-                </div>
-                <Button asChild variant="ghost" size="sm" className="w-full mt-4">
-                  <Link href="/resources?type=newsletter">
-                    View All Updates
-                    <ChevronRight className="h-4 w-4 ml-1" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Quick Calculator */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Calculator</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Get instant calculations without leaving your dashboard.
-                </p>
-                <Button asChild className="w-full">
-                  <Link href="/calculators">
-                    Open Calculator Suite
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+              {/* Quick Calculator */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Quick Calculator</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Get instant calculations for your financial planning needs.
+                  </p>
+                  <Button asChild className="w-full">
+                    <Link href="/calculators">
+                      Open Calculator Suite
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
     </div>
