@@ -237,6 +237,26 @@ export const pageContent = pgTable("page_content", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Change type enum for content history
+export const changeTypeEnum = pgEnum('change_type', [
+  'create',
+  'update',
+  'delete'
+]);
+
+// Content history table - tracks all changes to page content
+export const pageContentHistory = pgTable("page_content_history", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  contentId: uuid("content_id").notNull(), // References page_content.id
+  page: varchar("page", { length: 50 }).notNull(),
+  section: contentSectionEnum("section").notNull(),
+  oldContent: jsonb("old_content"), // null for create operations
+  newContent: jsonb("new_content"), // null for delete operations
+  changeType: changeTypeEnum("change_type").notNull(),
+  changedBy: varchar("changed_by").notNull(), // User ID who made the change
+  changedAt: timestamp("changed_at").defaultNow(),
+});
+
 // Create insert schemas
 export const upsertUserSchema = createInsertSchema(users);
 export const insertUserRegistrationSchema = createInsertSchema(users).omit({
