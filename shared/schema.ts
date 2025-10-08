@@ -237,6 +237,19 @@ export const pageContent = pgTable("page_content", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Page content history table - tracks all changes for System Restore
+export const pageContentHistory = pgTable("page_content_history", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  contentId: uuid("content_id").notNull(),
+  page: varchar("page", { length: 50 }).notNull(),
+  section: contentSectionEnum("section").notNull(),
+  content: jsonb("content").notNull(),
+  published: boolean("published").default(true),
+  changedBy: varchar("changed_by").notNull(),
+  changeType: varchar("change_type", { length: 20 }).notNull(), // 'create', 'update', 'delete'
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Create insert schemas
 export const upsertUserSchema = createInsertSchema(users);
 export const insertUserRegistrationSchema = createInsertSchema(users).omit({
@@ -308,6 +321,10 @@ export const insertPageContentSchema = createInsertSchema(pageContent).omit({
   createdAt: true,
   updatedAt: true,
 });
+export const insertPageContentHistorySchema = createInsertSchema(pageContentHistory).omit({
+  id: true,
+  createdAt: true,
+});
 export const insertLoginHistorySchema = createInsertSchema(loginHistory).omit({
   id: true,
   loginAt: true,
@@ -339,5 +356,7 @@ export type UserRole = typeof userRoles.$inferSelect;
 export type InsertUserRole = z.infer<typeof insertUserRoleSchema>;
 export type PageContent = typeof pageContent.$inferSelect;
 export type InsertPageContent = z.infer<typeof insertPageContentSchema>;
+export type PageContentHistory = typeof pageContentHistory.$inferSelect;
+export type InsertPageContentHistory = z.infer<typeof insertPageContentHistorySchema>;
 export type LoginHistory = typeof loginHistory.$inferSelect;
 export type InsertLoginHistory = z.infer<typeof insertLoginHistorySchema>;
