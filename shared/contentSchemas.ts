@@ -48,6 +48,9 @@ export const iconOptions = [
   { label: 'Calendar', value: 'Calendar' },
   { label: 'Message Circle', value: 'MessageCircle' },
   { label: 'Building', value: 'Building' },
+  { label: 'Car', value: 'Car' },
+  { label: 'Pie Chart', value: 'PieChart' },
+  { label: 'Credit Card', value: 'CreditCard' },
 ];
 
 // Color options

@@ -8,6 +8,12 @@ import {
   Calculator,
   Clock,
   TrendingUp,
+  PieChart,
+  CreditCard,
+  Building,
+  Car,
+  Shield,
+  DollarSign,
 } from "lucide-react";
 import type { PageContent } from "@shared/schema";
 
@@ -26,6 +32,7 @@ export default function Home() {
   const heroContent = getSection('home_hero')?.content as any;
   const statsContent = getSection('home_stats')?.content as any;
   const portfolioContent = getSection('home_portfolio')?.content as any;
+  const calculatorCategoriesContent = getSection('home_calculator_categories')?.content as any;
 
   // Helper to get icon component by name
   const getIcon = (iconName: string) => {
@@ -34,8 +41,14 @@ export default function Home() {
       Calculator,
       Clock,
       TrendingUp,
+      PieChart,
+      CreditCard,
+      Building,
+      Car,
+      Shield,
+      DollarSign,
     };
-    return icons[iconName] || Sparkles;
+    return icons[iconName] || Calculator;
   };
 
   const stats = statsContent?.stats || [];
@@ -160,6 +173,63 @@ export default function Home() {
             </Card>
           </div>
         </div>
+
+        {/* Calculator Categories Section */}
+        {calculatorCategoriesContent && (
+          <div className="mt-16">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                {calculatorCategoriesContent.title}
+              </h2>
+              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                {calculatorCategoriesContent.subtitle}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {calculatorCategoriesContent.categories?.map((category: any) => {
+                const CategoryIcon = getIcon(category.icon);
+                return (
+                  <Card 
+                    key={category.id} 
+                    className="hover:shadow-lg transition-shadow"
+                    data-testid={`category-${category.id}`}
+                  >
+                    <CardHeader>
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-blue-50 rounded-lg">
+                          <CategoryIcon className="h-6 w-6 text-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <CardTitle className="text-lg">{category.title}</CardTitle>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <p className="text-sm text-gray-600">{category.description}</p>
+                      <ul className="space-y-2">
+                        {category.calculators?.map((calc: string, idx: number) => (
+                          <li key={idx} className="text-sm text-gray-700 flex items-start">
+                            <span className="text-primary mr-2">✓</span>
+                            {calc}
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            <div className="text-center mt-10">
+              <Button asChild size="lg" className="px-8" data-testid="button-access-calculators">
+                <Link href="/calculators">
+                  Access All Calculators
+                </Link>
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
