@@ -180,6 +180,7 @@ export const contentSectionEnum = pgEnum('content_section', [
   'home_portfolio',
   'home_quick_actions',
   'home_calculators',
+  'home_calculator_categories',
   'footer_company',
   'footer_platform',
   'footer_resources',
