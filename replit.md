@@ -8,6 +8,13 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## Application Pages and Routes Update (October 2025)
+- **Under Construction Page**: Created `/pages/UnderConstruction.tsx` for links not yet implemented
+- **New Routes Added**: Profile, Guest Access, Client Login, Mobile App, API Docs, Help Center, Leadership, Careers, Press, Privacy Policy, Terms of Service
+- **Link Audit**: Completed end-to-end testing of all navigation links across the application
+- **Missing Pages Inventory**: Documented all existing vs missing pages for future development
+- **Code Cleanup**: Removed external references from client-side code
+
 ## User Role Persistence Fix (October 2025)
 - **Critical Fix**: Added `role` field to session data and login response
 - **Issue**: When user roles were updated in database, changes weren't reflected after logout/login
@@ -50,7 +57,7 @@ The application follows a monorepo structure with separate client and server dir
 - **File Structure**: Modular route handlers and storage layer abstraction
 
 ### Authentication System
-- **Primary Auth**: Replit's OpenID Connect integration for client authentication
+- **Primary Auth**: OpenID Connect integration for client authentication
 - **Guest Access**: Custom guest account system with email verification
 - **Session Storage**: PostgreSQL-backed sessions with configurable TTL
 - **Security**: HTTPS-only cookies, secure session management
@@ -91,12 +98,12 @@ The application follows a monorepo structure with separate client and server dir
 - **Connection**: WebSocket-based connections for serverless compatibility
 
 ### Authentication Provider
-- **Replit Auth**: OpenID Connect integration for user authentication
-- **Environment**: Configured for Replit ecosystem with domain validation
+- **OpenID Connect**: Secure authentication integration for user access
+- **Environment**: Configured for production and development environments
 
 ### Development Tools
-- **Replit Integration**: Development environment plugins and runtime error handling
-- **Vite Plugins**: Cartographer for development visualization, runtime error modal
+- **Development Environment**: Plugins and runtime error handling for enhanced developer experience
+- **Vite Plugins**: Development visualization tools and runtime error modal
 
 ### UI Dependencies
 - **Radix UI**: Comprehensive accessible component primitives

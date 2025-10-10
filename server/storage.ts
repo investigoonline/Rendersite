@@ -409,7 +409,7 @@ export class DatabaseStorage implements IStorage {
           email,
           firstName: 'Super',
           lastName: 'Admin',
-          authType: 'replit',
+          authType: 'oidc',
           isEmailVerified: true,
         })
         .returning();
