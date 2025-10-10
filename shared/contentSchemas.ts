@@ -227,6 +227,19 @@ const homeCalculatorsSchema = z.object({
   })).min(1).max(6),
 });
 
+// Home Calculator Categories Schema
+const homeCalculatorCategoriesSchema = z.object({
+  title: z.string().min(1).max(200),
+  subtitle: z.string().min(1).max(500),
+  categories: z.array(z.object({
+    id: z.string().min(1),
+    title: z.string().min(1).max(100),
+    icon: z.string().min(1),
+    description: z.string().min(1).max(300),
+    calculators: z.array(z.string()).min(1).max(5),
+  })).min(1).max(10),
+});
+
 // Dashboard Schemas
 const dashboardHeaderSchema = z.object({
   title: z.string().min(1).max(100),
@@ -758,6 +771,16 @@ export const contentSchemas: Record<string, SectionSchema> = {
       title: { label: 'Section Title', control: 'text', placeholder: 'Popular Calculators' },
       description: { label: 'Section Description', control: 'text', placeholder: 'Quick access to frequently used calculators' },
       calculators: { label: 'Calculators', control: 'text' },
+    },
+  },
+  home_calculator_categories: {
+    schema: homeCalculatorCategoriesSchema,
+    label: 'Calculator Categories Showcase',
+    description: 'Complete financial calculator suite with 8 calculator categories',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'Complete Financial Calculator Suite' },
+      subtitle: { label: 'Section Subtitle', control: 'textarea', rows: 2, placeholder: '32+ professional-grade calculators across 8 categories...' },
+      categories: { label: 'Calculator Categories', control: 'text' },
     },
   },
   footer_company: {
