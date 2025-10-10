@@ -21,6 +21,7 @@ import Disclosures from "@/pages/Disclosures";
 import Custodian from "@/pages/Custodian";
 import ContentManagement from "@/pages/ContentManagement";
 import Dashboard from "@/pages/Dashboard";
+import UnderConstruction from "@/pages/UnderConstruction";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -41,6 +42,20 @@ function Router() {
         <Route path="/location" component={Location} />
         <Route path="/disclosures" component={Disclosures} />
         <Route path="/custodian" component={Custodian} />
+        
+        {/* Under Construction pages */}
+        <Route path="/auth/login" component={UnderConstruction} />
+        <Route path="/profile" component={UnderConstruction} />
+        <Route path="/guest-access" component={UnderConstruction} />
+        <Route path="/client-login" component={UnderConstruction} />
+        <Route path="/mobile-app" component={UnderConstruction} />
+        <Route path="/api-docs" component={UnderConstruction} />
+        <Route path="/help-center" component={UnderConstruction} />
+        <Route path="/leadership" component={UnderConstruction} />
+        <Route path="/careers" component={UnderConstruction} />
+        <Route path="/press" component={UnderConstruction} />
+        <Route path="/privacy" component={UnderConstruction} />
+        <Route path="/terms" component={UnderConstruction} />
         
         {/* Protected routes - Super Admin only */}
         <Route path="/admin-dashboard">
