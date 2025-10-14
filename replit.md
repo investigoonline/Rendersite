@@ -8,6 +8,13 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## Content Update 500 Error Fix (October 2025)
+- **Critical Fix**: Database schema mismatch causing content updates to fail with 500 error
+- **Issue**: `page_content_history` table had `old_content`/`new_content` columns instead of single `content` column
+- **Root Cause**: Database table structure was out of sync with code schema
+- **Solution**: Altered table to match schema - dropped old columns, added `content`, `published`, `created_at`, `change_type`
+- **Impact**: Content updates now work reliably on first attempt
+
 ## Application Pages and Routes Update (October 2025)
 - **Under Construction Page**: Created `/pages/UnderConstruction.tsx` for links not yet implemented
 - **New Routes Added**: Profile, Guest Access, Client Login, Mobile App, API Docs, Help Center, Leadership, Careers, Press, Privacy Policy, Terms of Service
