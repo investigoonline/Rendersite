@@ -8,6 +8,12 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## Icon Picker Fix (October 2025)
+- **Issue**: Icons were not updating when changed in content forms
+- **Root Cause**: Icon fields were using generic 'select' control instead of specialized 'icon' control
+- **Solution**: Changed all icon field controls from `control: 'select'` to `control: 'icon'` in contentSchemas
+- **Impact**: Icon picker now displays visual icon previews and updates work correctly
+
 ## Content Section Title Display Fix (October 2025)
 - **Issue**: Multiple instances of same section type (e.g., two "Services Strategic") showed identical titles, making them hard to distinguish
 - **Root Cause**: Card titles displayed section type name instead of actual content title

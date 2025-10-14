@@ -508,7 +508,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       id: { label: 'Service ID', control: 'text', placeholder: 'strategic' },
       title: { label: 'Service Title', control: 'text', placeholder: 'Strategic Planning' },
-      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
       description: { label: 'Description', control: 'textarea', rows: 3 },
       features: { label: 'Key Features', control: 'text' },
       color: { label: 'Color Theme', control: 'select', options: colorOptions },
@@ -522,7 +522,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       id: { label: 'Service ID', control: 'text', placeholder: 'legacy' },
       title: { label: 'Service Title', control: 'text', placeholder: 'Legacy Planning' },
-      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
       description: { label: 'Description', control: 'textarea', rows: 3 },
       features: { label: 'Key Features', control: 'text' },
       color: { label: 'Color Theme', control: 'select', options: colorOptions },
@@ -536,7 +536,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       id: { label: 'Service ID', control: 'text', placeholder: 'risk' },
       title: { label: 'Service Title', control: 'text', placeholder: 'Risk Management' },
-      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
       description: { label: 'Description', control: 'textarea', rows: 3 },
       features: { label: 'Key Features', control: 'text' },
       color: { label: 'Color Theme', control: 'select', options: colorOptions },
@@ -550,7 +550,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       id: { label: 'Service ID', control: 'text', placeholder: 'special' },
       title: { label: 'Service Title', control: 'text', placeholder: 'Special Situations' },
-      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
       description: { label: 'Description', control: 'textarea', rows: 3 },
       features: { label: 'Key Features', control: 'text' },
       color: { label: 'Color Theme', control: 'select', options: colorOptions },
@@ -564,7 +564,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       id: { label: 'Service ID', control: 'text', placeholder: 'aggregation' },
       title: { label: 'Service Title', control: 'text', placeholder: 'Account Aggregation' },
-      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
       description: { label: 'Description', control: 'textarea', rows: 3 },
       features: { label: 'Key Features', control: 'text' },
       color: { label: 'Color Theme', control: 'select', options: colorOptions },
@@ -575,7 +575,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     label: 'Office Location',
     description: 'Office location contact information',
     uiMeta: {
-      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
       title: { label: 'Title', control: 'text', placeholder: 'Office Location' },
       content: { label: 'Content Lines', control: 'text' },
       color: { label: 'Color Theme', control: 'select', options: colorOptions },
@@ -586,7 +586,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     label: 'Phone Contact',
     description: 'Phone contact information',
     uiMeta: {
-      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
       title: { label: 'Title', control: 'text', placeholder: 'Phone Contact' },
       content: { label: 'Content Lines', control: 'text' },
       color: { label: 'Color Theme', control: 'select', options: colorOptions },
@@ -597,7 +597,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     label: 'Email Contact',
     description: 'Email contact information',
     uiMeta: {
-      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
       title: { label: 'Title', control: 'text', placeholder: 'Email Contact' },
       content: { label: 'Content Lines', control: 'text' },
       color: { label: 'Color Theme', control: 'select', options: colorOptions },
@@ -680,7 +680,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       id: { label: 'Resource ID', control: 'text', placeholder: 'article' },
       name: { label: 'Resource Name', control: 'text', placeholder: 'Articles' },
-      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
       description: { label: 'Description', control: 'textarea', rows: 2 },
     },
   },
@@ -691,7 +691,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       id: { label: 'Resource ID', control: 'text', placeholder: 'video' },
       name: { label: 'Resource Name', control: 'text', placeholder: 'Videos' },
-      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
       description: { label: 'Description', control: 'textarea', rows: 2 },
     },
   },
@@ -702,7 +702,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       id: { label: 'Resource ID', control: 'text', placeholder: 'newsletter' },
       name: { label: 'Resource Name', control: 'text', placeholder: 'Newsletters' },
-      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
       description: { label: 'Description', control: 'textarea', rows: 2 },
     },
   },
@@ -713,7 +713,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       id: { label: 'Resource ID', control: 'text', placeholder: 'flipbook' },
       name: { label: 'Resource Name', control: 'text', placeholder: 'Flipbooks' },
-      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
       description: { label: 'Description', control: 'textarea', rows: 2 },
     },
   },
@@ -724,7 +724,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       id: { label: 'Resource ID', control: 'text', placeholder: 'faq' },
       name: { label: 'Resource Name', control: 'text', placeholder: 'FAQ' },
-      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
       description: { label: 'Description', control: 'textarea', rows: 2 },
     },
   },
@@ -948,7 +948,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     label: 'Global Headquarters',
     description: 'Company headquarters information',
     uiMeta: {
-      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
       title: { label: 'Section Title', control: 'text', placeholder: 'Global Headquarters' },
       subtitle: { label: 'Subtitle', control: 'text', placeholder: 'Linköping, Sweden • Serving clients worldwide' },
       description: { label: 'Description', control: 'textarea', rows: 4 },
@@ -959,7 +959,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     label: 'Innovation & Technology',
     description: 'Technology and innovation section',
     uiMeta: {
-      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
       title: { label: 'Section Title', control: 'text', placeholder: 'Innovation at Our Core' },
       description: { label: 'Description', control: 'textarea', rows: 3 },
       features: { label: 'Innovation Features', control: 'text' },
@@ -970,7 +970,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     label: 'Security & Compliance',
     description: 'Security and compliance section',
     uiMeta: {
-      icon: { label: 'Icon', control: 'select', options: iconOptions },
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
       title: { label: 'Section Title', control: 'text', placeholder: 'Security & Compliance' },
       description: { label: 'Description', control: 'textarea', rows: 3 },
       features: { label: 'Security Features', control: 'text' },
