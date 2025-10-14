@@ -8,6 +8,13 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## Add Section Feature Fix (October 2025)
+- **Critical Fix**: Unable to add new service sections due to missing `allowMultiple` property
+- **Issue**: All service sections showed "Already exists" preventing content managers from adding multiple services
+- **Root Cause**: Service schemas didn't have `allowMultiple: true` flag, treating them as single-instance sections
+- **Solution**: Added `allowMultiple: true` to all 6 service section types (investment, strategic, legacy, risk, special, aggregation)
+- **Impact**: Content managers can now add multiple service items to services page
+
 ## Content Update 500 Error Fix (October 2025)
 - **Critical Fix**: Database schema mismatch causing content updates to fail with 500 error
 - **Issue**: `page_content_history` table had `old_content`/`new_content` columns instead of single `content` column

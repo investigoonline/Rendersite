@@ -466,6 +466,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     schema: serviceSchema,
     label: 'Investment Advisory Service',
     description: 'Investment advisory service details',
+    allowMultiple: true,
     uiMeta: {
       id: {
         label: 'Service ID',
@@ -503,6 +504,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     schema: serviceSchema,
     label: 'Strategic Financial Planning',
     description: 'Strategic planning service details',
+    allowMultiple: true,
     uiMeta: {
       id: { label: 'Service ID', control: 'text', placeholder: 'strategic' },
       title: { label: 'Service Title', control: 'text', placeholder: 'Strategic Planning' },
@@ -516,6 +518,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     schema: serviceSchema,
     label: 'Legacy & Estate Planning',
     description: 'Legacy planning service details',
+    allowMultiple: true,
     uiMeta: {
       id: { label: 'Service ID', control: 'text', placeholder: 'legacy' },
       title: { label: 'Service Title', control: 'text', placeholder: 'Legacy Planning' },
@@ -529,6 +532,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     schema: serviceSchema,
     label: 'Risk Management',
     description: 'Risk management service details',
+    allowMultiple: true,
     uiMeta: {
       id: { label: 'Service ID', control: 'text', placeholder: 'risk' },
       title: { label: 'Service Title', control: 'text', placeholder: 'Risk Management' },
@@ -542,6 +546,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     schema: serviceSchema,
     label: 'Special Situations',
     description: 'Special situations service details',
+    allowMultiple: true,
     uiMeta: {
       id: { label: 'Service ID', control: 'text', placeholder: 'special' },
       title: { label: 'Service Title', control: 'text', placeholder: 'Special Situations' },
@@ -555,6 +560,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     schema: serviceSchema,
     label: 'Account Aggregation',
     description: 'Account aggregation service details',
+    allowMultiple: true,
     uiMeta: {
       id: { label: 'Service ID', control: 'text', placeholder: 'aggregation' },
       title: { label: 'Service Title', control: 'text', placeholder: 'Account Aggregation' },
