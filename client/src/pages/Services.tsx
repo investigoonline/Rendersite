@@ -2,17 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import * as LucideIcons from "lucide-react";
 import { 
-  TrendingUp, 
-  Shield, 
-  PiggyBank, 
-  FileText, 
-  Users, 
-  Database,
   CheckCircle,
   ArrowRight,
   Calendar,
-  Phone
+  Phone,
+  FileText
 } from "lucide-react";
 import type { PageContent } from "@shared/schema";
 
@@ -40,21 +36,11 @@ export default function Services() {
     },
   });
 
-  // Helper to get icon component by name with type safety
-  type ServiceIcon = 'TrendingUp' | 'Shield' | 'PiggyBank' | 'FileText' | 'Users' | 'Database';
-  
-  const iconMap: Record<ServiceIcon, typeof TrendingUp> = {
-    TrendingUp,
-    Shield,
-    PiggyBank,
-    FileText,
-    Users,
-    Database,
-  };
-  
+  // Helper to get icon component by name dynamically from all Lucide icons
   const getIcon = (iconName: string) => {
-    if (iconName in iconMap) {
-      return iconMap[iconName as ServiceIcon];
+    const IconComponent = (LucideIcons as any)[iconName];
+    if (IconComponent) {
+      return IconComponent;
     }
     console.warn(`Unknown icon name: ${iconName}, falling back to FileText`);
     return FileText;

@@ -8,6 +8,12 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## Dynamic Icon Support Fix (October 2025)
+- **Issue**: "Unknown icon name: Globe" error when using icons not in hardcoded iconMap
+- **Root Cause**: Services page had hardcoded list of only 6 icons (TrendingUp, Shield, PiggyBank, FileText, Users, Database)
+- **Solution**: Updated Services.tsx to dynamically import all Lucide icons using `import * as LucideIcons` and dynamic lookup
+- **Impact**: Services page now supports ALL Lucide React icons, not just the hardcoded 6
+
 ## Icon Picker Fix (October 2025)
 - **Issue**: Icons were not updating when changed in content forms
 - **Root Cause**: Icon fields were using generic 'select' control instead of specialized 'icon' control
