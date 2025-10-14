@@ -8,6 +8,12 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## Content Section Title Display Fix (October 2025)
+- **Issue**: Multiple instances of same section type (e.g., two "Services Strategic") showed identical titles, making them hard to distinguish
+- **Root Cause**: Card titles displayed section type name instead of actual content title
+- **Solution**: Updated ContentManagement to display content.title when available, falling back to section type name
+- **Impact**: Each content section now shows its unique title (e.g., "Strategic Planning" vs "Strategic Investment")
+
 ## Add Section Feature Fix (October 2025)
 - **Critical Fix**: Unable to add new service sections due to missing `allowMultiple` property
 - **Issue**: All service sections showed "Already exists" preventing content managers from adding multiple services

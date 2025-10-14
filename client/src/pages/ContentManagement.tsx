@@ -427,7 +427,15 @@ export default function ContentManagement() {
                       <div className="flex items-center justify-between">
                         <div>
                           <CardTitle className="capitalize">
-                            {section.section.replace(/_/g, ' ')}
+                            {(() => {
+                              // Try to get title from content data first
+                              const contentData = section.content as any;
+                              if (contentData?.title) {
+                                return contentData.title;
+                              }
+                              // Fall back to section type name
+                              return section.section.replace(/_/g, ' ');
+                            })()}
                           </CardTitle>
                           <CardDescription>
                             Last updated: {new Date(section.updatedAt || '').toLocaleDateString()}
