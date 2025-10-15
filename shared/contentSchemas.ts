@@ -206,6 +206,44 @@ const servicesStatsSchema = z.object({
   })).length(4),
 });
 
+// Services Process Schema
+const servicesProcessSchema = z.object({
+  title: z.string().min(1).max(100),
+  description: z.string().min(1).max(300),
+  steps: z.array(z.object({
+    title: z.string().min(1).max(50),
+    description: z.string().min(1).max(200),
+  })).length(4),
+});
+
+// Services Why Choose Schema
+const servicesWhyChooseSchema = z.object({
+  title: z.string().min(1).max(100),
+  reasons: z.array(z.object({
+    title: z.string().min(1).max(100),
+    description: z.string().min(1).max(300),
+  })).min(3).max(6),
+});
+
+// Services Commitment Schema
+const servicesCommitmentSchema = z.object({
+  title: z.string().min(1).max(100),
+  commitments: z.array(z.object({
+    label: z.string().min(1).max(100),
+    value: z.string().min(1).max(50),
+  })).min(3).max(10),
+});
+
+// Services CTA Schema
+const servicesCtaSchema = z.object({
+  title: z.string().min(1).max(150),
+  description: z.string().min(1).max(500),
+  primaryButtonText: z.string().min(1).max(50),
+  primaryButtonHref: z.string().min(1).max(200),
+  secondaryButtonText: z.string().min(1).max(50),
+  secondaryButtonHref: z.string().min(1).max(200),
+});
+
 // Home Quick Actions Schema
 const homeQuickActionsSchema = z.object({
   actions: z.array(z.object({
@@ -755,6 +793,47 @@ export const contentSchemas: Record<string, SectionSchema> = {
       stats: { label: 'Statistics (4 items)', control: 'text' },
     },
   },
+  services_process: {
+    schema: servicesProcessSchema,
+    label: 'Our Service Process',
+    description: '4-step service process displayed on services page',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'Our Service Process' },
+      description: { label: 'Section Description', control: 'text', placeholder: 'A systematic approach to delivering comprehensive financial guidance' },
+      steps: { label: 'Process Steps (4 items)', control: 'text' },
+    },
+  },
+  services_why_choose: {
+    schema: servicesWhyChooseSchema,
+    label: 'Why Choose Our Services',
+    description: 'Reasons to choose our services section',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'Why Choose Our Services' },
+      reasons: { label: 'Reasons (3-6 items)', control: 'text' },
+    },
+  },
+  services_commitment: {
+    schema: servicesCommitmentSchema,
+    label: 'Service Commitment',
+    description: 'Service commitment metrics and guarantees',
+    uiMeta: {
+      title: { label: 'Card Title', control: 'text', placeholder: 'Service Commitment' },
+      commitments: { label: 'Commitments (3-10 items)', control: 'text' },
+    },
+  },
+  services_cta: {
+    schema: servicesCtaSchema,
+    label: 'Ready to Experience Our Services',
+    description: 'Call-to-action section for scheduling consultation',
+    uiMeta: {
+      title: { label: 'CTA Title', control: 'text', placeholder: 'Ready to Experience Our Services?' },
+      description: { label: 'CTA Description', control: 'textarea', rows: 3, placeholder: 'Schedule a consultation...' },
+      primaryButtonText: { label: 'Primary Button Text', control: 'text', placeholder: 'Schedule Consultation' },
+      primaryButtonHref: { label: 'Primary Button Link', control: 'text', placeholder: '/contact' },
+      secondaryButtonText: { label: 'Secondary Button Text', control: 'text', placeholder: 'Call +1 (555) 123-4567' },
+      secondaryButtonHref: { label: 'Secondary Button Link', control: 'text', placeholder: 'tel:+15551234567' },
+    },
+  },
   resources_header: {
     schema: pageHeaderSchema,
     label: 'Resources Page Header',
@@ -994,7 +1073,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
 // Page to sections mapping
 export const pageSections: Record<string, string[]> = {
   home: ['home_hero', 'home_stats', 'home_portfolio'],
-  services: ['services_header', 'services_stats', 'services_investment', 'services_strategic', 'services_legacy', 'services_risk', 'services_special', 'services_aggregation'],
+  services: ['services_header', 'services_stats', 'services_investment', 'services_strategic', 'services_legacy', 'services_risk', 'services_special', 'services_aggregation', 'services_process', 'services_why_choose', 'services_commitment', 'services_cta'],
   contact: [
     'contact_header',
     'contact_office', 
