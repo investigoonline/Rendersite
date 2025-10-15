@@ -74,10 +74,12 @@ export default function Resources() {
 
   // Extract sections
   const pageHeader = getSection('resources_header')?.content as any;
+  const becomeClientData = getSection('resources_become_client')?.content as any;
+  const needHelpData = getSection('resources_need_help')?.content as any;
 
-  // Extract resource types from database content (excluding header)
+  // Extract resource types from database content (excluding header and additional sections)
   const resourceTypes: ResourceType[] = resourceTypesContent
-    ?.filter(c => c.section !== 'resources_header')
+    ?.filter(c => !['resources_header', 'resources_become_client', 'resources_need_help'].includes(c.section))
     .map(content => content.content as ResourceType)
     .filter(type => type && type.id && type.name) || [];
 
@@ -245,58 +247,80 @@ export default function Resources() {
         </Tabs>
 
         {/* Additional Resources Section */}
-        <div className="mt-16 grid md:grid-cols-2 gap-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <UserPlus className="h-5 w-5 mr-2 text-primary" />
-                Become a Client
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Ready to take your financial planning to the next level? Learn about our comprehensive client services.
-              </p>
-              <ul className="space-y-2 text-sm text-muted-foreground mb-4">
-                <li>• Personalized financial planning</li>
-                <li>• Dedicated advisor support</li>
-                <li>• Advanced portfolio management</li>
-                <li>• Priority access to new tools</li>
-              </ul>
-              <Button className="w-full">
-                Learn More About Client Services
-              </Button>
-            </CardContent>
-          </Card>
+        {(becomeClientData || needHelpData) && (
+          <div className="mt-16 grid md:grid-cols-2 gap-8" data-testid="section-additional-resources">
+            {becomeClientData && (
+              <Card data-testid="card-become-client">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    {(() => {
+                      const IconComponent = getIcon(becomeClientData.icon);
+                      return <IconComponent className="h-5 w-5 mr-2 text-primary" />;
+                    })()}
+                    <span data-testid="text-become-client-title">{becomeClientData.title}</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground mb-4" data-testid="text-become-client-description">
+                    {becomeClientData.description}
+                  </p>
+                  {becomeClientData.benefits && becomeClientData.benefits.length > 0 && (
+                    <ul className="space-y-2 text-sm text-muted-foreground mb-4">
+                      {becomeClientData.benefits.map((benefit: string, index: number) => (
+                        <li key={index} data-testid={`text-benefit-${index}`}>• {benefit}</li>
+                      ))}
+                    </ul>
+                  )}
+                  <Button 
+                    className="w-full"
+                    onClick={() => window.location.href = becomeClientData.buttonHref}
+                    data-testid="button-become-client"
+                  >
+                    {becomeClientData.buttonText}
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <HelpCircle className="h-5 w-5 mr-2 text-secondary" />
-                Need Help?
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Have questions about our platform or need assistance with financial planning?
-              </p>
-              <div className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
-                  <HelpCircle className="h-4 w-4 mr-2" />
-                  Browse FAQ Database
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Mail className="h-4 w-4 mr-2" />
-                  Contact Support
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Schedule Consultation
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            {needHelpData && (
+              <Card data-testid="card-need-help">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    {(() => {
+                      const IconComponent = getIcon(needHelpData.icon);
+                      return <IconComponent className="h-5 w-5 mr-2 text-secondary" />;
+                    })()}
+                    <span data-testid="text-need-help-title">{needHelpData.title}</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground mb-4" data-testid="text-need-help-description">
+                    {needHelpData.description}
+                  </p>
+                  {needHelpData.actions && needHelpData.actions.length > 0 && (
+                    <div className="space-y-3">
+                      {needHelpData.actions.map((action: any, index: number) => {
+                        const ActionIcon = getIcon(action.icon);
+                        return (
+                          <Button 
+                            key={index}
+                            variant="outline" 
+                            className="w-full justify-start"
+                            onClick={() => window.location.href = action.href}
+                            data-testid={`button-help-action-${index}`}
+                          >
+                            <ActionIcon className="h-4 w-4 mr-2" />
+                            {action.label}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
