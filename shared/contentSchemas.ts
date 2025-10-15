@@ -244,6 +244,27 @@ const servicesCtaSchema = z.object({
   secondaryButtonHref: z.string().min(1).max(200),
 });
 
+// Resources Additional Section Schemas
+const resourcesBecomeClientSchema = z.object({
+  icon: z.string().min(1),
+  title: z.string().min(1).max(100),
+  description: z.string().min(1).max(300),
+  benefits: z.array(z.string()).min(1).max(10),
+  buttonText: z.string().min(1).max(50),
+  buttonHref: z.string().min(1).max(200),
+});
+
+const resourcesNeedHelpSchema = z.object({
+  icon: z.string().min(1),
+  title: z.string().min(1).max(100),
+  description: z.string().min(1).max(300),
+  actions: z.array(z.object({
+    icon: z.string().min(1),
+    label: z.string().min(1).max(50),
+    href: z.string().min(1).max(200),
+  })).min(1).max(5),
+});
+
 // Home Quick Actions Schema
 const homeQuickActionsSchema = z.object({
   actions: z.array(z.object({
@@ -766,6 +787,30 @@ export const contentSchemas: Record<string, SectionSchema> = {
       description: { label: 'Description', control: 'textarea', rows: 2 },
     },
   },
+  resources_become_client: {
+    schema: resourcesBecomeClientSchema,
+    label: 'Become a Client Card',
+    description: 'Card encouraging visitors to become clients',
+    uiMeta: {
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
+      title: { label: 'Card Title', control: 'text', placeholder: 'Become a Client' },
+      description: { label: 'Card Description', control: 'textarea', rows: 2, placeholder: 'Ready to take your financial planning to the next level?' },
+      benefits: { label: 'Benefits List', control: 'text' },
+      buttonText: { label: 'Button Text', control: 'text', placeholder: 'Learn More About Client Services' },
+      buttonHref: { label: 'Button Link', control: 'text', placeholder: '/contact' },
+    },
+  },
+  resources_need_help: {
+    schema: resourcesNeedHelpSchema,
+    label: 'Need Help Card',
+    description: 'Card with support and help action buttons',
+    uiMeta: {
+      icon: { label: 'Icon', control: 'icon', options: iconOptions },
+      title: { label: 'Card Title', control: 'text', placeholder: 'Need Help?' },
+      description: { label: 'Card Description', control: 'textarea', rows: 2, placeholder: 'Have questions about our platform?' },
+      actions: { label: 'Action Buttons (1-5 items)', control: 'text' },
+    },
+  },
   contact_header: {
     schema: pageHeaderSchema,
     label: 'Contact Page Header',
@@ -1087,7 +1132,7 @@ export const pageSections: Record<string, string[]> = {
     'contact_prospective_clients',
     'contact_current_clients'
   ],
-  resources: ['resources_header', 'resources_articles', 'resources_videos', 'resources_newsletters', 'resources_flipbooks', 'resources_faq'],
+  resources: ['resources_header', 'resources_articles', 'resources_videos', 'resources_newsletters', 'resources_flipbooks', 'resources_faq', 'resources_become_client', 'resources_need_help'],
   about: ['about_header', 'about_stats', 'about_story', 'about_mission_vision', 'about_values', 'about_leadership', 'about_headquarters', 'about_innovation', 'about_security', 'about_cta'],
   dashboard: ['dashboard_header', 'dashboard_stats', 'dashboard_user_distribution', 'dashboard_engagement', 'dashboard_system_status'],
   footer: ['footer_company', 'footer_platform', 'footer_resources', 'footer_company_details'],
