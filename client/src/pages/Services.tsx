@@ -53,10 +53,14 @@ export default function Services() {
   // Extract sections
   const pageHeader = getSection('services_header')?.content as any;
   const statsData = getSection('services_stats')?.content as any;
+  const processData = getSection('services_process')?.content as any;
+  const whyChooseData = getSection('services_why_choose')?.content as any;
+  const commitmentData = getSection('services_commitment')?.content as any;
+  const ctaData = getSection('services_cta')?.content as any;
   
-  // Extract services (excluding header and stats sections)
+  // Extract services (excluding header, stats, and new sections)
   const services: ServiceContent[] = servicesContent
-    ?.filter(c => !['services_header', 'services_stats'].includes(c.section))
+    ?.filter(c => !['services_header', 'services_stats', 'services_process', 'services_why_choose', 'services_commitment', 'services_cta'].includes(c.section))
     .map(content => content.content as ServiceContent)
     .filter(service => service && service.id && service.title) || [];
 
@@ -172,163 +176,115 @@ export default function Services() {
         </div>
 
         {/* Process Section */}
-        <Card className="mb-12 sm:mb-16 mx-4">
-          <CardHeader className="text-center">
-            <CardTitle className="text-xl sm:text-2xl">Our Service Process</CardTitle>
-            <p className="text-muted-foreground">
-              A systematic approach to delivering comprehensive financial guidance
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-white font-bold text-xl">1</span>
-                </div>
-                <h4 className="font-semibold text-gray-900 mb-2">Discovery</h4>
-                <p className="text-sm text-muted-foreground">
-                  Comprehensive analysis of your current financial situation and goals
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-white font-bold text-xl">2</span>
-                </div>
-                <h4 className="font-semibold text-gray-900 mb-2">Strategy</h4>
-                <p className="text-sm text-muted-foreground">
-                  Custom financial plan development tailored to your unique circumstances
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-white font-bold text-xl">3</span>
-                </div>
-                <h4 className="font-semibold text-gray-900 mb-2">Implementation</h4>
-                <p className="text-sm text-muted-foreground">
-                  Execution of your financial plan with ongoing coordination
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-white font-bold text-xl">4</span>
-                </div>
-                <h4 className="font-semibold text-gray-900 mb-2">Monitoring</h4>
-                <p className="text-sm text-muted-foreground">
-                  Regular reviews and adjustments to keep you on track
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Why Choose Our Services */}
-        <div className="grid lg:grid-cols-2 gap-12 mb-16">
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Why Choose Our Services</h2>
-            <div className="space-y-6">
-              <div className="flex items-start space-x-4">
-                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <CheckCircle className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-1">Fiduciary Standard</h4>
-                  <p className="text-muted-foreground text-sm">
-                    We're legally bound to act in your best interest at all times, ensuring unbiased advice.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start space-x-4">
-                <div className="w-8 h-8 bg-secondary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <CheckCircle className="h-5 w-5 text-secondary" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-1">Comprehensive Approach</h4>
-                  <p className="text-muted-foreground text-sm">
-                    All aspects of your financial life coordinated under one roof for seamless planning.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start space-x-4">
-                <div className="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <CheckCircle className="h-5 w-5 text-accent" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-1">Institutional Expertise</h4>
-                  <p className="text-muted-foreground text-sm">
-                    Access to institutional-grade investment strategies and professional resources.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start space-x-4">
-                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <CheckCircle className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-1">Ongoing Support</h4>
-                  <p className="text-muted-foreground text-sm">
-                    Regular monitoring, reviews, and adjustments to keep your plan current.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <Card className="h-fit">
-            <CardHeader>
-              <CardTitle>Service Commitment</CardTitle>
+        {processData && processData.steps && (
+          <Card className="mb-12 sm:mb-16 mx-4" data-testid="section-process">
+            <CardHeader className="text-center">
+              <CardTitle className="text-xl sm:text-2xl" data-testid="text-process-title">{processData.title}</CardTitle>
+              <p className="text-muted-foreground" data-testid="text-process-description">
+                {processData.description}
+              </p>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Client Review Frequency</span>
-                  <Badge>Quarterly</Badge>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Response Time</span>
-                  <Badge>24 Hours</Badge>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Account Access</span>
-                  <Badge>24/7 Online</Badge>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Performance Reports</span>
-                  <Badge>Monthly</Badge>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Planning Updates</span>
-                  <Badge>As Needed</Badge>
-                </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
+                {processData.steps.map((step: any, index: number) => {
+                  const colors = ['bg-primary', 'bg-secondary', 'bg-accent', 'bg-primary'];
+                  return (
+                    <div key={index} className="text-center" data-testid={`process-step-${index}`}>
+                      <div className={`w-16 h-16 ${colors[index]} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                        <span className="text-white font-bold text-xl">{index + 1}</span>
+                      </div>
+                      <h4 className="font-semibold text-gray-900 mb-2" data-testid={`text-step-title-${index}`}>{step.title}</h4>
+                      <p className="text-sm text-muted-foreground" data-testid={`text-step-description-${index}`}>
+                        {step.description}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
-        </div>
+        )}
+
+        {/* Why Choose Our Services */}
+        {whyChooseData && whyChooseData.reasons && (
+          <div className="grid lg:grid-cols-2 gap-12 mb-16" data-testid="section-why-choose">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6" data-testid="text-why-choose-title">{whyChooseData.title}</h2>
+              <div className="space-y-6">
+                {whyChooseData.reasons.map((reason: any, index: number) => {
+                  const colors = ['bg-primary/10 text-primary', 'bg-secondary/10 text-secondary', 'bg-accent/10 text-accent'];
+                  const colorClass = colors[index % colors.length];
+                  return (
+                    <div key={index} className="flex items-start space-x-4" data-testid={`reason-${index}`}>
+                      <div className={`w-8 h-8 ${colorClass} rounded-full flex items-center justify-center flex-shrink-0 mt-1`}>
+                        <CheckCircle className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-1" data-testid={`text-reason-title-${index}`}>{reason.title}</h4>
+                        <p className="text-muted-foreground text-sm" data-testid={`text-reason-description-${index}`}>
+                          {reason.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {commitmentData && commitmentData.commitments && (
+              <Card className="h-fit" data-testid="section-commitment">
+                <CardHeader>
+                  <CardTitle data-testid="text-commitment-title">{commitmentData.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {commitmentData.commitments.map((commitment: any, index: number) => (
+                      <div key={index} className="flex justify-between items-center" data-testid={`commitment-${index}`}>
+                        <span className="text-sm text-muted-foreground" data-testid={`text-commitment-label-${index}`}>{commitment.label}</span>
+                        <Badge data-testid={`text-commitment-value-${index}`}>{commitment.value}</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
 
         {/* Contact CTA */}
-        <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
-          <CardContent className="p-12 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Ready to Experience Our Services?
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Schedule a consultation to learn how our comprehensive approach can help 
-              you achieve your financial goals with confidence.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="text-lg px-8">
-                <Calendar className="h-5 w-5 mr-2" />
-                Schedule Consultation
-              </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8">
-                <Phone className="h-5 w-5 mr-2" />
-                Call +1 (555) 123-4567
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {ctaData && (
+          <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5" data-testid="section-cta">
+            <CardContent className="p-12 text-center">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4" data-testid="text-cta-title">
+                {ctaData.title}
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto" data-testid="text-cta-description">
+                {ctaData.description}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  size="lg" 
+                  className="text-lg px-8"
+                  onClick={() => window.location.href = ctaData.primaryButtonHref}
+                  data-testid="button-cta-primary"
+                >
+                  <Calendar className="h-5 w-5 mr-2" />
+                  {ctaData.primaryButtonText}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="text-lg px-8"
+                  onClick={() => window.location.href = ctaData.secondaryButtonHref}
+                  data-testid="button-cta-secondary"
+                >
+                  <Phone className="h-5 w-5 mr-2" />
+                  {ctaData.secondaryButtonText}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
