@@ -141,19 +141,34 @@ function getDefaultItemForField(fieldName: string): any {
     return { label: '', value: '', description: '', icon: 'Target' };
   }
   
-  // Features (simple string array)
-  if (fieldName === 'features') {
-    return '';
+  // Process steps / Why choose reasons
+  if (fieldName === 'steps' || fieldName === 'reasons' || fieldName === 'values') {
+    return { title: '', description: '' };
   }
   
-  // Contact content (simple string array)
-  if (fieldName === 'content') {
+  // Commitments
+  if (fieldName === 'commitments') {
+    return { label: '', value: '' };
+  }
+  
+  // Actions
+  if (fieldName === 'actions') {
+    return { icon: 'ArrowRight', label: '', href: '' };
+  }
+  
+  // Benefits / Features / Content (simple string arrays)
+  if (fieldName === 'benefits' || fieldName === 'features' || fieldName === 'content' || fieldName === 'calculators') {
     return '';
   }
   
   // Footer links
   if (fieldName === 'links') {
     return { label: '', href: '' };
+  }
+  
+  // Categories
+  if (fieldName === 'categories') {
+    return { title: '', description: '', icon: 'Calculator', calculators: [] };
   }
   
   // Default to empty string
@@ -166,14 +181,20 @@ function renderItemFields(
   index: number,
   updateItem: (index: number, field: string, value: any) => void
 ) {
-  // Simple string array (features, content)
-  if (typeof item === 'string' || fieldName === 'features' || fieldName === 'content') {
+  // Simple string array (features, content, benefits, calculators)
+  if (typeof item === 'string' || ['features', 'content', 'benefits', 'calculators'].includes(fieldName)) {
+    const placeholders: Record<string, string> = {
+      features: 'feature',
+      content: 'content line',
+      benefits: 'benefit',
+      calculators: 'calculator name'
+    };
     return (
       <div>
         <Input
           value={typeof item === 'string' ? item : ''}
           onChange={(e) => updateItem(index, '', e.target.value)}
-          placeholder={`Enter ${fieldName === 'features' ? 'feature' : 'content line'}`}
+          placeholder={`Enter ${placeholders[fieldName] || 'item'}`}
           data-testid={`input-${fieldName}-${index}`}
         />
       </div>
@@ -269,6 +290,119 @@ function renderItemFields(
             value={item.href || ''}
             onChange={(e) => updateItem(index, 'href', e.target.value)}
             placeholder="e.g., /about"
+            data-testid={`input-${fieldName}-${index}-href`}
+          />
+        </div>
+      </>
+    );
+  }
+
+  // Steps, Reasons, Values (title + description)
+  if (fieldName === 'steps' || fieldName === 'reasons' || fieldName === 'values') {
+    return (
+      <>
+        <div>
+          <Label className="text-sm">Title</Label>
+          <Input
+            value={item.title || ''}
+            onChange={(e) => updateItem(index, 'title', e.target.value)}
+            placeholder={`Enter ${fieldName === 'steps' ? 'step' : fieldName === 'values' ? 'value' : 'reason'} title`}
+            data-testid={`input-${fieldName}-${index}-title`}
+          />
+        </div>
+        <div>
+          <Label className="text-sm">Description</Label>
+          <Textarea
+            value={item.description || ''}
+            onChange={(e) => updateItem(index, 'description', e.target.value)}
+            placeholder="Enter description..."
+            rows={3}
+            data-testid={`textarea-${fieldName}-${index}-description`}
+          />
+        </div>
+      </>
+    );
+  }
+
+  // Commitments (label + value)
+  if (fieldName === 'commitments') {
+    return (
+      <>
+        <div>
+          <Label className="text-sm">Label</Label>
+          <Input
+            value={item.label || ''}
+            onChange={(e) => updateItem(index, 'label', e.target.value)}
+            placeholder="e.g., Client Review Frequency"
+            data-testid={`input-${fieldName}-${index}-label`}
+          />
+        </div>
+        <div>
+          <Label className="text-sm">Value</Label>
+          <Input
+            value={item.value || ''}
+            onChange={(e) => updateItem(index, 'value', e.target.value)}
+            placeholder="e.g., Quarterly"
+            data-testid={`input-${fieldName}-${index}-value`}
+          />
+        </div>
+      </>
+    );
+  }
+
+  // Actions (icon + label + href)
+  if (fieldName === 'actions') {
+    return (
+      <>
+        <div>
+          <Label className="text-sm">Icon</Label>
+          <Select
+            value={item.icon || 'ArrowRight'}
+            onValueChange={(value) => updateItem(index, 'icon', value)}
+          >
+            <SelectTrigger data-testid={`select-${fieldName}-${index}-icon`}>
+              <SelectValue>
+                {item.icon && (
+                  <div className="flex items-center gap-2">
+                    {(() => {
+                      const IconComponent = (LucideIcons as any)[item.icon];
+                      return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
+                    })()}
+                    <span>{item.icon}</span>
+                  </div>
+                )}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {iconOptions.map((option) => {
+                const IconComponent = (LucideIcons as any)[option.value];
+                return (
+                  <SelectItem key={option.value} value={option.value}>
+                    <div className="flex items-center gap-2">
+                      {IconComponent && <IconComponent className="h-4 w-4" />}
+                      <span>{option.label}</span>
+                    </div>
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label className="text-sm">Label</Label>
+          <Input
+            value={item.label || ''}
+            onChange={(e) => updateItem(index, 'label', e.target.value)}
+            placeholder="e.g., Browse FAQ Database"
+            data-testid={`input-${fieldName}-${index}-label`}
+          />
+        </div>
+        <div>
+          <Label className="text-sm">Link URL</Label>
+          <Input
+            value={item.href || ''}
+            onChange={(e) => updateItem(index, 'href', e.target.value)}
+            placeholder="e.g., /resources?type=faq"
             data-testid={`input-${fieldName}-${index}-href`}
           />
         </div>
