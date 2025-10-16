@@ -244,6 +244,23 @@ const servicesCtaSchema = z.object({
   secondaryButtonHref: z.string().min(1).max(200),
 });
 
+// Contact Form Fields Schema
+const contactFormFieldsSchema = z.object({
+  nameLabel: z.string().min(1).max(50),
+  namePlaceholder: z.string().min(1).max(100),
+  emailLabel: z.string().min(1).max(50),
+  emailPlaceholder: z.string().min(1).max(100),
+  phoneLabel: z.string().min(1).max(50),
+  phonePlaceholder: z.string().min(1).max(100),
+  contactMethodLabel: z.string().min(1).max(50),
+  subjectLabel: z.string().min(1).max(50),
+  messageLabel: z.string().min(1).max(50),
+  messagePlaceholder: z.string().min(1).max(200),
+  submitButtonText: z.string().min(1).max(50),
+  successTitle: z.string().min(1).max(100),
+  successMessage: z.string().min(1).max(200),
+});
+
 // Resources Additional Section Schemas
 const resourcesBecomeClientSchema = z.object({
   icon: z.string().min(1),
@@ -669,6 +686,26 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       title: { label: 'Form Title', control: 'text', placeholder: 'Send us a Message' },
       description: { label: 'Form Description', control: 'textarea', rows: 2, placeholder: 'Fill out the form...' },
+    },
+  },
+  contact_form_fields: {
+    schema: contactFormFieldsSchema,
+    label: 'Contact Form Fields',
+    description: 'Customize form field labels, placeholders, and messages',
+    uiMeta: {
+      nameLabel: { label: 'Name Field Label', control: 'text', placeholder: 'Full Name *' },
+      namePlaceholder: { label: 'Name Field Placeholder', control: 'text', placeholder: 'Enter your full name' },
+      emailLabel: { label: 'Email Field Label', control: 'text', placeholder: 'Email Address *' },
+      emailPlaceholder: { label: 'Email Field Placeholder', control: 'text', placeholder: 'Enter your email address' },
+      phoneLabel: { label: 'Phone Field Label', control: 'text', placeholder: 'Phone Number (Optional)' },
+      phonePlaceholder: { label: 'Phone Field Placeholder', control: 'text', placeholder: 'Enter your phone number' },
+      contactMethodLabel: { label: 'Contact Method Label', control: 'text', placeholder: 'Preferred Contact Method' },
+      subjectLabel: { label: 'Subject Field Label', control: 'text', placeholder: 'Subject *' },
+      messageLabel: { label: 'Message Field Label', control: 'text', placeholder: 'Your Message *' },
+      messagePlaceholder: { label: 'Message Field Placeholder', control: 'textarea', rows: 2, placeholder: 'Tell us how we can help...' },
+      submitButtonText: { label: 'Submit Button Text', control: 'text', placeholder: 'Send Message' },
+      successTitle: { label: 'Success Message Title', control: 'text', placeholder: 'Message Sent Successfully' },
+      successMessage: { label: 'Success Message Text', control: 'text', placeholder: 'Thank you for contacting us. We\'ll get back to you within 24 hours.' },
     },
   },
   contact_quick_actions: {
@@ -1125,6 +1162,7 @@ export const pageSections: Record<string, string[]> = {
     'contact_phone', 
     'contact_email',
     'contact_form_header',
+    'contact_form_fields',
     'contact_quick_actions',
     'contact_support_features',
     'contact_business_hours',

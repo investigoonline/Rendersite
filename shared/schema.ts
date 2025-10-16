@@ -202,6 +202,7 @@ export const contentSectionEnum = pgEnum('content_section', [
   'contact_phone',
   'contact_email',
   'contact_form_header',
+  'contact_form_fields',
   'contact_quick_actions',
   'contact_support_features',
   'contact_business_hours',

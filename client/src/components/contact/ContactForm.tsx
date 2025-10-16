@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Form,
   FormControl,
@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Send, Loader2 } from "lucide-react";
+import type { PageContent } from "@shared/schema";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -58,6 +59,20 @@ const contactMethodOptions = [
 export default function ContactForm() {
   const { toast } = useToast();
 
+  // Fetch form fields content from CMS
+  const { data: formFieldsContent } = useQuery<PageContent[]>({
+    queryKey: ['/api/content', 'contact'],
+    queryFn: async () => {
+      const res = await fetch('/api/content?page=contact', {
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to fetch content');
+      return res.json();
+    },
+  });
+
+  const formFields = formFieldsContent?.find(c => c.section === 'contact_form_fields')?.content as any || {};
+
   const form = useForm<ContactForm>({
     resolver: zodResolver(contactSchema),
     defaultValues: {
@@ -77,8 +92,8 @@ export default function ContactForm() {
     },
     onSuccess: () => {
       toast({
-        title: "Message Sent Successfully",
-        description: "Thank you for contacting us. We'll get back to you within 24 hours.",
+        title: formFields.successTitle || "Message Sent Successfully",
+        description: formFields.successMessage || "Thank you for contacting us. We'll get back to you within 24 hours.",
       });
       form.reset();
     },
@@ -104,10 +119,10 @@ export default function ContactForm() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name *</FormLabel>
+                <FormLabel>{formFields.nameLabel || "Full Name *"}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter your full name"
+                    placeholder={formFields.namePlaceholder || "Enter your full name"}
                     {...field}
                   />
                 </FormControl>
@@ -121,11 +136,11 @@ export default function ContactForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email Address *</FormLabel>
+                <FormLabel>{formFields.emailLabel || "Email Address *"}</FormLabel>
                 <FormControl>
                   <Input
                     type="email"
-                    placeholder="Enter your email address"
+                    placeholder={formFields.emailPlaceholder || "Enter your email address"}
                     {...field}
                   />
                 </FormControl>
@@ -141,11 +156,11 @@ export default function ContactForm() {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone Number (Optional)</FormLabel>
+                <FormLabel>{formFields.phoneLabel || "Phone Number (Optional)"}</FormLabel>
                 <FormControl>
                   <Input
                     type="tel"
-                    placeholder="Enter your phone number"
+                    placeholder={formFields.phonePlaceholder || "Enter your phone number"}
                     {...field}
                   />
                 </FormControl>
@@ -159,7 +174,7 @@ export default function ContactForm() {
             name="preferredContact"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Preferred Contact Method</FormLabel>
+                <FormLabel>{formFields.contactMethodLabel || "Preferred Contact Method"}</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
@@ -185,7 +200,7 @@ export default function ContactForm() {
           name="subject"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Subject *</FormLabel>
+              <FormLabel>{formFields.subjectLabel || "Subject *"}</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -210,10 +225,10 @@ export default function ContactForm() {
           name="message"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Message *</FormLabel>
+              <FormLabel>{formFields.messageLabel || "Your Message *"}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Please provide details about your inquiry..."
+                  placeholder={formFields.messagePlaceholder || "Tell us how we can help you..."}
                   className="min-h-[120px] resize-none"
                   {...field}
                 />
@@ -246,7 +261,7 @@ export default function ContactForm() {
           ) : (
             <>
               <Send className="mr-2 h-4 w-4" />
-              Send Message
+              {formFields.submitButtonText || "Send Message"}
             </>
           )}
         </Button>
