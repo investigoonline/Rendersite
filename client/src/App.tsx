@@ -11,6 +11,7 @@ import Home from "@/pages/Home";
 import Register from "@/pages/Register";
 import Calculators from "@/pages/Calculators";
 import Resources from "@/pages/Resources";
+import Blog from "@/pages/Blog";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import Services from "@/pages/Services";
@@ -34,6 +35,7 @@ function Router() {
         <Route path="/register" component={Register} />
         <Route path="/calculators" component={Calculators} />
         <Route path="/resources" component={Resources} />
+        <Route path="/blog" component={Blog} />
         <Route path="/about" component={About} />
         <Route path="/services" component={Services} />
         <Route path="/contact" component={Contact} />

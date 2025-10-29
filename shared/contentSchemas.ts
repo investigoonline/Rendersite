@@ -319,6 +319,37 @@ const homeCalculatorCategoriesSchema = z.object({
   })).min(1).max(10),
 });
 
+// Blog Page Schemas
+const blogHeaderSchema = z.object({
+  badge: z.string().min(1).max(50).optional(),
+  title: z.string().min(1).max(200),
+  description: z.string().min(1),
+});
+
+const blogFeaturedSchema = z.object({
+  title: z.string().min(1).max(100),
+  description: z.string().min(1),
+});
+
+const blogCategoriesSchema = z.object({
+  title: z.string().min(1).max(100),
+  categories: z.array(z.object({
+    id: z.string().min(1),
+    name: z.string().min(1).max(50),
+    description: z.string().min(1),
+    count: z.number().min(0).optional(),
+  })).min(1).max(10),
+});
+
+const blogCtaSchema = z.object({
+  title: z.string().min(1).max(150),
+  description: z.string().min(1),
+  primaryButtonText: z.string().min(1).max(50),
+  primaryButtonHref: z.string().min(1).max(200),
+  secondaryButtonText: z.string().min(1).max(50),
+  secondaryButtonHref: z.string().min(1).max(200),
+});
+
 // Dashboard Schemas
 const dashboardHeaderSchema = z.object({
   title: z.string().min(1).max(100),
@@ -1150,6 +1181,47 @@ export const contentSchemas: Record<string, SectionSchema> = {
       secondaryButtonHref: { label: 'Secondary Button Link', control: 'text', placeholder: '/contact' },
     },
   },
+  blog_header: {
+    schema: blogHeaderSchema,
+    label: 'Blog Page Header',
+    description: 'Blog page title, badge, and description',
+    uiMeta: {
+      badge: { label: 'Badge Text (optional)', control: 'text', placeholder: 'Insights & Analysis' },
+      title: { label: 'Page Title', control: 'text', placeholder: 'Financial Insights Blog' },
+      description: { label: 'Page Description', control: 'textarea', rows: 3, placeholder: 'Expert analysis and insights on financial planning, investments, and wealth management' },
+    },
+  },
+  blog_featured: {
+    schema: blogFeaturedSchema,
+    label: 'Featured Posts Section',
+    description: 'Section highlighting featured blog posts',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'Featured Articles' },
+      description: { label: 'Section Description', control: 'textarea', rows: 2, placeholder: 'Hand-picked articles from our financial experts' },
+    },
+  },
+  blog_categories: {
+    schema: blogCategoriesSchema,
+    label: 'Blog Categories',
+    description: 'Categories and topics navigation',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'Browse by Category' },
+      categories: { label: 'Categories (1-10 items)', control: 'text' },
+    },
+  },
+  blog_cta: {
+    schema: blogCtaSchema,
+    label: 'Blog Call to Action',
+    description: 'CTA section for newsletter subscription or consultation',
+    uiMeta: {
+      title: { label: 'CTA Title', control: 'text', placeholder: 'Stay Informed with Financial Insights' },
+      description: { label: 'CTA Description', control: 'textarea', rows: 3, placeholder: 'Subscribe to our newsletter or schedule a consultation to learn more' },
+      primaryButtonText: { label: 'Primary Button Text', control: 'text', placeholder: 'Subscribe to Newsletter' },
+      primaryButtonHref: { label: 'Primary Button Link', control: 'text', placeholder: '/resources' },
+      secondaryButtonText: { label: 'Secondary Button Text', control: 'text', placeholder: 'Schedule Consultation' },
+      secondaryButtonHref: { label: 'Secondary Button Link', control: 'text', placeholder: '/contact' },
+    },
+  },
 };
 
 // Page to sections mapping
@@ -1171,6 +1243,7 @@ export const pageSections: Record<string, string[]> = {
     'contact_current_clients'
   ],
   resources: ['resources_header', 'resources_articles', 'resources_videos', 'resources_newsletters', 'resources_flipbooks', 'resources_faq', 'resources_become_client', 'resources_need_help'],
+  blog: ['blog_header', 'blog_featured', 'blog_categories', 'blog_cta'],
   about: ['about_header', 'about_stats', 'about_story', 'about_mission_vision', 'about_values', 'about_leadership', 'about_headquarters', 'about_innovation', 'about_security', 'about_cta'],
   dashboard: ['dashboard_header', 'dashboard_stats', 'dashboard_user_distribution', 'dashboard_engagement', 'dashboard_system_status'],
   footer: ['footer_company', 'footer_platform', 'footer_resources', 'footer_company_details'],
