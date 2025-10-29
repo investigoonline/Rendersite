@@ -8,6 +8,11 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## Description Field Character Limit Increase (October 2025)
+- **Issue**: Content managers unable to save longer descriptions for resources and services
+- **Solution**: Increased description field character limit from 300 to 2000 characters across all content schemas
+- **Impact**: Content managers can now add detailed descriptions without hitting validation errors
+
 ## Dynamic Icon Support Fix (October 2025)
 - **Issue**: "Unknown icon name: Globe" error when using icons not in hardcoded iconMap
 - **Root Cause**: Services page had hardcoded list of only 6 icons (TrendingUp, Shield, PiggyBank, FileText, Users, Database)
