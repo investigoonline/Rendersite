@@ -8,12 +8,16 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
-## Description Field Character Limit Removed (October 2025)
-- **Issue**: Content managers unable to save longer descriptions for resources and services
-- **Solution**: Removed all character limits from description fields across all content schemas (changed from varchar with max to text type)
-- **Database**: Already using `text` type in PostgreSQL (unlimited)
+## Description Field Formatting Preservation (October 2025)
+- **Issue**: Content managers unable to save longer descriptions and formatting (line breaks, paragraphs) was not preserved when pasting content
+- **Solution**: 
+  - Removed all character limits from description fields across all content schemas
+  - Added `whitespace-pre-wrap` CSS class to all description display elements across all pages
+- **Database**: Already using `text` type in PostgreSQL (unlimited storage)
 - **Validation**: Removed `.max()` constraints from Zod schemas
-- **Impact**: Content managers can now add descriptions of any length without validation errors
+- **Display**: Added `whitespace-pre-wrap` to preserve line breaks and formatting while allowing text wrapping
+- **Pages Updated**: Services, Resources, Home (Landing), About, Contact
+- **Impact**: Content managers can now add descriptions of any length with preserved formatting (line breaks, paragraphs)
 
 ## Dynamic Icon Support Fix (October 2025)
 - **Issue**: "Unknown icon name: Globe" error when using icons not in hardcoded iconMap

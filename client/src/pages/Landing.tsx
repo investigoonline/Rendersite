@@ -277,7 +277,7 @@ export default function Landing() {
                           </div>
                           <div>
                             <h4 className="font-medium text-gray-900">{item.title}</h4>
-                            <p className="text-sm text-muted-foreground">{item.description}</p>
+                            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.description}</p>
                           </div>
                         </div>
                         {index < 2 && <div className="ml-5 w-0.5 h-6 bg-gray-200 mt-2"></div>}

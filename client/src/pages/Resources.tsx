@@ -135,7 +135,7 @@ export default function Resources() {
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               {pageHeader.title}
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8 whitespace-pre-wrap">
               {pageHeader.description}
             </p>
           </div>
@@ -176,7 +176,7 @@ export default function Resources() {
                   {type.name}
                 </Badge>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">{type.name}</h2>
-                <p className="text-muted-foreground">{type.description}</p>
+                <p className="text-muted-foreground whitespace-pre-wrap">{type.description}</p>
               </div>
 
               {/* Special handling for Newsletter */}
@@ -261,7 +261,7 @@ export default function Resources() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground mb-4" data-testid="text-become-client-description">
+                  <p className="text-muted-foreground mb-4 whitespace-pre-wrap" data-testid="text-become-client-description">
                     {becomeClientData.description}
                   </p>
                   {becomeClientData.benefits && becomeClientData.benefits.length > 0 && (
@@ -294,7 +294,7 @@ export default function Resources() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground mb-4" data-testid="text-need-help-description">
+                  <p className="text-muted-foreground mb-4 whitespace-pre-wrap" data-testid="text-need-help-description">
                     {needHelpData.description}
                   </p>
                   {needHelpData.actions && needHelpData.actions.length > 0 && (
