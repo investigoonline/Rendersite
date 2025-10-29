@@ -100,7 +100,7 @@ const serviceSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1).max(100),
   icon: z.string().min(1),
-  description: z.string().min(1).max(2000),
+  description: z.string().min(1),
   features: z.array(z.string()).min(1).max(10),
   color: z.string().min(1),
 });
@@ -115,7 +115,7 @@ const contactMethodSchema = z.object({
 
 const contactFormHeaderSchema = z.object({
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(2000),
+  description: z.string().min(1),
 });
 
 const quickActionSchema = z.object({
@@ -131,7 +131,7 @@ const contactQuickActionsSchema = z.object({
 const supportFeatureSchema = z.object({
   icon: z.string().min(1),
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(2000),
+  description: z.string().min(1),
 });
 
 const contactSupportFeaturesSchema = z.object({
@@ -160,7 +160,7 @@ const contactOfficeInfoSchema = z.object({
 
 const clientSectionSchema = z.object({
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(500),
+  description: z.string().min(1),
   benefits: z.array(z.string()).min(1).max(10),
   buttonText: z.string().min(1).max(50),
 });
@@ -170,7 +170,7 @@ const resourceTypeSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1).max(100),
   icon: z.string().min(1),
-  description: z.string().min(1).max(2000),
+  description: z.string().min(1),
 });
 
 // Footer Schemas
@@ -194,7 +194,7 @@ const footerCompanyDetailsSchema = z.object({
 const pageHeaderSchema = z.object({
   badge: z.string().min(1).max(50).optional(),
   title: z.string().min(1).max(200),
-  description: z.string().min(1).max(500),
+  description: z.string().min(1),
 });
 
 // Services Stats Schema
@@ -209,10 +209,10 @@ const servicesStatsSchema = z.object({
 // Services Process Schema
 const servicesProcessSchema = z.object({
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(2000),
+  description: z.string().min(1),
   steps: z.array(z.object({
     title: z.string().min(1).max(50),
-    description: z.string().min(1).max(200),
+    description: z.string().min(1),
   })).length(4),
 });
 
@@ -221,7 +221,7 @@ const servicesWhyChooseSchema = z.object({
   title: z.string().min(1).max(100),
   reasons: z.array(z.object({
     title: z.string().min(1).max(100),
-    description: z.string().min(1).max(2000),
+    description: z.string().min(1),
   })).min(3).max(6),
 });
 
@@ -237,7 +237,7 @@ const servicesCommitmentSchema = z.object({
 // Services CTA Schema
 const servicesCtaSchema = z.object({
   title: z.string().min(1).max(150),
-  description: z.string().min(1).max(500),
+  description: z.string().min(1),
   primaryButtonText: z.string().min(1).max(50),
   primaryButtonHref: z.string().min(1).max(200),
   secondaryButtonText: z.string().min(1).max(50),
@@ -265,7 +265,7 @@ const contactFormFieldsSchema = z.object({
 const resourcesBecomeClientSchema = z.object({
   icon: z.string().min(1),
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(2000),
+  description: z.string().min(1),
   benefits: z.array(z.string()).min(1).max(10),
   buttonText: z.string().min(1).max(50),
   buttonHref: z.string().min(1).max(200),
@@ -274,7 +274,7 @@ const resourcesBecomeClientSchema = z.object({
 const resourcesNeedHelpSchema = z.object({
   icon: z.string().min(1),
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(2000),
+  description: z.string().min(1),
   actions: z.array(z.object({
     icon: z.string().min(1),
     label: z.string().min(1).max(50),
@@ -287,7 +287,7 @@ const homeQuickActionsSchema = z.object({
   actions: z.array(z.object({
     icon: z.string().min(1),
     title: z.string().min(1).max(100),
-    description: z.string().min(1).max(200),
+    description: z.string().min(1),
     href: z.string().min(1).max(200),
     color: z.string().min(1),
   })).min(1).max(6),
@@ -296,11 +296,11 @@ const homeQuickActionsSchema = z.object({
 // Home Calculators Schema
 const homeCalculatorsSchema = z.object({
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(2000),
+  description: z.string().min(1),
   calculators: z.array(z.object({
     icon: z.string().min(1),
     title: z.string().min(1).max(100),
-    description: z.string().min(1).max(200),
+    description: z.string().min(1),
     href: z.string().min(1).max(200),
     color: z.string().min(1),
   })).min(1).max(6),
@@ -314,7 +314,7 @@ const homeCalculatorCategoriesSchema = z.object({
     id: z.string().min(1),
     title: z.string().min(1).max(100),
     icon: z.string().min(1),
-    description: z.string().min(1).max(2000),
+    description: z.string().min(1),
     calculators: z.array(z.string()).min(1).max(5),
   })).min(1).max(10),
 });
@@ -322,7 +322,7 @@ const homeCalculatorCategoriesSchema = z.object({
 // Dashboard Schemas
 const dashboardHeaderSchema = z.object({
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(2000),
+  description: z.string().min(1),
 });
 
 const dashboardStatsSchema = z.object({
@@ -361,7 +361,7 @@ const dashboardSystemStatusSchema = z.object({
 const aboutHeaderSchema = z.object({
   badge: z.string().min(1).max(50),
   title: z.string().min(1).max(200),
-  description: z.string().min(1).max(500),
+  description: z.string().min(1),
 });
 
 const aboutStatsSchema = z.object({
@@ -393,7 +393,7 @@ const aboutValuesSchema = z.object({
   values: z.array(z.object({
     icon: z.string().min(1),
     title: z.string().min(1).max(100),
-    description: z.string().min(1).max(2000),
+    description: z.string().min(1),
   })).length(4),
 });
 
@@ -402,7 +402,7 @@ const aboutLeadershipSchema = z.object({
   leaders: z.array(z.object({
     name: z.string().min(1).max(100),
     title: z.string().min(1).max(100),
-    description: z.string().min(1).max(2000),
+    description: z.string().min(1),
   })).min(1).max(10),
 });
 
@@ -410,26 +410,26 @@ const aboutHeadquartersSchema = z.object({
   icon: z.string().min(1),
   title: z.string().min(1).max(100),
   subtitle: z.string().min(1).max(200),
-  description: z.string().min(1).max(2000),
+  description: z.string().min(1),
 });
 
 const aboutInnovationSchema = z.object({
   icon: z.string().min(1),
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(2000),
+  description: z.string().min(1),
   features: z.array(z.string().min(1).max(200)).min(1).max(10),
 });
 
 const aboutSecuritySchema = z.object({
   icon: z.string().min(1),
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(2000),
+  description: z.string().min(1),
   features: z.array(z.string().min(1).max(200)).min(1).max(10),
 });
 
 const aboutCtaSchema = z.object({
   title: z.string().min(1).max(200),
-  description: z.string().min(1).max(500),
+  description: z.string().min(1),
   primaryButtonText: z.string().min(1).max(50),
   primaryButtonHref: z.string().min(1).max(200),
   secondaryButtonText: z.string().min(1).max(50),

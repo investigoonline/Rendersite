@@ -8,10 +8,12 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
-## Description Field Character Limit Increase (October 2025)
+## Description Field Character Limit Removed (October 2025)
 - **Issue**: Content managers unable to save longer descriptions for resources and services
-- **Solution**: Increased description field character limit from 300 to 2000 characters across all content schemas
-- **Impact**: Content managers can now add detailed descriptions without hitting validation errors
+- **Solution**: Removed all character limits from description fields across all content schemas (changed from varchar with max to text type)
+- **Database**: Already using `text` type in PostgreSQL (unlimited)
+- **Validation**: Removed `.max()` constraints from Zod schemas
+- **Impact**: Content managers can now add descriptions of any length without validation errors
 
 ## Dynamic Icon Support Fix (October 2025)
 - **Issue**: "Unknown icon name: Globe" error when using icons not in hardcoded iconMap
