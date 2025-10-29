@@ -89,7 +89,7 @@ export default function ResourceCard({ resource, onView }: ResourceCardProps) {
       <CardContent className="pt-0 flex flex-col justify-between flex-1">
         <div className="space-y-3 mb-4">
           {resource.description && (
-            <p className="text-sm text-muted-foreground line-clamp-3">
+            <p className="text-sm text-muted-foreground line-clamp-3 whitespace-pre-wrap">
               {resource.description}
             </p>
           )}
