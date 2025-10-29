@@ -318,12 +318,13 @@ export default function ContentManagement() {
           <TabsContent value="content" className="space-y-6">
             {/* Page Selection Tabs */}
             <Tabs value={selectedPage} onValueChange={setSelectedPage} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-grid">
+              <TabsList className="grid w-full grid-cols-8 lg:w-auto lg:inline-grid">
                 <TabsTrigger value="home" data-testid="tab-home">Home</TabsTrigger>
                 <TabsTrigger value="footer" data-testid="tab-footer">Footer</TabsTrigger>
                 <TabsTrigger value="services" data-testid="tab-services">Services</TabsTrigger>
                 <TabsTrigger value="contact" data-testid="tab-contact">Contact</TabsTrigger>
                 <TabsTrigger value="resources" data-testid="tab-resources">Resources</TabsTrigger>
+                <TabsTrigger value="blog" data-testid="tab-blog">Blog</TabsTrigger>
                 <TabsTrigger value="about" data-testid="tab-about">About</TabsTrigger>
                 <TabsTrigger value="dashboard" data-testid="tab-dashboard">Dashboard</TabsTrigger>
               </TabsList>
