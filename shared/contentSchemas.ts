@@ -100,7 +100,7 @@ const serviceSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1).max(100),
   icon: z.string().min(1),
-  description: z.string().min(1).max(300),
+  description: z.string().min(1).max(1000),
   features: z.array(z.string()).min(1).max(10),
   color: z.string().min(1),
 });
@@ -115,7 +115,7 @@ const contactMethodSchema = z.object({
 
 const contactFormHeaderSchema = z.object({
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(300),
+  description: z.string().min(1).max(1000),
 });
 
 const quickActionSchema = z.object({
@@ -131,7 +131,7 @@ const contactQuickActionsSchema = z.object({
 const supportFeatureSchema = z.object({
   icon: z.string().min(1),
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(300),
+  description: z.string().min(1).max(1000),
 });
 
 const contactSupportFeaturesSchema = z.object({
@@ -170,7 +170,7 @@ const resourceTypeSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1).max(100),
   icon: z.string().min(1),
-  description: z.string().min(1).max(300),
+  description: z.string().min(1).max(1000),
 });
 
 // Footer Schemas
@@ -209,7 +209,7 @@ const servicesStatsSchema = z.object({
 // Services Process Schema
 const servicesProcessSchema = z.object({
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(300),
+  description: z.string().min(1).max(1000),
   steps: z.array(z.object({
     title: z.string().min(1).max(50),
     description: z.string().min(1).max(200),
@@ -221,7 +221,7 @@ const servicesWhyChooseSchema = z.object({
   title: z.string().min(1).max(100),
   reasons: z.array(z.object({
     title: z.string().min(1).max(100),
-    description: z.string().min(1).max(300),
+    description: z.string().min(1).max(1000),
   })).min(3).max(6),
 });
 
@@ -265,7 +265,7 @@ const contactFormFieldsSchema = z.object({
 const resourcesBecomeClientSchema = z.object({
   icon: z.string().min(1),
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(300),
+  description: z.string().min(1).max(1000),
   benefits: z.array(z.string()).min(1).max(10),
   buttonText: z.string().min(1).max(50),
   buttonHref: z.string().min(1).max(200),
@@ -274,7 +274,7 @@ const resourcesBecomeClientSchema = z.object({
 const resourcesNeedHelpSchema = z.object({
   icon: z.string().min(1),
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(300),
+  description: z.string().min(1).max(1000),
   actions: z.array(z.object({
     icon: z.string().min(1),
     label: z.string().min(1).max(50),
@@ -296,7 +296,7 @@ const homeQuickActionsSchema = z.object({
 // Home Calculators Schema
 const homeCalculatorsSchema = z.object({
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(300),
+  description: z.string().min(1).max(1000),
   calculators: z.array(z.object({
     icon: z.string().min(1),
     title: z.string().min(1).max(100),
@@ -314,7 +314,7 @@ const homeCalculatorCategoriesSchema = z.object({
     id: z.string().min(1),
     title: z.string().min(1).max(100),
     icon: z.string().min(1),
-    description: z.string().min(1).max(300),
+    description: z.string().min(1).max(1000),
     calculators: z.array(z.string()).min(1).max(5),
   })).min(1).max(10),
 });
@@ -322,7 +322,7 @@ const homeCalculatorCategoriesSchema = z.object({
 // Dashboard Schemas
 const dashboardHeaderSchema = z.object({
   title: z.string().min(1).max(100),
-  description: z.string().min(1).max(300),
+  description: z.string().min(1).max(1000),
 });
 
 const dashboardStatsSchema = z.object({
@@ -393,7 +393,7 @@ const aboutValuesSchema = z.object({
   values: z.array(z.object({
     icon: z.string().min(1),
     title: z.string().min(1).max(100),
-    description: z.string().min(1).max(300),
+    description: z.string().min(1).max(1000),
   })).length(4),
 });
 
@@ -402,7 +402,7 @@ const aboutLeadershipSchema = z.object({
   leaders: z.array(z.object({
     name: z.string().min(1).max(100),
     title: z.string().min(1).max(100),
-    description: z.string().min(1).max(300),
+    description: z.string().min(1).max(1000),
   })).min(1).max(10),
 });
 
