@@ -6,6 +6,7 @@ import GuestSignupForm from "@/components/guest/GuestSignupForm";
 import CalculatorCard from "@/components/calculators/CalculatorCard";
 import NetWorthCalculator from "@/components/calculators/NetWorthCalculator";
 import GuestAccessModal from "@/components/modals/GuestAccessModal";
+import { HTMLContent } from "@/components/HTMLContent";
 import {
   PieChart,
   CreditCard,
@@ -277,7 +278,7 @@ export default function Landing() {
                           </div>
                           <div>
                             <h4 className="font-medium text-gray-900">{item.title}</h4>
-                            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.description}</p>
+                            <HTMLContent content={item.description} className="text-sm text-muted-foreground" />
                           </div>
                         </div>
                         {index < 2 && <div className="ml-5 w-0.5 h-6 bg-gray-200 mt-2"></div>}
