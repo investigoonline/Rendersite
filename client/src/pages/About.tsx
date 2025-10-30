@@ -61,9 +61,7 @@ export default function About() {
             <h1 className="text-4xl font-bold text-gray-900 mb-6" data-testid="text-about-title">
               {header.title}
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto whitespace-pre-wrap" data-testid="text-about-description">
-              {header.description}
-            </p>
+            <HTMLContent content={header.description} className="text-xl text-muted-foreground max-w-3xl mx-auto" data-testid="text-about-description" />
           </div>
         )}
 
@@ -164,9 +162,7 @@ export default function About() {
                       <h3 className="text-lg font-semibold text-gray-900 mb-2" data-testid={`text-value-title-${index}`}>
                         {value.title}
                       </h3>
-                      <p className="text-sm text-muted-foreground whitespace-pre-wrap" data-testid={`text-value-description-${index}`}>
-                        {value.description}
-                      </p>
+                      <HTMLContent content={value.description} className="text-sm text-muted-foreground" data-testid={`text-value-description-${index}`} />
                     </CardContent>
                   </Card>
                 );
@@ -196,9 +192,7 @@ export default function About() {
                     <p className="text-sm text-primary text-center mb-3" data-testid={`text-leader-title-${index}`}>
                       {leader.title}
                     </p>
-                    <p className="text-sm text-muted-foreground text-center whitespace-pre-wrap" data-testid={`text-leader-description-${index}`}>
-                      {leader.description}
-                    </p>
+                    <HTMLContent content={leader.description} className="text-sm text-muted-foreground text-center" data-testid={`text-leader-description-${index}`} />
                   </CardContent>
                 </Card>
               ))}
@@ -223,7 +217,7 @@ export default function About() {
                 {headquarters.subtitle}
               </p>
               <div className="max-w-2xl mx-auto text-muted-foreground">
-                <p className="whitespace-pre-wrap" data-testid="text-headquarters-description">{headquarters.description}</p>
+                <HTMLContent content={headquarters.description} className="" data-testid="text-headquarters-description" />
               </div>
             </CardContent>
           </Card>
@@ -243,9 +237,7 @@ export default function About() {
                 <h3 className="text-2xl font-bold text-gray-900 mb-4" data-testid="text-innovation-title">
                   {innovation.title}
                 </h3>
-                <p className="text-muted-foreground mb-4 whitespace-pre-wrap" data-testid="text-innovation-description">
-                  {innovation.description}
-                </p>
+                <HTMLContent content={innovation.description} className="text-muted-foreground mb-4" data-testid="text-innovation-description" />
                 {innovation.features && (
                   <ul className="space-y-2 text-sm text-muted-foreground">
                     {innovation.features.map((feature: string, index: number) => (
@@ -269,9 +261,7 @@ export default function About() {
                 <h3 className="text-2xl font-bold text-gray-900 mb-4" data-testid="text-security-title">
                   {security.title}
                 </h3>
-                <p className="text-muted-foreground mb-4 whitespace-pre-wrap" data-testid="text-security-description">
-                  {security.description}
-                </p>
+                <HTMLContent content={security.description} className="text-muted-foreground mb-4" data-testid="text-security-description" />
                 {security.features && (
                   <ul className="space-y-2 text-sm text-muted-foreground">
                     {security.features.map((feature: string, index: number) => (
@@ -291,9 +281,7 @@ export default function About() {
               <h2 className="text-3xl font-bold text-gray-900 mb-4" data-testid="text-cta-title">
                 {cta.title}
               </h2>
-              <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto whitespace-pre-wrap" data-testid="text-cta-description">
-                {cta.description}
-              </p>
+              <HTMLContent content={cta.description} className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto" data-testid="text-cta-description" />
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
                   size="lg" 
