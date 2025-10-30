@@ -509,7 +509,8 @@ export const contentSchemas: Record<string, SectionSchema> = {
       },
       subtitle: {
         label: 'Subtitle',
-        control: 'richtext',
+        control: 'textarea',
+        rows: 4,
         placeholder: 'Comprehensive financial planning tools, AI-driven insights, and personalized recommendations...',
       },
       primaryCTA: {
@@ -591,7 +592,8 @@ export const contentSchemas: Record<string, SectionSchema> = {
       },
       description: {
         label: 'Description',
-        control: 'richtext',
+        control: 'textarea',
+        rows: 3,
         placeholder: 'Comprehensive investment strategies...',
       },
       features: {
@@ -731,7 +733,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
       contactMethodLabel: { label: 'Contact Method Label', control: 'text', placeholder: 'Preferred Contact Method' },
       subjectLabel: { label: 'Subject Field Label', control: 'text', placeholder: 'Subject *' },
       messageLabel: { label: 'Message Field Label', control: 'text', placeholder: 'Your Message *' },
-      messagePlaceholder: { label: 'Message Field Placeholder', control: 'text', placeholder: 'Tell us how we can help...' },
+      messagePlaceholder: { label: 'Message Field Placeholder', control: 'textarea', rows: 2, placeholder: 'Tell us how we can help...' },
       submitButtonText: { label: 'Submit Button Text', control: 'text', placeholder: 'Send Message' },
       successTitle: { label: 'Success Message Title', control: 'text', placeholder: 'Message Sent Successfully' },
       successMessage: { label: 'Success Message Text', control: 'text', placeholder: 'Thank you for contacting us. We\'ll get back to you within 24 hours.' },
@@ -978,7 +980,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     description: 'Complete financial calculator suite with 8 calculator categories',
     uiMeta: {
       title: { label: 'Section Title', control: 'text', placeholder: 'Complete Financial Calculator Suite' },
-      subtitle: { label: 'Section Subtitle', control: 'richtext', placeholder: '32+ professional-grade calculators across 8 categories...' },
+      subtitle: { label: 'Section Subtitle', control: 'textarea', rows: 2, placeholder: '32+ professional-grade calculators across 8 categories...' },
       categories: { label: 'Calculator Categories', control: 'text' },
     },
   },
@@ -1015,8 +1017,8 @@ export const contentSchemas: Record<string, SectionSchema> = {
     description: 'Footer company information',
     uiMeta: {
       name: { label: 'Company Name', control: 'text', placeholder: 'IFS Group' },
-      tagline: { label: 'Tagline', control: 'richtext' },
-      address: { label: 'Address', control: 'richtext' },
+      tagline: { label: 'Tagline', control: 'textarea', rows: 2 },
+      address: { label: 'Address', control: 'textarea', rows: 2 },
       phone: { label: 'Phone', control: 'text', placeholder: '+46 13 123 4567' },
       email: { label: 'Email', control: 'text', placeholder: 'contact@ifsgroup.com' },
     },
@@ -1108,10 +1110,10 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       title: { label: 'Section Title', control: 'text', placeholder: 'Mission & Vision' },
       missionTitle: { label: 'Mission Title', control: 'text', placeholder: 'Our Mission' },
-      missionText: { label: 'Mission Text', control: 'richtext' },
+      missionText: { label: 'Mission Text', control: 'textarea', rows: 3 },
       missionIcon: { label: 'Mission Icon', control: 'select', options: iconOptions },
       visionTitle: { label: 'Vision Title', control: 'text', placeholder: 'Our Vision' },
-      visionText: { label: 'Vision Text', control: 'richtext' },
+      visionText: { label: 'Vision Text', control: 'textarea', rows: 3 },
       visionIcon: { label: 'Vision Icon', control: 'select', options: iconOptions },
     },
   },

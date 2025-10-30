@@ -6,7 +6,6 @@ import Underline from '@tiptap/extension-underline';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
-import { FontFamily } from '@tiptap/extension-font-family';
 import { Button } from '@/components/ui/button';
 import {
   Bold,
@@ -29,7 +28,6 @@ import {
   Underline as UnderlineIcon,
   Highlighter,
   Palette,
-  Type,
 } from 'lucide-react';
 import { useState } from 'react';
 import {
@@ -37,13 +35,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -72,7 +63,6 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         types: ['heading', 'paragraph'],
       }),
       TextStyle,
-      FontFamily,
       Color,
       Highlight.configure({ multicolor: true }),
     ],
@@ -256,37 +246,6 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
 
         <div className="w-px h-6 bg-border mx-1" />
 
-        {/* Font Family */}
-        <Select
-          value={editor.getAttributes('textStyle').fontFamily || 'default'}
-          onValueChange={(value) => {
-            if (value === 'default') {
-              editor.chain().focus().unsetFontFamily().run();
-            } else {
-              editor.chain().focus().setFontFamily(value).run();
-            }
-          }}
-        >
-          <SelectTrigger className="h-8 w-[140px]" title="Font Family">
-            <Type className="h-4 w-4 mr-2" />
-            <SelectValue placeholder="Font" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="default">Default</SelectItem>
-            <SelectItem value="Arial, sans-serif">Arial</SelectItem>
-            <SelectItem value="'Times New Roman', serif">Times New Roman</SelectItem>
-            <SelectItem value="'Courier New', monospace">Courier New</SelectItem>
-            <SelectItem value="Georgia, serif">Georgia</SelectItem>
-            <SelectItem value="Verdana, sans-serif">Verdana</SelectItem>
-            <SelectItem value="'Trebuchet MS', sans-serif">Trebuchet MS</SelectItem>
-            <SelectItem value="'Comic Sans MS', cursive">Comic Sans</SelectItem>
-            <SelectItem value="Impact, sans-serif">Impact</SelectItem>
-            <SelectItem value="'Palatino Linotype', serif">Palatino</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <div className="w-px h-6 bg-border mx-1" />
-
         {/* Colors */}
         <Popover>
           <PopoverTrigger asChild>
@@ -357,18 +316,12 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-80">
-            <div className="space-y-3">
-              <div>
-                <Label>Add Link</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  External: https://example.com<br />
-                  Internal: /services, /blog, /contact, etc.
-                </p>
-              </div>
+            <div className="space-y-2">
+              <Label>Add Link</Label>
               <div className="flex gap-2">
                 <Input
-                  type="text"
-                  placeholder="https://example.com or /page-path"
+                  type="url"
+                  placeholder="https://example.com"
                   value={linkUrl}
                   onChange={(e) => setLinkUrl(e.target.value)}
                   onKeyDown={(e) => {

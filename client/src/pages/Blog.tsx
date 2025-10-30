@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { HTMLContent } from "@/components/HTMLContent";
 import ResourceCard from "@/components/resources/ResourceCard";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -106,10 +105,9 @@ export default function Blog() {
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               {pageHeader.title}
             </h1>
-            <HTMLContent 
-              content={pageHeader.description} 
-              className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8"
-            />
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8 whitespace-pre-wrap">
+              {pageHeader.description}
+            </p>
           </div>
         )}
 
@@ -122,10 +120,9 @@ export default function Blog() {
                 {featuredSection.title}
               </h2>
             </div>
-            <HTMLContent 
-              content={featuredSection.description} 
-              className="text-muted-foreground mb-6"
-            />
+            <p className="text-muted-foreground mb-6 whitespace-pre-wrap">
+              {featuredSection.description}
+            </p>
             <div className="grid md:grid-cols-3 gap-6">
               {featuredPosts.map((post: any) => (
                 <Card key={post.id} className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
@@ -252,10 +249,9 @@ export default function Blog() {
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 {ctaSection.title}
               </h2>
-              <HTMLContent 
-                content={ctaSection.description} 
-                className="text-muted-foreground mb-6 max-w-2xl mx-auto"
-              />
+              <p className="text-muted-foreground mb-6 max-w-2xl mx-auto whitespace-pre-wrap">
+                {ctaSection.description}
+              </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 {ctaSection.primaryButtonText && (
                   <Button

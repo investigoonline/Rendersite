@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { HTMLContent } from "@/components/HTMLContent";
 import { getIconComponent } from "@/lib/iconMapper";
 import UnderConstruction from "@/components/UnderConstruction";
 import type { PageContent } from "@shared/schema";
@@ -61,10 +60,9 @@ export default function About() {
             <h1 className="text-4xl font-bold text-gray-900 mb-6" data-testid="text-about-title">
               {header.title}
             </h1>
-            <HTMLContent 
-              content={header.description} 
-              className="text-xl text-muted-foreground max-w-3xl mx-auto"
-            />
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto whitespace-pre-wrap" data-testid="text-about-description">
+              {header.description}
+            </p>
           </div>
         )}
 
@@ -165,10 +163,9 @@ export default function About() {
                       <h3 className="text-lg font-semibold text-gray-900 mb-2" data-testid={`text-value-title-${index}`}>
                         {value.title}
                       </h3>
-                      <HTMLContent 
-                        content={value.description} 
-                        className="text-sm text-muted-foreground"
-                      />
+                      <p className="text-sm text-muted-foreground whitespace-pre-wrap" data-testid={`text-value-description-${index}`}>
+                        {value.description}
+                      </p>
                     </CardContent>
                   </Card>
                 );
@@ -198,10 +195,9 @@ export default function About() {
                     <p className="text-sm text-primary text-center mb-3" data-testid={`text-leader-title-${index}`}>
                       {leader.title}
                     </p>
-                    <HTMLContent 
-                      content={leader.description} 
-                      className="text-sm text-muted-foreground text-center"
-                    />
+                    <p className="text-sm text-muted-foreground text-center whitespace-pre-wrap" data-testid={`text-leader-description-${index}`}>
+                      {leader.description}
+                    </p>
                   </CardContent>
                 </Card>
               ))}
@@ -226,7 +222,7 @@ export default function About() {
                 {headquarters.subtitle}
               </p>
               <div className="max-w-2xl mx-auto text-muted-foreground">
-                <HTMLContent content={headquarters.description} className="" />
+                <p className="whitespace-pre-wrap" data-testid="text-headquarters-description">{headquarters.description}</p>
               </div>
             </CardContent>
           </Card>
@@ -246,10 +242,9 @@ export default function About() {
                 <h3 className="text-2xl font-bold text-gray-900 mb-4" data-testid="text-innovation-title">
                   {innovation.title}
                 </h3>
-                <HTMLContent 
-                  content={innovation.description} 
-                  className="text-muted-foreground mb-4"
-                />
+                <p className="text-muted-foreground mb-4 whitespace-pre-wrap" data-testid="text-innovation-description">
+                  {innovation.description}
+                </p>
                 {innovation.features && (
                   <ul className="space-y-2 text-sm text-muted-foreground">
                     {innovation.features.map((feature: string, index: number) => (
@@ -273,10 +268,9 @@ export default function About() {
                 <h3 className="text-2xl font-bold text-gray-900 mb-4" data-testid="text-security-title">
                   {security.title}
                 </h3>
-                <HTMLContent 
-                  content={security.description} 
-                  className="text-muted-foreground mb-4"
-                />
+                <p className="text-muted-foreground mb-4 whitespace-pre-wrap" data-testid="text-security-description">
+                  {security.description}
+                </p>
                 {security.features && (
                   <ul className="space-y-2 text-sm text-muted-foreground">
                     {security.features.map((feature: string, index: number) => (
@@ -296,10 +290,9 @@ export default function About() {
               <h2 className="text-3xl font-bold text-gray-900 mb-4" data-testid="text-cta-title">
                 {cta.title}
               </h2>
-              <HTMLContent 
-                content={cta.description} 
-                className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto"
-              />
+              <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto whitespace-pre-wrap" data-testid="text-cta-description">
+                {cta.description}
+              </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
                   size="lg" 
