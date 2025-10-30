@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { HTMLContent } from "@/components/HTMLContent";
 import ResourceCard from "@/components/resources/ResourceCard";
 import { useToast } from "@/hooks/use-toast";
 import {

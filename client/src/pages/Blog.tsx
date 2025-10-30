@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { HTMLContent } from "@/components/HTMLContent";
 import ResourceCard from "@/components/resources/ResourceCard";
 import { useToast } from "@/hooks/use-toast";
 import {

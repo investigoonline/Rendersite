@@ -8,6 +8,27 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## Rich Text Editor Integration (October 2025)
+- **Feature**: Integrated TipTap WYSIWYG rich text editor for all description fields in CMS
+- **Capabilities**: Full Word-style formatting including bold, italic, underline, headings, bullet/numbered lists, blockquotes, text alignment, text colors, highlighting, strikethrough
+- **Font Support**: Added font family picker with 10 popular fonts (Arial, Times New Roman, Georgia, Verdana, etc.)
+- **Hyperlinks**: Enhanced link functionality supporting both external URLs (https://...) and internal page paths (/services, /blog, etc.)
+- **Component**: Created RichTextEditor component with comprehensive toolbar for content formatting
+- **Rendering**: Created HTMLContent component for backward-compatible rendering of both plain text (legacy) and HTML (rich text) content
+- **CMS Integration**: Updated all 27 description fields across contentSchemas to use 'richtext' control instead of 'textarea'
+- **Storage**: Content stored as HTML in existing text fields - no database schema changes needed
+- **Pages Updated**: Services, About, Contact, Blog, Resources all import and can display rich text content
+- **Impact**: Content managers can now create professionally formatted content with fonts, colors, links, and structured text
+
+## Resources Page Blog Integration (October 2025)
+- **Feature**: Resources - Articles tab now displays blog content (flipbooks) with category filtering
+- **Functionality**: When "article" type is selected, page fetches flipbook resources instead of generic articles
+- **Category Filtering**: Added dynamic category filter buttons from blog categories (Estates & Trusts, etc.)
+- **Consistency**: Uses same ResourceCard component as Blog page for identical format and style
+- **User Experience**: Category selection persists per tab, automatically clears when switching resource types
+- **Integration**: Fetches blog categories from CMS (blog_categories section) for dynamic category list
+- **Impact**: Blog content is now accessible from both dedicated Blog page and Resources section with consistent styling
+
 ## Blog Page Implementation (October 2025)
 - **Feature**: Created dedicated Blog page redesigning flipbook articles section as a standalone blog
 - **Route**: Added `/blog` route accessible to all users

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { HTMLContent } from "@/components/HTMLContent";
 import { getIconComponent } from "@/lib/iconMapper";
 import UnderConstruction from "@/components/UnderConstruction";
 import type { PageContent } from "@shared/schema";

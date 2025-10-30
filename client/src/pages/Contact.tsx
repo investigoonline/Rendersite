@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { HTMLContent } from "@/components/HTMLContent";
 import ContactForm from "@/components/contact/ContactForm";
 import {
   MapPin,
