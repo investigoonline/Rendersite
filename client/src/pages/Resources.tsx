@@ -18,6 +18,7 @@ import {
   Filter,
   Eye,
   Calendar,
+  Tag,
 } from "lucide-react";
 import type { PageContent } from "@shared/schema";
 
@@ -33,6 +34,12 @@ export default function Resources() {
   const [selectedType, setSelectedType] = useState("article");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+
+  // Clear category filter when changing tabs
+  const handleTypeChange = (newType: string) => {
+    setSelectedType(newType);
+    setSelectedCategory("");
+  };
 
   // Fetch resource types content
   const { data: resourceTypesContent } = useQuery<PageContent[]>({
@@ -83,11 +90,33 @@ export default function Resources() {
     .map(content => content.content as ResourceType)
     .filter(type => type && type.id && type.name) || [];
 
+  // Fetch blog categories for article type
+  const { data: blogCategories } = useQuery<PageContent[]>({
+    queryKey: ['/api/content', 'blog'],
+    enabled: selectedType === 'article',
+    queryFn: async () => {
+      const res = await fetch('/api/content?page=blog', {
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch blog categories: ${res.statusText}`);
+      }
+      return res.json();
+    },
+  });
+
+  const categoriesSection = blogCategories?.find(c => c.section === 'blog_categories')?.content as any;
+
   const { data: resources, isLoading } = useQuery({
     queryKey: ["/api/resources", selectedType, selectedCategory],
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (selectedType) params.append("type", selectedType);
+      // For articles, fetch flipbooks (blog posts)
+      if (selectedType === 'article') {
+        params.append("type", "flipbook");
+      } else if (selectedType) {
+        params.append("type", selectedType);
+      }
       if (selectedCategory) params.append("category", selectedCategory);
       
       const response = await fetch(`/api/resources?${params}`);
@@ -154,7 +183,7 @@ export default function Resources() {
           </div>
         </div>
 
-        <Tabs value={selectedType} onValueChange={setSelectedType} className="space-y-8">
+        <Tabs value={selectedType} onValueChange={handleTypeChange} className="space-y-8">
           {/* Resource Type Tabs */}
           <TabsList className="grid w-full grid-cols-5">
             {resourceTypes.map((type) => {
@@ -178,6 +207,37 @@ export default function Resources() {
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">{type.name}</h2>
                 <p className="text-muted-foreground whitespace-pre-wrap">{type.description}</p>
               </div>
+
+              {/* Category filters for Articles (Blog posts) */}
+              {type.id === "article" && categoriesSection && categoriesSection.categories && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                    Filter by Category
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant={selectedCategory === "" ? "default" : "outline"}
+                      onClick={() => setSelectedCategory("")}
+                      size="sm"
+                      data-testid="button-category-all"
+                    >
+                      All Articles
+                    </Button>
+                    {categoriesSection.categories.map((category: any) => (
+                      <Button
+                        key={category.id}
+                        variant={selectedCategory === category.id ? "default" : "outline"}
+                        onClick={() => setSelectedCategory(category.id)}
+                        size="sm"
+                        data-testid={`button-category-${category.id}`}
+                      >
+                        <Tag className="h-3 w-3 mr-1" />
+                        {category.name}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Special handling for Newsletter */}
               {type.id === "newsletter" && (
