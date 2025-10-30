@@ -173,10 +173,10 @@ export default function Resources() {
               <div className="text-center">
                 {type.showBadge !== false && (
                   <Badge className="mb-4">
-                    {type.badgeText || type.name}
+                    <HTMLContent content={type.badgeText || type.name} className="" />
                   </Badge>
                 )}
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">{type.headingText || type.name}</h2>
+                <HTMLContent content={type.headingText || type.name} className="text-2xl font-bold text-gray-900 mb-2" />
                 <HTMLContent content={type.description} className="text-muted-foreground" />
               </div>
 
