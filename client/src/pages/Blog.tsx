@@ -106,9 +106,7 @@ export default function Blog() {
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               {pageHeader.title}
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8 whitespace-pre-wrap">
-              {pageHeader.description}
-            </p>
+            <HTMLContent content={pageHeader.description} className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8" />
           </div>
         )}
 
@@ -121,9 +119,7 @@ export default function Blog() {
                 {featuredSection.title}
               </h2>
             </div>
-            <p className="text-muted-foreground mb-6 whitespace-pre-wrap">
-              {featuredSection.description}
-            </p>
+            <HTMLContent content={featuredSection.description} className="text-muted-foreground mb-6" />
             <div className="grid md:grid-cols-3 gap-6">
               {featuredPosts.map((post: any) => (
                 <Card key={post.id} className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
@@ -250,9 +246,7 @@ export default function Blog() {
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 {ctaSection.title}
               </h2>
-              <p className="text-muted-foreground mb-6 max-w-2xl mx-auto whitespace-pre-wrap">
-                {ctaSection.description}
-              </p>
+              <HTMLContent content={ctaSection.description} className="text-muted-foreground mb-6 max-w-2xl mx-auto" />
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 {ctaSection.primaryButtonText && (
                   <Button
