@@ -616,7 +616,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
       id: { label: 'Service ID', control: 'text', placeholder: 'strategic' },
       title: { label: 'Service Title', control: 'text', placeholder: 'Strategic Planning' },
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
-      description: { label: 'Description', control: 'textarea', rows: 3 },
+      description: { label: 'Description', control: 'richtext' },
       features: { label: 'Key Features', control: 'text' },
       color: { label: 'Color Theme', control: 'select', options: colorOptions },
     },
@@ -630,7 +630,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
       id: { label: 'Service ID', control: 'text', placeholder: 'legacy' },
       title: { label: 'Service Title', control: 'text', placeholder: 'Legacy Planning' },
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
-      description: { label: 'Description', control: 'textarea', rows: 3 },
+      description: { label: 'Description', control: 'richtext' },
       features: { label: 'Key Features', control: 'text' },
       color: { label: 'Color Theme', control: 'select', options: colorOptions },
     },
@@ -644,7 +644,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
       id: { label: 'Service ID', control: 'text', placeholder: 'risk' },
       title: { label: 'Service Title', control: 'text', placeholder: 'Risk Management' },
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
-      description: { label: 'Description', control: 'textarea', rows: 3 },
+      description: { label: 'Description', control: 'richtext' },
       features: { label: 'Key Features', control: 'text' },
       color: { label: 'Color Theme', control: 'select', options: colorOptions },
     },
@@ -658,7 +658,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
       id: { label: 'Service ID', control: 'text', placeholder: 'special' },
       title: { label: 'Service Title', control: 'text', placeholder: 'Special Situations' },
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
-      description: { label: 'Description', control: 'textarea', rows: 3 },
+      description: { label: 'Description', control: 'richtext' },
       features: { label: 'Key Features', control: 'text' },
       color: { label: 'Color Theme', control: 'select', options: colorOptions },
     },
@@ -672,7 +672,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
       id: { label: 'Service ID', control: 'text', placeholder: 'aggregation' },
       title: { label: 'Service Title', control: 'text', placeholder: 'Account Aggregation' },
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
-      description: { label: 'Description', control: 'textarea', rows: 3 },
+      description: { label: 'Description', control: 'richtext' },
       features: { label: 'Key Features', control: 'text' },
       color: { label: 'Color Theme', control: 'select', options: colorOptions },
     },
@@ -716,7 +716,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     description: 'Header text for the contact form section',
     uiMeta: {
       title: { label: 'Form Title', control: 'text', placeholder: 'Send us a Message' },
-      description: { label: 'Form Description', control: 'textarea', rows: 2, placeholder: 'Fill out the form...' },
+      description: { label: 'Form Description', control: 'richtext', placeholder: 'Fill out the form...' },
     },
   },
   contact_form_fields: {
@@ -784,7 +784,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     description: 'Information for prospective clients',
     uiMeta: {
       title: { label: 'Section Title', control: 'text', placeholder: 'For Prospective Clients' },
-      description: { label: 'Description', control: 'textarea', rows: 3 },
+      description: { label: 'Description', control: 'richtext' },
       benefits: { label: 'Benefits List', control: 'text' },
       buttonText: { label: 'Button Text', control: 'text', placeholder: 'Schedule Free Consultation' },
     },
@@ -795,7 +795,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     description: 'Information for current clients',
     uiMeta: {
       title: { label: 'Section Title', control: 'text', placeholder: 'For Current Clients' },
-      description: { label: 'Description', control: 'textarea', rows: 3 },
+      description: { label: 'Description', control: 'richtext' },
       benefits: { label: 'Benefits List', control: 'text' },
       buttonText: { label: 'Button Text', control: 'text', placeholder: 'Access Client Portal' },
     },
@@ -808,7 +808,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
       id: { label: 'Resource ID', control: 'text', placeholder: 'article' },
       name: { label: 'Resource Name', control: 'text', placeholder: 'Articles' },
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
-      description: { label: 'Description', control: 'textarea', rows: 2 },
+      description: { label: 'Description', control: 'richtext' },
     },
   },
   resources_videos: {
@@ -819,7 +819,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
       id: { label: 'Resource ID', control: 'text', placeholder: 'video' },
       name: { label: 'Resource Name', control: 'text', placeholder: 'Videos' },
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
-      description: { label: 'Description', control: 'textarea', rows: 2 },
+      description: { label: 'Description', control: 'richtext' },
     },
   },
   resources_newsletters: {
@@ -830,7 +830,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
       id: { label: 'Resource ID', control: 'text', placeholder: 'newsletter' },
       name: { label: 'Resource Name', control: 'text', placeholder: 'Newsletters' },
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
-      description: { label: 'Description', control: 'textarea', rows: 2 },
+      description: { label: 'Description', control: 'richtext' },
     },
   },
   resources_flipbooks: {
@@ -841,7 +841,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
       id: { label: 'Resource ID', control: 'text', placeholder: 'flipbook' },
       name: { label: 'Resource Name', control: 'text', placeholder: 'Flipbooks' },
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
-      description: { label: 'Description', control: 'textarea', rows: 2 },
+      description: { label: 'Description', control: 'richtext' },
     },
   },
   resources_faq: {
@@ -852,7 +852,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
       id: { label: 'Resource ID', control: 'text', placeholder: 'faq' },
       name: { label: 'Resource Name', control: 'text', placeholder: 'FAQ' },
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
-      description: { label: 'Description', control: 'textarea', rows: 2 },
+      description: { label: 'Description', control: 'richtext' },
     },
   },
   resources_become_client: {
@@ -862,7 +862,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
       title: { label: 'Card Title', control: 'text', placeholder: 'Become a Client' },
-      description: { label: 'Card Description', control: 'textarea', rows: 2, placeholder: 'Ready to take your financial planning to the next level?' },
+      description: { label: 'Card Description', control: 'richtext', placeholder: 'Ready to take your financial planning to the next level?' },
       benefits: { label: 'Benefits List', control: 'text' },
       buttonText: { label: 'Button Text', control: 'text', placeholder: 'Learn More About Client Services' },
       buttonHref: { label: 'Button Link', control: 'text', placeholder: '/contact' },
@@ -875,7 +875,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
       title: { label: 'Card Title', control: 'text', placeholder: 'Need Help?' },
-      description: { label: 'Card Description', control: 'textarea', rows: 2, placeholder: 'Have questions about our platform?' },
+      description: { label: 'Card Description', control: 'richtext', placeholder: 'Have questions about our platform?' },
       actions: { label: 'Action Buttons (1-5 items)', control: 'text' },
     },
   },
@@ -885,7 +885,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     description: 'Contact page title and description',
     uiMeta: {
       title: { label: 'Page Title', control: 'text', placeholder: 'Get in Touch' },
-      description: { label: 'Page Description', control: 'textarea', rows: 3 },
+      description: { label: 'Page Description', control: 'richtext' },
     },
   },
   services_header: {
@@ -895,7 +895,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       badge: { label: 'Badge Text (optional)', control: 'text', placeholder: 'Professional Services' },
       title: { label: 'Page Title', control: 'text', placeholder: 'Comprehensive Financial Services' },
-      description: { label: 'Page Description', control: 'textarea', rows: 3 },
+      description: { label: 'Page Description', control: 'richtext' },
     },
   },
   services_stats: {
@@ -940,7 +940,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     description: 'Call-to-action section for scheduling consultation',
     uiMeta: {
       title: { label: 'CTA Title', control: 'text', placeholder: 'Ready to Experience Our Services?' },
-      description: { label: 'CTA Description', control: 'textarea', rows: 3, placeholder: 'Schedule a consultation...' },
+      description: { label: 'CTA Description', control: 'richtext', placeholder: 'Schedule a consultation...' },
       primaryButtonText: { label: 'Primary Button Text', control: 'text', placeholder: 'Schedule Consultation' },
       primaryButtonHref: { label: 'Primary Button Link', control: 'text', placeholder: '/contact' },
       secondaryButtonText: { label: 'Secondary Button Text', control: 'text', placeholder: 'Call +1 (555) 123-4567' },
@@ -953,7 +953,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     description: 'Resources page title and description',
     uiMeta: {
       title: { label: 'Page Title', control: 'text', placeholder: 'Resource Library' },
-      description: { label: 'Page Description', control: 'textarea', rows: 3 },
+      description: { label: 'Page Description', control: 'richtext' },
     },
   },
   home_quick_actions: {
@@ -1083,7 +1083,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       badge: { label: 'Badge Text', control: 'text', placeholder: 'IFS Group' },
       title: { label: 'Page Title', control: 'text', placeholder: 'Trusted Financial Intelligence Since 1983' },
-      description: { label: 'Page Description', control: 'textarea', rows: 3 },
+      description: { label: 'Page Description', control: 'richtext' },
     },
   },
   about_stats: {
@@ -1143,7 +1143,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
       title: { label: 'Section Title', control: 'text', placeholder: 'Global Headquarters' },
       subtitle: { label: 'Subtitle', control: 'text', placeholder: 'Linköping, Sweden • Serving clients worldwide' },
-      description: { label: 'Description', control: 'textarea', rows: 4 },
+      description: { label: 'Description', control: 'richtext' },
     },
   },
   about_innovation: {
@@ -1153,7 +1153,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
       title: { label: 'Section Title', control: 'text', placeholder: 'Innovation at Our Core' },
-      description: { label: 'Description', control: 'textarea', rows: 3 },
+      description: { label: 'Description', control: 'richtext' },
       features: { label: 'Innovation Features', control: 'text' },
     },
   },
@@ -1164,7 +1164,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
       title: { label: 'Section Title', control: 'text', placeholder: 'Security & Compliance' },
-      description: { label: 'Description', control: 'textarea', rows: 3 },
+      description: { label: 'Description', control: 'richtext' },
       features: { label: 'Security Features', control: 'text' },
     },
   },
@@ -1174,7 +1174,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     description: 'Final CTA section with buttons',
     uiMeta: {
       title: { label: 'CTA Title', control: 'text', placeholder: 'Ready to Experience the Future of Financial Planning?' },
-      description: { label: 'CTA Description', control: 'textarea', rows: 2 },
+      description: { label: 'CTA Description', control: 'richtext' },
       primaryButtonText: { label: 'Primary Button Text', control: 'text', placeholder: 'Explore Our Platform' },
       primaryButtonHref: { label: 'Primary Button Link', control: 'text', placeholder: '/calculators' },
       secondaryButtonText: { label: 'Secondary Button Text', control: 'text', placeholder: 'Contact Our Team' },
@@ -1188,7 +1188,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     uiMeta: {
       badge: { label: 'Badge Text (optional)', control: 'text', placeholder: 'Insights & Analysis' },
       title: { label: 'Page Title', control: 'text', placeholder: 'Financial Insights Blog' },
-      description: { label: 'Page Description', control: 'textarea', rows: 3, placeholder: 'Expert analysis and insights on financial planning, investments, and wealth management' },
+      description: { label: 'Page Description', control: 'richtext', placeholder: 'Expert analysis and insights on financial planning, investments, and wealth management' },
     },
   },
   blog_featured: {
@@ -1197,7 +1197,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     description: 'Section highlighting featured blog posts',
     uiMeta: {
       title: { label: 'Section Title', control: 'text', placeholder: 'Featured Articles' },
-      description: { label: 'Section Description', control: 'textarea', rows: 2, placeholder: 'Hand-picked articles from our financial experts' },
+      description: { label: 'Section Description', control: 'richtext', placeholder: 'Hand-picked articles from our financial experts' },
     },
   },
   blog_categories: {
@@ -1215,7 +1215,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     description: 'CTA section for newsletter subscription or consultation',
     uiMeta: {
       title: { label: 'CTA Title', control: 'text', placeholder: 'Stay Informed with Financial Insights' },
-      description: { label: 'CTA Description', control: 'textarea', rows: 3, placeholder: 'Subscribe to our newsletter or schedule a consultation to learn more' },
+      description: { label: 'CTA Description', control: 'richtext', placeholder: 'Subscribe to our newsletter or schedule a consultation to learn more' },
       primaryButtonText: { label: 'Primary Button Text', control: 'text', placeholder: 'Subscribe to Newsletter' },
       primaryButtonHref: { label: 'Primary Button Link', control: 'text', placeholder: '/resources' },
       secondaryButtonText: { label: 'Secondary Button Text', control: 'text', placeholder: 'Schedule Consultation' },
