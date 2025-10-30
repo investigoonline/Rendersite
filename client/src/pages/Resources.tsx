@@ -168,13 +168,15 @@ export default function Resources() {
           </TabsList>
 
           {/* Content for each resource type */}
-          {resourceTypes.map((type) => (
+          {resourceTypes.map((type: any) => (
             <TabsContent key={type.id} value={type.id} className="space-y-6">
               <div className="text-center">
-                <Badge className="mb-4">
-                  {type.name}
-                </Badge>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">{type.name}</h2>
+                {type.showBadge !== false && (
+                  <Badge className="mb-4">
+                    {type.badgeText || type.name}
+                  </Badge>
+                )}
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">{type.headingText || type.name}</h2>
                 <HTMLContent content={type.description} className="text-muted-foreground" />
               </div>
 

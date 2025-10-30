@@ -171,6 +171,9 @@ const resourceTypeSchema = z.object({
   name: z.string().min(1).max(100),
   icon: z.string().min(1),
   description: z.string().min(1),
+  showBadge: z.boolean().default(true),
+  badgeText: z.string().max(50).optional(),
+  headingText: z.string().max(100).optional(),
 });
 
 // Footer Schemas
@@ -809,6 +812,9 @@ export const contentSchemas: Record<string, SectionSchema> = {
       name: { label: 'Resource Name', control: 'text', placeholder: 'Articles' },
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
       description: { label: 'Description', control: 'richtext' },
+      showBadge: { label: 'Show Badge', control: 'switch', help: 'Display badge above the heading' },
+      badgeText: { label: 'Badge Text', control: 'text', placeholder: 'Articles', help: 'Custom badge text (uses Resource Name if empty)' },
+      headingText: { label: 'Heading Text', control: 'text', placeholder: 'Articles', help: 'Custom heading text (uses Resource Name if empty)' },
     },
   },
   resources_videos: {
@@ -820,6 +826,9 @@ export const contentSchemas: Record<string, SectionSchema> = {
       name: { label: 'Resource Name', control: 'text', placeholder: 'Videos' },
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
       description: { label: 'Description', control: 'richtext' },
+      showBadge: { label: 'Show Badge', control: 'switch', help: 'Display badge above the heading' },
+      badgeText: { label: 'Badge Text', control: 'text', placeholder: 'Videos', help: 'Custom badge text (uses Resource Name if empty)' },
+      headingText: { label: 'Heading Text', control: 'text', placeholder: 'Videos', help: 'Custom heading text (uses Resource Name if empty)' },
     },
   },
   resources_newsletters: {
@@ -831,6 +840,9 @@ export const contentSchemas: Record<string, SectionSchema> = {
       name: { label: 'Resource Name', control: 'text', placeholder: 'Newsletters' },
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
       description: { label: 'Description', control: 'richtext' },
+      showBadge: { label: 'Show Badge', control: 'switch', help: 'Display badge above the heading' },
+      badgeText: { label: 'Badge Text', control: 'text', placeholder: 'Newsletters', help: 'Custom badge text (uses Resource Name if empty)' },
+      headingText: { label: 'Heading Text', control: 'text', placeholder: 'Newsletters', help: 'Custom heading text (uses Resource Name if empty)' },
     },
   },
   resources_flipbooks: {
@@ -842,6 +854,9 @@ export const contentSchemas: Record<string, SectionSchema> = {
       name: { label: 'Resource Name', control: 'text', placeholder: 'Flipbooks' },
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
       description: { label: 'Description', control: 'richtext' },
+      showBadge: { label: 'Show Badge', control: 'switch', help: 'Display badge above the heading' },
+      badgeText: { label: 'Badge Text', control: 'text', placeholder: 'Flipbooks', help: 'Custom badge text (uses Resource Name if empty)' },
+      headingText: { label: 'Heading Text', control: 'text', placeholder: 'Flipbooks', help: 'Custom heading text (uses Resource Name if empty)' },
     },
   },
   resources_faq: {
@@ -853,6 +868,9 @@ export const contentSchemas: Record<string, SectionSchema> = {
       name: { label: 'Resource Name', control: 'text', placeholder: 'FAQ' },
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
       description: { label: 'Description', control: 'richtext' },
+      showBadge: { label: 'Show Badge', control: 'switch', help: 'Display badge above the heading' },
+      badgeText: { label: 'Badge Text', control: 'text', placeholder: 'FAQ', help: 'Custom badge text (uses Resource Name if empty)' },
+      headingText: { label: 'Heading Text', control: 'text', placeholder: 'FAQ', help: 'Custom heading text (uses Resource Name if empty)' },
     },
   },
   resources_become_client: {
