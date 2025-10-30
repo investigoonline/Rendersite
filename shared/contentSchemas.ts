@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // UI Control types
-export type UIControl = 'text' | 'textarea' | 'number' | 'select' | 'radio' | 'switch' | 'icon' | 'color';
+export type UIControl = 'text' | 'textarea' | 'richtext' | 'number' | 'select' | 'radio' | 'switch' | 'icon' | 'color';
 
 export interface UIFieldMeta {
   label: string;

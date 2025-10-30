@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/form";
 import type { SectionSchema } from "@shared/contentSchemas";
 import { ArrayFieldEditor } from "./ArrayFieldEditor";
+import { RichTextEditor } from "./RichTextEditor";
 import * as LucideIcons from "lucide-react";
 
 interface FormRendererProps {
@@ -86,6 +87,29 @@ export function FormRenderer({
                   rows={rows || 4}
                   {...field}
                   data-testid={`textarea-${fieldName}`}
+                />
+              </FormControl>
+              {help && <FormDescription>{help}</FormDescription>}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      );
+    }
+
+    if (control === "richtext") {
+      return (
+        <FormField
+          control={form.control}
+          name={fieldName}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{label}</FormLabel>
+              <FormControl>
+                <RichTextEditor
+                  value={field.value || ''}
+                  onChange={field.onChange}
+                  placeholder={placeholder}
                 />
               </FormControl>
               {help && <FormDescription>{help}</FormDescription>}
