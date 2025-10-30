@@ -112,3 +112,79 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 }
+
+@layer utilities {
+  /* Rich text editor content styles - preserve editor alignment and formatting */
+  [dangerouslySetInnerHTML] h1,
+  [dangerouslySetInnerHTML] h2,
+  [dangerouslySetInnerHTML] h3,
+  [dangerouslySetInnerHTML] h4,
+  [dangerouslySetInnerHTML] h5,
+  [dangerouslySetInnerHTML] h6 {
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 0.5em;
+  }
+  
+  [dangerouslySetInnerHTML] h1 { font-size: 2em; }
+  [dangerouslySetInnerHTML] h2 { font-size: 1.5em; }
+  [dangerouslySetInnerHTML] h3 { font-size: 1.25em; }
+  
+  [dangerouslySetInnerHTML] p {
+    margin-bottom: 0.75em;
+    line-height: 1.6;
+  }
+  
+  [dangerouslySetInnerHTML] ul,
+  [dangerouslySetInnerHTML] ol {
+    margin-left: 1.5em;
+    margin-bottom: 0.75em;
+    line-height: 1.6;
+  }
+  
+  [dangerouslySetInnerHTML] ul {
+    list-style-type: disc;
+  }
+  
+  [dangerouslySetInnerHTML] ol {
+    list-style-type: decimal;
+  }
+  
+  [dangerouslySetInnerHTML] li {
+    margin-bottom: 0.25em;
+  }
+  
+  [dangerouslySetInnerHTML] blockquote {
+    border-left: 4px solid hsl(214, 88%, 36%);
+    padding-left: 1em;
+    margin-left: 0;
+    margin-bottom: 0.75em;
+    font-style: italic;
+    color: hsl(215, 13%, 39%);
+  }
+  
+  [dangerouslySetInnerHTML] a {
+    color: hsl(214, 88%, 36%);
+    text-decoration: underline;
+  }
+  
+  [dangerouslySetInnerHTML] a:hover {
+    color: hsl(214, 88%, 46%);
+  }
+  
+  [dangerouslySetInnerHTML] strong {
+    font-weight: 600;
+  }
+  
+  [dangerouslySetInnerHTML] em {
+    font-style: italic;
+  }
+  
+  [dangerouslySetInnerHTML] code {
+    background: hsl(210, 40%, 96%);
+    padding: 0.125em 0.25em;
+    border-radius: 0.25em;
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+  }
+}

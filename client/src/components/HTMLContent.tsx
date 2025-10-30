@@ -16,9 +16,10 @@ export function HTMLContent({ content, className = '' }: HTMLContentProps) {
   
   if (hasHTMLTags) {
     // Render as HTML (rich text editor output)
+    // Remove prose class to preserve editor's text alignment and formatting
     return (
       <div
-        className={`prose prose-sm max-w-none ${className}`}
+        className={className}
         dangerouslySetInnerHTML={{ __html: content }}
       />
     );
