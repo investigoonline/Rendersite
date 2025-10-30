@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { HTMLContent } from "@/components/HTMLContent";
 import {
   FileText,
   Video,
@@ -89,9 +90,10 @@ export default function ResourceCard({ resource, onView }: ResourceCardProps) {
       <CardContent className="pt-0 flex flex-col justify-between flex-1">
         <div className="space-y-3 mb-4">
           {resource.description && (
-            <p className="text-sm text-muted-foreground line-clamp-3 whitespace-pre-wrap">
-              {resource.description}
-            </p>
+            <HTMLContent 
+              content={resource.description} 
+              className="text-sm text-muted-foreground line-clamp-3"
+            />
           )}
           
           <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
