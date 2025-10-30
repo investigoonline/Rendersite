@@ -80,9 +80,10 @@ export default function Contact() {
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               {pageHeader.title}
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto whitespace-pre-wrap">
-              {pageHeader.description}
-            </p>
+            <HTMLContent 
+              content={pageHeader.description} 
+              className="text-xl text-muted-foreground max-w-3xl mx-auto"
+            />
           </div>
         )}
 
@@ -175,7 +176,7 @@ export default function Contact() {
                           <IconComponent className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                           <div>
                             <h4 className="font-medium text-gray-900 text-sm">{feature.title}</h4>
-                            <p className="text-xs text-muted-foreground whitespace-pre-wrap">{feature.description}</p>
+                            <HTMLContent content={feature.description} className="text-xs text-muted-foreground " />
                           </div>
                         </div>
                       );
@@ -256,9 +257,10 @@ export default function Contact() {
                 <CardTitle data-testid="text-prospective-title">{prospectiveClients.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-4 whitespace-pre-wrap" data-testid="text-prospective-description">
-                  {prospectiveClients.description}
-                </p>
+                <HTMLContent 
+                  content={prospectiveClients.description} 
+                  className="text-muted-foreground mb-4"
+                />
                 <ul className="space-y-2 text-sm text-muted-foreground mb-4">
                   {prospectiveClients.benefits?.map((benefit: string, index: number) => (
                     <li key={index} data-testid={`text-prospective-benefit-${index}`}>• {benefit}</li>
@@ -278,9 +280,10 @@ export default function Contact() {
                 <CardTitle data-testid="text-current-title">{currentClients.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-4 whitespace-pre-wrap" data-testid="text-current-description">
-                  {currentClients.description}
-                </p>
+                <HTMLContent 
+                  content={currentClients.description} 
+                  className="text-muted-foreground mb-4"
+                />
                 <ul className="space-y-2 text-sm text-muted-foreground mb-4">
                   {currentClients.benefits?.map((benefit: string, index: number) => (
                     <li key={index} data-testid={`text-current-benefit-${index}`}>• {benefit}</li>

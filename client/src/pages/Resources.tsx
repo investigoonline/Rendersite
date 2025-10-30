@@ -165,9 +165,10 @@ export default function Resources() {
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               {pageHeader.title}
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8 whitespace-pre-wrap">
-              {pageHeader.description}
-            </p>
+            <HTMLContent 
+              content={pageHeader.description} 
+              className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8"
+            />
           </div>
         )}
 
@@ -206,7 +207,7 @@ export default function Resources() {
                   {type.name}
                 </Badge>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">{type.name}</h2>
-                <p className="text-muted-foreground whitespace-pre-wrap">{type.description}</p>
+                <HTMLContent content={type.description} className="text-muted-foreground " />
               </div>
 
               {/* Category filters for Articles (Blog posts) */}
@@ -322,9 +323,10 @@ export default function Resources() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground mb-4 whitespace-pre-wrap" data-testid="text-become-client-description">
-                    {becomeClientData.description}
-                  </p>
+                  <HTMLContent 
+                    content={becomeClientData.description} 
+                    className="text-muted-foreground mb-4"
+                  />
                   {becomeClientData.benefits && becomeClientData.benefits.length > 0 && (
                     <ul className="space-y-2 text-sm text-muted-foreground mb-4">
                       {becomeClientData.benefits.map((benefit: string, index: number) => (
@@ -355,9 +357,10 @@ export default function Resources() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground mb-4 whitespace-pre-wrap" data-testid="text-need-help-description">
-                    {needHelpData.description}
-                  </p>
+                  <HTMLContent 
+                    content={needHelpData.description} 
+                    className="text-muted-foreground mb-4"
+                  />
                   {needHelpData.actions && needHelpData.actions.length > 0 && (
                     <div className="space-y-3">
                       {needHelpData.actions.map((action: any, index: number) => {

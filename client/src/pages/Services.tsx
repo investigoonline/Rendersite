@@ -119,9 +119,10 @@ export default function Services() {
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 sm:mb-6">
               {pageHeader.title}
             </h1>
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto whitespace-pre-wrap">
-              {pageHeader.description}
-            </p>
+            <HTMLContent 
+              content={pageHeader.description} 
+              className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto"
+            />
           </div>
         )}
 
@@ -159,7 +160,7 @@ export default function Services() {
                     <CardTitle className="text-xl">{service.title}</CardTitle>
                   </div>
                 </div>
-                <p className="text-muted-foreground text-sm whitespace-pre-wrap">{service.description}</p>
+                <HTMLContent content={service.description} className="text-muted-foreground text-sm" />
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3">
@@ -181,9 +182,10 @@ export default function Services() {
           <Card className="mb-12 sm:mb-16 mx-4" data-testid="section-process">
             <CardHeader className="text-center">
               <CardTitle className="text-xl sm:text-2xl" data-testid="text-process-title">{processData.title}</CardTitle>
-              <p className="text-muted-foreground whitespace-pre-wrap" data-testid="text-process-description">
-                {processData.description}
-              </p>
+              <HTMLContent 
+                content={processData.description} 
+                className="text-muted-foreground" 
+              />
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
@@ -195,9 +197,10 @@ export default function Services() {
                         <span className="text-white font-bold text-xl">{index + 1}</span>
                       </div>
                       <h4 className="font-semibold text-gray-900 mb-2" data-testid={`text-step-title-${index}`}>{step.title}</h4>
-                      <p className="text-sm text-muted-foreground whitespace-pre-wrap" data-testid={`text-step-description-${index}`}>
-                        {step.description}
-                      </p>
+                      <HTMLContent 
+                        content={step.description} 
+                        className="text-sm text-muted-foreground" 
+                      />
                     </div>
                   );
                 })}
@@ -222,9 +225,10 @@ export default function Services() {
                       </div>
                       <div>
                         <h4 className="font-semibold text-gray-900 mb-1" data-testid={`text-reason-title-${index}`}>{reason.title}</h4>
-                        <p className="text-muted-foreground text-sm whitespace-pre-wrap" data-testid={`text-reason-description-${index}`}>
-                          {reason.description}
-                        </p>
+                        <HTMLContent 
+                          content={reason.description} 
+                          className="text-muted-foreground text-sm" 
+                        />
                       </div>
                     </div>
                   );
@@ -259,9 +263,10 @@ export default function Services() {
               <h2 className="text-3xl font-bold text-gray-900 mb-4" data-testid="text-cta-title">
                 {ctaData.title}
               </h2>
-              <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto whitespace-pre-wrap" data-testid="text-cta-description">
-                {ctaData.description}
-              </p>
+              <HTMLContent 
+                content={ctaData.description} 
+                className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto" 
+              />
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
                   size="lg" 
