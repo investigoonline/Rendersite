@@ -20,6 +20,7 @@ import {
   Calendar,
 } from "lucide-react";
 import type { PageContent } from "@shared/schema";
+import { HTMLContent } from "@/components/HTMLContent";
 
 interface ResourceType {
   id: string;

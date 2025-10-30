@@ -14,6 +14,7 @@ import {
   Star,
 } from "lucide-react";
 import type { PageContent } from "@shared/schema";
+import { HTMLContent } from "@/components/HTMLContent";
 
 export default function Blog() {
   const { toast } = useToast();
