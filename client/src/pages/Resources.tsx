@@ -50,7 +50,7 @@ export default function Resources() {
   });
 
   // Helper to get icon component by name with type safety
-  type ResourceIcon = 'FileText' | 'Video' | 'Mail' | 'Book' | 'HelpCircle';
+  type ResourceIcon = 'FileText' | 'Video' | 'Mail' | 'Book' | 'HelpCircle' | 'UserPlus' | 'Calendar';
   
   const iconMap: Record<ResourceIcon, typeof FileText> = {
     FileText,
@@ -58,6 +58,8 @@ export default function Resources() {
     Mail,
     Book,
     HelpCircle,
+    UserPlus,
+    Calendar,
   };
   
   const getIcon = (iconName: string): typeof FileText => {

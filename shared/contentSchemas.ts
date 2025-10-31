@@ -167,7 +167,10 @@ const clientSectionSchema = z.object({
 
 // Resources Page Schemas
 const resourceTypeSchema = z.object({
-  id: z.string().min(1),
+  id: z.string().min(1).refine(
+    (val) => ['article', 'video', 'newsletter', 'flipbook', 'faq'].includes(val),
+    { message: 'Resource ID must be one of: article, video, newsletter, flipbook, faq (lowercase)' }
+  ),
   name: z.string().min(1).max(100),
   icon: z.string().min(1),
   description: z.string().min(1),
@@ -809,7 +812,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     description: 'Articles resource type description',
     allowMultiple: true,
     uiMeta: {
-      id: { label: 'Resource ID', control: 'text', placeholder: 'article' },
+      id: { label: 'Resource ID', control: 'text', placeholder: 'article', help: 'Must be lowercase: article, video, newsletter, flipbook, or faq' },
       name: { label: 'Resource Name', control: 'text', placeholder: 'Articles' },
       icon: { label: 'Icon', control: 'icon', options: iconOptions },
       description: { label: 'Description', control: 'richtext' },
