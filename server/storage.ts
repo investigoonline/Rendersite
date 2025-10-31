@@ -65,6 +65,8 @@ export interface IStorage {
   getResources(type?: string, category?: string): Promise<Resource[]>;
   getResource(id: string): Promise<Resource | undefined>;
   createResource(resource: InsertResource): Promise<Resource>;
+  updateResource(id: string, resource: Partial<InsertResource>): Promise<Resource>;
+  deleteResource(id: string): Promise<void>;
   incrementResourceView(id: string): Promise<void>;
   
   // Contact operations
@@ -263,6 +265,19 @@ export class DatabaseStorage implements IStorage {
       .update(resources)
       .set({ viewCount: sql`${resources.viewCount} + 1` })
       .where(eq(resources.id, id));
+  }
+
+  async updateResource(id: string, resource: Partial<InsertResource>): Promise<Resource> {
+    const [updated] = await db
+      .update(resources)
+      .set({ ...resource, updatedAt: new Date() })
+      .where(eq(resources.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteResource(id: string): Promise<void> {
+    await db.delete(resources).where(eq(resources.id, id));
   }
 
   // Contact operations

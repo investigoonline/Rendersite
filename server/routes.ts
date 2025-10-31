@@ -7,6 +7,7 @@ import {
   insertUserRegistrationSchema,
   insertUserBackendSchema,
   insertCalculationSchema,
+  insertResourceSchema,
   insertContactMessageSchema,
   insertNetWorthSnapshotSchema,
   insertUserRoleSchema,
@@ -365,6 +366,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching resource:", error);
       res.status(500).json({ message: "We're unable to load this resource at this time" });
+    }
+  });
+
+  app.post('/api/resources', async (req, res) => {
+    try {
+      // Only super_admin and content_manager can create resources
+      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
+      if (!authorized) return;
+
+      const resourceData = insertResourceSchema.parse(req.body);
+      const resource = await storage.createResource(resourceData);
+      res.json(resource);
+    } catch (error: any) {
+      console.error("Error creating resource:", error);
+      res.status(500).json({ message: error.message || "We're unable to create this resource at this time" });
+    }
+  });
+
+  app.patch('/api/resources/:id', async (req, res) => {
+    try {
+      // Only super_admin and content_manager can update resources
+      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
+      if (!authorized) return;
+
+      const resource = await storage.updateResource(req.params.id, req.body);
+      res.json(resource);
+    } catch (error) {
+      console.error("Error updating resource:", error);
+      res.status(500).json({ message: "We're unable to update this resource at this time" });
+    }
+  });
+
+  app.delete('/api/resources/:id', async (req, res) => {
+    try {
+      // Only super_admin and content_manager can delete resources
+      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
+      if (!authorized) return;
+
+      await storage.deleteResource(req.params.id);
+      res.json({ message: "Resource has been deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting resource:", error);
+      res.status(500).json({ message: "We're unable to delete this resource at this time" });
     }
   });
 
