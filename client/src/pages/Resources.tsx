@@ -170,16 +170,18 @@ export default function Resources() {
           {/* Content for each resource type */}
           {resourceTypes.map((type: any) => (
             <TabsContent key={type.id} value={type.id} className="space-y-6">
-              <div className="text-center">
+              <div>
                 {type.showBadge !== false && (
-                  <div className="mb-4 inline-block">
+                  <div className="mb-4">
                     <HTMLContent content={type.badgeText || type.name} className="" />
                   </div>
                 )}
                 <div className="mb-2">
                   <HTMLContent content={type.headingText || type.name} className="" />
                 </div>
-                <HTMLContent content={type.description} className="text-muted-foreground" />
+                <div className="text-center">
+                  <HTMLContent content={type.description} className="text-muted-foreground" />
+                </div>
               </div>
 
               {/* Special handling for Newsletter */}
