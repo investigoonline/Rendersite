@@ -65,7 +65,7 @@ export default function NetWorthCalculator() {
 
   const saveCalculationMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest("POST", "/api/calculations", data);
+      const response = await apiRequest("/api/calculations", "POST", data);
       return response.json();
     },
     onSuccess: () => {

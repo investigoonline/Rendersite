@@ -78,7 +78,7 @@ export function useAuth() {
   const logout = async () => {
     if (isRegisteredUser) {
       try {
-        await apiRequest("POST", "/api/auth/logout");
+        await apiRequest("/api/auth/logout", "POST");
         // Clear user query cache after successful logout
         queryClient.removeQueries({ queryKey: ["/api/auth/user"] });
         // Redirect to home page

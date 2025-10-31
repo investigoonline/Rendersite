@@ -51,7 +51,7 @@ export default function Register() {
   const registerMutation = useMutation({
     mutationFn: async (data: RegistrationForm) => {
       const { confirmPassword, ...registrationData } = data;
-      return apiRequest("POST", "/api/auth/register", {
+      return apiRequest("/api/auth/register", "POST", {
         ...registrationData,
         captcha,
       });

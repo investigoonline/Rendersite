@@ -65,7 +65,7 @@ export default function GuestAccessModal({ open, onOpenChange }: GuestAccessModa
 
   const createGuestMutation = useMutation({
     mutationFn: async (data: GuestSignupForm) => {
-      return apiRequest("POST", "/api/guest/signup", data);
+      return apiRequest("/api/guest/signup", "POST", data);
     },
     onSuccess: (data: any) => {
       setSubmitted(true);
@@ -86,7 +86,7 @@ export default function GuestAccessModal({ open, onOpenChange }: GuestAccessModa
 
   const guestLoginMutation = useMutation({
     mutationFn: async (data: GuestLoginForm) => {
-      return apiRequest("POST", "/api/guest/login", {
+      return apiRequest("/api/guest/login", "POST", {
         ...data,
         captcha,
       });

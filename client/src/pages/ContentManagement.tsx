@@ -112,7 +112,7 @@ export default function ContentManagement() {
   // Update content mutation
   const updateContentMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      return apiRequest("PATCH", `/api/content/${id}`, data);
+      return apiRequest(`/api/content/${id}`, "PATCH", data);
     },
     onSuccess: () => {
       toast({
@@ -134,7 +134,7 @@ export default function ContentManagement() {
   // Create content mutation
   const createContentMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest("POST", "/api/content", data);
+      return apiRequest("/api/content", "POST", data);
     },
     onSuccess: () => {
       toast({
@@ -156,7 +156,7 @@ export default function ContentManagement() {
   // Delete content mutation
   const deleteContentMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest("DELETE", `/api/content/${id}`, {});
+      return apiRequest(`/api/content/${id}`, "DELETE", {});
     },
     onSuccess: () => {
       toast({
@@ -177,7 +177,7 @@ export default function ContentManagement() {
   // Assign role mutation
   const assignRoleMutation = useMutation({
     mutationFn: async ({ userId, roleId }: { userId: string; roleId: string }) => {
-      return apiRequest("POST", `/api/users/${userId}/roles`, { roleId });
+      return apiRequest(`/api/users/${userId}/roles`, "POST", { roleId });
     },
     onSuccess: () => {
       toast({
@@ -198,7 +198,7 @@ export default function ContentManagement() {
   // Remove role mutation
   const removeRoleMutation = useMutation({
     mutationFn: async ({ userId, roleId }: { userId: string; roleId: string }) => {
-      return apiRequest("DELETE", `/api/users/${userId}/roles/${roleId}`, {});
+      return apiRequest(`/api/users/${userId}/roles/${roleId}`, "DELETE", {});
     },
     onSuccess: () => {
       toast({

@@ -38,7 +38,7 @@ export default function GuestSignupForm() {
 
   const createGuestMutation = useMutation({
     mutationFn: async (data: GuestSignupForm) => {
-      const response = await apiRequest("POST", "/api/guest/signup", data);
+      const response = await apiRequest("/api/guest/signup", "POST", data);
       return response.json();
     },
     onSuccess: (data) => {
