@@ -176,7 +176,6 @@ const resourceTypeSchema = z.object({
   description: z.string().min(1),
   showBadge: z.boolean().default(true),
   badgeText: z.string().optional(),
-  headingText: z.string().optional(),
 });
 
 // Footer Schemas
@@ -818,7 +817,6 @@ export const contentSchemas: Record<string, SectionSchema> = {
       description: { label: 'Description', control: 'richtext' },
       showBadge: { label: 'Show Badge', control: 'switch', help: 'Display badge above the heading' },
       badgeText: { label: 'Badge Text', control: 'richtext', placeholder: 'Articles', help: 'Custom badge text with formatting (uses Resource Name if empty)' },
-      headingText: { label: 'Heading Text', control: 'richtext', placeholder: 'Articles', help: 'Custom heading text with formatting (uses Resource Name if empty)' },
     },
   },
   resources_videos: {
@@ -832,7 +830,6 @@ export const contentSchemas: Record<string, SectionSchema> = {
       description: { label: 'Description', control: 'richtext' },
       showBadge: { label: 'Show Badge', control: 'switch', help: 'Display badge above the heading' },
       badgeText: { label: 'Badge Text', control: 'richtext', placeholder: 'Videos', help: 'Custom badge text with formatting (uses Resource Name if empty)' },
-      headingText: { label: 'Heading Text', control: 'richtext', placeholder: 'Videos', help: 'Custom heading text with formatting (uses Resource Name if empty)' },
     },
   },
   resources_newsletters: {
@@ -846,7 +843,6 @@ export const contentSchemas: Record<string, SectionSchema> = {
       description: { label: 'Description', control: 'richtext' },
       showBadge: { label: 'Show Badge', control: 'switch', help: 'Display badge above the heading' },
       badgeText: { label: 'Badge Text', control: 'richtext', placeholder: 'Newsletters', help: 'Custom badge text with formatting (uses Resource Name if empty)' },
-      headingText: { label: 'Heading Text', control: 'richtext', placeholder: 'Newsletters', help: 'Custom heading text with formatting (uses Resource Name if empty)' },
     },
   },
   resources_flipbooks: {
@@ -860,7 +856,6 @@ export const contentSchemas: Record<string, SectionSchema> = {
       description: { label: 'Description', control: 'richtext' },
       showBadge: { label: 'Show Badge', control: 'switch', help: 'Display badge above the heading' },
       badgeText: { label: 'Badge Text', control: 'richtext', placeholder: 'Flipbooks', help: 'Custom badge text with formatting (uses Resource Name if empty)' },
-      headingText: { label: 'Heading Text', control: 'richtext', placeholder: 'Flipbooks', help: 'Custom heading text with formatting (uses Resource Name if empty)' },
     },
   },
   resources_faq: {
@@ -874,7 +869,6 @@ export const contentSchemas: Record<string, SectionSchema> = {
       description: { label: 'Description', control: 'richtext' },
       showBadge: { label: 'Show Badge', control: 'switch', help: 'Display badge above the heading' },
       badgeText: { label: 'Badge Text', control: 'richtext', placeholder: 'FAQ', help: 'Custom badge text with formatting (uses Resource Name if empty)' },
-      headingText: { label: 'Heading Text', control: 'richtext', placeholder: 'FAQ', help: 'Custom heading text with formatting (uses Resource Name if empty)' },
     },
   },
   resources_become_client: {

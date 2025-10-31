@@ -179,9 +179,6 @@ export default function Resources() {
                     <HTMLContent content={type.badgeText || type.name} className="" />
                   </div>
                 )}
-                <div className="mb-2">
-                  <HTMLContent content={type.headingText || type.name} className="" />
-                </div>
                 <div className="text-center">
                   <HTMLContent content={type.description} className="text-muted-foreground" />
                 </div>
