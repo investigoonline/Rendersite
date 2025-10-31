@@ -63,7 +63,8 @@ export const calculatorCategoryEnum = pgEnum('calculator_category', [
   'estate_planning',
   'retirement_inflation',
   'taxes_iras',
-  'credit_debt'
+  'credit_debt',
+  'currency_tools'
 ]);
 
 // Financial calculations table
