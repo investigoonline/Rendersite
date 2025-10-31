@@ -172,11 +172,13 @@ export default function Resources() {
             <TabsContent key={type.id} value={type.id} className="space-y-6">
               <div className="text-center">
                 {type.showBadge !== false && (
-                  <Badge className="mb-4">
+                  <div className="mb-4 inline-block">
                     <HTMLContent content={type.badgeText || type.name} className="" />
-                  </Badge>
+                  </div>
                 )}
-                <HTMLContent content={type.headingText || type.name} className="text-2xl font-bold text-gray-900 mb-2" />
+                <div className="mb-2">
+                  <HTMLContent content={type.headingText || type.name} className="" />
+                </div>
                 <HTMLContent content={type.description} className="text-muted-foreground" />
               </div>
 
