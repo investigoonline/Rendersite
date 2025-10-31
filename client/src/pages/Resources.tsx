@@ -5,6 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import ResourceCard from "@/components/resources/ResourceCard";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -219,15 +225,62 @@ export default function Resources() {
                   ))}
                 </div>
               ) : filteredResources.length > 0 ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredResources.map((resource: any) => (
-                    <ResourceCard
-                      key={resource.id}
-                      resource={resource}
-                      onView={() => handleViewResource(resource.id)}
-                    />
-                  ))}
-                </div>
+                type.id === 'article' ? (
+                  // Collapsible sections for articles grouped by category
+                  (() => {
+                    // Group articles by category
+                    const categorizedArticles = filteredResources.reduce((acc: any, resource: any) => {
+                      const category = resource.category || 'Uncategorized';
+                      if (!acc[category]) {
+                        acc[category] = [];
+                      }
+                      acc[category].push(resource);
+                      return acc;
+                    }, {});
+
+                    const categories = Object.keys(categorizedArticles).sort();
+
+                    return (
+                      <Accordion type="multiple" defaultValue={categories.slice(0, 2)} className="space-y-4">
+                        {categories.map((category) => (
+                          <AccordionItem key={category} value={category} className="border rounded-lg px-4">
+                            <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                              <div className="flex items-center gap-2">
+                                <FileText className="h-5 w-5 text-primary" />
+                                <span>{category}</span>
+                                <Badge variant="secondary" className="ml-2">
+                                  {categorizedArticles[category].length}
+                                </Badge>
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+                                {categorizedArticles[category].map((resource: any) => (
+                                  <ResourceCard
+                                    key={resource.id}
+                                    resource={resource}
+                                    onView={() => handleViewResource(resource.id)}
+                                  />
+                                ))}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+                    );
+                  })()
+                ) : (
+                  // Regular grid for other resource types
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredResources.map((resource: any) => (
+                      <ResourceCard
+                        key={resource.id}
+                        resource={resource}
+                        onView={() => handleViewResource(resource.id)}
+                      />
+                    ))}
+                  </div>
+                )
               ) : (
                 <Card>
                   <CardContent className="p-12 text-center">
