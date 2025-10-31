@@ -79,9 +79,10 @@ export default function Resources() {
   const needHelpData = getSection('resources_need_help')?.content as any;
 
   // Extract resource types from database content (excluding header and additional sections)
-  const resourceTypes: ResourceType[] = resourceTypesContent
+  // Keep the database ID for unique keys
+  const resourceTypes: (ResourceType & { dbId: string })[] = resourceTypesContent
     ?.filter(c => !['resources_header', 'resources_become_client', 'resources_need_help'].includes(c.section))
-    .map(content => content.content as ResourceType)
+    .map(content => ({ ...(content.content as ResourceType), dbId: content.id }))
     .filter(type => type && type.id && type.name) || [];
 
   const { data: resources, isLoading } = useQuery({
@@ -159,7 +160,7 @@ export default function Resources() {
             {resourceTypes.map((type) => {
               const IconComponent = getIcon(type.icon);
               return (
-              <TabsTrigger key={type.id} value={type.id} className="flex items-center gap-1">
+              <TabsTrigger key={type.dbId} value={type.id} className="flex items-center gap-1">
                 <IconComponent className="h-4 w-4" />
                 <span className="hidden sm:inline">{type.name}</span>
               </TabsTrigger>
@@ -169,7 +170,7 @@ export default function Resources() {
 
           {/* Content for each resource type */}
           {resourceTypes.map((type: any) => (
-            <TabsContent key={type.id} value={type.id} className="space-y-6">
+            <TabsContent key={type.dbId} value={type.id} className="space-y-6">
               <div>
                 {type.showBadge !== false && (
                   <div className="mb-4">
