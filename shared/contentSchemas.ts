@@ -807,6 +807,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     schema: resourceTypeSchema,
     label: 'Articles Resource Type',
     description: 'Articles resource type description',
+    allowMultiple: true,
     uiMeta: {
       id: { label: 'Resource ID', control: 'text', placeholder: 'article' },
       name: { label: 'Resource Name', control: 'text', placeholder: 'Articles' },
