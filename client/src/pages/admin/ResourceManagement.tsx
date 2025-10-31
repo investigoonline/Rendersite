@@ -28,6 +28,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
@@ -371,6 +372,9 @@ export default function ResourceManagement() {
               <DialogTitle>
                 {editingResource ? 'Edit' : 'Add'} {resourceTypes.find(t => t.id === selectedType)?.name.slice(0, -1)}
               </DialogTitle>
+              <DialogDescription>
+                {editingResource ? 'Update' : 'Create a new'} {resourceTypes.find(t => t.id === selectedType)?.name.toLowerCase().slice(0, -1)} with rich text content, category, and tags.
+              </DialogDescription>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
