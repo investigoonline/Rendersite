@@ -78,26 +78,11 @@ export default function Resources() {
   const becomeClientData = getSection('resources_become_client')?.content as any;
   const needHelpData = getSection('resources_need_help')?.content as any;
 
-  // Extract resource types and CMS articles from database content
-  const allSections = resourceTypesContent?.filter(c => 
-    !['resources_header', 'resources_become_client', 'resources_need_help'].includes(c.section)
-  ) || [];
-
-  // Get unique resource type tabs (one tab per type: article, video, newsletter, flipbook, faq)
-  const resourceTypes: ResourceType[] = allSections
+  // Extract resource types from database content (excluding header and additional sections)
+  const resourceTypes: ResourceType[] = resourceTypesContent
+    ?.filter(c => !['resources_header', 'resources_become_client', 'resources_need_help'].includes(c.section))
     .map(content => content.content as ResourceType)
-    .filter(type => type && type.id && type.name)
-    .reduce((acc: ResourceType[], curr) => {
-      if (!acc.find(item => item.id === curr.id)) {
-        acc.push(curr);
-      }
-      return acc;
-    }, []);
-
-  // Get CMS articles sections (multiple articles from CMS)
-  const cmsArticles = allSections
-    .filter(c => c.section === 'resources_articles')
-    .map(c => c.content) || [];
+    .filter(type => type && type.id && type.name) || [];
 
   const { data: resources, isLoading } = useQuery({
     queryKey: ["/api/resources", selectedType, selectedCategory],
@@ -217,34 +202,7 @@ export default function Resources() {
                 </Card>
               )}
 
-              {/* CMS Articles for Articles tab */}
-              {type.id === 'article' && cmsArticles.length > 0 && (
-                <div className="space-y-8">
-                  {cmsArticles.map((article: any, idx: number) => (
-                    <Card key={idx} className="overflow-hidden">
-                      <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10">
-                        <div className="space-y-2">
-                          {article.showBadge !== false && article.badgeText && (
-                            <div>
-                              <HTMLContent content={article.badgeText} className="" />
-                            </div>
-                          )}
-                          {article.headingText && (
-                            <div>
-                              <HTMLContent content={article.headingText} className="" />
-                            </div>
-                          )}
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pt-6">
-                        <HTMLContent content={article.description} className="text-muted-foreground" />
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-
-              {/* Database Resources Grid */}
+              {/* Resource Grid */}
               {isLoading ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[...Array(6)].map((_, i) => (
@@ -260,7 +218,7 @@ export default function Resources() {
                     </Card>
                   ))}
                 </div>
-              ) : filteredResources.length > 0 && (
+              ) : filteredResources.length > 0 ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredResources.map((resource: any) => (
                     <ResourceCard
@@ -270,6 +228,24 @@ export default function Resources() {
                     />
                   ))}
                 </div>
+              ) : (
+                <Card>
+                  <CardContent className="p-12 text-center">
+                    {(() => {
+                      const IconComponent = getIcon(type.icon);
+                      return <IconComponent className="h-12 w-12 text-muted-foreground mx-auto mb-4" />;
+                    })()}
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      No {type.name} Found
+                    </h3>
+                    <p className="text-muted-foreground">
+                      {searchTerm 
+                        ? `No ${type.name.toLowerCase()} match your search criteria. Try adjusting your filters.`
+                        : `No ${type.name.toLowerCase()} are available at the moment. Check back soon for new content.`
+                      }
+                    </p>
+                  </CardContent>
+                </Card>
               )}
             </TabsContent>
           ))}
