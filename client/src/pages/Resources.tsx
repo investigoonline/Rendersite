@@ -11,6 +11,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import ResourceCard from "@/components/resources/ResourceCard";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -40,6 +47,7 @@ export default function Resources() {
   const [selectedType, setSelectedType] = useState("article");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [viewingResource, setViewingResource] = useState<any | null>(null);
 
   // Fetch resource types content
   const { data: resourceTypesContent } = useQuery<PageContent[]>({
@@ -118,22 +126,34 @@ export default function Resources() {
     });
   };
 
-  const handleViewResource = (resourceId: string) => {
-    // Increment view count
-    fetch(`/api/resources/${resourceId}`, { method: "GET" })
-      .then(() => {
+  const handleViewResource = async (resourceId: string) => {
+    try {
+      // Fetch full resource with content
+      const response = await fetch(`/api/resources/${resourceId}`, {
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch resource');
+      
+      const resource = await response.json();
+      
+      // If resource has a URL, open it in new tab
+      if (resource.url) {
+        window.open(resource.url, '_blank');
         toast({
           title: "Resource Opened",
           description: "View count updated successfully.",
         });
-      })
-      .catch(() => {
-        toast({
-          title: "Error",
-          description: "Failed to open resource.",
-          variant: "destructive",
-        });
+      } else {
+        // Otherwise, show in dialog
+        setViewingResource(resource);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to open resource.",
+        variant: "destructive",
       });
+    }
   };
 
   return (
@@ -375,6 +395,54 @@ export default function Resources() {
             )}
           </div>
         )}
+
+        {/* Article Viewer Dialog */}
+        <Dialog open={!!viewingResource} onOpenChange={(open) => !open && setViewingResource(null)}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            {viewingResource && (
+              <>
+                <DialogHeader>
+                  <div className="flex items-center gap-2 mb-2">
+                    {viewingResource.category && (
+                      <Badge variant="outline">{viewingResource.category}</Badge>
+                    )}
+                    {viewingResource.publishDate && (
+                      <span className="text-sm text-muted-foreground">
+                        {new Date(viewingResource.publishDate).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    )}
+                  </div>
+                  <DialogTitle className="text-2xl">{viewingResource.title}</DialogTitle>
+                  {viewingResource.description && (
+                    <DialogDescription asChild>
+                      <HTMLContent content={viewingResource.description} className="text-base" />
+                    </DialogDescription>
+                  )}
+                </DialogHeader>
+                
+                <div className="mt-6">
+                  {viewingResource.content ? (
+                    <HTMLContent content={viewingResource.content} className="prose max-w-none" />
+                  ) : (
+                    <p className="text-muted-foreground italic">No content available</p>
+                  )}
+                </div>
+
+                {viewingResource.tags && viewingResource.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-6 pt-6 border-t">
+                    {viewingResource.tags.map((tag: string, index: number) => (
+                      <Badge key={index} variant="secondary">{tag}</Badge>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
