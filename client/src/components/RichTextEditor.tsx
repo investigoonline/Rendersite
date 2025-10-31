@@ -51,7 +51,10 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        // Disable link extension in StarterKit to avoid duplicate
+        link: false,
+      }),
       Underline,
       Link.configure({
         openOnClick: false,
