@@ -431,7 +431,7 @@ export default function ResourceManagement() {
                     <FormItem>
                       <FormLabel>Category</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Enter category" data-testid="input-category" />
+                        <Input {...field} value={field.value || ""} placeholder="Enter category" data-testid="input-category" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -460,7 +460,7 @@ export default function ResourceManagement() {
                         <FormLabel>Published</FormLabel>
                         <FormControl>
                           <Switch
-                            checked={field.value}
+                            checked={field.value || false}
                             onCheckedChange={field.onChange}
                             data-testid="switch-published"
                           />
@@ -477,7 +477,7 @@ export default function ResourceManagement() {
                         <FormLabel>Featured</FormLabel>
                         <FormControl>
                           <Switch
-                            checked={field.value}
+                            checked={field.value || false}
                             onCheckedChange={field.onChange}
                             data-testid="switch-featured"
                           />
