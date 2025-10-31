@@ -77,6 +77,7 @@ const resourceTypes = [
 export default function ResourceManagement() {
   const { toast } = useToast();
   const [selectedType, setSelectedType] = useState("article");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [deletingResource, setDeletingResource] = useState<Resource | null>(null);
@@ -93,6 +94,26 @@ export default function ResourceManagement() {
       return res.json();
     },
   });
+
+  // Get unique categories from resources and sort alphabetically
+  const categories = Array.from(
+    new Set(
+      resources?.map(r => r.category).filter((cat): cat is string => Boolean(cat)) || []
+    )
+  ).sort();
+
+  // Filter and sort resources
+  const filteredAndSortedResources = resources
+    ?.filter(r => selectedCategory === "all" || r.category === selectedCategory)
+    .sort((a, b) => {
+      // Sort by category first (alphabetically), then by title
+      const categoryA = a.category || "";
+      const categoryB = b.category || "";
+      if (categoryA !== categoryB) {
+        return categoryA.localeCompare(categoryB);
+      }
+      return a.title.localeCompare(b.title);
+    }) || [];
 
   const form = useForm<ResourceFormData>({
     resolver: zodResolver(resourceFormSchema),
@@ -236,8 +257,11 @@ export default function ResourceManagement() {
           </p>
         </div>
 
-        <Tabs value={selectedType} onValueChange={setSelectedType} className="space-y-6">
-          <div className="flex justify-between items-center">
+        <Tabs value={selectedType} onValueChange={(value) => {
+          setSelectedType(value);
+          setSelectedCategory("all");
+        }} className="space-y-6">
+          <div className="flex justify-between items-center gap-4">
             <TabsList>
               {resourceTypes.map(type => {
                 const Icon = type.icon;
@@ -249,10 +273,27 @@ export default function ResourceManagement() {
                 );
               })}
             </TabsList>
-            <Button onClick={handleAdd} data-testid="button-add-resource">
-              <Plus className="h-4 w-4 mr-2" />
-              Add {resourceTypes.find(t => t.id === selectedType)?.name.slice(0, -1)}
-            </Button>
+            <div className="flex items-center gap-4">
+              {categories.length > 0 && (
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="w-[200px]" data-testid="select-category-filter">
+                    <SelectValue placeholder="Filter by category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {categories.map(category => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              <Button onClick={handleAdd} data-testid="button-add-resource">
+                <Plus className="h-4 w-4 mr-2" />
+                Add {resourceTypes.find(t => t.id === selectedType)?.name.slice(0, -1)}
+              </Button>
+            </div>
           </div>
 
           {resourceTypes.map(type => (
@@ -270,9 +311,9 @@ export default function ResourceManagement() {
                     </Card>
                   ))}
                 </div>
-              ) : resources && resources.length > 0 ? (
+              ) : filteredAndSortedResources && filteredAndSortedResources.length > 0 ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {resources.map(resource => (
+                  {filteredAndSortedResources.map(resource => (
                     <Card key={resource.id} data-testid={`card-resource-${resource.id}`}>
                       <CardHeader>
                         <CardTitle className="flex items-start justify-between">
@@ -342,15 +383,26 @@ export default function ResourceManagement() {
                   <CardContent className="p-12 text-center">
                     <type.icon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      No {type.name} Yet
+                      {selectedCategory !== "all" 
+                        ? `No ${type.name} in "${selectedCategory}"`
+                        : `No ${type.name} Yet`}
                     </h3>
                     <p className="text-muted-foreground mb-4">
-                      Get started by creating your first {type.name.toLowerCase().slice(0, -1)}.
+                      {selectedCategory !== "all"
+                        ? `Try selecting a different category or add a new ${type.name.toLowerCase().slice(0, -1)} to this category.`
+                        : `Get started by creating your first ${type.name.toLowerCase().slice(0, -1)}.`}
                     </p>
-                    <Button onClick={handleAdd}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add {type.name.slice(0, -1)}
-                    </Button>
+                    <div className="flex gap-2 justify-center">
+                      {selectedCategory !== "all" && (
+                        <Button variant="outline" onClick={() => setSelectedCategory("all")}>
+                          Show All
+                        </Button>
+                      )}
+                      <Button onClick={handleAdd}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add {type.name.slice(0, -1)}
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               )}
