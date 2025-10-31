@@ -21,6 +21,7 @@ import Location from "@/pages/Location";
 import Disclosures from "@/pages/Disclosures";
 import Custodian from "@/pages/Custodian";
 import ContentManagement from "@/pages/ContentManagement";
+import ResourceManagement from "@/pages/admin/ResourceManagement";
 import Dashboard from "@/pages/Dashboard";
 import UnderConstruction from "@/pages/UnderConstruction";
 import NotFound from "@/pages/not-found";
@@ -70,6 +71,12 @@ function Router() {
         <Route path="/content-management">
           <ProtectedRoute allowedRoles={['super_admin', 'content_manager']}>
             <ContentManagement />
+          </ProtectedRoute>
+        </Route>
+        
+        <Route path="/resource-management">
+          <ProtectedRoute allowedRoles={['super_admin', 'content_manager']}>
+            <ResourceManagement />
           </ProtectedRoute>
         </Route>
         

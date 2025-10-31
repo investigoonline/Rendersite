@@ -134,9 +134,14 @@ export default function Header() {
                           </DropdownMenuItem>
                         )}
                         {hasContentAccess && (
-                          <DropdownMenuItem>
-                            <Link href="/content-management" data-testid="link-content-management">Content Management</Link>
-                          </DropdownMenuItem>
+                          <>
+                            <DropdownMenuItem>
+                              <Link href="/content-management" data-testid="link-content-management">Content Management</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Link href="/resource-management" data-testid="link-resource-management">Resource Management</Link>
+                            </DropdownMenuItem>
+                          </>
                         )}
                       </>
                     )}
@@ -234,11 +239,18 @@ export default function Header() {
                               </Button>
                             )}
                             {hasContentAccess && (
-                              <Button variant="outline" className="w-full" asChild>
-                                <Link href="/content-management" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-link-content-management">
-                                  Content Management
-                                </Link>
-                              </Button>
+                              <>
+                                <Button variant="outline" className="w-full" asChild>
+                                  <Link href="/content-management" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-link-content-management">
+                                    Content Management
+                                  </Link>
+                                </Button>
+                                <Button variant="outline" className="w-full" asChild>
+                                  <Link href="/resource-management" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-link-resource-management">
+                                    Resource Management
+                                  </Link>
+                                </Button>
+                              </>
                             )}
                           </>
                         )}
