@@ -172,8 +172,8 @@ const resourceTypeSchema = z.object({
   icon: z.string().min(1),
   description: z.string().min(1),
   showBadge: z.boolean().default(true),
-  badgeText: z.string().max(50).optional(),
-  headingText: z.string().max(100).optional(),
+  badgeText: z.string().optional(),
+  headingText: z.string().optional(),
 });
 
 // Footer Schemas
