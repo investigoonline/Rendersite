@@ -47,75 +47,73 @@ export default function About() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
         {header && (
-          <div className="text-center mb-16">
+          <div className="text-center mb-20">
             <Badge className="bg-primary/10 text-primary border-primary/20 mb-6" data-testid="badge-about-header">
               {header.badge}
             </Badge>
-            <h1 className="text-4xl font-bold text-gray-900 mb-6" data-testid="text-about-title">
+            <h1 className="text-5xl font-bold text-gray-900 mb-8" data-testid="text-about-title">
               {header.title}
             </h1>
-            <HTMLContent content={header.description} className="text-xl text-muted-foreground max-w-3xl mx-auto" data-testid="text-about-description" />
+            <HTMLContent content={header.description} className="text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed" data-testid="text-about-description" />
           </div>
         )}
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Company Story */}
-          {story && (
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6" data-testid="text-story-title">
-                {story.title}
-              </h2>
-              <div className="space-y-4 text-muted-foreground">
-                {story.paragraphs?.map((paragraph: string, index: number) => (
-                  <p key={index} data-testid={`text-story-paragraph-${index}`}>{paragraph}</p>
-                ))}
-              </div>
+        {/* Company Story */}
+        {story && (
+          <div className="max-w-4xl mx-auto mb-20">
+            <h2 className="text-4xl font-bold text-gray-900 text-center mb-10" data-testid="text-story-title">
+              {story.title}
+            </h2>
+            <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
+              {story.paragraphs?.map((paragraph: string, index: number) => (
+                <p key={index} data-testid={`text-story-paragraph-${index}`}>{paragraph}</p>
+              ))}
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Mission & Vision */}
-          {missionVision && (
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6" data-testid="text-mission-vision-title">
-                {missionVision.title}
-              </h2>
-              <div className="space-y-6">
-                <Card className="border-primary/20 bg-primary/5">
-                  <CardContent className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center" data-testid="text-mission-title">
-                      {getIconComponent(missionVision.missionIcon) && 
-                        (() => {
-                          const Icon = getIconComponent(missionVision.missionIcon);
-                          return <Icon className="h-5 w-5 text-primary mr-2" />;
-                        })()
-                      }
-                      {missionVision.missionTitle}
-                    </h3>
-                    <p className="text-muted-foreground" data-testid="text-mission-content">
-                      {missionVision.missionText}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card className="border-secondary/20 bg-secondary/5">
-                  <CardContent className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center" data-testid="text-vision-title">
-                      {getIconComponent(missionVision.visionIcon) && 
-                        (() => {
-                          const Icon = getIconComponent(missionVision.visionIcon);
-                          return <Icon className="h-5 w-5 text-secondary mr-2" />;
-                        })()
-                      }
-                      {missionVision.visionTitle}
-                    </h3>
-                    <p className="text-muted-foreground" data-testid="text-vision-content">
-                      {missionVision.visionText}
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
+        {/* Mission & Vision */}
+        {missionVision && (
+          <div className="mb-20">
+            <h2 className="text-4xl font-bold text-gray-900 text-center mb-12" data-testid="text-mission-vision-title">
+              {missionVision.title}
+            </h2>
+            <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              <Card className="border-primary/20 bg-primary/5 hover:shadow-lg transition-shadow">
+                <CardContent className="p-8">
+                  <h3 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center" data-testid="text-mission-title">
+                    {getIconComponent(missionVision.missionIcon) && 
+                      (() => {
+                        const Icon = getIconComponent(missionVision.missionIcon);
+                        return <Icon className="h-7 w-7 text-primary mr-3" />;
+                      })()
+                    }
+                    {missionVision.missionTitle}
+                  </h3>
+                  <p className="text-muted-foreground text-lg leading-relaxed" data-testid="text-mission-content">
+                    {missionVision.missionText}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="border-secondary/20 bg-secondary/5 hover:shadow-lg transition-shadow">
+                <CardContent className="p-8">
+                  <h3 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center" data-testid="text-vision-title">
+                    {getIconComponent(missionVision.visionIcon) && 
+                      (() => {
+                        const Icon = getIconComponent(missionVision.visionIcon);
+                        return <Icon className="h-7 w-7 text-secondary mr-3" />;
+                      })()
+                    }
+                    {missionVision.visionTitle}
+                  </h3>
+                  <p className="text-muted-foreground text-lg leading-relaxed" data-testid="text-vision-content">
+                    {missionVision.visionText}
+                  </p>
+                </CardContent>
+              </Card>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
