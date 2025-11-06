@@ -56,13 +56,13 @@ export default function Home() {
   const Badge2Icon = heroContent?.badge2Icon ? getIcon(heroContent.badge2Icon) : Calculator;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 py-12 sm:py-20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 py-8 sm:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8 items-start">
           {/* Left side - Hero Content */}
-          <div className="lg:col-span-3 space-y-8">
+          <div className="lg:col-span-3 space-y-6">
             {/* Hero Section */}
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Badges */}
               <div className="flex flex-wrap gap-3">
                 <Badge variant="secondary" className="px-4 py-2 text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200">
@@ -111,35 +111,38 @@ export default function Home() {
             </div>
 
             {/* Stats Section */}
-            <div className="grid grid-cols-3 gap-6 pt-8">
-              {stats.map((stat: any, index: number) => (
-                <div key={index} className="text-center" data-testid={`stat-${index}`}>
-                  <div className="text-3xl sm:text-4xl font-bold text-primary mb-2">
-                    {stat.value}
+            {stats.length > 0 && (
+              <div className="grid grid-cols-3 gap-4 pt-4">
+                {stats.map((stat: any, index: number) => (
+                  <div key={index} className="text-center" data-testid={`stat-${index}`}>
+                    <div className="text-2xl sm:text-3xl font-bold text-primary mb-1">
+                      {stat.value}
+                    </div>
+                    <div className="text-xs sm:text-sm text-gray-600 font-medium">
+                      {stat.label}
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-600 font-medium">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Right side - Portfolio Overview */}
           <div className="lg:col-span-2">
-            <Card className="shadow-xl border-0 bg-white/80 backdrop-blur">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl">
-                    {portfolioContent?.title || "Portfolio Overview"}
-                  </CardTitle>
-                  <Badge variant="outline" className="text-green-600 border-green-600">
-                    <TrendingUp className="h-3 w-3 mr-1" />
-                    {portfolioContent?.growthPercent || "+12.4%"}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
+            {portfolioContent && (
+              <Card className="shadow-lg border-0 bg-white/80 backdrop-blur">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">
+                      {portfolioContent.title || "Portfolio Overview"}
+                    </CardTitle>
+                    <Badge variant="outline" className="text-green-600 border-green-600">
+                      <TrendingUp className="h-3 w-3 mr-1" />
+                      {portfolioContent.growthPercent || "+12.4%"}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
                 {/* Simple Chart Visualization */}
                 <div className="flex items-end justify-around h-32 gap-2">
                   <div className="w-full bg-primary/30 rounded-t" style={{ height: '45%' }}></div>
@@ -171,17 +174,18 @@ export default function Home() {
                 </div>
               </CardContent>
             </Card>
+            )}
           </div>
         </div>
 
         {/* Calculator Categories Section */}
-        {calculatorCategoriesContent && (
-          <div className="mt-16">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+        {calculatorCategoriesContent && calculatorCategoriesContent.categories && calculatorCategoriesContent.categories.length > 0 && (
+          <div className="mt-12">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
                 {calculatorCategoriesContent.title}
               </h2>
-              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              <p className="text-base text-gray-600 max-w-3xl mx-auto">
                 {calculatorCategoriesContent.subtitle}
               </p>
             </div>
@@ -221,7 +225,7 @@ export default function Home() {
               })}
             </div>
 
-            <div className="text-center mt-10">
+            <div className="text-center mt-8">
               <Button asChild size="lg" className="px-8" data-testid="button-access-calculators">
                 <Link href="/calculators">
                   Access All Calculators
