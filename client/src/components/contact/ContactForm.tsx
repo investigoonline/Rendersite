@@ -13,7 +13,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Send, Loader2 } from "lucide-react";
@@ -31,7 +37,7 @@ const contactSchema = z.object({
     "feature_request",
     "consultation_request",
     "partnership_inquiry",
-    "other"
+    "other",
   ]),
   message: z.string().min(10, "Message must be at least 10 characters"),
   preferredContact: z.enum(["email", "phone", "either"]).default("email"),
@@ -61,17 +67,19 @@ export default function ContactForm() {
 
   // Fetch form fields content from CMS
   const { data: formFieldsContent } = useQuery<PageContent[]>({
-    queryKey: ['/api/content', 'contact'],
+    queryKey: ["/api/content", "contact"],
     queryFn: async () => {
-      const res = await fetch('/api/content?page=contact', {
-        credentials: 'include',
+      const res = await fetch("/api/content?page=contact", {
+        credentials: "include",
       });
-      if (!res.ok) throw new Error('Failed to fetch content');
+      if (!res.ok) throw new Error("Failed to fetch content");
       return res.json();
     },
   });
 
-  const formFields = formFieldsContent?.find(c => c.section === 'contact_form_fields')?.content as any || {};
+  const formFields =
+    (formFieldsContent?.find((c) => c.section === "contact_form_fields")
+      ?.content as any) || {};
 
   const form = useForm<ContactForm>({
     resolver: zodResolver(contactSchema),
@@ -93,14 +101,17 @@ export default function ContactForm() {
     onSuccess: () => {
       toast({
         title: formFields.successTitle || "Message Sent Successfully",
-        description: formFields.successMessage || "Thank you for contacting us. We'll get back to you within 24 hours.",
+        description:
+          formFields.successMessage ||
+          "Thank you for contacting us. We'll get back to you within 24 hours.",
       });
       form.reset();
     },
     onError: (error: Error) => {
       toast({
         title: "Error Sending Message",
-        description: error.message || "Failed to send your message. Please try again.",
+        description:
+          error.message || "Failed to send your message. Please try again.",
         variant: "destructive",
       });
     },
@@ -122,7 +133,9 @@ export default function ContactForm() {
                 <FormLabel>{formFields.nameLabel || "Full Name *"}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={formFields.namePlaceholder || "Enter your full name"}
+                    placeholder={
+                      formFields.namePlaceholder || "Enter your full name"
+                    }
                     {...field}
                   />
                 </FormControl>
@@ -136,11 +149,15 @@ export default function ContactForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{formFields.emailLabel || "Email Address *"}</FormLabel>
+                <FormLabel>
+                  {formFields.emailLabel || "Email Address *"}
+                </FormLabel>
                 <FormControl>
                   <Input
                     type="email"
-                    placeholder={formFields.emailPlaceholder || "Enter your email address"}
+                    placeholder={
+                      formFields.emailPlaceholder || "Enter your email address"
+                    }
                     {...field}
                   />
                 </FormControl>
@@ -156,11 +173,15 @@ export default function ContactForm() {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{formFields.phoneLabel || "Phone Number (Optional)"}</FormLabel>
+                <FormLabel>
+                  {formFields.phoneLabel || "Phone Number (Optional)"}
+                </FormLabel>
                 <FormControl>
                   <Input
                     type="tel"
-                    placeholder={formFields.phonePlaceholder || "Enter your phone number"}
+                    placeholder={
+                      formFields.phonePlaceholder || "Enter your phone number"
+                    }
                     {...field}
                   />
                 </FormControl>
@@ -174,8 +195,13 @@ export default function ContactForm() {
             name="preferredContact"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{formFields.contactMethodLabel || "Preferred Contact Method"}</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormLabel>
+                  {formFields.contactMethodLabel || "Preferred Contact Method"}
+                </FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select contact method" />
@@ -225,10 +251,15 @@ export default function ContactForm() {
           name="message"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{formFields.messageLabel || "Your Message *"}</FormLabel>
+              <FormLabel>
+                {formFields.messageLabel || "Your Message *"}
+              </FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder={formFields.messagePlaceholder || "Tell us how we can help you..."}
+                  placeholder={
+                    formFields.messagePlaceholder ||
+                    "Tell us how we can help you..."
+                  }
                   className="min-h-[120px] resize-none"
                   {...field}
                 />
@@ -240,16 +271,18 @@ export default function ContactForm() {
 
         <div className="bg-gray-50 p-4 rounded-lg text-sm text-muted-foreground">
           <p className="mb-2">
-            <strong>Response Time:</strong> We typically respond within 24 hours during business days.
+            <strong>Response Time:</strong> We typically respond within 24 hours
+            during business days.
           </p>
           <p>
-            <strong>Privacy:</strong> Your information is secure and will never be shared with third parties.
+            <strong>Privacy:</strong> Your information is secure and will never
+            be shared with third parties.
           </p>
         </div>
 
-        <Button 
-          type="submit" 
-          className="w-full" 
+        <Button
+          type="submit"
+          className="w-full"
           size="lg"
           disabled={submitContactMutation.isPending}
         >
@@ -268,8 +301,11 @@ export default function ContactForm() {
 
         <div className="text-center text-sm text-muted-foreground">
           Need immediate assistance? Call us at{" "}
-          <a href="tel:+15551234567" className="text-primary hover:underline">
-            +1 (555) 123-4567
+          <a
+            href="tel:+1 (512) 923-6479"
+            className="text-primary hover:underline"
+          >
+            +1 (512) 923-6479
           </a>
         </div>
       </form>
