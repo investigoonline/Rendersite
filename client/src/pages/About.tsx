@@ -72,41 +72,57 @@ export default function About() {
           </div>
         )}
 
-        {/* Mission & Vision */}
+        {/* Approach Section: Mission, Approach & Philosophy */}
         {missionVision && (
           <div className="mb-20">
-            <h2 className="text-4xl font-bold text-gray-900 text-center mb-12" data-testid="text-mission-vision-title">
+            <h2 className="text-4xl font-bold text-gray-900 text-center mb-12" data-testid="text-approach-section-title">
               {missionVision.title}
             </h2>
-            <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <div className="grid lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
               <Card className="border-primary/20 bg-primary/5 hover:shadow-lg transition-shadow">
-                <CardContent className="p-8">
-                  <h3 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center" data-testid="text-mission-title">
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center" data-testid="text-mission-title">
                     {getIconComponent(missionVision.missionIcon) && 
                       (() => {
                         const Icon = getIconComponent(missionVision.missionIcon);
-                        return <Icon className="h-7 w-7 text-primary mr-3" />;
+                        return <Icon className="h-6 w-6 text-primary mr-2" />;
                       })()
                     }
                     {missionVision.missionTitle}
                   </h3>
-                  <p className="text-muted-foreground text-lg leading-relaxed" data-testid="text-mission-content">
+                  <p className="text-muted-foreground leading-relaxed" data-testid="text-mission-content">
                     {missionVision.missionText}
                   </p>
                 </CardContent>
               </Card>
+              <Card className="border-accent/20 bg-accent/5 hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center" data-testid="text-approach-title">
+                    {getIconComponent(missionVision.approachIcon) && 
+                      (() => {
+                        const Icon = getIconComponent(missionVision.approachIcon);
+                        return <Icon className="h-6 w-6 text-accent mr-2" />;
+                      })()
+                    }
+                    {missionVision.approachTitle}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed" data-testid="text-approach-content">
+                    {missionVision.approachText}
+                  </p>
+                </CardContent>
+              </Card>
               <Card className="border-secondary/20 bg-secondary/5 hover:shadow-lg transition-shadow">
-                <CardContent className="p-8">
-                  <h3 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center" data-testid="text-vision-title">
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center" data-testid="text-philosophy-title">
                     {getIconComponent(missionVision.visionIcon) && 
                       (() => {
                         const Icon = getIconComponent(missionVision.visionIcon);
-                        return <Icon className="h-7 w-7 text-secondary mr-3" />;
+                        return <Icon className="h-6 w-6 text-secondary mr-2" />;
                       })()
                     }
                     {missionVision.visionTitle}
                   </h3>
-                  <p className="text-muted-foreground text-lg leading-relaxed" data-testid="text-vision-content">
+                  <p className="text-muted-foreground leading-relaxed" data-testid="text-philosophy-content">
                     {missionVision.visionText}
                   </p>
                 </CardContent>
