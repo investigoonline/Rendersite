@@ -22,10 +22,10 @@ import type { PageContent } from "@shared/schema";
 export default function Contact() {
   // Fetch contact content with proper query parameter
   const { data: contactContent, isLoading } = useQuery<PageContent[]>({
-    queryKey: ['/api/content', 'contact'],
+    queryKey: ["/api/content", "contact"],
     queryFn: async () => {
-      const res = await fetch('/api/content?page=contact', {
-        credentials: 'include',
+      const res = await fetch("/api/content?page=contact", {
+        credentials: "include",
       });
       if (!res.ok) {
         throw new Error(`Failed to fetch contact: ${res.statusText}`);
@@ -46,22 +46,25 @@ export default function Contact() {
 
   // Helper to get content by section
   const getSection = (sectionName: string) => {
-    return contactContent?.find(c => c.section === sectionName);
+    return contactContent?.find((c) => c.section === sectionName);
   };
 
   // Extract sections
-  const contactMethods = contactContent?.filter(c => 
-    ['contact_office', 'contact_phone', 'contact_email'].includes(c.section)
-  ) || [];
+  const contactMethods =
+    contactContent?.filter((c) =>
+      ["contact_office", "contact_phone", "contact_email"].includes(c.section),
+    ) || [];
 
-  const pageHeader = getSection('contact_header')?.content as any;
-  const formHeader = getSection('contact_form_header')?.content as any;
-  const quickActions = getSection('contact_quick_actions')?.content as any;
-  const supportFeatures = getSection('contact_support_features')?.content as any;
-  const businessHours = getSection('contact_business_hours')?.content as any;
-  const officeInfo = getSection('contact_office_info')?.content as any;
-  const prospectiveClients = getSection('contact_prospective_clients')?.content as any;
-  const currentClients = getSection('contact_current_clients')?.content as any;
+  const pageHeader = getSection("contact_header")?.content as any;
+  const formHeader = getSection("contact_form_header")?.content as any;
+  const quickActions = getSection("contact_quick_actions")?.content as any;
+  const supportFeatures = getSection("contact_support_features")
+    ?.content as any;
+  const businessHours = getSection("contact_business_hours")?.content as any;
+  const officeInfo = getSection("contact_office_info")?.content as any;
+  const prospectiveClients = getSection("contact_prospective_clients")
+    ?.content as any;
+  const currentClients = getSection("contact_current_clients")?.content as any;
 
   if (isLoading) {
     return (
@@ -80,7 +83,10 @@ export default function Contact() {
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               {pageHeader.title}
             </h1>
-            <HTMLContent content={pageHeader.description} className="text-xl text-muted-foreground max-w-3xl mx-auto" />
+            <HTMLContent
+              content={pageHeader.description}
+              className="text-xl text-muted-foreground max-w-3xl mx-auto"
+            />
           </div>
         )}
 
@@ -91,15 +97,27 @@ export default function Contact() {
               const data = method.content as any;
               const IconComponent = getIcon(data.icon);
               return (
-                <Card key={index} className="text-center hover:shadow-lg transition-shadow" data-testid={`card-contact-method-${index}`}>
+                <Card
+                  key={index}
+                  className="text-center hover:shadow-lg transition-shadow"
+                  data-testid={`card-contact-method-${index}`}
+                >
                   <CardContent className="p-6">
-                    <IconComponent className={`h-12 w-12 ${data.color} mx-auto mb-4`} />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">{data.title}</h3>
+                    <IconComponent
+                      className={`h-12 w-12 ${data.color} mx-auto mb-4`}
+                    />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                      {data.title}
+                    </h3>
                     <div className="space-y-1">
                       {data.content?.map((line: string, lineIndex: number) => (
                         <p
                           key={lineIndex}
-                          className={lineIndex === 0 ? "font-medium text-gray-900" : "text-sm text-muted-foreground"}
+                          className={
+                            lineIndex === 0
+                              ? "font-medium text-gray-900"
+                              : "text-sm text-muted-foreground"
+                          }
                         >
                           {line}
                         </p>
@@ -118,10 +136,14 @@ export default function Contact() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-2xl" data-testid="text-form-title">
-                  {formHeader?.title || 'Send us a Message'}
+                  {formHeader?.title || "Send us a Message"}
                 </CardTitle>
-                <p className="text-muted-foreground" data-testid="text-form-description">
-                  {formHeader?.description || "Fill out the form below and we'll get back to you within 24 hours."}
+                <p
+                  className="text-muted-foreground"
+                  data-testid="text-form-description"
+                >
+                  {formHeader?.description ||
+                    "Fill out the form below and we'll get back to you within 24 hours."}
                 </p>
               </CardHeader>
               <CardContent>
@@ -136,15 +158,17 @@ export default function Contact() {
             {quickActions && (
               <Card>
                 <CardHeader>
-                  <CardTitle data-testid="text-quick-actions-title">{quickActions.title}</CardTitle>
+                  <CardTitle data-testid="text-quick-actions-title">
+                    {quickActions.title}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {quickActions.actions?.map((action: any, index: number) => {
                     const IconComponent = getIcon(action.icon);
                     return (
-                      <Button 
-                        key={index} 
-                        className="w-full justify-start" 
+                      <Button
+                        key={index}
+                        className="w-full justify-start"
                         size="sm"
                         variant={index === 0 ? "default" : "outline"}
                         data-testid={`button-quick-action-${index}`}
@@ -162,22 +186,35 @@ export default function Contact() {
             {supportFeatures && (
               <Card>
                 <CardHeader>
-                  <CardTitle data-testid="text-support-features-title">{supportFeatures.title}</CardTitle>
+                  <CardTitle data-testid="text-support-features-title">
+                    {supportFeatures.title}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {supportFeatures.features?.map((feature: any, index: number) => {
-                      const IconComponent = getIcon(feature.icon);
-                      return (
-                        <div key={index} className="flex items-start space-x-3" data-testid={`card-support-feature-${index}`}>
-                          <IconComponent className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                          <div>
-                            <h4 className="font-medium text-gray-900 text-sm">{feature.title}</h4>
-                            <HTMLContent content={feature.description} className="text-xs text-muted-foreground" />
+                    {supportFeatures.features?.map(
+                      (feature: any, index: number) => {
+                        const IconComponent = getIcon(feature.icon);
+                        return (
+                          <div
+                            key={index}
+                            className="flex items-start space-x-3"
+                            data-testid={`card-support-feature-${index}`}
+                          >
+                            <IconComponent className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                            <div>
+                              <h4 className="font-medium text-gray-900 text-sm">
+                                {feature.title}
+                              </h4>
+                              <HTMLContent
+                                content={feature.description}
+                                className="text-xs text-muted-foreground"
+                              />
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      },
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -187,26 +224,52 @@ export default function Contact() {
             {businessHours && (
               <Card>
                 <CardHeader>
-                  <CardTitle data-testid="text-business-hours-title">{businessHours.title}</CardTitle>
+                  <CardTitle data-testid="text-business-hours-title">
+                    {businessHours.title}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Monday - Friday</span>
-                      <span className="font-medium" data-testid="text-hours-weekday">{businessHours.monday_friday}</span>
+                      <span className="text-muted-foreground">
+                        Monday - Friday
+                      </span>
+                      <span
+                        className="font-medium"
+                        data-testid="text-hours-weekday"
+                      >
+                        {businessHours.monday_friday}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Saturday</span>
-                      <span className="font-medium" data-testid="text-hours-saturday">{businessHours.saturday}</span>
+                      <span
+                        className="font-medium"
+                        data-testid="text-hours-saturday"
+                      >
+                        {businessHours.saturday}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Sunday</span>
-                      <span className="font-medium" data-testid="text-hours-sunday">{businessHours.sunday}</span>
+                      <span
+                        className="font-medium"
+                        data-testid="text-hours-sunday"
+                      >
+                        {businessHours.sunday}
+                      </span>
                     </div>
                     <div className="pt-3 border-t">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Emergency Support</span>
-                        <Badge variant="secondary" data-testid="text-hours-emergency">{businessHours.emergency}</Badge>
+                        <span className="text-muted-foreground">
+                          Emergency Support
+                        </span>
+                        <Badge
+                          variant="secondary"
+                          data-testid="text-hours-emergency"
+                        >
+                          {businessHours.emergency}
+                        </Badge>
                       </div>
                     </div>
                   </div>
@@ -215,33 +278,8 @@ export default function Contact() {
             )}
 
             {/* Office Information */}
-            {officeInfo && (
-              <Card>
-                <CardHeader>
-                  <CardTitle data-testid="text-office-info-title">{officeInfo.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {officeInfo.items?.map((item: any, index: number) => {
-                      const IconComponent = getIcon(item.icon);
-                      return (
-                        <div key={index} className="flex items-start space-x-3" data-testid={`card-office-item-${index}`}>
-                          <IconComponent className="h-5 w-5 text-primary mt-0.5" />
-                          <div>
-                            <h4 className="font-medium text-gray-900 text-sm">{item.title}</h4>
-                            <div className="text-xs text-muted-foreground">
-                              {item.details?.map((detail: string, detailIndex: number) => (
-                                <div key={detailIndex}>{detail}</div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+
+            <Card></Card>
           </div>
         </div>
 
@@ -251,16 +289,32 @@ export default function Contact() {
           {prospectiveClients && (
             <Card>
               <CardHeader>
-                <CardTitle data-testid="text-prospective-title">{prospectiveClients.title}</CardTitle>
+                <CardTitle data-testid="text-prospective-title">
+                  {prospectiveClients.title}
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <HTMLContent content={prospectiveClients.description} className="text-muted-foreground mb-4" data-testid="text-prospective-description" />
+                <HTMLContent
+                  content={prospectiveClients.description}
+                  className="text-muted-foreground mb-4"
+                  data-testid="text-prospective-description"
+                />
                 <ul className="space-y-2 text-sm text-muted-foreground mb-4">
-                  {prospectiveClients.benefits?.map((benefit: string, index: number) => (
-                    <li key={index} data-testid={`text-prospective-benefit-${index}`}>• {benefit}</li>
-                  ))}
+                  {prospectiveClients.benefits?.map(
+                    (benefit: string, index: number) => (
+                      <li
+                        key={index}
+                        data-testid={`text-prospective-benefit-${index}`}
+                      >
+                        • {benefit}
+                      </li>
+                    ),
+                  )}
                 </ul>
-                <Button className="w-full" data-testid="button-prospective-action">
+                <Button
+                  className="w-full"
+                  data-testid="button-prospective-action"
+                >
                   {prospectiveClients.buttonText}
                 </Button>
               </CardContent>
@@ -271,16 +325,33 @@ export default function Contact() {
           {currentClients && (
             <Card>
               <CardHeader>
-                <CardTitle data-testid="text-current-title">{currentClients.title}</CardTitle>
+                <CardTitle data-testid="text-current-title">
+                  {currentClients.title}
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <HTMLContent content={currentClients.description} className="text-muted-foreground mb-4" data-testid="text-current-description" />
+                <HTMLContent
+                  content={currentClients.description}
+                  className="text-muted-foreground mb-4"
+                  data-testid="text-current-description"
+                />
                 <ul className="space-y-2 text-sm text-muted-foreground mb-4">
-                  {currentClients.benefits?.map((benefit: string, index: number) => (
-                    <li key={index} data-testid={`text-current-benefit-${index}`}>• {benefit}</li>
-                  ))}
+                  {currentClients.benefits?.map(
+                    (benefit: string, index: number) => (
+                      <li
+                        key={index}
+                        data-testid={`text-current-benefit-${index}`}
+                      >
+                        • {benefit}
+                      </li>
+                    ),
+                  )}
                 </ul>
-                <Button variant="outline" className="w-full" data-testid="button-current-action">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  data-testid="button-current-action"
+                >
                   {currentClients.buttonText}
                 </Button>
               </CardContent>
