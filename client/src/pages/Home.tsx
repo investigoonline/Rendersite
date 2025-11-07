@@ -58,9 +58,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 py-8 sm:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8 items-start">
+        <div className={`grid grid-cols-1 gap-6 lg:gap-8 items-start ${portfolioContent ? 'lg:grid-cols-5' : ''}`}>
           {/* Left side - Hero Content */}
-          <div className="lg:col-span-3 space-y-6">
+          <div className={portfolioContent ? 'lg:col-span-3 space-y-6' : 'space-y-6'}>
             {/* Hero Section */}
             <div className="space-y-5">
               {/* Badges */}
@@ -128,8 +128,8 @@ export default function Home() {
           </div>
 
           {/* Right side - Portfolio Overview */}
-          <div className="lg:col-span-2">
-            {portfolioContent && (
+          {portfolioContent && (
+            <div className="lg:col-span-2">
               <Card className="shadow-lg border-0 bg-white/80 backdrop-blur">
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between">
@@ -143,39 +143,39 @@ export default function Home() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                {/* Simple Chart Visualization */}
-                <div className="flex items-end justify-around h-32 gap-2">
-                  <div className="w-full bg-primary/30 rounded-t" style={{ height: '45%' }}></div>
-                  <div className="w-full bg-primary/50 rounded-t" style={{ height: '65%' }}></div>
-                  <div className="w-full bg-primary/70 rounded-t" style={{ height: '85%' }}></div>
-                  <div className="w-full bg-primary rounded-t" style={{ height: '100%' }}></div>
-                </div>
+                  {/* Simple Chart Visualization */}
+                  <div className="flex items-end justify-around h-32 gap-2">
+                    <div className="w-full bg-primary/30 rounded-t" style={{ height: '45%' }}></div>
+                    <div className="w-full bg-primary/50 rounded-t" style={{ height: '65%' }}></div>
+                    <div className="w-full bg-primary/70 rounded-t" style={{ height: '85%' }}></div>
+                    <div className="w-full bg-primary rounded-t" style={{ height: '100%' }}></div>
+                  </div>
 
-                {/* Financial Metrics */}
-                <div className="space-y-3 pt-4 border-t">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Total Net Worth</span>
-                    <span className="text-lg font-bold text-gray-900">
-                      {portfolioContent?.totalNetWorth || "$1,247,832"}
-                    </span>
+                  {/* Financial Metrics */}
+                  <div className="space-y-3 pt-4 border-t">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Total Net Worth</span>
+                      <span className="text-lg font-bold text-gray-900">
+                        {portfolioContent.totalNetWorth || "$1,247,832"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Monthly Income</span>
+                      <span className="text-lg font-bold text-gray-900">
+                        {portfolioContent.monthlyIncome || "$8,450"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Debt Ratio</span>
+                      <span className="text-lg font-bold text-gray-900">
+                        {portfolioContent.debtRatio || "18.2%"}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Monthly Income</span>
-                    <span className="text-lg font-bold text-gray-900">
-                      {portfolioContent?.monthlyIncome || "$8,450"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Debt Ratio</span>
-                    <span className="text-lg font-bold text-gray-900">
-                      {portfolioContent?.debtRatio || "18.2%"}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            )}
-          </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
 
         {/* Calculator Categories Section */}
