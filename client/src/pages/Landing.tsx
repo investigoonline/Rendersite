@@ -268,22 +268,7 @@ export default function Landing() {
       </section>
 
       {/* Guest Account System Feature */}
-      <section className="py-20 gradient-secondary">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Guest Account Flow Visualization */}
-            <div className="relative">
-              <Card className="shadow-xl border border-gray-200">
-                <CardContent className="p-8">
-                  {/* Trial Counter Mockup */}
-                  <div className="mt-8 p-4 gradient-secondary rounded-lg"></div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
-
+      
       {/* Sample Calculator Interface */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
