@@ -32,16 +32,16 @@ export default function Header() {
   ];
 
   const resourceItems = [
-    { name: "Become a Client", href: "/become-client" },
+    
     { name: "Frequently Asked Questions", href: "/faq" },
-    { name: "Our Custodian", href: "/custodian" },
+    
     { name: "Disclosures", href: "/disclosures" },
-    { name: "Our Location", href: "/location" },
+    
     { name: "Articles", href: "/resources?type=article" },
     { name: "Calculators", href: "/calculators" },
     { name: "Flipbooks", href: "/resources?type=flipbook" },
     { name: "Newsletters", href: "/resources?type=newsletter" },
-    { name: "Videos", href: "/resources?type=video" },
+    //{ name: "Videos", href: "/resources?type=video" },
   ];
 
   return (

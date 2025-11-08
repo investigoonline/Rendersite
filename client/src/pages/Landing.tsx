@@ -252,57 +252,13 @@ export default function Landing() {
             ))}
           </div>
 
-          <div className="text-center">
-            <Button
-              size="lg"
-              onClick={() => setGuestModalOpen(true)}
-              className="px-8 py-4 text-lg"
-            >
-              Access All Calculators
-            </Button>
-            <p className="text-sm text-muted-foreground mt-2">
-              Free 30-day guest access • No credit card required
-            </p>
-          </div>
+          
         </div>
       </section>
 
       {/* Guest Account System Feature */}
-      
+
       {/* Sample Calculator Interface */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Professional-Grade Calculators
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Experience the power of our financial calculation engine with this
-              interactive Net Worth Calculator.
-            </p>
-          </div>
-
-          <NetWorthCalculator />
-
-          <div className="mt-12 text-center">
-            <p className="text-lg text-muted-foreground mb-6">
-              This is just one of our 32+ calculators available to guest users
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              {[
-                "Real-time calculations",
-                "Save & export results",
-                "Professional reports",
-                "Mobile optimized",
-              ].map((feature) => (
-                <Badge key={feature} variant="secondary" className="px-4 py-2">
-                  {feature}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* About Section */}
       <section className="py-20 bg-white">
