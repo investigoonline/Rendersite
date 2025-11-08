@@ -282,13 +282,15 @@ export function FormRenderer({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {Object.entries(schema.uiMeta).map(([fieldName, meta]) => {
           // Check if this is an array field by looking at the fieldName
-          // Array fields like "stats", "features", "content", "links" need special handling
+          // Array fields like "stats", "features", "content", "links", "categories" need special handling
           const value = form.watch(fieldName);
           const isArrayField = Array.isArray(value) || 
             fieldName === 'stats' || 
             fieldName === 'features' || 
             fieldName === 'content' || 
-            fieldName === 'links';
+            fieldName === 'links' ||
+            fieldName === 'categories' ||
+            fieldName === 'calculators';
 
           if (isArrayField) {
             return (

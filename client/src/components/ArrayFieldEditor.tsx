@@ -168,7 +168,7 @@ function getDefaultItemForField(fieldName: string): any {
   
   // Categories
   if (fieldName === 'categories') {
-    return { title: '', description: '', icon: 'Calculator', calculators: [] };
+    return { id: '', title: '', description: '', icon: 'Calculator', calculators: [] };
   }
   
   // Default to empty string
@@ -405,6 +405,124 @@ function renderItemFields(
             placeholder="e.g., /resources?type=faq"
             data-testid={`input-${fieldName}-${index}-href`}
           />
+        </div>
+      </>
+    );
+  }
+
+  // Calculator Categories (id, title, icon, description, calculators array)
+  if (fieldName === 'categories') {
+    const calculators = item.calculators || [];
+    return (
+      <>
+        <div>
+          <Label className="text-sm">Category ID</Label>
+          <Input
+            value={item.id || ''}
+            onChange={(e) => updateItem(index, 'id', e.target.value)}
+            placeholder="e.g., wealth_management"
+            data-testid={`input-${fieldName}-${index}-id`}
+          />
+        </div>
+        <div>
+          <Label className="text-sm">Title</Label>
+          <Input
+            value={item.title || ''}
+            onChange={(e) => updateItem(index, 'title', e.target.value)}
+            placeholder="e.g., Wealth Management"
+            data-testid={`input-${fieldName}-${index}-title`}
+          />
+        </div>
+        <div>
+          <Label className="text-sm">Icon</Label>
+          <Select
+            value={item.icon || 'Calculator'}
+            onValueChange={(value) => updateItem(index, 'icon', value)}
+          >
+            <SelectTrigger data-testid={`select-${fieldName}-${index}-icon`}>
+              <SelectValue>
+                {item.icon && (
+                  <div className="flex items-center gap-2">
+                    {(() => {
+                      const IconComponent = (LucideIcons as any)[item.icon];
+                      return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
+                    })()}
+                    <span>{item.icon}</span>
+                  </div>
+                )}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {iconOptions.map((option) => {
+                const IconComponent = (LucideIcons as any)[option.value];
+                return (
+                  <SelectItem key={option.value} value={option.value}>
+                    <div className="flex items-center gap-2">
+                      {IconComponent && <IconComponent className="h-4 w-4" />}
+                      <span>{option.label}</span>
+                    </div>
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label className="text-sm">Description</Label>
+          <Textarea
+            value={item.description || ''}
+            onChange={(e) => updateItem(index, 'description', e.target.value)}
+            placeholder="Brief description of this calculator category..."
+            rows={2}
+            data-testid={`textarea-${fieldName}-${index}-description`}
+          />
+        </div>
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <Label className="text-sm">Calculators (2-5 items)</Label>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const newCalculators = [...calculators, ''];
+                updateItem(index, 'calculators', newCalculators);
+              }}
+              data-testid={`button-add-calculator-${index}`}
+            >
+              <Plus className="h-3 w-3 mr-1" />
+              Add
+            </Button>
+          </div>
+          {calculators.map((calc: string, calcIndex: number) => (
+            <div key={calcIndex} className="flex gap-2">
+              <Input
+                value={calc}
+                onChange={(e) => {
+                  const newCalculators = [...calculators];
+                  newCalculators[calcIndex] = e.target.value;
+                  updateItem(index, 'calculators', newCalculators);
+                }}
+                placeholder="e.g., Total Net Worth Calculator"
+                data-testid={`input-calculator-${index}-${calcIndex}`}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  const newCalculators = calculators.filter((_: any, i: number) => i !== calcIndex);
+                  updateItem(index, 'calculators', newCalculators);
+                }}
+                data-testid={`button-remove-calculator-${index}-${calcIndex}`}
+              >
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            </div>
+          ))}
+          {calculators.length === 0 && (
+            <p className="text-xs text-muted-foreground">Click "Add" to add calculators</p>
+          )}
         </div>
       </>
     );
