@@ -98,28 +98,12 @@ export default function Landing() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="flex items-center space-x-2 mb-6">
-                <Badge className="bg-primary/10 text-primary border-primary/20">
-                  <Bot className="mr-1 h-3 w-3" />
-                  AI-Powered Platform
-                </Badge>
-                <Badge className="bg-secondary/10 text-secondary border-secondary/20">
-                  32+ Calculators
-                </Badge>
-              </div>
-
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-                Your Complete
-                <span className="text-primary block">
-                  Financial Intelligence
-                </span>
-                Platform
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary mb-6 leading-tight">
+                Welcome to IFS Wealth Management Inc- Your Trusted Partner in Wealth Management
               </h1>
 
-              <p className="text-lg sm:text-xl text-muted-foreground mb-8 leading-relaxed">
-                Comprehensive financial planning tools, AI-driven insights, and
-                personalized recommendations. From wealth management to
-                retirement planning - all in one secure platform.
+              <p className="text-lg sm:text-xl text-gray-700 mb-8 leading-relaxed">
+                At IFS Wealth Management Inc, we understand that managing wealth is not just about numbers; it's about realizing your dreams, securing your future, and achieving financial freedom. As a leading wealth management firm, we are dedicated to providing personalized solutions and expert guidance to help you navigate the complexities of financial planning and investment management.
               </p>
 
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-12">
