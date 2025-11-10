@@ -8,6 +8,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Layout from "@/components/Layout";
 import Landing from "@/pages/Landing";
 import Home from "@/pages/Home";
+import HomeDesignOptions from "@/pages/HomeDesignOptions";
 import Register from "@/pages/Register";
 import Calculators from "@/pages/Calculators";
 import Resources from "@/pages/Resources";
@@ -34,6 +35,7 @@ function Router() {
       <Switch>
         {/* Public routes available to everyone */}
         <Route path="/register" component={Register} />
+        <Route path="/home-designs" component={HomeDesignOptions} />
         <Route path="/calculators" component={Calculators} />
         <Route path="/resources" component={Resources} />
         <Route path="/blog" component={Blog} />
