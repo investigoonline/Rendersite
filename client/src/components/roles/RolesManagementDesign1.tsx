@@ -61,6 +61,7 @@ const permissions: Permission[] = [
 
 const roles = [
   { id: "super_admin", name: "Super Admin" },
+  { id: "admin", name: "System Admin" },
   { id: "content_manager", name: "Content Manager" },
   { id: "guest_user", name: "Guest User" },
   { id: "preferred_client", name: "Preferred Client" },
@@ -70,6 +71,7 @@ const roles = [
 // Default permissions mapping
 const defaultPermissions: Record<string, string[]> = {
   "super_admin": permissions.map(p => p.resource),
+  "admin": permissions.map(p => p.resource),
   "content_manager": [
     "Home (Landing/Dashboard)", "Register", "Resources", "About", "Contact", 
     "Services", "FAQ", "Become Client", "Location", "Disclosures", "Custodian", 

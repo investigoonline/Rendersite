@@ -487,8 +487,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/users/:userId/roles', async (req, res) => {
     try {
-      // Only super_admin can assign roles
-      const authorized = await requireRole(req, res, ['super_admin']);
+      // Only super_admin and admin can assign roles
+      const authorized = await requireRole(req, res, ['super_admin', 'admin']);
       if (!authorized) return;
 
       const roleData = insertUserRoleSchema.parse({
@@ -505,8 +505,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete('/api/users/:userId/roles/:roleId', async (req, res) => {
     try {
-      // Only super_admin can remove roles
-      const authorized = await requireRole(req, res, ['super_admin']);
+      // Only super_admin and admin can remove roles
+      const authorized = await requireRole(req, res, ['super_admin', 'admin']);
       if (!authorized) return;
 
       await storage.removeUserRole(req.params.userId, req.params.roleId);
@@ -557,8 +557,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin routes for user management
   app.get('/api/admin/users', async (req, res) => {
     try {
-      // Only super_admin can view all users
-      const authorized = await requireRole(req, res, ['super_admin']);
+      // Only super_admin and admin can view all users
+      const authorized = await requireRole(req, res, ['super_admin', 'admin']);
       if (!authorized) return;
 
       const users = await storage.getAllUsersWithRoles();
@@ -583,11 +583,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update user role - super_admin only
+  // Update user role - super_admin and admin only
   app.put('/api/admin/users/:userId/role', async (req, res) => {
     try {
-      // Only super_admin can update user roles
-      const authorized = await requireRole(req, res, ['super_admin']);
+      // Only super_admin and admin can update user roles
+      const authorized = await requireRole(req, res, ['super_admin', 'admin']);
       if (!authorized) return;
 
       const { userId } = req.params;
@@ -598,7 +598,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Validate role is one of the valid enum values
-      const validRoles = ['super_admin', 'content_manager', 'guest_user', 'preferred_client', 'client'];
+      const validRoles = ['super_admin', 'admin', 'content_manager', 'guest_user', 'preferred_client', 'client'];
       if (!validRoles.includes(role)) {
         return res.status(400).json({ message: "The specified role is not valid" });
       }
@@ -621,11 +621,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Dashboard statistics for super_admin
+  // Dashboard statistics for super_admin and admin
   app.get('/api/admin/dashboard-stats', async (req, res) => {
     try {
-      // Only super_admin can view dashboard stats
-      const authorized = await requireRole(req, res, ['super_admin']);
+      // Only super_admin and admin can view dashboard stats
+      const authorized = await requireRole(req, res, ['super_admin', 'admin']);
       if (!authorized) return;
 
       const [activeClients, totalCalculations, totalResources] = await Promise.all([
@@ -648,11 +648,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Login history for super_admin
+  // Login history for super_admin and admin
   app.get('/api/admin/login-history', async (req, res) => {
     try {
-      // Only super_admin can view login history
-      const authorized = await requireRole(req, res, ['super_admin']);
+      // Only super_admin and admin can view login history
+      const authorized = await requireRole(req, res, ['super_admin', 'admin']);
       if (!authorized) return;
 
       const limit = parseInt(req.query.limit as string) || 50;
@@ -668,7 +668,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Role permission routes
   app.get('/api/admin/role-permissions', async (req, res) => {
     try {
-      const authorized = await requireRole(req, res, ['super_admin']);
+      const authorized = await requireRole(req, res, ['super_admin', 'admin']);
       if (!authorized) return;
 
       const permissions = await storage.getRolePermissions();
@@ -681,7 +681,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/admin/role-permissions', async (req, res) => {
     try {
-      const authorized = await requireRole(req, res, ['super_admin']);
+      const authorized = await requireRole(req, res, ['super_admin', 'admin']);
       if (!authorized) return;
 
       const { permissions } = req.body;
@@ -808,10 +808,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Page content history routes (super admin only)
+  // Page content history routes (super admin and admin only)
   app.get('/api/admin/content-history', async (req, res) => {
     try {
-      const authorized = requireRole(req, res, ['super_admin']);
+      const authorized = requireRole(req, res, ['super_admin', 'admin']);
       if (!authorized) return;
 
       const contentId = req.query.contentId as string | undefined;
@@ -827,7 +827,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/admin/content-history/:historyId/restore', async (req, res) => {
     try {
-      const authorized = requireRole(req, res, ['super_admin']);
+      const authorized = requireRole(req, res, ['super_admin', 'admin']);
       if (!authorized) return;
 
       const restored = await storage.restorePageContentFromHistory(req.params.historyId);
