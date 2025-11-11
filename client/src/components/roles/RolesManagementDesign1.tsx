@@ -148,7 +148,7 @@ export default function RolesManagementDesign1() {
         });
       });
 
-      return apiRequest('POST', '/api/admin/role-permissions', { permissions: permissionsArray });
+      return apiRequest('/api/admin/role-permissions', 'POST', { permissions: permissionsArray });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/role-permissions'] });
