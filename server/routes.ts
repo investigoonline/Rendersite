@@ -698,6 +698,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get current user's permissions
+  app.get('/api/user/permissions', async (req, res) => {
+    try {
+      const userId = req.session?.user?.id;
+      const userRole = req.session?.user?.role;
+
+      // If user is not logged in, return empty permissions (guest access)
+      if (!userId) {
+        return res.json([]);
+      }
+
+      // Get permissions for the user's role
+      const permissions = await storage.getRolePermissionsByRole(userRole || 'client');
+      res.json(permissions);
+    } catch (error) {
+      console.error("Error fetching user permissions:", error);
+      res.status(500).json({ message: "Unable to fetch permissions" });
+    }
+  });
+
   // Content management routes
   app.get('/api/content', async (req, res) => {
     try {

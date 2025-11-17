@@ -659,6 +659,14 @@ export class DatabaseStorage implements IStorage {
     return permissions;
   }
 
+  async getRolePermissionsByRole(role: string): Promise<RolePermission[]> {
+    const permissions = await db
+      .select()
+      .from(rolePermissions)
+      .where(eq(rolePermissions.role, role as any));
+    return permissions;
+  }
+
   async setRolePermissions(permissions: InsertRolePermission[]): Promise<void> {
     // Delete existing permissions
     await db.delete(rolePermissions);
