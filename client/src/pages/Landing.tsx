@@ -23,6 +23,7 @@ import {
   Bot,
 } from "lucide-react";
 import type { RolePermission } from "@shared/schema";
+import { useAuth } from "@/hooks/useAuth";
 
 const calculatorCategories = [
   {
@@ -99,6 +100,7 @@ const calculatorCategories = [
 
 export default function Landing() {
   const [guestModalOpen, setGuestModalOpen] = useState(false);
+  const { user } = useAuth();
 
   // Fetch user permissions
   const { data: userPermissions } = useQuery<RolePermission[]>({
@@ -107,6 +109,11 @@ export default function Landing() {
 
   // Helper to check if user has permission for a calculator category
   const hasPermission = (categoryId: string): boolean => {
+    // Super Admins and Admins have access to everything
+    if (user?.role === 'super_admin' || user?.role === 'admin') {
+      return true;
+    }
+
     // If no permissions data yet, show nothing (loading state)
     if (!userPermissions) return false;
     

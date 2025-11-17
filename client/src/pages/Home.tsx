@@ -16,8 +16,11 @@ import {
   DollarSign,
 } from "lucide-react";
 import type { PageContent, RolePermission } from "@shared/schema";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
+  const { user } = useAuth();
+
   // Fetch home page content
   const { data: homeContent } = useQuery<PageContent[]>({
     queryKey: ['/api/content?page=home'],
@@ -62,6 +65,11 @@ export default function Home() {
 
   // Helper to check if user has permission for a calculator category
   const hasPermission = (categoryId: string): boolean => {
+    // Super Admins and Admins have access to everything
+    if (user?.role === 'super_admin' || user?.role === 'admin') {
+      return true;
+    }
+
     // If no permissions data yet, show nothing (loading state)
     if (!userPermissions) return false;
     
