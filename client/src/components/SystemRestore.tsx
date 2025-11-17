@@ -37,7 +37,7 @@ export default function SystemRestore() {
 
   const restoreMutation = useMutation({
     mutationFn: async (historyId: string) => {
-      return apiRequest('POST', `/api/admin/content-history/${historyId}/restore`);
+      return apiRequest(`/api/admin/content-history/${historyId}/restore`, 'POST');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/content'] });

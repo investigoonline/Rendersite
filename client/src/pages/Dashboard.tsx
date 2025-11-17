@@ -48,7 +48,7 @@ export default function Dashboard() {
 
   const updateRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
-      return apiRequest('PUT', `/api/admin/users/${userId}/role`, { role });
+      return apiRequest(`/api/admin/users/${userId}/role`, 'PUT', { role });
     },
     onSuccess: async () => {
       // Invalidate and refetch to ensure UI updates immediately
