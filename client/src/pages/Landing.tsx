@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,9 +22,11 @@ import {
   ShieldCheck,
   Bot,
 } from "lucide-react";
+import type { RolePermission } from "@shared/schema";
 
 const calculatorCategories = [
   {
+    id: "wealth_management",
     title: "Wealth Management",
     description:
       "Net worth tracking, debt ratio analysis, and wealth building strategies.",
@@ -31,6 +34,7 @@ const calculatorCategories = [
     calculators: ["Total Net Worth Calculator", "Income to Debt Ratio"],
   },
   {
+    id: "loans_credit",
     title: "Loans & Credit Cards",
     description:
       "Payoff strategies, payment schedules, and debt optimization tools.",
@@ -38,6 +42,7 @@ const calculatorCategories = [
     calculators: ["Loan Payoff Calculator", "Credit Card Debt Analysis"],
   },
   {
+    id: "real_estate",
     title: "Real Estate & Housing",
     description:
       "Home affordability, mortgage refinancing, and acceleration strategies.",
@@ -45,6 +50,7 @@ const calculatorCategories = [
     calculators: ["Home Affordability Calculator", "Mortgage Refinancing"],
   },
   {
+    id: "vehicle_financing",
     title: "Vehicle Financing",
     description:
       "Lease vs buy analysis, payment calculations, and affordability assessment.",
@@ -52,6 +58,7 @@ const calculatorCategories = [
     calculators: ["Lease Payment Calculator", "Car Affordability Analysis"],
   },
   {
+    id: "retirement_inflation",
     title: "Retirement & Inflation",
     description:
       "Retirement cost planning, RMD calculations, and inflation impact analysis.",
@@ -59,6 +66,7 @@ const calculatorCategories = [
     calculators: ["Cost of Retirement Calculator", "RMD Calculator"],
   },
   {
+    id: "estate_planning",
     title: "Estate Planning",
     description:
       "Estate tax calculations and planning recommendations for asset transfer.",
@@ -66,6 +74,7 @@ const calculatorCategories = [
     calculators: ["Estate Tax Calculator", "Tax Planning Tools"],
   },
   {
+    id: "taxes_iras",
     title: "Taxes & IRAs",
     description:
       "Income tax calculations, IRA eligibility, and Roth conversion analysis.",
@@ -76,6 +85,7 @@ const calculatorCategories = [
     ],
   },
   {
+    id: "credit_debt",
     title: "Credit & Debt Management",
     description:
       "Credit optimization strategies and debt management planning tools.",
@@ -89,6 +99,32 @@ const calculatorCategories = [
 
 export default function Landing() {
   const [guestModalOpen, setGuestModalOpen] = useState(false);
+
+  // Fetch user permissions
+  const { data: userPermissions } = useQuery<RolePermission[]>({
+    queryKey: ['/api/user/permissions'],
+  });
+
+  // Helper to check if user has permission for a calculator category
+  const hasPermission = (categoryId: string): boolean => {
+    // If no permissions data yet, show nothing (loading state)
+    if (!userPermissions) return false;
+    
+    // If user has no permissions (not logged in or no permissions set), show all
+    if (userPermissions.length === 0) return true;
+    
+    // Check if user has permission for this calculator category
+    return userPermissions.some(
+      permission => 
+        permission.resourceType === 'calculator_category' && 
+        permission.resourceId === categoryId
+    );
+  };
+
+  // Filter calculator categories based on permissions
+  const filteredCategories = calculatorCategories.filter((category) => 
+    hasPermission(category.id)
+  );
 
   return (
     <div className="min-h-screen bg-white">
@@ -121,8 +157,8 @@ export default function Landing() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {calculatorCategories.map((category) => (
-              <CalculatorCard key={category.title} {...category} />
+            {filteredCategories.map((category) => (
+              <CalculatorCard key={category.id} {...category} />
             ))}
           </div>
 
