@@ -15,12 +15,17 @@ import {
   Shield,
   DollarSign,
 } from "lucide-react";
-import type { PageContent } from "@shared/schema";
+import type { PageContent, RolePermission } from "@shared/schema";
 
 export default function Home() {
   // Fetch home page content
   const { data: homeContent } = useQuery<PageContent[]>({
     queryKey: ['/api/content?page=home'],
+  });
+
+  // Fetch user permissions
+  const { data: userPermissions } = useQuery<RolePermission[]>({
+    queryKey: ['/api/user/permissions'],
   });
 
   // Helper to get content by section
@@ -55,6 +60,27 @@ export default function Home() {
   const Badge1Icon = heroContent?.badge1Icon ? getIcon(heroContent.badge1Icon) : Sparkles;
   const Badge2Icon = heroContent?.badge2Icon ? getIcon(heroContent.badge2Icon) : Calculator;
 
+  // Helper to check if user has permission for a calculator category
+  const hasPermission = (categoryId: string): boolean => {
+    // If no permissions data yet, show nothing (loading state)
+    if (!userPermissions) return false;
+    
+    // If user has no permissions (not logged in or no permissions set), show all
+    if (userPermissions.length === 0) return true;
+    
+    // Check if user has permission for this calculator category
+    return userPermissions.some(
+      permission => 
+        permission.resourceType === 'calculator_category' && 
+        permission.resourceId === categoryId
+    );
+  };
+
+  // Filter calculator categories based on permissions
+  const filteredCategories = calculatorCategoriesContent?.categories?.filter((category: any) => 
+    hasPermission(category.id)
+  ) || [];
+
   return (
     <div className="min-h-screen bg-white py-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-12">
@@ -71,7 +97,7 @@ export default function Home() {
         </div>
 
         {/* Calculator Categories Section */}
-        {calculatorCategoriesContent && calculatorCategoriesContent.categories && calculatorCategoriesContent.categories.length > 0 && (
+        {calculatorCategoriesContent && filteredCategories.length > 0 && (
           <div className="mt-12">
             <div className="text-center mb-8">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
@@ -83,7 +109,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {calculatorCategoriesContent.categories?.map((category: any) => {
+              {filteredCategories.map((category: any) => {
                 const CategoryIcon = getIcon(category.icon);
                 return (
                   <Card 
