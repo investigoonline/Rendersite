@@ -407,7 +407,7 @@ export default function RetirementCalculator() {
             {/* Results Section */}
             {results && (
               <div className="mt-8 pt-8 border-t border-gray-200">
-                <TabsContent value="cost">
+                {calculatorType === "cost" && (
                   <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <div className="text-center p-6 bg-primary/5 rounded-lg">
                       <div className="text-2xl font-bold font-mono text-primary mb-2">
@@ -434,10 +434,9 @@ export default function RetirementCalculator() {
                       <div className="text-sm font-medium text-gray-700">Monthly Needed</div>
                     </div>
                   </div>
-                </TabsContent>
+                )}
 
-                <TabsContent value="rmd">
-                  {results.rmdAmount && (
+                {calculatorType === "rmd" && results.rmdAmount && (
                     <div className="text-center p-8 bg-primary/5 rounded-lg mb-8">
                       <h3 className="text-xl font-semibold text-gray-900 mb-2">
                         Required Minimum Distribution
@@ -447,11 +446,9 @@ export default function RetirementCalculator() {
                       </div>
                       <p className="text-muted-foreground">Annual RMD amount for current age</p>
                     </div>
-                  )}
-                </TabsContent>
+                )}
 
-                <TabsContent value="lifespan">
-                  {results.portfolioLifespan && (
+                {calculatorType === "lifespan" && results.portfolioLifespan && (
                     <div className="text-center p-8 bg-secondary/5 rounded-lg mb-8">
                       <h3 className="text-xl font-semibold text-gray-900 mb-2">
                         Portfolio Lifespan
@@ -463,8 +460,7 @@ export default function RetirementCalculator() {
                         How long your current savings will last using 4% withdrawal rule
                       </p>
                     </div>
-                  )}
-                </TabsContent>
+                )}
 
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">

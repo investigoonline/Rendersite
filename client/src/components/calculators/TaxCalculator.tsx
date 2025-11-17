@@ -435,7 +435,7 @@ export default function TaxCalculator() {
             {/* Results Section */}
             {results && (
               <div className="mt-8 pt-8 border-t border-gray-200">
-                <TabsContent value="federal_tax">
+                {calculatorType === "federal_tax" && (
                   <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <div className="text-center p-6 bg-primary/5 rounded-lg">
                       <div className="text-2xl font-bold font-mono text-primary mb-2">
@@ -462,10 +462,9 @@ export default function TaxCalculator() {
                       <div className="text-sm font-medium text-gray-700">After-Tax Income</div>
                     </div>
                   </div>
-                </TabsContent>
+                )}
 
-                <TabsContent value="estate_tax">
-                  {results.estateRax !== undefined && (
+                {calculatorType === "estate_tax" && results.estateRax !== undefined && (
                     <div className="text-center p-8 bg-primary/5 rounded-lg mb-8">
                       <h3 className="text-xl font-semibold text-gray-900 mb-2">
                         Federal Estate Tax
@@ -477,11 +476,9 @@ export default function TaxCalculator() {
                         Tax owed on estate value above federal exemption
                       </p>
                     </div>
-                  )}
-                </TabsContent>
+                )}
 
-                <TabsContent value="ira_eligibility">
-                  {results.iraEligible !== undefined && (
+                {calculatorType === "ira_eligibility" && results.iraEligible !== undefined && (
                     <div className="grid md:grid-cols-2 gap-6 mb-8">
                       <div className="text-center p-6 bg-primary/5 rounded-lg">
                         <div className="text-2xl font-bold text-primary mb-2">
@@ -496,11 +493,9 @@ export default function TaxCalculator() {
                         <div className="text-sm font-medium text-gray-700">Contribution Limit</div>
                       </div>
                     </div>
-                  )}
-                </TabsContent>
+                )}
 
-                <TabsContent value="tax_deferred">
-                  {results.taxSavings !== undefined && (
+                {calculatorType === "tax_deferred" && results.taxSavings !== undefined && (
                     <div className="text-center p-8 bg-secondary/5 rounded-lg mb-8">
                       <h3 className="text-xl font-semibold text-gray-900 mb-2">
                         Tax Savings from IRA Contribution
@@ -512,8 +507,7 @@ export default function TaxCalculator() {
                         Annual tax savings from traditional IRA contributions
                       </p>
                     </div>
-                  )}
-                </TabsContent>
+                )}
 
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
