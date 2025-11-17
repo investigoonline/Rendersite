@@ -11,8 +11,6 @@ import type { PageContent, LoginHistory, User } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import RolesManagementDesign1 from "@/components/roles/RolesManagementDesign1";
-import RolesManagementDesign2 from "@/components/roles/RolesManagementDesign2";
-import RolesManagementDesign3 from "@/components/roles/RolesManagementDesign3";
 import SystemRestore from "@/components/SystemRestore";
 
 interface DashboardStats {
@@ -28,7 +26,6 @@ interface UserWithRoles extends User {
 export default function Dashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [selectedDesign, setSelectedDesign] = useState<"design1" | "design2" | "design3">("design1");
 
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
     queryKey: ['/api/admin/dashboard-stats'],
@@ -251,44 +248,7 @@ export default function Dashboard() {
 
           {/* Roles Management Tab */}
           <TabsContent value="roles" className="mt-6">
-            <div className="space-y-6">
-              {/* Design Selector */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Choose Design Preview</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex gap-4">
-                    <Button
-                      variant={selectedDesign === "design1" ? "default" : "outline"}
-                      onClick={() => setSelectedDesign("design1")}
-                      data-testid="button-select-design1"
-                    >
-                      Design 1: Matrix View
-                    </Button>
-                    <Button
-                      variant={selectedDesign === "design2" ? "default" : "outline"}
-                      onClick={() => setSelectedDesign("design2")}
-                      data-testid="button-select-design2"
-                    >
-                      Design 2: Card Groups
-                    </Button>
-                    <Button
-                      variant={selectedDesign === "design3" ? "default" : "outline"}
-                      onClick={() => setSelectedDesign("design3")}
-                      data-testid="button-select-design3"
-                    >
-                      Design 3: Role-First
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Design Preview */}
-              {selectedDesign === "design1" && <RolesManagementDesign1 />}
-              {selectedDesign === "design2" && <RolesManagementDesign2 />}
-              {selectedDesign === "design3" && <RolesManagementDesign3 />}
-            </div>
+            <RolesManagementDesign1 />
           </TabsContent>
 
           {/* System Restore Tab */}
