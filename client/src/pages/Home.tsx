@@ -63,8 +63,8 @@ export default function Home() {
   const Badge1Icon = heroContent?.badge1Icon ? getIcon(heroContent.badge1Icon) : Sparkles;
   const Badge2Icon = heroContent?.badge2Icon ? getIcon(heroContent.badge2Icon) : Calculator;
 
-  // Helper to check if user has permission for a calculator category
-  const hasPermission = (categoryId: string): boolean => {
+  // Helper to check if user has permission for a specific calculator
+  const hasCalculatorPermission = (calculatorName: string): boolean => {
     // Super Admins and Admins have access to everything
     if (user?.role === 'super_admin' || user?.role === 'admin') {
       return true;
@@ -76,17 +76,28 @@ export default function Home() {
     // If user has no permissions (not logged in or no permissions set), show all
     if (userPermissions.length === 0) return true;
     
-    // Check if user has permission for this calculator category
+    // Check if user has permission for this specific calculator
     return userPermissions.some(
       permission => 
-        permission.resourceType === 'calculator_category' && 
-        permission.resourceId === categoryId
+        permission.resourceType === 'calculator' && 
+        permission.resourceId === calculatorName
     );
   };
 
-  // Filter calculator categories based on permissions
-  const filteredCategories = calculatorCategoriesContent?.categories?.filter((category: any) => 
-    hasPermission(category.id)
+  // Filter categories and their calculators based on permissions
+  const filteredCategories = calculatorCategoriesContent?.categories?.map((category: any) => {
+    // Filter calculators within this category
+    const filteredCalculators = category.calculators?.filter((calc: string) => 
+      hasCalculatorPermission(calc)
+    ) || [];
+    
+    return {
+      ...category,
+      calculators: filteredCalculators
+    };
+  }).filter((category: any) => 
+    // Only show categories that have at least one accessible calculator
+    category.calculators && category.calculators.length > 0
   ) || [];
 
   return (
