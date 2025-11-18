@@ -25,8 +25,16 @@ export function useCalculatorPermission(calculatorName: string) {
     };
   }
 
-  // If user has no permissions (not logged in or no permissions set), deny access to calculators
-  if (userPermissions.length === 0) {
+  // If not logged in and no permissions, show all (for non-authenticated users)
+  if (!user && userPermissions.length === 0) {
+    return {
+      hasPermission: true,
+      isLoading: false,
+    };
+  }
+
+  // If logged in but has no permissions configured, deny access
+  if (user && userPermissions.length === 0) {
     return {
       hasPermission: false,
       isLoading: false,

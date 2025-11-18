@@ -117,8 +117,11 @@ export default function Landing() {
     // If no permissions data yet, show nothing (loading state)
     if (!userPermissions) return false;
     
-    // If user has no permissions (not logged in or no permissions set), show all
-    if (userPermissions.length === 0) return true;
+    // If not logged in and no permissions, show all (for non-authenticated users)
+    if (!user && userPermissions.length === 0) return true;
+    
+    // If logged in but has no permissions configured, deny access
+    if (user && userPermissions.length === 0) return false;
     
     // Check if user has permission for this specific calculator
     return userPermissions.some(
