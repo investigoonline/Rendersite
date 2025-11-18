@@ -16,7 +16,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { PlusCircle, MinusCircle, Save, Download, Mail } from "lucide-react";
+import { PlusCircle, MinusCircle, Save, Download, Mail, Lock } from "lucide-react";
+import { useCalculatorPermission } from "@/hooks/useCalculatorPermission";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const netWorthSchema = z.object({
   assets: z.object({
@@ -37,6 +39,7 @@ type NetWorthForm = z.infer<typeof netWorthSchema>;
 
 export default function NetWorthCalculator() {
   const { toast } = useToast();
+  const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission("Total Net Worth");
   const [results, setResults] = useState<{
     totalAssets: number;
     totalLiabilities: number;
@@ -381,10 +384,28 @@ export default function NetWorthCalculator() {
             </div>
 
             {/* Calculate Button */}
-            <div className="flex justify-center">
-              <Button type="submit" size="lg" className="px-8">
-                Calculate Net Worth
-              </Button>
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                <Button 
+                  type="submit" 
+                  size="lg" 
+                  className="px-8"
+                  disabled={!hasPermission || permissionLoading}
+                  data-testid="button-calculate"
+                >
+                  {!hasPermission && <Lock className="mr-2 h-4 w-4" />}
+                  Calculate Net Worth
+                </Button>
+              </div>
+              
+              {!hasPermission && !permissionLoading && (
+                <Alert className="border-amber-200 bg-amber-50">
+                  <Lock className="h-4 w-4 text-amber-600" />
+                  <AlertDescription className="text-amber-800">
+                    This calculator is not available with your current account. <a href="/contact" className="underline font-medium">Contact us to upgrade your account</a> and unlock all features.
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
 
             {/* Results Section */}
