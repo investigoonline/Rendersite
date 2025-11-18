@@ -176,12 +176,40 @@ export default function RolesManagementDesign1() {
     setExpandedCategories(newExpanded);
   };
 
+  // Helper to get all children of a resource (recursive)
+  const getAllChildren = (parentResource: string): string[] => {
+    const directChildren = permissions.filter(p => p.parentId === parentResource);
+    const allChildren: string[] = [];
+    
+    directChildren.forEach(child => {
+      allChildren.push(child.resource);
+      // Recursively get children of children
+      const grandChildren = getAllChildren(child.resource);
+      allChildren.push(...grandChildren);
+    });
+    
+    return allChildren;
+  };
+
   const togglePermission = (roleId: string, resource: string) => {
     setRolePermissions(prev => {
       const current = prev[roleId] || [];
-      const newPermissions = current.includes(resource)
-        ? current.filter(r => r !== resource)
-        : [...current, resource];
+      const isCurrentlyChecked = current.includes(resource);
+      
+      // Get all children of this resource
+      const children = getAllChildren(resource);
+      
+      let newPermissions: string[];
+      
+      if (isCurrentlyChecked) {
+        // Unchecking: remove this resource and all its children
+        newPermissions = current.filter(r => r !== resource && !children.includes(r));
+      } else {
+        // Checking: add this resource and all its children
+        const toAdd = [resource, ...children];
+        newPermissions = [...current, ...toAdd.filter(r => !current.includes(r))];
+      }
+      
       return { ...prev, [roleId]: newPermissions };
     });
   };
