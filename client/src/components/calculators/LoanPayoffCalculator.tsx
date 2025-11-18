@@ -16,7 +16,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { CreditCard, Save, Download, Mail } from "lucide-react";
+import { CreditCard, Save, Download, Mail, Lock } from "lucide-react";
+import { useCalculatorPermission } from "@/hooks/useCalculatorPermission";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const loanPayoffSchema = z.object({
   principal: z.coerce.number().min(1, "Principal amount is required"),
@@ -29,6 +31,7 @@ type LoanPayoffForm = z.infer<typeof loanPayoffSchema>;
 
 export default function LoanPayoffCalculator() {
   const { toast } = useToast();
+  const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission("Loan Payoff Calculator");
   const [results, setResults] = useState<{
     monthsToPayoff: number;
     totalInterest: number;
@@ -288,10 +291,28 @@ export default function LoanPayoffCalculator() {
             </div>
 
             {/* Calculate Button */}
-            <div className="flex justify-center">
-              <Button type="submit" size="lg" className="px-8">
-                Calculate Payoff Schedule
-              </Button>
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                <Button 
+                  type="submit" 
+                  size="lg" 
+                  className="px-8"
+                  disabled={!hasPermission || permissionLoading}
+                  data-testid="button-calculate"
+                >
+                  {!hasPermission && <Lock className="mr-2 h-4 w-4" />}
+                  Calculate Payoff Schedule
+                </Button>
+              </div>
+              
+              {!hasPermission && !permissionLoading && (
+                <Alert className="border-amber-200 bg-amber-50">
+                  <Lock className="h-4 w-4 text-amber-600" />
+                  <AlertDescription className="text-amber-800">
+                    This calculator is not available with your current account. <a href="/contact" className="underline font-medium">Contact us to upgrade your account</a> and unlock all features.
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
 
             {/* Results Section */}

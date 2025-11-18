@@ -18,7 +18,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { FileText, Save, Download, Mail } from "lucide-react";
+import { FileText, Save, Download, Mail, Lock } from "lucide-react";
+import { useCalculatorPermission } from "@/hooks/useCalculatorPermission";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const taxSchema = z.object({
   filingStatus: z.enum(["single", "married_filing_jointly", "married_filing_separately", "head_of_household"]),
@@ -40,6 +42,18 @@ type TaxForm = z.infer<typeof taxSchema>;
 export default function TaxCalculator() {
   const { toast } = useToast();
   const [calculatorType, setCalculatorType] = useState("federal_tax");
+  
+  // Map calculator type to permission name
+  const calculatorNameMap: Record<string, string> = {
+    federal_tax: "Federal Income Tax",
+    estate_tax: "Estate Tax Calculator",
+    ira: "IRA Eligibility",
+  };
+  
+  const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission(
+    calculatorNameMap[calculatorType]
+  );
+  
   const [results, setResults] = useState<{
     federalTax: number;
     stateTax: number;
@@ -426,10 +440,28 @@ export default function TaxCalculator() {
             </div>
 
             {/* Calculate Button */}
-            <div className="flex justify-center">
-              <Button type="submit" size="lg" className="px-8">
-                Calculate Taxes
-              </Button>
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                <Button 
+                  type="submit" 
+                  size="lg" 
+                  className="px-8"
+                  disabled={!hasPermission || permissionLoading}
+                  data-testid="button-calculate"
+                >
+                  {!hasPermission && <Lock className="mr-2 h-4 w-4" />}
+                  Calculate Taxes
+                </Button>
+              </div>
+              
+              {!hasPermission && !permissionLoading && (
+                <Alert className="border-amber-200 bg-amber-50">
+                  <Lock className="h-4 w-4 text-amber-600" />
+                  <AlertDescription className="text-amber-800">
+                    This calculator is not available with your current account. <a href="/contact" className="underline font-medium">Contact us to upgrade your account</a> and unlock all features.
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
 
             {/* Results Section */}

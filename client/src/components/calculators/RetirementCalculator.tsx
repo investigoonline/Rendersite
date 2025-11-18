@@ -17,7 +17,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { PiggyBank, Save, Download, Mail } from "lucide-react";
+import { PiggyBank, Save, Download, Mail, Lock } from "lucide-react";
+import { useCalculatorPermission } from "@/hooks/useCalculatorPermission";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const retirementSchema = z.object({
   currentAge: z.coerce.number().min(18).max(100, "Age must be between 18 and 100"),
@@ -36,6 +38,18 @@ type RetirementForm = z.infer<typeof retirementSchema>;
 export default function RetirementCalculator() {
   const { toast } = useToast();
   const [calculatorType, setCalculatorType] = useState("cost");
+  
+  // Map calculator type to permission name
+  const calculatorNameMap: Record<string, string> = {
+    cost: "Cost of Retirement",
+    rmd: "Required Minimum Distributions",
+    inflation: "Impact of Inflation",
+  };
+  
+  const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission(
+    calculatorNameMap[calculatorType]
+  );
+  
   const [results, setResults] = useState<{
     retirementGoal: number;
     monthlyNeeded: number;
@@ -398,10 +412,28 @@ export default function RetirementCalculator() {
             </div>
 
             {/* Calculate Button */}
-            <div className="flex justify-center">
-              <Button type="submit" size="lg" className="px-8">
-                Calculate Retirement Plan
-              </Button>
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                <Button 
+                  type="submit" 
+                  size="lg" 
+                  className="px-8"
+                  disabled={!hasPermission || permissionLoading}
+                  data-testid="button-calculate"
+                >
+                  {!hasPermission && <Lock className="mr-2 h-4 w-4" />}
+                  Calculate Retirement Plan
+                </Button>
+              </div>
+              
+              {!hasPermission && !permissionLoading && (
+                <Alert className="border-amber-200 bg-amber-50">
+                  <Lock className="h-4 w-4 text-amber-600" />
+                  <AlertDescription className="text-amber-800">
+                    This calculator is not available with your current account. <a href="/contact" className="underline font-medium">Contact us to upgrade your account</a> and unlock all features.
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
 
             {/* Results Section */}
