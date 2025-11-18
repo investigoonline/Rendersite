@@ -107,45 +107,8 @@ export default function Landing() {
     queryKey: ['/api/user/permissions'],
   });
 
-  // Helper to check if user has permission for a specific calculator
-  const hasCalculatorPermission = (calculatorName: string): boolean => {
-    // Super Admins and Admins have access to everything
-    if (user?.role === 'super_admin' || user?.role === 'admin') {
-      return true;
-    }
-
-    // If no permissions data yet, show nothing (loading state)
-    if (!userPermissions) return false;
-    
-    // If not logged in and no permissions, show all (for non-authenticated users)
-    if (!user && userPermissions.length === 0) return true;
-    
-    // If logged in but has no permissions configured, deny access
-    if (user && userPermissions.length === 0) return false;
-    
-    // Check if user has permission for this specific calculator
-    return userPermissions.some(
-      permission => 
-        permission.resourceType === 'calculator' && 
-        permission.resourceId === calculatorName
-    );
-  };
-
-  // Filter categories and their calculators based on permissions
-  const filteredCategories = calculatorCategories.map((category) => {
-    // Filter calculators within this category
-    const filteredCalculators = category.calculators.filter((calc: any) => 
-      hasCalculatorPermission(calc.name)
-    );
-    
-    return {
-      ...category,
-      calculators: filteredCalculators
-    };
-  }).filter((category) => 
-    // Only show categories that have at least one accessible calculator
-    category.calculators.length > 0
-  );
+  // Show all categories without filtering
+  const filteredCategories = calculatorCategories;
 
   return (
     <div className="min-h-screen bg-white">
