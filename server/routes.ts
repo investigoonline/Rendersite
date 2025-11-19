@@ -711,6 +711,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get permissions for the user's role
       const permissions = await storage.getRolePermissionsByRole(userRole || 'client');
+      
+      // Debug: Log what we're returning
+      console.log(`[DEBUG] User ${userId} (${userRole}) has ${permissions.length} permissions`);
+      const calcPerms = permissions.filter(p => p.resourceType === 'calculator');
+      console.log(`[DEBUG] Calculator permissions (${calcPerms.length}):`, calcPerms.map(p => p.resourceId));
+      
       res.json(permissions);
     } catch (error) {
       console.error("Error fetching user permissions:", error);

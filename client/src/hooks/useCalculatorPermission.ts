@@ -41,11 +41,27 @@ export function useCalculatorPermission(calculatorName: string) {
     };
   }
 
+  // Debug: Log all permissions to see their structure
+  if (userPermissions && userPermissions.length > 0 && calculatorName.includes("Tax")) {
+    console.log("[DEBUG] All permissions for user:", userPermissions);
+    console.log("[DEBUG] Looking for calculator:", calculatorName);
+    console.log("[DEBUG] First permission structure:", userPermissions[0]);
+  }
+
   // Check if user has permission for this specific calculator
   const hasPermission = userPermissions.some(
-    permission => 
-      permission.resourceType === 'calculator' && 
-      permission.resourceId === calculatorName
+    permission => {
+      const matches = permission.resourceType === 'calculator' && permission.resourceId === calculatorName;
+      if (calculatorName.includes("Tax")) {
+        console.log("[DEBUG] Checking permission:", {
+          resourceType: permission.resourceType,
+          resourceId: permission.resourceId,
+          calculatorName,
+          matches
+        });
+      }
+      return matches;
+    }
   );
 
   return {
