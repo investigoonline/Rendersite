@@ -37,9 +37,13 @@ const netWorthSchema = z.object({
 
 type NetWorthForm = z.infer<typeof netWorthSchema>;
 
-export default function NetWorthCalculator() {
+interface NetWorthCalculatorProps {
+  calculatorName?: string;
+}
+
+export default function NetWorthCalculator({ calculatorName = "Total Net Worth Calculator" }: NetWorthCalculatorProps = {}) {
   const { toast } = useToast();
-  const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission("Total Net Worth");
+  const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission(calculatorName);
   const [results, setResults] = useState<{
     totalAssets: number;
     totalLiabilities: number;

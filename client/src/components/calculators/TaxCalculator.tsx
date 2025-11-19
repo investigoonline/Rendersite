@@ -39,20 +39,15 @@ const taxSchema = z.object({
 
 type TaxForm = z.infer<typeof taxSchema>;
 
-export default function TaxCalculator() {
+interface TaxCalculatorProps {
+  calculatorName?: string;
+}
+
+export default function TaxCalculator({ calculatorName = "Federal Income Tax Calculator" }: TaxCalculatorProps = {}) {
   const { toast } = useToast();
   const [calculatorType, setCalculatorType] = useState("federal_tax");
   
-  // Map calculator type to permission name
-  const calculatorNameMap: Record<string, string> = {
-    federal_tax: "Federal Income Tax",
-    estate_tax: "Estate Tax Calculator",
-    ira: "IRA Eligibility",
-  };
-  
-  const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission(
-    calculatorNameMap[calculatorType]
-  );
+  const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission(calculatorName);
   
   const [results, setResults] = useState<{
     federalTax: number;

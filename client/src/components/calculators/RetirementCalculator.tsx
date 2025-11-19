@@ -35,20 +35,15 @@ const retirementSchema = z.object({
 
 type RetirementForm = z.infer<typeof retirementSchema>;
 
-export default function RetirementCalculator() {
+interface RetirementCalculatorProps {
+  calculatorName?: string;
+}
+
+export default function RetirementCalculator({ calculatorName = "Cost of Retirement Calculator" }: RetirementCalculatorProps = {}) {
   const { toast } = useToast();
   const [calculatorType, setCalculatorType] = useState("cost");
   
-  // Map calculator type to permission name
-  const calculatorNameMap: Record<string, string> = {
-    cost: "Cost of Retirement",
-    rmd: "Required Minimum Distributions",
-    inflation: "Impact of Inflation",
-  };
-  
-  const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission(
-    calculatorNameMap[calculatorType]
-  );
+  const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission(calculatorName);
   
   const [results, setResults] = useState<{
     retirementGoal: number;

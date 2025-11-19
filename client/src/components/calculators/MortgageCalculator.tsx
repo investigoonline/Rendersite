@@ -34,20 +34,15 @@ const mortgageSchema = z.object({
 
 type MortgageForm = z.infer<typeof mortgageSchema>;
 
-export default function MortgageCalculator() {
+interface MortgageCalculatorProps {
+  calculatorName?: string;
+}
+
+export default function MortgageCalculator({ calculatorName = "Home Affordability Calculator" }: MortgageCalculatorProps = {}) {
   const { toast } = useToast();
   const [calculatorType, setCalculatorType] = useState("affordability");
   
-  // Map calculator type to permission name
-  const calculatorNameMap: Record<string, string> = {
-    affordability: "Home Affordability",
-    refinancing: "Mortgage Refinancing",
-    acceleration: "Mortgage Acceleration",
-  };
-  
-  const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission(
-    calculatorNameMap[calculatorType]
-  );
+  const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission(calculatorName);
   
   const [results, setResults] = useState<{
     monthlyPayment: number;

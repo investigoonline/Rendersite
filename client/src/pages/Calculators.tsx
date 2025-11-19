@@ -225,7 +225,7 @@ export default function Calculators() {
               {currentCategory?.description}
             </p>
           </div>
-          <CalculatorComponent />
+          <CalculatorComponent calculatorName={currentCalculatorData.name} />
         </div>
       </div>
     );

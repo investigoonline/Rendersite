@@ -29,9 +29,13 @@ const loanPayoffSchema = z.object({
 
 type LoanPayoffForm = z.infer<typeof loanPayoffSchema>;
 
-export default function LoanPayoffCalculator() {
+interface LoanPayoffCalculatorProps {
+  calculatorName?: string;
+}
+
+export default function LoanPayoffCalculator({ calculatorName = "Loan Payoff Calculator" }: LoanPayoffCalculatorProps = {}) {
   const { toast } = useToast();
-  const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission("Loan Payoff Calculator");
+  const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission(calculatorName);
   const [results, setResults] = useState<{
     monthsToPayoff: number;
     totalInterest: number;
