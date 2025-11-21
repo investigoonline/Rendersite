@@ -35,11 +35,11 @@ export default function Footer() {
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Company Information */}
           <div className="lg:col-span-1">
-            <div className="mb-4">
+            <div className="mb-4 bg-white p-2 rounded inline-block">
               <img 
                 src={ifsLogo} 
                 alt="IFS Wealth Management" 
-                className="h-12 w-auto object-contain brightness-0 invert"
+                className="h-12 w-auto object-contain"
               />
             </div>
             <p className="text-gray-400 text-sm mb-4" data-testid="text-footer-tagline">
