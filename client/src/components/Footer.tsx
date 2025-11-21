@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ChartLine, Linkedin, Twitter, Facebook } from "lucide-react";
 import type { PageContent } from "@shared/schema";
+import ifsLogo from "@assets/image_1763735441524.jpeg";
 
 export default function Footer() {
   // Fetch footer content
@@ -34,16 +35,12 @@ export default function Footer() {
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Company Information */}
           <div className="lg:col-span-1">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <ChartLine className="text-white h-4 w-4" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold" data-testid="text-footer-company-name">
-                  {companyDetails?.name || 'Investigoonline'}
-                </h3>
-                <p className="text-xs text-gray-400">by IFS Group</p>
-              </div>
+            <div className="mb-4">
+              <img 
+                src={ifsLogo} 
+                alt="IFS Wealth Management" 
+                className="h-12 w-auto object-contain brightness-0 invert"
+              />
             </div>
             <p className="text-gray-400 text-sm mb-4" data-testid="text-footer-tagline">
               {companyDetails?.tagline || 'Professional financial planning platform powered by 40+ years of IFS Group expertise.'}

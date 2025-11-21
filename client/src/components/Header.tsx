@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ChartLine, ChevronDown, Menu, User } from "lucide-react";
 import GuestAccessModal from "./modals/GuestAccessModal";
 import ClientLoginModal from "./modals/ClientLoginModal";
+import ifsLogo from "@assets/image_1763735441524.jpeg";
 
 export default function Header() {
   const [location] = useLocation();
@@ -50,14 +51,12 @@ export default function Header() {
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2 min-w-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
-                <ChartLine className="text-white h-4 w-4 sm:h-5 sm:w-5" />
-              </div>
-              <div className="min-w-0">
-                <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">Investigoonline</h1>
-                <p className="text-xs text-muted-foreground hidden sm:block">by IFS Group</p>
-              </div>
+            <Link href="/" className="flex items-center min-w-0">
+              <img 
+                src={ifsLogo} 
+                alt="IFS Wealth Management" 
+                className="h-10 sm:h-12 w-auto object-contain"
+              />
             </Link>
 
             {/* Desktop Navigation */}
