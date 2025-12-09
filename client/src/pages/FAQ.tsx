@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { HelpCircle, Search, ChevronDown, ChevronUp } from "lucide-react";
+import faqImage from "@assets/FAQ's_1765300417805.png";
 
 const faqData = [
   {
@@ -115,16 +116,14 @@ export default function FAQ() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Frequently Asked Questions
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Find answers to common questions about our platform, services, and
-            financial planning tools.
-          </p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header Image */}
+        <div className="mb-12">
+          <img 
+            src={faqImage} 
+            alt="Frequently Asked Questions" 
+            className="w-full h-auto rounded-lg shadow-lg object-cover"
+          />
         </div>
 
         {/* Search */}
