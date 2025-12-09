@@ -131,6 +131,15 @@ export default function Contact() {
           </div>
         )}
 
+        {/* Contact Us Image Section */}
+        <div className="w-full mb-12">
+          <img 
+            src={contactImage} 
+            alt="IFS Wealth Management - Contact Us" 
+            className="w-full h-auto rounded-lg shadow-lg object-cover"
+          />
+        </div>
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Contact Form */}
           <div className="lg:col-span-2">
@@ -289,15 +298,6 @@ export default function Contact() {
 
             <Card></Card>
           </div>
-        </div>
-
-        {/* Contact Us Image Section */}
-        <div className="w-full my-12">
-          <img 
-            src={contactImage} 
-            alt="IFS Wealth Management - Contact Us" 
-            className="w-full h-auto rounded-lg shadow-lg object-cover"
-          />
         </div>
 
         {/* Additional Information */}
