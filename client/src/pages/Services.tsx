@@ -6,6 +6,7 @@ import * as LucideIcons from "lucide-react";
 import { CheckCircle, Calendar, Phone, FileText } from "lucide-react";
 import type { PageContent } from "@shared/schema";
 import { HTMLContent } from "@/components/HTMLContent";
+import servicesImage from "@assets/Services_1765299577367.png";
 
 interface ServiceContent {
   id: string;
@@ -165,6 +166,15 @@ export default function Services() {
             })}
           </div>
         )}
+
+        {/* Services Image Section */}
+        <div className="w-full mb-12 sm:mb-16 px-4">
+          <img 
+            src={servicesImage} 
+            alt="IFS Wealth Management professional services team" 
+            className="w-full h-auto rounded-lg shadow-lg object-cover"
+          />
+        </div>
 
         {/* Services Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-12 sm:mb-16 px-4">
