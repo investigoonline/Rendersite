@@ -122,14 +122,14 @@ export default function Landing() {
             className="w-full h-auto rounded-lg shadow-lg object-cover"
           />
         </div>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-center">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-center">
+        <div className="mx-auto space-y-8 text-center">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-center">
             <span className="text-primary">
               Welcome to IFS Wealth Management Inc- Your Trusted Partner in Wealth Management
             </span>
           </h1>
 
-          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed text-center">
+          <p className="text-xl sm:text-2xl text-gray-600 mx-auto leading-relaxed text-center">
             At IFS Wealth Management Inc, we understand that managing wealth is not just about numbers; it's about realizing your dreams, securing your future, and achieving financial freedom. As a leading wealth management firm, we are dedicated to providing personalized solutions and expert guidance to help you navigate the complexities of financial planning and investment management.
           </p>
         </div>
@@ -139,12 +139,11 @@ export default function Landing() {
       <section id="calculators" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-6">
               Complete Financial Calculator Suite
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              32+ professional-grade calculators across 8 categories. From basic
-              budgeting to complex estate planning.
+            <p className="text-2xl sm:text-3xl text-muted-foreground mx-auto">
+              32+ professional-grade calculators across 8 categories. From basic budgeting to complex estate planning.
             </p>
           </div>
 
