@@ -26,6 +26,7 @@ import {
   Search,
   Calculator,
 } from "lucide-react";
+import calculatorsImage from "@assets/Calculators_1765301634531.png";
 
 const calculatorCategories = [
   {
@@ -243,6 +244,15 @@ export default function Calculators() {
             Access our complete collection of 32+ professional-grade financial calculators. 
             Make informed decisions with real-time calculations and personalized insights.
           </p>
+
+          {/* Hero Image */}
+          <div className="w-full mb-8">
+            <img 
+              src={calculatorsImage} 
+              alt="Financial planning and calculators" 
+              className="w-full h-auto rounded-lg shadow-lg object-cover"
+            />
+          </div>
           
           {/* Search */}
           <div className="max-w-md mx-auto relative">
