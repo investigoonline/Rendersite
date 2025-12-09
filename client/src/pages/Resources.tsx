@@ -189,6 +189,17 @@ export default function Resources() {
           </div>
         )}
 
+        {/* Rotating Image Carousel for Articles */}
+        {selectedType === "article" && (
+          <div className="w-full mb-8">
+            <img 
+              src={carouselImages[currentImageIndex]} 
+              alt="Resource carousel" 
+              className="w-full h-auto rounded-lg shadow-lg object-cover"
+            />
+          </div>
+        )}
+
         {/* Search and Filters */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="flex-1 relative">
@@ -219,17 +230,6 @@ export default function Resources() {
           {/* Content for each resource type */}
           {resourceTypes.map((type: any) => (
             <TabsContent key={type.dbId} value={type.id} className="space-y-6">
-              {/* Rotating Image Carousel for Articles */}
-              {type.id === "article" && (
-                <div className="w-full mb-8">
-                  <img 
-                    src={carouselImages[currentImageIndex]} 
-                    alt="Resource carousel" 
-                    className="w-full h-auto rounded-lg shadow-lg object-cover"
-                  />
-                </div>
-              )}
-
               <div>
                 {type.showBadge !== false && (
                   <div className="mb-4">
