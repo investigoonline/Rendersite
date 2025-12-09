@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,10 @@ import {
 } from "lucide-react";
 import type { PageContent } from "@shared/schema";
 import { HTMLContent } from "@/components/HTMLContent";
+import cashImage from "@assets/image_1765301156968.png";
+import riskImage from "@assets/image_1765301191599.png";
+import retirementImage from "@assets/image_1765301218910.png";
+import investingImage from "@assets/image_1765301276527.png";
 
 interface ResourceType {
   id: string;
@@ -42,12 +46,28 @@ interface ResourceType {
   description: string;
 }
 
+const carouselImages = [
+  cashImage,
+  riskImage,
+  retirementImage,
+  investingImage,
+];
+
 export default function Resources() {
   const { toast } = useToast();
   const [selectedType, setSelectedType] = useState("article");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [viewingResource, setViewingResource] = useState<any | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Rotate carousel images every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % carouselImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Fetch resource types content
   const { data: resourceTypesContent } = useQuery<PageContent[]>({
@@ -209,6 +229,17 @@ export default function Resources() {
                   <HTMLContent content={type.description} className="text-muted-foreground" />
                 </div>
               </div>
+
+              {/* Rotating Image Carousel for Articles */}
+              {type.id === "article" && (
+                <div className="w-full mb-8">
+                  <img 
+                    src={carouselImages[currentImageIndex]} 
+                    alt="Resource carousel" 
+                    className="w-full h-auto rounded-lg shadow-lg object-cover"
+                  />
+                </div>
+              )}
 
               {/* Special handling for Newsletter */}
               {type.id === "newsletter" && (
