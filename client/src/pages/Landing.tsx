@@ -8,6 +8,7 @@ import CalculatorCard from "@/components/calculators/CalculatorCard";
 import NetWorthCalculator from "@/components/calculators/NetWorthCalculator";
 import GuestAccessModal from "@/components/modals/GuestAccessModal";
 import { HTMLContent } from "@/components/HTMLContent";
+import homeHeroImage from "@assets/Home_(1)_1765298801223.png";
 import {
   PieChart,
   CreditCard,
@@ -114,8 +115,15 @@ export default function Landing() {
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="space-y-6">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <img 
+              src={homeHeroImage} 
+              alt="Family enjoying financial freedom" 
+              className="w-full h-auto rounded-lg shadow-lg"
+            />
+          </div>
+          <div className="space-y-6 text-center">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
               <span className="text-primary">Welcome to IFS Wealth Management Inc- Your Trusted Partner in Wealth Management</span>
             </h1>
