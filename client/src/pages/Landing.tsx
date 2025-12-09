@@ -8,7 +8,7 @@ import CalculatorCard from "@/components/calculators/CalculatorCard";
 import NetWorthCalculator from "@/components/calculators/NetWorthCalculator";
 import GuestAccessModal from "@/components/modals/GuestAccessModal";
 import { HTMLContent } from "@/components/HTMLContent";
-import homeHeroImage from "@assets/Home_(1)_1765298801223.png";
+import homeHeroImage from "@assets/Home_(2)_1765299273068.png";
 import {
   PieChart,
   CreditCard,
