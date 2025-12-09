@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import * as Icons from "lucide-react";
 import type { PageContent } from "@shared/schema";
+import contactImage from "@assets/Contact_Us_1765299919540.png";
 
 export default function Contact() {
   // Fetch contact content with proper query parameter
@@ -288,6 +289,15 @@ export default function Contact() {
 
             <Card></Card>
           </div>
+        </div>
+
+        {/* Contact Us Image Section */}
+        <div className="w-full my-12">
+          <img 
+            src={contactImage} 
+            alt="IFS Wealth Management - Contact Us" 
+            className="w-full h-auto rounded-lg shadow-lg object-cover"
+          />
         </div>
 
         {/* Additional Information */}
