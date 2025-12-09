@@ -219,17 +219,6 @@ export default function Resources() {
           {/* Content for each resource type */}
           {resourceTypes.map((type: any) => (
             <TabsContent key={type.dbId} value={type.id} className="space-y-6">
-              <div>
-                {type.showBadge !== false && (
-                  <div className="mb-4">
-                    <HTMLContent content={type.badgeText || type.name} className="" />
-                  </div>
-                )}
-                <div className="text-center">
-                  <HTMLContent content={type.description} className="text-muted-foreground" />
-                </div>
-              </div>
-
               {/* Rotating Image Carousel for Articles */}
               {type.id === "article" && (
                 <div className="w-full mb-8">
@@ -240,6 +229,17 @@ export default function Resources() {
                   />
                 </div>
               )}
+
+              <div>
+                {type.showBadge !== false && (
+                  <div className="mb-4">
+                    <HTMLContent content={type.badgeText || type.name} className="" />
+                  </div>
+                )}
+                <div className="text-center">
+                  <HTMLContent content={type.description} className="text-muted-foreground" />
+                </div>
+              </div>
 
               {/* Special handling for Newsletter */}
               {type.id === "newsletter" && (
