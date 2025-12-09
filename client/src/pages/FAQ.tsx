@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { HelpCircle, Search, ChevronDown, ChevronUp } from "lucide-react";
-import faqImage from "@assets/FAQ's_1765300417805.png";
+import faqImage from "@assets/image_1765300607561.png";
 
 const faqData = [
   {
