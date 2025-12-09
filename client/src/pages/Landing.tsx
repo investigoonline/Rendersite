@@ -105,7 +105,7 @@ export default function Landing() {
 
   // Fetch user permissions
   const { data: userPermissions } = useQuery<RolePermission[]>({
-    queryKey: ['/api/user/permissions'],
+    queryKey: ["/api/user/permissions"],
   });
 
   // Show all categories without filtering
@@ -114,24 +114,24 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8">
-            <img 
-              src={homeHeroImage} 
-              alt="Family enjoying financial freedom" 
-              className="w-full h-auto rounded-lg shadow-lg"
-            />
-          </div>
-          <div className="space-y-6 text-center">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
-              <span className="text-primary">Welcome to IFS Wealth Management Inc- Your Trusted Partner in Wealth Management</span>
-            </h1>
+      <section className="py-8 px-4 sm:px-6 lg:px-8">
+        <div className="w-full mb-12">
+          <img
+            src={homeHeroImage}
+            alt="Family enjoying financial freedom"
+            className="w-full h-auto rounded-lg shadow-lg object-cover"
+          />
+        </div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-center">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-center">
+            <span className="text-primary">
+              Welcome to IFS Wealth Management Inc- Your Trusted Partner in Wealth Management
+            </span>
+          </h1>
 
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              At IFS Wealth Management Inc, we understand that managing wealth is not just about numbers; it's about realizing your dreams, securing your future, and achieving financial freedom. As a leading wealth management firm, we are dedicated to providing personalized solutions and expert guidance to help you navigate the complexities of financial planning and investment management.
-            </p>
-          </div>
+          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed text-center">
+            At IFS Wealth Management Inc, we understand that managing wealth is not just about numbers; it's about realizing your dreams, securing your future, and achieving financial freedom. As a leading wealth management firm, we are dedicated to providing personalized solutions and expert guidance to help you navigate the complexities of financial planning and investment management.
+          </p>
         </div>
       </section>
 
@@ -153,8 +153,6 @@ export default function Landing() {
               <CalculatorCard key={category.id} {...category} />
             ))}
           </div>
-
-          
         </div>
       </section>
 
