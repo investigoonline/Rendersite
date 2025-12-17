@@ -10,6 +10,7 @@ import {
   pageContentHistory,
   loginHistory,
   rolePermissions,
+  imageAssets,
   type User,
   type UpsertUser,
   type InsertUserRegistration,
@@ -34,6 +35,8 @@ import {
   type InsertLoginHistory,
   type RolePermission,
   type InsertRolePermission,
+  type ImageAsset,
+  type InsertImageAsset,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, sql } from "drizzle-orm";
@@ -117,6 +120,14 @@ export interface IStorage {
   getRolePermissions(): Promise<RolePermission[]>;
   setRolePermissions(permissions: InsertRolePermission[]): Promise<void>;
   deleteAllRolePermissions(): Promise<void>;
+  
+  // Image asset operations
+  getImageAssets(page?: string): Promise<ImageAsset[]>;
+  getImageAsset(id: string): Promise<ImageAsset | undefined>;
+  getImageAssetByPageSection(page: string, section: string): Promise<ImageAsset | undefined>;
+  createImageAsset(asset: InsertImageAsset): Promise<ImageAsset>;
+  updateImageAsset(id: string, asset: Partial<InsertImageAsset>): Promise<ImageAsset>;
+  deleteImageAsset(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -679,6 +690,42 @@ export class DatabaseStorage implements IStorage {
 
   async deleteAllRolePermissions(): Promise<void> {
     await db.delete(rolePermissions);
+  }
+
+  // Image asset operations
+  async getImageAssets(page?: string): Promise<ImageAsset[]> {
+    if (page) {
+      return db.select().from(imageAssets).where(eq(imageAssets.page, page)).orderBy(desc(imageAssets.createdAt));
+    }
+    return db.select().from(imageAssets).orderBy(desc(imageAssets.createdAt));
+  }
+
+  async getImageAsset(id: string): Promise<ImageAsset | undefined> {
+    const [asset] = await db.select().from(imageAssets).where(eq(imageAssets.id, id));
+    return asset;
+  }
+
+  async getImageAssetByPageSection(page: string, section: string): Promise<ImageAsset | undefined> {
+    const [asset] = await db.select().from(imageAssets)
+      .where(and(eq(imageAssets.page, page), eq(imageAssets.section, section)));
+    return asset;
+  }
+
+  async createImageAsset(asset: InsertImageAsset): Promise<ImageAsset> {
+    const [newAsset] = await db.insert(imageAssets).values(asset).returning();
+    return newAsset;
+  }
+
+  async updateImageAsset(id: string, asset: Partial<InsertImageAsset>): Promise<ImageAsset> {
+    const [updatedAsset] = await db.update(imageAssets)
+      .set({ ...asset, updatedAt: new Date() })
+      .where(eq(imageAssets.id, id))
+      .returning();
+    return updatedAsset;
+  }
+
+  async deleteImageAsset(id: string): Promise<void> {
+    await db.delete(imageAssets).where(eq(imageAssets.id, id));
   }
 }
 
