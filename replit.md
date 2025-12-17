@@ -88,6 +88,18 @@ Preferred communication style: Simple, everyday language.
 - **Database Integration**: Permissions persist across sessions, fully integrated with PostgreSQL
 - **Resource Types**: Pages, calculators, calculator categories, and resource types
 
+## Hero Image Management System (December 2025)
+- **Feature**: CMS-driven hero image upload and management for all major pages
+- **Database**: Added `image_assets` table to store uploaded image metadata (page, section, filePath, dimensions)
+- **Image Processing**: Sharp library for automatic resizing (max 1920px width) and WebP conversion
+- **File Handling**: Multer for multipart uploads with 10MB limit and type validation (JPEG, PNG, WebP, GIF)
+- **Storage**: Images stored in `/uploads/hero-images/` with static file serving
+- **CMS UI**: Added "Hero Images" tab to Content Management with upload/replace functionality per page
+- **Dynamic Loading**: `useDynamicImage` hook fetches dynamic images with bundled asset fallbacks
+- **Pages Updated**: Landing, About, Services, Contact, Calculators, FAQ, Resources
+- **Security**: Upload/delete endpoints protected by role middleware (super_admin, content_manager)
+- **Impact**: Content managers can upload/replace hero images without code changes; pages gracefully fall back to bundled images if no custom image is uploaded
+
 # System Architecture
 
 ## Full-Stack Architecture

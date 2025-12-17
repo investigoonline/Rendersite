@@ -9,6 +9,7 @@ import NetWorthCalculator from "@/components/calculators/NetWorthCalculator";
 import GuestAccessModal from "@/components/modals/GuestAccessModal";
 import { HTMLContent } from "@/components/HTMLContent";
 import homeHeroImage from "@assets/Home_(2)_1765299273068.png";
+import { useDynamicImage } from "@/hooks/useDynamicImage";
 import {
   PieChart,
   CreditCard,
@@ -100,6 +101,7 @@ const calculatorCategories = [
 ];
 
 export default function Landing() {
+  const heroImage = useDynamicImage('home', 'hero', homeHeroImage);
   const [guestModalOpen, setGuestModalOpen] = useState(false);
   const { user } = useAuth();
 
@@ -117,7 +119,7 @@ export default function Landing() {
       <section className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="w-full mb-12">
           <img
-            src={homeHeroImage}
+            src={heroImage}
             alt="Family enjoying financial freedom"
             className="w-full h-auto rounded-lg shadow-lg object-cover"
           />

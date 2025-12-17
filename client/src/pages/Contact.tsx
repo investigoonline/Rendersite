@@ -19,8 +19,11 @@ import {
 import * as Icons from "lucide-react";
 import type { PageContent } from "@shared/schema";
 import contactImage from "@assets/Contact_Us_1765299919540.png";
+import { useDynamicImage } from "@/hooks/useDynamicImage";
 
 export default function Contact() {
+  const heroImage = useDynamicImage('contact', 'hero', contactImage);
+  
   // Fetch contact content with proper query parameter
   const { data: contactContent, isLoading } = useQuery<PageContent[]>({
     queryKey: ["/api/content", "contact"],
@@ -134,7 +137,7 @@ export default function Contact() {
         {/* Contact Us Image Section */}
         <div className="w-full mb-12">
           <img 
-            src={contactImage} 
+            src={heroImage} 
             alt="IFS Wealth Management - Contact Us" 
             className="w-full h-auto rounded-lg shadow-lg object-cover"
           />

@@ -7,6 +7,7 @@ import { CheckCircle, Calendar, Phone, FileText } from "lucide-react";
 import type { PageContent } from "@shared/schema";
 import { HTMLContent } from "@/components/HTMLContent";
 import servicesImage from "@assets/Services_1765299577367.png";
+import { useDynamicImage } from "@/hooks/useDynamicImage";
 
 interface ServiceContent {
   id: string;
@@ -18,6 +19,8 @@ interface ServiceContent {
 }
 
 export default function Services() {
+  const heroImage = useDynamicImage('services', 'hero', servicesImage);
+  
   // Fetch services content with proper query parameter
   const {
     data: servicesContent,
@@ -170,7 +173,7 @@ export default function Services() {
         {/* Services Image Section */}
         <div className="w-full mb-12 sm:mb-16 px-4">
           <img 
-            src={servicesImage} 
+            src={heroImage} 
             alt="IFS Wealth Management professional services team" 
             className="w-full h-auto rounded-lg shadow-lg object-cover"
           />

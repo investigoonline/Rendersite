@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { HelpCircle, Search, ChevronDown, ChevronUp } from "lucide-react";
 import faqImage from "@assets/image_1765300607561.png";
+import { useDynamicImage } from "@/hooks/useDynamicImage";
 
 const faqData = [
   {
@@ -89,6 +90,7 @@ const faqData = [
 ];
 
 export default function FAQ() {
+  const heroImage = useDynamicImage('faq', 'hero', faqImage);
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
@@ -120,7 +122,7 @@ export default function FAQ() {
         {/* Header Image */}
         <div className="mb-12">
           <img 
-            src={faqImage} 
+            src={heroImage} 
             alt="Frequently Asked Questions" 
             className="w-full h-auto rounded-lg shadow-lg object-cover"
           />

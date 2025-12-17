@@ -931,12 +931,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Image asset routes (super admin and content manager only)
+  // Image asset routes
+  // NOTE: GET endpoints are intentionally public because:
+  // 1. Hero images are displayed on public-facing pages to all website visitors
+  // 2. The useDynamicImage hook on public pages needs to fetch image metadata
+  // 3. Only filePath, page, section, and dimensions are returned - no sensitive data
+  // 4. Upload/Delete operations ARE protected by requireRole middleware below
   app.get('/api/images', async (req, res) => {
     try {
       const page = req.query.page as string | undefined;
       const images = await storage.getImageAssets(page);
-      res.json(images);
+      // Return only public-safe fields
+      const publicImages = images.map(img => ({
+        id: img.id,
+        page: img.page,
+        section: img.section,
+        filePath: img.filePath,
+        width: img.width,
+        height: img.height,
+        createdAt: img.createdAt,
+      }));
+      res.json(publicImages);
     } catch (error) {
       console.error("Error fetching images:", error);
       res.status(500).json({ message: "Unable to fetch images" });
@@ -948,7 +963,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { page, section } = req.params;
       const image = await storage.getImageAssetByPageSection(page, section);
       if (image) {
-        res.json(image);
+        // Return only public-safe fields
+        res.json({
+          id: image.id,
+          page: image.page,
+          section: image.section,
+          filePath: image.filePath,
+          width: image.width,
+          height: image.height,
+          createdAt: image.createdAt,
+        });
       } else {
         res.status(404).json({ message: "Image not found" });
       }

@@ -27,6 +27,7 @@ import {
   Calculator,
 } from "lucide-react";
 import calculatorsImage from "@assets/Calculators_1765301634531.png";
+import { useDynamicImage } from "@/hooks/useDynamicImage";
 
 const calculatorCategories = [
   {
@@ -117,6 +118,7 @@ const calculatorCategories = [
 ];
 
 export default function Calculators() {
+  const heroImage = useDynamicImage('calculators', 'hero', calculatorsImage);
   const { isAuthenticated, isGuestUser, isRegisteredUser, hasCalculatorAccess, accessLevel } = useAuth();
   const { toast } = useToast();
   const [location] = useLocation();
@@ -248,7 +250,7 @@ export default function Calculators() {
           {/* Hero Image */}
           <div className="w-full mb-8">
             <img 
-              src={calculatorsImage} 
+              src={heroImage} 
               alt="Financial planning and calculators" 
               className="w-full h-auto rounded-lg shadow-lg object-cover"
             />

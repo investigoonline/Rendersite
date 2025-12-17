@@ -7,8 +7,11 @@ import UnderConstruction from "@/components/UnderConstruction";
 import { HTMLContent } from "@/components/HTMLContent";
 import type { PageContent } from "@shared/schema";
 import aboutImage from "@assets/About_1765299432034.png";
+import { useDynamicImage } from "@/hooks/useDynamicImage";
 
 export default function About() {
+  const heroImage = useDynamicImage('about', 'hero', aboutImage);
+  
   const { data: pageContent, isLoading } = useQuery<PageContent[]>({
     queryKey: ['/api/content', 'about'],
     queryFn: async () => {
@@ -62,7 +65,7 @@ export default function About() {
         {/* About Us Image Section */}
         <div className="w-full mb-20">
           <img 
-            src={aboutImage} 
+            src={heroImage} 
             alt="IFS Wealth Management - Family and personal service" 
             className="w-full h-auto rounded-lg shadow-lg object-cover"
           />
