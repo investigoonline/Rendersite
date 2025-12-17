@@ -3,6 +3,10 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
+import multer from "multer";
+import sharp from "sharp";
+import path from "path";
+import fs from "fs";
 import { 
   insertUserRegistrationSchema,
   insertUserBackendSchema,
@@ -16,6 +20,57 @@ import {
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+
+// Configure multer for image uploads
+const uploadDir = path.join(process.cwd(), 'uploads', 'hero-images');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const multerStorage = multer.memoryStorage();
+const upload = multer({
+  storage: multerStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed.'));
+    }
+  },
+});
+
+// Process and save hero image with Sharp
+async function processHeroImage(buffer: Buffer, originalName: string): Promise<{
+  fileName: string;
+  filePath: string;
+  width: number;
+  height: number;
+  fileSize: number;
+}> {
+  const timestamp = Date.now();
+  const sanitizedName = originalName.replace(/[^a-zA-Z0-9.-]/g, '_');
+  const fileName = `hero_${timestamp}_${sanitizedName.replace(/\.[^.]+$/, '')}.webp`;
+  const filePath = path.join(uploadDir, fileName);
+
+  // Process image: resize to max 1920px width, convert to WebP for optimization
+  const processedImage = await sharp(buffer)
+    .resize(1920, null, { 
+      withoutEnlargement: true,
+      fit: 'inside'
+    })
+    .webp({ quality: 85 })
+    .toFile(filePath);
+
+  return {
+    fileName,
+    filePath: `/uploads/hero-images/${fileName}`,
+    width: processedImage.width,
+    height: processedImage.height,
+    fileSize: processedImage.size,
+  };
+}
 
 // Middleware to check if user has required role (using session data for consistency)
 function requireRole(req: any, res: any, roles: string[]): boolean {
@@ -873,6 +928,122 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error restoring content:", error);
       res.status(500).json({ message: "Unable to restore content" });
+    }
+  });
+
+  // Image asset routes (super admin and content manager only)
+  app.get('/api/images', async (req, res) => {
+    try {
+      const page = req.query.page as string | undefined;
+      const images = await storage.getImageAssets(page);
+      res.json(images);
+    } catch (error) {
+      console.error("Error fetching images:", error);
+      res.status(500).json({ message: "Unable to fetch images" });
+    }
+  });
+
+  app.get('/api/images/:page/:section', async (req, res) => {
+    try {
+      const { page, section } = req.params;
+      const image = await storage.getImageAssetByPageSection(page, section);
+      if (image) {
+        res.json(image);
+      } else {
+        res.status(404).json({ message: "Image not found" });
+      }
+    } catch (error) {
+      console.error("Error fetching image:", error);
+      res.status(500).json({ message: "Unable to fetch image" });
+    }
+  });
+
+  app.post('/api/images/upload', upload.single('image'), async (req: any, res) => {
+    try {
+      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
+      if (!authorized) return;
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided" });
+      }
+
+      const { page, section } = req.body;
+      if (!page || !section) {
+        return res.status(400).json({ message: "Page and section are required" });
+      }
+
+      // Process the image
+      const processedImage = await processHeroImage(req.file.buffer, req.file.originalname);
+
+      // Check if an image already exists for this page/section
+      const existingImage = await storage.getImageAssetByPageSection(page, section);
+
+      let imageAsset;
+      if (existingImage) {
+        // Delete old file if it exists
+        const oldFilePath = path.join(process.cwd(), existingImage.filePath.replace(/^\//, ''));
+        if (fs.existsSync(oldFilePath)) {
+          fs.unlinkSync(oldFilePath);
+        }
+        
+        // Update existing record
+        imageAsset = await storage.updateImageAsset(existingImage.id, {
+          fileName: processedImage.fileName,
+          filePath: processedImage.filePath,
+          originalName: req.file.originalname,
+          mimeType: 'image/webp',
+          fileSize: processedImage.fileSize,
+          width: processedImage.width,
+          height: processedImage.height,
+          uploadedBy: req.session.user?.id,
+        });
+      } else {
+        // Create new record
+        imageAsset = await storage.createImageAsset({
+          page,
+          section,
+          fileName: processedImage.fileName,
+          filePath: processedImage.filePath,
+          originalName: req.file.originalname,
+          mimeType: 'image/webp',
+          fileSize: processedImage.fileSize,
+          width: processedImage.width,
+          height: processedImage.height,
+          uploadedBy: req.session.user?.id,
+        });
+      }
+
+      res.json({ 
+        message: "Image uploaded successfully", 
+        image: imageAsset 
+      });
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      res.status(500).json({ message: "Unable to upload image" });
+    }
+  });
+
+  app.delete('/api/images/:id', async (req, res) => {
+    try {
+      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
+      if (!authorized) return;
+
+      const image = await storage.getImageAsset(req.params.id);
+      if (!image) {
+        return res.status(404).json({ message: "Image not found" });
+      }
+
+      // Delete file from disk
+      const filePath = path.join(process.cwd(), image.filePath.replace(/^\//, ''));
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+
+      await storage.deleteImageAsset(req.params.id);
+      res.json({ message: "Image deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      res.status(500).json({ message: "Unable to delete image" });
     }
   });
 
