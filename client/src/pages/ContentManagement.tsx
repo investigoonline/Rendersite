@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,8 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Shield, Save, Plus, Trash2, Edit, Lock, Users } from "lucide-react";
-import type { PageContent, User, Role } from "@shared/schema";
+import { Shield, Save, Plus, Trash2, Edit, Lock, Users, Image, Upload, RefreshCw } from "lucide-react";
+import type { PageContent, User, Role, ImageAsset } from "@shared/schema";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FormRenderer } from "@/components/FormRenderer";
 import { getSectionSchema, pageSections } from "@shared/contentSchemas";
@@ -65,6 +65,21 @@ export default function ContentManagement() {
   const hasAccess = user?.role === 'super_admin' || user?.role === 'content_manager';
   const isSuperAdmin = user?.role === 'super_admin';
   const checkingAccess = false;
+  
+  // Image upload state
+  const [uploadingImage, setUploadingImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Hero image pages configuration
+  const heroImagePages = [
+    { page: 'home', section: 'hero', label: 'Home Page Hero', description: 'Main landing page hero image' },
+    { page: 'about', section: 'hero', label: 'About Page Hero', description: 'About us page header image' },
+    { page: 'services', section: 'hero', label: 'Services Page Hero', description: 'Services page header image' },
+    { page: 'contact', section: 'hero', label: 'Contact Page Hero', description: 'Contact page header image' },
+    { page: 'calculators', section: 'hero', label: 'Calculators Page Hero', description: 'Calculators page header image' },
+    { page: 'faq', section: 'hero', label: 'FAQ Page Hero', description: 'FAQ page header image' },
+    { page: 'resources', section: 'hero', label: 'Resources Page Hero', description: 'Resources page rotating carousel images' },
+  ];
 
   // Fetch page content
   const { data: pageContent, isLoading } = useQuery<PageContent[]>({
@@ -104,6 +119,19 @@ export default function ContentManagement() {
       const res = await fetch('/api/roles');
       if (!res.ok) {
         throw new Error('Failed to fetch roles');
+      }
+      return res.json();
+    },
+  });
+
+  // Fetch all image assets
+  const { data: imageAssets, isLoading: loadingImages, refetch: refetchImages } = useQuery<ImageAsset[]>({
+    queryKey: ['/api/images'],
+    enabled: hasAccess === true && mainTab === "images",
+    queryFn: async () => {
+      const res = await fetch('/api/images', { credentials: 'include' });
+      if (!res.ok) {
+        throw new Error('Failed to fetch images');
       }
       return res.json();
     },
@@ -236,6 +264,51 @@ export default function ContentManagement() {
     setFormData({});
   };
 
+  // Handle image upload
+  const handleImageUpload = async (page: string, section: string, file: File) => {
+    const uploadKey = `${page}_${section}`;
+    setUploadingImage(uploadKey);
+    
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('page', page);
+      formData.append('section', section);
+
+      const res = await fetch('/api/images/upload', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Upload failed');
+      }
+
+      const result = await res.json();
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully. It will be displayed on the page.",
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ['/api/images'] });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to upload image",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingImage(null);
+    }
+  };
+
+  // Get image for a specific page/section
+  const getImageForSection = (page: string, section: string): ImageAsset | undefined => {
+    return imageAssets?.find(img => img.page === page && img.section === section);
+  };
+
   const handleCreateSection = async (data: any) => {
     await createContentMutation.mutateAsync({
       page: selectedPage,
@@ -299,12 +372,16 @@ export default function ContentManagement() {
           </p>
         </div>
 
-        {/* Main Tabs - Content and User Roles */}
+        {/* Main Tabs - Content, Images, and User Roles */}
         <Tabs value={mainTab} onValueChange={setMainTab} className="space-y-6">
           <TabsList>
             <TabsTrigger value="content" data-testid="tab-content">
               <Shield className="h-4 w-4 mr-2" />
               Content Management
+            </TabsTrigger>
+            <TabsTrigger value="images" data-testid="tab-images">
+              <Image className="h-4 w-4 mr-2" />
+              Hero Images
             </TabsTrigger>
             {isSuperAdmin && (
               <TabsTrigger value="users" data-testid="tab-users">
@@ -551,6 +628,113 @@ export default function ContentManagement() {
                 </div>
               )}
             </Tabs>
+          </TabsContent>
+
+          {/* Hero Images Management Tab */}
+          <TabsContent value="images" className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-lg font-semibold">Hero Image Management</h2>
+                <p className="text-sm text-muted-foreground">
+                  Upload and replace hero images for each page. Images are automatically optimized and resized.
+                </p>
+              </div>
+              <Button variant="outline" onClick={() => refetchImages()} disabled={loadingImages}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${loadingImages ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+            </div>
+
+            {loadingImages ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Loading images...</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {heroImagePages.map((heroConfig) => {
+                  const existingImage = getImageForSection(heroConfig.page, heroConfig.section);
+                  const uploadKey = `${heroConfig.page}_${heroConfig.section}`;
+                  const isUploading = uploadingImage === uploadKey;
+                  
+                  return (
+                    <Card key={uploadKey} data-testid={`image-card-${heroConfig.page}`}>
+                      <CardHeader>
+                        <CardTitle className="text-base">{heroConfig.label}</CardTitle>
+                        <CardDescription>{heroConfig.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {/* Current Image Preview */}
+                        {existingImage ? (
+                          <div className="space-y-2">
+                            <div className="relative rounded-lg overflow-hidden border">
+                              <img
+                                src={existingImage.filePath}
+                                alt={heroConfig.label}
+                                className="w-full h-32 object-cover"
+                              />
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              <p>Size: {existingImage.width}x{existingImage.height}px</p>
+                              <p>Uploaded: {new Date(existingImage.createdAt || '').toLocaleDateString()}</p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="h-32 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50">
+                            <div className="text-center">
+                              <Image className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                              <p className="text-sm text-muted-foreground">No custom image uploaded</p>
+                              <p className="text-xs text-muted-foreground">Using default image</p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Upload Button */}
+                        <div className="flex gap-2">
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,image/gif"
+                            className="hidden"
+                            id={`file-input-${uploadKey}`}
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                handleImageUpload(heroConfig.page, heroConfig.section, file);
+                                e.target.value = '';
+                              }
+                            }}
+                            disabled={isUploading}
+                          />
+                          <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => document.getElementById(`file-input-${uploadKey}`)?.click()}
+                            disabled={isUploading}
+                            data-testid={`button-upload-${heroConfig.page}`}
+                          >
+                            {isUploading ? (
+                              <>
+                                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                                Uploading...
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="h-4 w-4 mr-2" />
+                                {existingImage ? 'Replace Image' : 'Upload Image'}
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                        
+                        <p className="text-xs text-muted-foreground">
+                          Supported: JPEG, PNG, WebP, GIF (max 10MB). Images are auto-optimized to 1920px width.
+                        </p>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
           </TabsContent>
 
           {/* User Roles Management Tab */}
