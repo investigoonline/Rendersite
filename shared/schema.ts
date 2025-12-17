@@ -265,6 +265,23 @@ export const pageContentHistory = pgTable("page_content_history", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Image assets table - stores uploaded hero images for pages
+export const imageAssets = pgTable("image_assets", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  page: varchar("page", { length: 50 }).notNull(),
+  section: varchar("section", { length: 100 }).notNull(),
+  fileName: varchar("file_name", { length: 255 }).notNull(),
+  filePath: varchar("file_path", { length: 500 }).notNull(),
+  originalName: varchar("original_name", { length: 255 }),
+  mimeType: varchar("mime_type", { length: 100 }),
+  fileSize: integer("file_size"),
+  width: integer("width"),
+  height: integer("height"),
+  uploadedBy: varchar("uploaded_by"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Create insert schemas
 export const upsertUserSchema = createInsertSchema(users);
 export const insertUserRegistrationSchema = createInsertSchema(users).omit({
@@ -349,6 +366,11 @@ export const insertRolePermissionSchema = createInsertSchema(rolePermissions).om
   createdAt: true,
   updatedAt: true,
 });
+export const insertImageAssetSchema = createInsertSchema(imageAssets).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 
 // Export types
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
@@ -375,3 +397,5 @@ export type PageContentHistory = typeof pageContentHistory.$inferSelect;
 export type InsertPageContentHistory = z.infer<typeof insertPageContentHistorySchema>;
 export type LoginHistory = typeof loginHistory.$inferSelect;
 export type InsertLoginHistory = z.infer<typeof insertLoginHistorySchema>;
+export type ImageAsset = typeof imageAssets.$inferSelect;
+export type InsertImageAsset = z.infer<typeof insertImageAssetSchema>;
