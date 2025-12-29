@@ -1,39 +1,42 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { Link } from "wouter";
 
-interface PreviewProps {
-  onSelect: (option: number) => void;
-}
-
-export default function BackgroundPreview({ onSelect }: PreviewProps) {
+export default function BackgroundPreview() {
   const options = [
     {
       name: "Option 1: Soft Cream",
       color: "hsl(40, 33%, 98%)",
       hex: "#FDFBF7",
-      description: "Warm, elegant - great for financial sites"
+      description: "Warm, elegant - great for financial sites",
+      route: "/preview-option-1"
     },
     {
       name: "Option 2: Light Gray",
       color: "hsl(210, 17%, 97%)",
       hex: "#F8F9FA",
-      description: "Clean, modern - makes content pop"
+      description: "Clean, modern - makes content pop",
+      route: "/preview-option-2"
     },
     {
       name: "Option 3: Light Blue-Gray",
       color: "hsl(210, 40%, 96%)",
       hex: "#F0F4F8",
-      description: "Professional trust - financial industry favorite"
+      description: "Professional trust - financial industry favorite",
+      route: "/preview-option-3"
     }
   ];
 
   return (
     <div className="min-h-screen bg-gray-800 py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-white text-center mb-8">
+        <h1 className="text-3xl font-bold text-white text-center mb-4">
           Background Color Options - Side by Side Preview
         </h1>
+        <p className="text-gray-300 text-center mb-8">
+          Click "View Full Site" to see how each option looks on the actual pages
+        </p>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {options.map((option, index) => (
@@ -79,23 +82,26 @@ export default function BackgroundPreview({ onSelect }: PreviewProps) {
                 </div>
               </div>
               
-              <p className="text-gray-300 text-sm text-center mt-3 mb-3">{option.description}</p>
+              <p className="text-gray-300 text-sm text-center mt-3 mb-2">{option.description}</p>
               <p className="text-gray-400 text-xs text-center mb-3">Color: {option.hex}</p>
               
-              <Button 
-                onClick={() => onSelect(index + 1)}
-                className="w-full"
-              >
-                <Check className="w-4 h-4 mr-2" />
-                Choose {option.name.split(":")[0]}
-              </Button>
+              <Link href={option.route}>
+                <Button className="w-full" data-testid={`button-view-option-${index + 1}`}>
+                  <Check className="w-4 h-4 mr-2" />
+                  View Full Site with {option.name.split(":")[0]}
+                </Button>
+              </Link>
             </div>
           ))}
         </div>
         
-        <p className="text-gray-400 text-center mt-8">
-          Click a button below each option to apply it to your site
-        </p>
+        <div className="mt-8 text-center">
+          <Link href="/">
+            <Button variant="outline" className="bg-white">
+              Back to Home
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );
