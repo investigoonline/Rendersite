@@ -25,6 +25,14 @@ export default function BackgroundPreview() {
       hex: "#F0F4F8",
       description: "Professional trust - financial industry favorite",
       route: "/preview-option-3"
+    },
+    {
+      name: "Option 4: Dark Blue",
+      color: "hsl(220, 50%, 15%)",
+      hex: "#132344",
+      description: "Bold, premium - executive finance look",
+      route: "/preview-option-4",
+      isDark: true
     }
   ];
 
@@ -38,7 +46,7 @@ export default function BackgroundPreview() {
           Click "View Full Site" to see how each option looks on the actual pages
         </p>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {options.map((option, index) => (
             <div key={index} className="flex flex-col">
               <h2 className="text-white font-semibold mb-3 text-center">{option.name}</h2>
@@ -48,12 +56,12 @@ export default function BackgroundPreview() {
                 style={{ backgroundColor: option.color }}
               >
                 <div className="p-6">
-                  <div className="bg-white rounded-lg shadow-sm border p-4 mb-4">
+                  <div className={`rounded-lg shadow-sm border p-4 mb-4 ${(option as any).isDark ? 'bg-slate-800 border-slate-600' : 'bg-white'}`}>
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-12 h-12 bg-blue-600 rounded"></div>
                       <div>
-                        <div className="font-semibold text-gray-900">IFS Wealth Management</div>
-                        <div className="text-sm text-gray-500">Financial Planning</div>
+                        <div className={`font-semibold ${(option as any).isDark ? 'text-white' : 'text-gray-900'}`}>IFS Wealth Management</div>
+                        <div className={`text-sm ${(option as any).isDark ? 'text-gray-300' : 'text-gray-500'}`}>Financial Planning</div>
                       </div>
                     </div>
                   </div>

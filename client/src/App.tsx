@@ -29,6 +29,7 @@ import BackgroundPreview from "@/pages/BackgroundPreview";
 import PreviewOption1 from "@/pages/PreviewOption1";
 import PreviewOption2 from "@/pages/PreviewOption2";
 import PreviewOption3 from "@/pages/PreviewOption3";
+import PreviewOption4 from "@/pages/PreviewOption4";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -55,6 +56,7 @@ function Router() {
         <Route path="/preview-option-1" component={PreviewOption1} />
         <Route path="/preview-option-2" component={PreviewOption2} />
         <Route path="/preview-option-3" component={PreviewOption3} />
+        <Route path="/preview-option-4" component={PreviewOption4} />
         
         {/* Under Construction pages */}
         <Route path="/auth/login" component={UnderConstruction} />
