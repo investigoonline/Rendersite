@@ -20,13 +20,9 @@ import {
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import { objectStorageClient } from "./replit_integrations/object_storage";
 
-// Configure multer for image uploads
-const uploadDir = path.join(process.cwd(), 'uploads', 'hero-images');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
+// Configure multer for image uploads (memory storage for processing before upload)
 const multerStorage = multer.memoryStorage();
 const upload = multer({
   storage: multerStorage,
@@ -41,7 +37,16 @@ const upload = multer({
   },
 });
 
-// Process and save hero image with Sharp
+// Get bucket name from environment
+function getBucketName(): string {
+  const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
+  if (!bucketId) {
+    throw new Error('DEFAULT_OBJECT_STORAGE_BUCKET_ID not set');
+  }
+  return bucketId;
+}
+
+// Process and upload hero image to persistent object storage
 async function processHeroImage(buffer: Buffer, originalName: string): Promise<{
   fileName: string;
   filePath: string;
@@ -52,24 +57,64 @@ async function processHeroImage(buffer: Buffer, originalName: string): Promise<{
   const timestamp = Date.now();
   const sanitizedName = originalName.replace(/[^a-zA-Z0-9.-]/g, '_');
   const fileName = `hero_${timestamp}_${sanitizedName.replace(/\.[^.]+$/, '')}.webp`;
-  const filePath = path.join(uploadDir, fileName);
 
   // Process image: resize to max 1920px width, convert to WebP for optimization
-  const processedImage = await sharp(buffer)
+  const processedBuffer = await sharp(buffer)
     .resize(1920, null, { 
       withoutEnlargement: true,
       fit: 'inside'
     })
     .webp({ quality: 85 })
-    .toFile(filePath);
+    .toBuffer({ resolveWithObject: true });
+
+  // Upload to object storage
+  const bucketName = getBucketName();
+  const bucket = objectStorageClient.bucket(bucketName);
+  const objectPath = `public/hero-images/${fileName}`;
+  const file = bucket.file(objectPath);
+  
+  await file.save(processedBuffer.data, {
+    contentType: 'image/webp',
+    metadata: {
+      cacheControl: 'public, max-age=31536000',
+    },
+  });
+
+  // Make file public
+  await file.makePublic();
+
+  // Get the public URL
+  const publicUrl = `https://storage.googleapis.com/${bucketName}/${objectPath}`;
 
   return {
     fileName,
-    filePath: `/uploads/hero-images/${fileName}`,
-    width: processedImage.width,
-    height: processedImage.height,
-    fileSize: processedImage.size,
+    filePath: publicUrl,
+    width: processedBuffer.info.width,
+    height: processedBuffer.info.height,
+    fileSize: processedBuffer.info.size,
   };
+}
+
+// Delete image from object storage
+async function deleteFromObjectStorage(filePath: string): Promise<void> {
+  try {
+    // Check if it's an object storage URL
+    if (filePath.startsWith('https://storage.googleapis.com/')) {
+      const url = new URL(filePath);
+      const pathParts = url.pathname.split('/');
+      const bucketName = pathParts[1];
+      const objectPath = pathParts.slice(2).join('/');
+      
+      const bucket = objectStorageClient.bucket(bucketName);
+      const file = bucket.file(objectPath);
+      const [exists] = await file.exists();
+      if (exists) {
+        await file.delete();
+      }
+    }
+  } catch (error) {
+    console.error('Error deleting from object storage:', error);
+  }
 }
 
 // Middleware to check if user has required role (using session data for consistency)
@@ -1004,11 +1049,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       let imageAsset;
       if (existingImage) {
-        // Delete old file if it exists
-        const oldFilePath = path.join(process.cwd(), existingImage.filePath.replace(/^\//, ''));
-        if (fs.existsSync(oldFilePath)) {
-          fs.unlinkSync(oldFilePath);
-        }
+        // Delete old file from object storage
+        await deleteFromObjectStorage(existingImage.filePath);
         
         // Update existing record
         imageAsset = await storage.updateImageAsset(existingImage.id, {
@@ -1057,11 +1099,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Image not found" });
       }
 
-      // Delete file from disk
-      const filePath = path.join(process.cwd(), image.filePath.replace(/^\//, ''));
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
+      // Delete file from object storage
+      await deleteFromObjectStorage(image.filePath);
 
       await storage.deleteImageAsset(req.params.id);
       res.json({ message: "Image deleted successfully" });
