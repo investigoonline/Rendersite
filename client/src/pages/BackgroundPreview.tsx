@@ -6,27 +6,6 @@ import { Link } from "wouter";
 export default function BackgroundPreview() {
   const options = [
     {
-      name: "Option 1: Soft Cream",
-      color: "hsl(40, 33%, 98%)",
-      hex: "#FDFBF7",
-      description: "Warm, elegant - great for financial sites",
-      route: "/preview-option-1"
-    },
-    {
-      name: "Option 2: Light Gray",
-      color: "hsl(210, 17%, 97%)",
-      hex: "#F8F9FA",
-      description: "Clean, modern - makes content pop",
-      route: "/preview-option-2"
-    },
-    {
-      name: "Option 3: Light Blue-Gray",
-      color: "hsl(210, 40%, 96%)",
-      hex: "#F0F4F8",
-      description: "Professional trust - financial industry favorite",
-      route: "/preview-option-3"
-    },
-    {
       name: "Option 4: Dark Blue",
       color: "hsl(220, 50%, 15%)",
       hex: "#132344",
@@ -46,7 +25,7 @@ export default function BackgroundPreview() {
           Click "View Full Site" to see how each option looks on the actual pages
         </p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 max-w-md mx-auto gap-6">
           {options.map((option, index) => (
             <div key={index} className="flex flex-col">
               <h2 className="text-white font-semibold mb-3 text-center">{option.name}</h2>
