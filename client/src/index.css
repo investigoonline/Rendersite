@@ -5,8 +5,8 @@
 @tailwind utilities;
 
 :root {
-  /* Darker background - professional slate gray */
-  --background: hsl(220, 15%, 20%);
+  /* Dark blue background - professional finance look */
+  --background: hsl(220, 50%, 15%);
   --foreground: hsl(0, 0%, 95%);
   --card: hsl(180, 6.6667%, 97.0588%);
   --card-foreground: hsl(210, 25%, 7.8431%);
