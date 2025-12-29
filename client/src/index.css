@@ -5,7 +5,8 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(0, 0%, 100%);
+  /* Option 1: Soft Cream - warm, elegant financial look */
+  --background: hsl(40, 33%, 98%);
   --foreground: hsl(210, 25%, 7.8431%);
   --card: hsl(180, 6.6667%, 97.0588%);
   --card-foreground: hsl(210, 25%, 7.8431%);
