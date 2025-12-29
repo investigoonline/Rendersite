@@ -39,7 +39,7 @@ export default function Footer() {
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Company Information */}
           <div className="lg:col-span-1">
-            <div className="mb-4 bg-background p-3 rounded inline-block">
+            <div className="mb-4 bg-white p-3 rounded inline-block">
               <img 
                 src={logoSrc} 
                 alt="IFS Wealth Management" 

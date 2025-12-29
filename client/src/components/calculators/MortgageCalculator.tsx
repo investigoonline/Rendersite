@@ -417,7 +417,7 @@ export default function MortgageCalculator({ calculatorName = "Home Affordabilit
                     </div>
                     <div className="text-sm font-medium text-gray-700">Total Monthly</div>
                   </div>
-                  <div className="text-center p-6 bg-background rounded-lg">
+                  <div className="text-center p-6 bg-gray-50 rounded-lg">
                     <div className="text-2xl font-bold font-mono text-gray-900 mb-2">
                       {results.downPaymentPercent.toFixed(1)}%
                     </div>

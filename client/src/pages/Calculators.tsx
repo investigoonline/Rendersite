@@ -217,7 +217,7 @@ export default function Calculators() {
   if (selectedCalculator && currentCalculatorData) {
     const CalculatorComponent = currentCalculatorData.component;
     return (
-      <div className="min-h-screen bg-background py-8">
+      <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <Button variant="ghost" onClick={handleBackToList} className="mb-4">
@@ -235,7 +235,7 @@ export default function Calculators() {
   }
 
   return (
-    <div className="min-h-screen bg-background py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12 px-4">

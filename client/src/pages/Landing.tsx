@@ -114,7 +114,7 @@ export default function Landing() {
   const filteredCategories = calculatorCategories;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="w-full mb-12">
@@ -138,7 +138,7 @@ export default function Landing() {
       </section>
 
       {/* Calculator Categories Section */}
-      <section id="calculators" className="py-20 bg-background">
+      <section id="calculators" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-6">
@@ -162,7 +162,7 @@ export default function Landing() {
       {/* Sample Calculator Interface */}
 
       {/* About Section */}
-      <section className="py-20 bg-background">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>

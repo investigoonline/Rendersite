@@ -49,7 +49,7 @@ export default function HomeDesignOptions() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Design Selector */}
-      <div className="bg-background border-b sticky top-0 z-50 shadow-sm">
+      <div className="bg-white border-b sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <h2 className="text-xl font-bold mb-3">Select Home Page Design</h2>
           <div className="flex flex-wrap gap-3">
@@ -112,7 +112,7 @@ export default function HomeDesignOptions() {
 
       {/* Design 2: Clean Minimal (No Badges) */}
       {selectedDesign === 2 && (
-        <div className="bg-background py-16">
+        <div className="bg-white py-16">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-12">
             <div className="space-y-6">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
@@ -131,7 +131,7 @@ export default function HomeDesignOptions() {
 
       {/* Design 3: Left-Aligned Professional */}
       {selectedDesign === 3 && (
-        <div className="bg-background py-16">
+        <div className="bg-white py-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
             <div className="max-w-4xl space-y-6">
               <div className="flex flex-wrap gap-3">

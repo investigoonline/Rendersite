@@ -482,7 +482,7 @@ export default function TaxCalculator({ calculatorName = "Federal Income Tax Cal
                       </div>
                       <div className="text-sm font-medium text-gray-700">Effective Rate</div>
                     </div>
-                    <div className="text-center p-6 bg-background rounded-lg">
+                    <div className="text-center p-6 bg-gray-50 rounded-lg">
                       <div className="text-2xl font-bold font-mono text-gray-900 mb-2">
                         {formatCurrency(results.afterTaxIncome)}
                       </div>

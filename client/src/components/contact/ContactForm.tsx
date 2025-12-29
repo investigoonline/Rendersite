@@ -269,7 +269,7 @@ export default function ContactForm() {
           )}
         />
 
-        <div className="bg-background p-4 rounded-lg text-sm text-muted-foreground">
+        <div className="bg-gray-50 p-4 rounded-lg text-sm text-muted-foreground">
           <p className="mb-2">
             <strong>Response Time:</strong> We typically respond within 24 hours
             during business days.

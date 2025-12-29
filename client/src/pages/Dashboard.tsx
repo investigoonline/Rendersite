@@ -93,7 +93,7 @@ export default function Dashboard() {
 
   if (statsLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
@@ -109,7 +109,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -192,7 +192,7 @@ export default function Dashboard() {
                       </thead>
                       <tbody>
                         {allUsers.map((u, index) => (
-                          <tr key={u.id} className="border-b hover:bg-background" data-testid={`user-row-${index}`}>
+                          <tr key={u.id} className="border-b hover:bg-gray-50" data-testid={`user-row-${index}`}>
                             <td className="py-3 px-4" data-testid={`user-name-${index}`}>
                               {u.firstName} {u.lastName}
                             </td>
@@ -271,7 +271,7 @@ export default function Dashboard() {
                 {loginHistory.slice(0, 10).map((login, index) => (
                   <div 
                     key={login.id} 
-                    className="flex items-center justify-between p-3 bg-background rounded-lg"
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                     data-testid={`login-history-${index}`}
                   >
                     <div className="flex items-center space-x-3">

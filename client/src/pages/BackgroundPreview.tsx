@@ -1,31 +1,41 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
-import { Link } from "wouter";
 
-export default function BackgroundPreview() {
+interface PreviewProps {
+  onSelect: (option: number) => void;
+}
+
+export default function BackgroundPreview({ onSelect }: PreviewProps) {
   const options = [
     {
-      name: "Option 4: Dark Blue",
-      color: "hsl(220, 50%, 15%)",
-      hex: "#132344",
-      description: "Bold, premium - executive finance look",
-      route: "/preview-option-4",
-      isDark: true
+      name: "Option 1: Soft Cream",
+      color: "hsl(40, 33%, 98%)",
+      hex: "#FDFBF7",
+      description: "Warm, elegant - great for financial sites"
+    },
+    {
+      name: "Option 2: Light Gray",
+      color: "hsl(210, 17%, 97%)",
+      hex: "#F8F9FA",
+      description: "Clean, modern - makes content pop"
+    },
+    {
+      name: "Option 3: Light Blue-Gray",
+      color: "hsl(210, 40%, 96%)",
+      hex: "#F0F4F8",
+      description: "Professional trust - financial industry favorite"
     }
   ];
 
   return (
     <div className="min-h-screen bg-gray-800 py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-white text-center mb-4">
+        <h1 className="text-3xl font-bold text-white text-center mb-8">
           Background Color Options - Side by Side Preview
         </h1>
-        <p className="text-gray-300 text-center mb-8">
-          Click "View Full Site" to see how each option looks on the actual pages
-        </p>
         
-        <div className="grid grid-cols-1 max-w-md mx-auto gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {options.map((option, index) => (
             <div key={index} className="flex flex-col">
               <h2 className="text-white font-semibold mb-3 text-center">{option.name}</h2>
@@ -35,12 +45,12 @@ export default function BackgroundPreview() {
                 style={{ backgroundColor: option.color }}
               >
                 <div className="p-6">
-                  <div className={`rounded-lg shadow-sm border p-4 mb-4 ${(option as any).isDark ? 'bg-slate-800 border-slate-600' : 'bg-white'}`}>
+                  <div className="bg-white rounded-lg shadow-sm border p-4 mb-4">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-12 h-12 bg-blue-600 rounded"></div>
                       <div>
-                        <div className={`font-semibold ${(option as any).isDark ? 'text-white' : 'text-gray-900'}`}>IFS Wealth Management</div>
-                        <div className={`text-sm ${(option as any).isDark ? 'text-gray-300' : 'text-gray-500'}`}>Financial Planning</div>
+                        <div className="font-semibold text-gray-900">IFS Wealth Management</div>
+                        <div className="text-sm text-gray-500">Financial Planning</div>
                       </div>
                     </div>
                   </div>
@@ -69,26 +79,23 @@ export default function BackgroundPreview() {
                 </div>
               </div>
               
-              <p className="text-gray-300 text-sm text-center mt-3 mb-2">{option.description}</p>
+              <p className="text-gray-300 text-sm text-center mt-3 mb-3">{option.description}</p>
               <p className="text-gray-400 text-xs text-center mb-3">Color: {option.hex}</p>
               
-              <Link href={option.route}>
-                <Button className="w-full" data-testid={`button-view-option-${index + 1}`}>
-                  <Check className="w-4 h-4 mr-2" />
-                  View Full Site with {option.name.split(":")[0]}
-                </Button>
-              </Link>
+              <Button 
+                onClick={() => onSelect(index + 1)}
+                className="w-full"
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Choose {option.name.split(":")[0]}
+              </Button>
             </div>
           ))}
         </div>
         
-        <div className="mt-8 text-center">
-          <Link href="/">
-            <Button variant="outline" className="bg-white">
-              Back to Home
-            </Button>
-          </Link>
-        </div>
+        <p className="text-gray-400 text-center mt-8">
+          Click a button below each option to apply it to your site
+        </p>
       </div>
     </div>
   );
