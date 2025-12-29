@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
+import { useDynamicImage } from "@/hooks/useDynamicImage";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,7 +13,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ChartLine, ChevronDown, Menu, User } from "lucide-react";
 import GuestAccessModal from "./modals/GuestAccessModal";
 import ClientLoginModal from "./modals/ClientLoginModal";
-import ifsLogo from "@assets/image_1763735441524.jpeg";
+import defaultLogo from "@assets/image_1763735441524.jpeg";
 
 export default function Header() {
   const [location] = useLocation();
@@ -20,6 +21,9 @@ export default function Header() {
   const [guestModalOpen, setGuestModalOpen] = useState(false);
   const [clientModalOpen, setClientModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // Dynamic logo from CMS with fallback to bundled asset
+  const logoSrc = useDynamicImage('global', 'logo', defaultLogo);
 
   // Check roles directly from user object (more efficient and reliable)
   const isSuperAdmin = user?.role === 'super_admin';
@@ -53,7 +57,7 @@ export default function Header() {
             {/* Logo */}
             <Link href="/" className="flex items-center min-w-0">
               <img 
-                src={ifsLogo} 
+                src={logoSrc} 
                 alt="IFS Wealth Management" 
                 className="h-16 sm:h-20 w-auto object-contain"
                 style={{ imageRendering: 'crisp-edges' }}

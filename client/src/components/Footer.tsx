@@ -2,9 +2,13 @@ import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ChartLine, Linkedin, Twitter, Facebook } from "lucide-react";
 import type { PageContent } from "@shared/schema";
-import ifsLogo from "@assets/image_1763735441524.jpeg";
+import { useDynamicImage } from "@/hooks/useDynamicImage";
+import defaultLogo from "@assets/image_1763735441524.jpeg";
 
 export default function Footer() {
+  // Dynamic logo from CMS with fallback to bundled asset
+  const logoSrc = useDynamicImage('global', 'logo', defaultLogo);
+  
   // Fetch footer content
   const { data: footerContent } = useQuery<PageContent[]>({
     queryKey: ['/api/content', 'footer'],
@@ -37,7 +41,7 @@ export default function Footer() {
           <div className="lg:col-span-1">
             <div className="mb-4 bg-white p-3 rounded inline-block">
               <img 
-                src={ifsLogo} 
+                src={logoSrc} 
                 alt="IFS Wealth Management" 
                 className="h-20 w-auto object-contain"
                 style={{ imageRendering: 'crisp-edges' }}

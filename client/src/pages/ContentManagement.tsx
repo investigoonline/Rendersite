@@ -72,6 +72,7 @@ export default function ContentManagement() {
   
   // Hero image pages configuration
   const heroImagePages = [
+    { page: 'global', section: 'logo', label: 'Site Logo', description: 'Company logo displayed in header and footer (recommended: PNG with transparent background)' },
     { page: 'home', section: 'hero', label: 'Home Page Hero', description: 'Main landing page hero image' },
     { page: 'about', section: 'hero', label: 'About Page Hero', description: 'About us page header image' },
     { page: 'services', section: 'hero', label: 'Services Page Hero', description: 'Services page header image' },
