@@ -25,6 +25,7 @@ import ContentManagement from "@/pages/ContentManagement";
 import ResourceManagement from "@/pages/admin/ResourceManagement";
 import Dashboard from "@/pages/Dashboard";
 import UnderConstruction from "@/pages/UnderConstruction";
+import BackgroundPreview from "@/pages/BackgroundPreview";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -47,6 +48,9 @@ function Router() {
         <Route path="/location" component={Location} />
         <Route path="/disclosures" component={Disclosures} />
         <Route path="/custodian" component={Custodian} />
+        <Route path="/background-preview">
+          {() => <BackgroundPreview onSelect={(opt) => alert(`You selected Option ${opt}. Tell me which one you want!`)} />}
+        </Route>
         
         {/* Under Construction pages */}
         <Route path="/auth/login" component={UnderConstruction} />
