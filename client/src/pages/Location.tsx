@@ -58,7 +58,7 @@ const businessHours = [
 
 export default function Location() {
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <Badge className="bg-primary/10 text-primary border-primary/20 mb-6">
@@ -184,7 +184,7 @@ export default function Location() {
           <CardContent>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {businessHours.map((schedule, index) => (
-                <div key={index} className="text-center p-4 bg-gray-50 rounded-lg">
+                <div key={index} className="text-center p-4 bg-background rounded-lg">
                   <h4 className="font-semibold text-gray-900 mb-1">{schedule.region}</h4>
                   <p className="text-sm text-muted-foreground mb-2">{schedule.timezone}</p>
                   <p className="text-sm font-medium">{schedule.hours}</p>

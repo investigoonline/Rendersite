@@ -277,7 +277,7 @@ export default function LoanPayoffCalculator({ calculatorName = "Loan Payoff Cal
                       </div>
                     </div>
                     
-                    <div className="p-4 bg-gray-50 rounded-lg">
+                    <div className="p-4 bg-background rounded-lg">
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">Time Saved</span>
                         <span className="font-mono font-semibold text-gray-900">

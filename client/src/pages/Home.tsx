@@ -67,7 +67,7 @@ export default function Home() {
   const filteredCategories = calculatorCategoriesContent?.categories || [];
 
   return (
-    <div className="min-h-screen bg-white py-16">
+    <div className="min-h-screen bg-background py-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-12">
         {/* Hero Section */}
         <div className="space-y-6">

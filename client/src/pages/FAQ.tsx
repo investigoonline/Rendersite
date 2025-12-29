@@ -117,7 +117,7 @@ export default function FAQ() {
     .filter((category) => category.questions.length > 0);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Image */}
         <div className="mb-12">
@@ -165,7 +165,7 @@ export default function FAQ() {
                       >
                         <button
                           onClick={() => toggleExpanded(key)}
-                          className="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                          className="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-background transition-colors"
                         >
                           <span className="font-medium text-gray-900">
                             {item.question}

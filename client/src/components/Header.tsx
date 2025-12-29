@@ -51,7 +51,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+      <header className="bg-background shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20 sm:h-24">
             {/* Logo */}
@@ -73,7 +73,7 @@ export default function Header() {
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     location === item.href
                       ? "text-primary bg-blue-50"
-                      : "text-muted-foreground hover:text-gray-900 hover:bg-gray-50"
+                      : "text-muted-foreground hover:text-gray-900 hover:bg-background"
                   }`}
                 >
                   {item.name}
@@ -85,7 +85,7 @@ export default function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="text-muted-foreground hover:text-gray-900 hover:bg-gray-50"
+                    className="text-muted-foreground hover:text-gray-900 hover:bg-background"
                   >
                     Resources <ChevronDown className="ml-1 h-4 w-4" />
                   </Button>
@@ -202,7 +202,7 @@ export default function Header() {
                       <Link
                         key={item.name}
                         href={item.href}
-                        className="block px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-50 rounded-md"
+                        className="block px-3 py-2 text-base font-medium text-gray-900 hover:bg-background rounded-md"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         {item.name}
@@ -214,7 +214,7 @@ export default function Header() {
                         <Link
                           key={item.name}
                           href={item.href}
-                          className="block px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded-md"
+                          className="block px-3 py-1 text-sm text-gray-600 hover:bg-background rounded-md"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           {item.name}
