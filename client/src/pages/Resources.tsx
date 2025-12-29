@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ import {
   Eye,
   Calendar,
 } from "lucide-react";
-import type { PageContent } from "@shared/schema";
+import type { PageContent, ImageAsset } from "@shared/schema";
 import { HTMLContent } from "@/components/HTMLContent";
 import cashImage from "@assets/image_1765301156968.png";
 import riskImage from "@assets/image_1765301191599.png";
@@ -46,7 +46,7 @@ interface ResourceType {
   description: string;
 }
 
-const carouselImages = [
+const defaultCarouselImages = [
   cashImage,
   riskImage,
   retirementImage,
@@ -61,13 +61,33 @@ export default function Resources() {
   const [viewingResource, setViewingResource] = useState<any | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  // Fetch dynamic carousel images from CMS
+  const { data: dynamicImages } = useQuery<ImageAsset[]>({
+    queryKey: ['/api/images', 'articles'],
+    staleTime: 1000 * 60 * 5,
+    queryFn: async () => {
+      const res = await fetch('/api/images?page=articles', { credentials: 'include' });
+      if (!res.ok) return [];
+      return res.json();
+    },
+  });
+
+  // Build carousel images array: use dynamic images if available, fall back to defaults
+  const carouselImages = useMemo(() => {
+    const slots = ['carousel_1', 'carousel_2', 'carousel_3', 'carousel_4'];
+    return slots.map((section, index) => {
+      const dynamicImage = dynamicImages?.find(img => img.section === section);
+      return dynamicImage?.filePath || defaultCarouselImages[index];
+    });
+  }, [dynamicImages]);
+
   // Rotate carousel images every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % carouselImages.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [carouselImages.length]);
 
   // Fetch resource types content
   const { data: resourceTypesContent } = useQuery<PageContent[]>({

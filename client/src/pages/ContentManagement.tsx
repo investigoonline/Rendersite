@@ -80,6 +80,10 @@ export default function ContentManagement() {
     { page: 'calculators', section: 'hero', label: 'Calculators Page Hero', description: 'Calculators page header image' },
     { page: 'faq', section: 'hero', label: 'FAQ Page Hero', description: 'FAQ page header image' },
     { page: 'resources', section: 'hero', label: 'Resources Page Hero', description: 'Resources page rotating carousel images' },
+    { page: 'articles', section: 'carousel_1', label: 'Articles Carousel Image 1', description: 'First rotating image on the Articles page' },
+    { page: 'articles', section: 'carousel_2', label: 'Articles Carousel Image 2', description: 'Second rotating image on the Articles page' },
+    { page: 'articles', section: 'carousel_3', label: 'Articles Carousel Image 3', description: 'Third rotating image on the Articles page' },
+    { page: 'articles', section: 'carousel_4', label: 'Articles Carousel Image 4', description: 'Fourth rotating image on the Articles page' },
   ];
 
   // Fetch page content
