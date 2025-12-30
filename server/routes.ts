@@ -58,6 +58,8 @@ async function processHeroImage(buffer: Buffer, originalName: string): Promise<{
   const sanitizedName = originalName.replace(/[^a-zA-Z0-9.-]/g, '_');
   const fileName = `hero_${timestamp}_${sanitizedName.replace(/\.[^.]+$/, '')}.webp`;
 
+  console.log('[Image Upload] Processing image:', originalName);
+
   // Process image: resize to max 1920px width, convert to WebP for optimization
   const processedBuffer = await sharp(buffer)
     .resize(1920, null, { 
@@ -67,11 +69,21 @@ async function processHeroImage(buffer: Buffer, originalName: string): Promise<{
     .webp({ quality: 85 })
     .toBuffer({ resolveWithObject: true });
 
+  console.log('[Image Upload] Image processed, size:', processedBuffer.info.size);
+
   // Upload to object storage
-  const bucketName = getBucketName();
+  let bucketName = getBucketName();
+  // Remove leading slash if present
+  if (bucketName.startsWith('/')) {
+    bucketName = bucketName.slice(1);
+  }
+  console.log('[Image Upload] Bucket name:', bucketName);
+  
   const bucket = objectStorageClient.bucket(bucketName);
   const objectPath = `public/hero-images/${fileName}`;
   const file = bucket.file(objectPath);
+  
+  console.log('[Image Upload] Uploading to:', objectPath);
   
   await file.save(processedBuffer.data, {
     contentType: 'image/webp',
@@ -80,11 +92,14 @@ async function processHeroImage(buffer: Buffer, originalName: string): Promise<{
     },
   });
 
+  console.log('[Image Upload] File saved, making public...');
+
   // Make file public
   await file.makePublic();
 
   // Get the public URL
   const publicUrl = `https://storage.googleapis.com/${bucketName}/${objectPath}`;
+  console.log('[Image Upload] Upload complete, URL:', publicUrl);
 
   return {
     fileName,
@@ -1083,9 +1098,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Image uploaded successfully", 
         image: imageAsset 
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error uploading image:", error);
-      res.status(500).json({ message: "Unable to upload image" });
+      console.error("Error details:", error?.message);
+      res.status(500).json({ message: "Unable to upload image", error: error?.message });
     }
   });
 
