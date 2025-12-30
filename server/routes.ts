@@ -92,18 +92,15 @@ async function processHeroImage(buffer: Buffer, originalName: string): Promise<{
     },
   });
 
-  console.log('[Image Upload] File saved, making public...');
+  console.log('[Image Upload] File saved successfully');
 
-  // Make file public
-  await file.makePublic();
-
-  // Get the public URL
-  const publicUrl = `https://storage.googleapis.com/${bucketName}/${objectPath}`;
-  console.log('[Image Upload] Upload complete, URL:', publicUrl);
+  // Store the object storage path (served via our proxy endpoint)
+  const proxyPath = `/api/storage/hero-images/${fileName}`;
+  console.log('[Image Upload] Upload complete, proxy path:', proxyPath);
 
   return {
     fileName,
-    filePath: publicUrl,
+    filePath: proxyPath,
     width: processedBuffer.info.width,
     height: processedBuffer.info.height,
     fileSize: processedBuffer.info.size,
@@ -113,18 +110,32 @@ async function processHeroImage(buffer: Buffer, originalName: string): Promise<{
 // Delete image from object storage
 async function deleteFromObjectStorage(filePath: string): Promise<void> {
   try {
+    let bucketName = getBucketName();
+    if (bucketName.startsWith('/')) {
+      bucketName = bucketName.slice(1);
+    }
+    
+    let objectPath: string | null = null;
+    
+    // Check if it's our proxy path
+    if (filePath.startsWith('/api/storage/hero-images/')) {
+      const fileName = filePath.replace('/api/storage/hero-images/', '');
+      objectPath = `public/hero-images/${fileName}`;
+    }
     // Check if it's an object storage URL
-    if (filePath.startsWith('https://storage.googleapis.com/')) {
+    else if (filePath.startsWith('https://storage.googleapis.com/')) {
       const url = new URL(filePath);
       const pathParts = url.pathname.split('/');
-      const bucketName = pathParts[1];
-      const objectPath = pathParts.slice(2).join('/');
-      
+      objectPath = pathParts.slice(2).join('/');
+    }
+    
+    if (objectPath) {
       const bucket = objectStorageClient.bucket(bucketName);
       const file = bucket.file(objectPath);
       const [exists] = await file.exists();
       if (exists) {
         await file.delete();
+        console.log('[Image Delete] Deleted:', objectPath);
       }
     }
   } catch (error) {
@@ -988,6 +999,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error restoring content:", error);
       res.status(500).json({ message: "Unable to restore content" });
+    }
+  });
+
+  // Proxy endpoint to serve images from object storage
+  // This is needed because the bucket has public access prevention enabled
+  app.get('/api/storage/hero-images/:fileName', async (req, res) => {
+    try {
+      let bucketName = getBucketName();
+      if (bucketName.startsWith('/')) {
+        bucketName = bucketName.slice(1);
+      }
+      
+      const { fileName } = req.params;
+      const objectPath = `public/hero-images/${fileName}`;
+      
+      const bucket = objectStorageClient.bucket(bucketName);
+      const file = bucket.file(objectPath);
+      
+      const [exists] = await file.exists();
+      if (!exists) {
+        return res.status(404).json({ message: "Image not found" });
+      }
+      
+      const [metadata] = await file.getMetadata();
+      
+      res.set({
+        'Content-Type': metadata.contentType || 'image/webp',
+        'Cache-Control': 'public, max-age=31536000',
+      });
+      
+      file.createReadStream().pipe(res);
+    } catch (error) {
+      console.error("Error serving image:", error);
+      res.status(500).json({ message: "Unable to serve image" });
     }
   });
 
