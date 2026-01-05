@@ -171,9 +171,9 @@ export default function MortgageCalculator({ calculatorName = "Home Affordabilit
             <TabsTrigger value="refinance">Mortgage Refinance</TabsTrigger>
             <TabsTrigger value="acceleration">Payment Acceleration</TabsTrigger>
           </TabsList>
-        </Tabs>
 
-        <Form {...form}>
+          <TabsContent value="affordability" className="mt-6">
+            <Form {...form}>
           <form onSubmit={form.handleSubmit(calculateMortgage)} className="space-y-8">
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Loan Details */}
@@ -499,7 +499,197 @@ export default function MortgageCalculator({ calculatorName = "Home Affordabilit
               </div>
             )}
           </form>
-        </Form>
+            </Form>
+          </TabsContent>
+
+          <TabsContent value="refinance" className="mt-6">
+            <div className="text-center py-12">
+              <Home className="h-16 w-16 mx-auto text-primary/30 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Mortgage Refinance Calculator</h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                Compare your current mortgage with refinancing options to see potential savings.
+              </p>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(calculateMortgage)} className="space-y-6 max-w-2xl mx-auto">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="homePrice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Current Loan Balance</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <span className="absolute left-3 top-3 text-gray-500">$</span>
+                              <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="interestRate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Current Interest Rate</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Input type="number" step="0.01" placeholder="0" className="pr-8 font-mono" {...field} />
+                              <span className="absolute right-3 top-3 text-gray-500">%</span>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="loanTerm"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Remaining Term</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Input type="number" placeholder="30" className="pr-16 font-mono" {...field} />
+                              <span className="absolute right-3 top-3 text-gray-500">years</span>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="downPayment"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>New Interest Rate</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Input type="number" step="0.01" placeholder="0" className="pr-8 font-mono" {...field} />
+                              <span className="absolute right-3 top-3 text-gray-500">%</span>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex justify-center pt-4">
+                    <Button type="submit" size="lg" className="px-8" disabled={!hasPermission || permissionLoading}>
+                      {!hasPermission && <Lock className="mr-2 h-4 w-4" />}
+                      Calculate Refinance Savings
+                    </Button>
+                  </div>
+                  {!hasPermission && !permissionLoading && (
+                    <Alert className="border-amber-200 bg-amber-50">
+                      <Lock className="h-4 w-4 text-amber-600" />
+                      <AlertDescription className="text-amber-800">
+                        This calculator is not available with your current account. <a href="/contact" className="underline font-medium">Contact us to upgrade</a>.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </form>
+              </Form>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="acceleration" className="mt-6">
+            <div className="text-center py-12">
+              <Home className="h-16 w-16 mx-auto text-primary/30 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Payment Acceleration Calculator</h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                See how extra payments can help you pay off your mortgage faster and save on interest.
+              </p>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(calculateMortgage)} className="space-y-6 max-w-2xl mx-auto">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="homePrice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Current Loan Balance</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <span className="absolute left-3 top-3 text-gray-500">$</span>
+                              <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="interestRate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Interest Rate</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Input type="number" step="0.01" placeholder="0" className="pr-8 font-mono" {...field} />
+                              <span className="absolute right-3 top-3 text-gray-500">%</span>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="loanTerm"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Remaining Term</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Input type="number" placeholder="30" className="pr-16 font-mono" {...field} />
+                              <span className="absolute right-3 top-3 text-gray-500">years</span>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="downPayment"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Extra Monthly Payment</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <span className="absolute left-3 top-3 text-gray-500">$</span>
+                              <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex justify-center pt-4">
+                    <Button type="submit" size="lg" className="px-8" disabled={!hasPermission || permissionLoading}>
+                      {!hasPermission && <Lock className="mr-2 h-4 w-4" />}
+                      Calculate Payoff Savings
+                    </Button>
+                  </div>
+                  {!hasPermission && !permissionLoading && (
+                    <Alert className="border-amber-200 bg-amber-50">
+                      <Lock className="h-4 w-4 text-amber-600" />
+                      <AlertDescription className="text-amber-800">
+                        This calculator is not available with your current account. <a href="/contact" className="underline font-medium">Contact us to upgrade</a>.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </form>
+              </Form>
+            </div>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
