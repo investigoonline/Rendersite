@@ -228,9 +228,9 @@ export default function TaxCalculator({ calculatorName = "Federal Income Tax Cal
             <TabsTrigger value="ira_eligibility">IRA Eligibility</TabsTrigger>
             <TabsTrigger value="estate_tax">Estate Tax</TabsTrigger>
           </TabsList>
-        </Tabs>
 
-        <Form {...form}>
+          <TabsContent value="federal_tax" className="mt-6">
+            <Form {...form}>
           <form onSubmit={form.handleSubmit(calculateTaxes)} className="space-y-8">
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Income Information */}
@@ -567,7 +567,174 @@ export default function TaxCalculator({ calculatorName = "Federal Income Tax Cal
               </div>
             )}
           </form>
-        </Form>
+            </Form>
+          </TabsContent>
+
+          <TabsContent value="tax_deferred" className="mt-6">
+            <div className="text-center py-12">
+              <FileText className="h-16 w-16 mx-auto text-primary/30 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Tax-Deferred Calculator</h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                Calculate potential tax savings from tax-deferred investment accounts like 401(k) and traditional IRA.
+              </p>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(calculateTaxes)} className="space-y-6 max-w-2xl mx-auto">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <FormField control={form.control} name="annualIncome" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Annual Income</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-500">$</span>
+                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="iraContribution" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Annual Contribution</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-500">$</span>
+                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                  <div className="flex justify-center pt-4">
+                    <Button type="submit" size="lg" className="px-8" disabled={!hasPermission || permissionLoading}>
+                      {!hasPermission && <Lock className="mr-2 h-4 w-4" />}
+                      Calculate Tax Savings
+                    </Button>
+                  </div>
+                  {!hasPermission && !permissionLoading && (
+                    <Alert className="border-amber-200 bg-amber-50">
+                      <Lock className="h-4 w-4 text-amber-600" />
+                      <AlertDescription className="text-amber-800">
+                        This calculator requires an upgraded account. <a href="/contact" className="underline font-medium">Contact us to upgrade</a>.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </form>
+              </Form>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="ira_eligibility" className="mt-6">
+            <div className="text-center py-12">
+              <FileText className="h-16 w-16 mx-auto text-primary/30 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">IRA Eligibility Calculator</h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                Determine your eligibility for Traditional IRA and Roth IRA contributions based on income.
+              </p>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(calculateTaxes)} className="space-y-6 max-w-2xl mx-auto">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <FormField control={form.control} name="filingStatus" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Filing Status</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="single">Single</SelectItem>
+                            <SelectItem value="married_filing_jointly">Married Filing Jointly</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="annualIncome" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Modified Adjusted Gross Income</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-500">$</span>
+                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                  <div className="flex justify-center pt-4">
+                    <Button type="submit" size="lg" className="px-8" disabled={!hasPermission || permissionLoading}>
+                      {!hasPermission && <Lock className="mr-2 h-4 w-4" />}
+                      Check Eligibility
+                    </Button>
+                  </div>
+                  {!hasPermission && !permissionLoading && (
+                    <Alert className="border-amber-200 bg-amber-50">
+                      <Lock className="h-4 w-4 text-amber-600" />
+                      <AlertDescription className="text-amber-800">
+                        This calculator requires an upgraded account. <a href="/contact" className="underline font-medium">Contact us to upgrade</a>.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </form>
+              </Form>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="estate_tax" className="mt-6">
+            <div className="text-center py-12">
+              <FileText className="h-16 w-16 mx-auto text-primary/30 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Estate Tax Calculator</h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                Estimate potential federal estate taxes and plan for wealth transfer.
+              </p>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(calculateTaxes)} className="space-y-6 max-w-2xl mx-auto">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <FormField control={form.control} name="annualIncome" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Total Estate Value</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-500">$</span>
+                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="deductions" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Charitable Deductions</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-500">$</span>
+                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                  <div className="flex justify-center pt-4">
+                    <Button type="submit" size="lg" className="px-8" disabled={!hasPermission || permissionLoading}>
+                      {!hasPermission && <Lock className="mr-2 h-4 w-4" />}
+                      Calculate Estate Tax
+                    </Button>
+                  </div>
+                  {!hasPermission && !permissionLoading && (
+                    <Alert className="border-amber-200 bg-amber-50">
+                      <Lock className="h-4 w-4 text-amber-600" />
+                      <AlertDescription className="text-amber-800">
+                        This calculator requires an upgraded account. <a href="/contact" className="underline font-medium">Contact us to upgrade</a>.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </form>
+              </Form>
+            </div>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );

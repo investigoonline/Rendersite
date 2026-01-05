@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { PiggyBank, Save, Download, Mail, Lock } from "lucide-react";
+import { PiggyBank, Save, Download, Mail, Lock, TrendingUp, Clock } from "lucide-react";
 import { useCalculatorPermission } from "@/hooks/useCalculatorPermission";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -188,9 +188,9 @@ export default function RetirementCalculator({ calculatorName = "Cost of Retirem
             <TabsTrigger value="inflation">Inflation Impact</TabsTrigger>
             <TabsTrigger value="lifespan">Portfolio Lifespan</TabsTrigger>
           </TabsList>
-        </Tabs>
 
-        <Form {...form}>
+          <TabsContent value="cost" className="mt-6">
+            <Form {...form}>
           <form onSubmit={form.handleSubmit(calculateRetirement)} className="space-y-8">
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Personal Information */}
@@ -520,7 +520,166 @@ export default function RetirementCalculator({ calculatorName = "Cost of Retirem
               </div>
             )}
           </form>
-        </Form>
+            </Form>
+          </TabsContent>
+
+          <TabsContent value="rmd" className="mt-6">
+            <div className="text-center py-12">
+              <PiggyBank className="h-16 w-16 mx-auto text-primary/30 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Required Minimum Distributions</h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                Calculate your required minimum distributions from retirement accounts based on IRS life expectancy tables.
+              </p>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(calculateRetirement)} className="space-y-6 max-w-2xl mx-auto">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <FormField control={form.control} name="currentAge" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Your Age</FormLabel>
+                        <FormControl><Input type="number" placeholder="72" className="font-mono" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="currentSavings" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Account Balance</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-500">$</span>
+                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                  <div className="flex justify-center pt-4">
+                    <Button type="submit" size="lg" className="px-8" disabled={!hasPermission || permissionLoading}>
+                      {!hasPermission && <Lock className="mr-2 h-4 w-4" />}
+                      Calculate RMD
+                    </Button>
+                  </div>
+                  {!hasPermission && !permissionLoading && (
+                    <Alert className="border-amber-200 bg-amber-50">
+                      <Lock className="h-4 w-4 text-amber-600" />
+                      <AlertDescription className="text-amber-800">
+                        This calculator requires an upgraded account. <a href="/contact" className="underline font-medium">Contact us to upgrade</a>.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </form>
+              </Form>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="inflation" className="mt-6">
+            <div className="text-center py-12">
+              <TrendingUp className="h-16 w-16 mx-auto text-primary/30 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Inflation Impact Calculator</h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                See how inflation affects your purchasing power and retirement savings over time.
+              </p>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(calculateRetirement)} className="space-y-6 max-w-2xl mx-auto">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <FormField control={form.control} name="currentSavings" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Current Amount</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-500">$</span>
+                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="inflationRate" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Expected Inflation Rate</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Input type="number" step="0.1" placeholder="3" className="pr-8 font-mono" {...field} />
+                            <span className="absolute right-3 top-3 text-gray-500">%</span>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                  <div className="flex justify-center pt-4">
+                    <Button type="submit" size="lg" className="px-8" disabled={!hasPermission || permissionLoading}>
+                      {!hasPermission && <Lock className="mr-2 h-4 w-4" />}
+                      Calculate Impact
+                    </Button>
+                  </div>
+                  {!hasPermission && !permissionLoading && (
+                    <Alert className="border-amber-200 bg-amber-50">
+                      <Lock className="h-4 w-4 text-amber-600" />
+                      <AlertDescription className="text-amber-800">
+                        This calculator requires an upgraded account. <a href="/contact" className="underline font-medium">Contact us to upgrade</a>.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </form>
+              </Form>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="lifespan" className="mt-6">
+            <div className="text-center py-12">
+              <Clock className="h-16 w-16 mx-auto text-primary/30 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Portfolio Lifespan Calculator</h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                Determine how long your retirement savings will last based on withdrawal rates.
+              </p>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(calculateRetirement)} className="space-y-6 max-w-2xl mx-auto">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <FormField control={form.control} name="currentSavings" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Current Portfolio Value</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-500">$</span>
+                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="annualIncome" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Annual Withdrawal</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-500">$</span>
+                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                  <div className="flex justify-center pt-4">
+                    <Button type="submit" size="lg" className="px-8" disabled={!hasPermission || permissionLoading}>
+                      {!hasPermission && <Lock className="mr-2 h-4 w-4" />}
+                      Calculate Lifespan
+                    </Button>
+                  </div>
+                  {!hasPermission && !permissionLoading && (
+                    <Alert className="border-amber-200 bg-amber-50">
+                      <Lock className="h-4 w-4 text-amber-600" />
+                      <AlertDescription className="text-amber-800">
+                        This calculator requires an upgraded account. <a href="/contact" className="underline font-medium">Contact us to upgrade</a>.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </form>
+              </Form>
+            </div>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
