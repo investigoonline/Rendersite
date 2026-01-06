@@ -19,6 +19,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { PlusCircle, MinusCircle, Save, Download, Mail, Lock } from "lucide-react";
 import { useCalculatorPermission } from "@/hooks/useCalculatorPermission";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import CalculatorDisclaimer from "./CalculatorDisclaimer";
 
 const netWorthSchema = z.object({
   assets: z.object({
@@ -470,6 +471,7 @@ export default function NetWorthCalculator({ calculatorName = "Total Net Worth C
             )}
           </form>
         </Form>
+        <CalculatorDisclaimer />
       </CardContent>
     </Card>
   );

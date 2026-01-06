@@ -20,6 +20,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Home, Save, Download, Mail, Lock } from "lucide-react";
 import { useCalculatorPermission } from "@/hooks/useCalculatorPermission";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import CalculatorDisclaimer from "./CalculatorDisclaimer";
 
 const mortgageSchema = z.object({
   homePrice: z.coerce.number().min(1, "Home price is required"),
@@ -690,6 +691,7 @@ export default function MortgageCalculator({ calculatorName = "Home Affordabilit
             </div>
           </TabsContent>
         </Tabs>
+        <CalculatorDisclaimer />
       </CardContent>
     </Card>
   );

@@ -20,6 +20,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { PiggyBank, Save, Download, Mail, Lock, TrendingUp, Clock } from "lucide-react";
 import { useCalculatorPermission } from "@/hooks/useCalculatorPermission";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import CalculatorDisclaimer from "./CalculatorDisclaimer";
 
 const retirementSchema = z.object({
   currentAge: z.coerce.number().min(18).max(100, "Age must be between 18 and 100"),
@@ -680,6 +681,7 @@ export default function RetirementCalculator({ calculatorName = "Cost of Retirem
             </div>
           </TabsContent>
         </Tabs>
+        <CalculatorDisclaimer />
       </CardContent>
     </Card>
   );

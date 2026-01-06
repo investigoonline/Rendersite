@@ -21,6 +21,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { FileText, Save, Download, Mail, Lock } from "lucide-react";
 import { useCalculatorPermission } from "@/hooks/useCalculatorPermission";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import CalculatorDisclaimer from "./CalculatorDisclaimer";
 
 const taxSchema = z.object({
   filingStatus: z.enum(["single", "married_filing_jointly", "married_filing_separately", "head_of_household"]),
@@ -735,6 +736,7 @@ export default function TaxCalculator({ calculatorName = "Federal Income Tax Cal
             </div>
           </TabsContent>
         </Tabs>
+        <CalculatorDisclaimer />
       </CardContent>
     </Card>
   );

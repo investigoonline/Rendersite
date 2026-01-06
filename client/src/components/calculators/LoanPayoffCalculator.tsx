@@ -19,6 +19,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { CreditCard, Save, Download, Mail, Lock } from "lucide-react";
 import { useCalculatorPermission } from "@/hooks/useCalculatorPermission";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import CalculatorDisclaimer from "./CalculatorDisclaimer";
 
 const loanPayoffSchema = z.object({
   principal: z.coerce.number().min(1, "Principal amount is required"),
@@ -375,6 +376,7 @@ export default function LoanPayoffCalculator({ calculatorName = "Loan Payoff Cal
             )}
           </form>
         </Form>
+        <CalculatorDisclaimer />
       </CardContent>
     </Card>
   );
