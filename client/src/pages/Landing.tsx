@@ -116,15 +116,15 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="w-full mb-12">
+      <section>
+        <div className="w-full">
           <img
             src={heroImage}
             alt="Family enjoying financial freedom"
-            className="w-full h-auto rounded-lg shadow-lg object-cover"
+            className="w-full h-auto object-cover"
           />
         </div>
-        <div className="mx-auto space-y-8 text-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-center">
             <span className="text-primary">
               Welcome to IFS Wealth Management Inc- Your Trusted Partner in Wealth Management
