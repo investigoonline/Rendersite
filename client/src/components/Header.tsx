@@ -41,7 +41,7 @@ export default function Header() {
   ];
 
   const allResourceItems = [
-    { name: "Frequently Asked Questions", href: "/faq", pageId: "Resources" },
+    { name: "Frequently Asked Questions", href: "/faq", pageId: "FAQ" },
     { name: "Disclosures", href: "/disclosures", pageId: "Disclosures" },
     { name: "Articles", href: "/resources?type=article", pageId: "Resources" },
     { name: "Calculators", href: "/calculators", calculatorCategory: "CALCULATORS" },

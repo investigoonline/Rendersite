@@ -27,10 +27,6 @@ export function usePagePermissions() {
 
     const pagePermissions = permissions.filter(p => p.resourceType === 'page');
     
-    if (pagePermissions.length === 0) {
-      return true;
-    }
-
     return pagePermissions.some(p => p.resourceId === pageId);
   };
 
@@ -45,10 +41,6 @@ export function usePagePermissions() {
 
     const resourcePermissions = permissions.filter(p => p.resourceType === 'resource_type');
     
-    if (resourcePermissions.length === 0) {
-      return true;
-    }
-
     return resourcePermissions.some(p => p.resourceId === resourceType);
   };
 
@@ -63,10 +55,6 @@ export function usePagePermissions() {
 
     const categoryPermissions = permissions.filter(p => p.resourceType === 'calculator_category');
     
-    if (categoryPermissions.length === 0) {
-      return true;
-    }
-
     return categoryPermissions.some(p => p.resourceId === categoryId);
   };
 
