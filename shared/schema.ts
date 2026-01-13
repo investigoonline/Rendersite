@@ -238,7 +238,10 @@ export const contentSectionEnum = pgEnum('content_section', [
   'dashboard_stats',
   'dashboard_user_distribution',
   'dashboard_engagement',
-  'dashboard_system_status'
+  'dashboard_system_status',
+  'legal_privacy_policy',
+  'legal_terms_of_service',
+  'legal_disclosures'
 ]);
 
 // Content management table

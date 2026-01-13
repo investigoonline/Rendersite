@@ -19,9 +19,9 @@ import Services from "@/pages/Services";
 import FAQ from "@/pages/FAQ";
 import BecomeClient from "@/pages/BecomeClient";
 import Location from "@/pages/Location";
-import Disclosures from "@/pages/Disclosures";
 import Custodian from "@/pages/Custodian";
 import ContentManagement from "@/pages/ContentManagement";
+import LegalPage from "@/pages/LegalPage";
 import ResourceManagement from "@/pages/admin/ResourceManagement";
 import Dashboard from "@/pages/Dashboard";
 import UnderConstruction from "@/pages/UnderConstruction";
@@ -46,8 +46,18 @@ function Router() {
         <Route path="/faq" component={FAQ} />
         <Route path="/become-client" component={BecomeClient} />
         <Route path="/location" component={Location} />
-        <Route path="/disclosures" component={Disclosures} />
         <Route path="/custodian" component={Custodian} />
+        
+        {/* Legal pages with CMS content */}
+        <Route path="/privacy-policy">
+          {() => <LegalPage pageType="privacy_policy" />}
+        </Route>
+        <Route path="/terms-of-service">
+          {() => <LegalPage pageType="terms_of_service" />}
+        </Route>
+        <Route path="/disclosures">
+          {() => <LegalPage pageType="disclosures" />}
+        </Route>
         <Route path="/background-preview">
           {() => <BackgroundPreview onSelect={(opt) => alert(`You selected Option ${opt}. Tell me which one you want!`)} />}
         </Route>
@@ -63,8 +73,6 @@ function Router() {
         <Route path="/leadership" component={UnderConstruction} />
         <Route path="/careers" component={UnderConstruction} />
         <Route path="/press" component={UnderConstruction} />
-        <Route path="/privacy" component={UnderConstruction} />
-        <Route path="/terms" component={UnderConstruction} />
         
         {/* Protected routes - Super Admin only */}
         <Route path="/admin-dashboard">

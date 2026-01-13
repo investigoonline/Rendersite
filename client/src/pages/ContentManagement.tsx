@@ -400,7 +400,7 @@ export default function ContentManagement() {
           <TabsContent value="content" className="space-y-6">
             {/* Page Selection Tabs */}
             <Tabs value={selectedPage} onValueChange={setSelectedPage} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-8 lg:w-auto lg:inline-grid">
+              <TabsList className="flex flex-wrap gap-1 lg:w-auto lg:inline-flex">
                 <TabsTrigger value="home" data-testid="tab-home">Home</TabsTrigger>
                 <TabsTrigger value="footer" data-testid="tab-footer">Footer</TabsTrigger>
                 <TabsTrigger value="services" data-testid="tab-services">Services</TabsTrigger>
@@ -409,6 +409,9 @@ export default function ContentManagement() {
                 <TabsTrigger value="blog" data-testid="tab-blog">Blog</TabsTrigger>
                 <TabsTrigger value="about" data-testid="tab-about">About</TabsTrigger>
                 <TabsTrigger value="dashboard" data-testid="tab-dashboard">Dashboard</TabsTrigger>
+                <TabsTrigger value="privacy_policy" data-testid="tab-privacy">Privacy Policy</TabsTrigger>
+                <TabsTrigger value="terms_of_service" data-testid="tab-terms">Terms of Service</TabsTrigger>
+                <TabsTrigger value="disclosures" data-testid="tab-disclosures">Disclosures</TabsTrigger>
               </TabsList>
 
               {/* Add Section Button */}

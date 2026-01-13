@@ -1244,6 +1244,48 @@ export const contentSchemas: Record<string, SectionSchema> = {
       secondaryButtonHref: { label: 'Secondary Button Link', control: 'text', placeholder: '/contact' },
     },
   },
+  legal_privacy_policy: {
+    schema: z.object({
+      title: z.string().min(1),
+      lastUpdated: z.string().optional(),
+      content: z.string().min(1),
+    }),
+    label: 'Privacy Policy',
+    description: 'Privacy policy page content',
+    uiMeta: {
+      title: { label: 'Page Title', control: 'text', placeholder: 'Privacy Policy' },
+      lastUpdated: { label: 'Last Updated Date', control: 'text', placeholder: 'January 2026' },
+      content: { label: 'Policy Content', control: 'richtext', placeholder: 'Enter the full privacy policy content here...' },
+    },
+  },
+  legal_terms_of_service: {
+    schema: z.object({
+      title: z.string().min(1),
+      lastUpdated: z.string().optional(),
+      content: z.string().min(1),
+    }),
+    label: 'Terms of Service',
+    description: 'Terms of service page content',
+    uiMeta: {
+      title: { label: 'Page Title', control: 'text', placeholder: 'Terms of Service' },
+      lastUpdated: { label: 'Last Updated Date', control: 'text', placeholder: 'January 2026' },
+      content: { label: 'Terms Content', control: 'richtext', placeholder: 'Enter the full terms of service content here...' },
+    },
+  },
+  legal_disclosures: {
+    schema: z.object({
+      title: z.string().min(1),
+      lastUpdated: z.string().optional(),
+      content: z.string().min(1),
+    }),
+    label: 'Disclosures',
+    description: 'Legal disclosures page content',
+    uiMeta: {
+      title: { label: 'Page Title', control: 'text', placeholder: 'Disclosures' },
+      lastUpdated: { label: 'Last Updated Date', control: 'text', placeholder: 'January 2026' },
+      content: { label: 'Disclosures Content', control: 'richtext', placeholder: 'Enter the full disclosures content here...' },
+    },
+  },
 };
 
 // Page to sections mapping
@@ -1269,6 +1311,9 @@ export const pageSections: Record<string, string[]> = {
   about: ['about_header', 'about_stats', 'about_story', 'about_mission_vision', 'about_values', 'about_leadership', 'about_headquarters', 'about_innovation', 'about_security', 'about_cta'],
   dashboard: ['dashboard_header', 'dashboard_stats', 'dashboard_user_distribution', 'dashboard_engagement', 'dashboard_system_status'],
   footer: ['footer_company', 'footer_platform', 'footer_resources', 'footer_company_details'],
+  privacy_policy: ['legal_privacy_policy'],
+  terms_of_service: ['legal_terms_of_service'],
+  disclosures: ['legal_disclosures'],
 };
 
 // Helper to get schema for a section

@@ -135,9 +135,9 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-sm text-gray-400">
               © 2024 IFS Group. All rights reserved. • 
-              <a href="#" className="hover:text-white transition-colors ml-1">Privacy Policy</a> • 
-              <a href="#" className="hover:text-white transition-colors ml-1">Terms of Service</a> • 
-              <a href="#" className="hover:text-white transition-colors ml-1">Disclosures</a>
+              <Link href="/privacy-policy" className="hover:text-white transition-colors ml-1">Privacy Policy</Link> • 
+              <Link href="/terms-of-service" className="hover:text-white transition-colors ml-1">Terms of Service</Link> • 
+              <Link href="/disclosures" className="hover:text-white transition-colors ml-1">Disclosures</Link>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-400">Powered by</span>
