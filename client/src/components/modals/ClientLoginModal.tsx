@@ -20,12 +20,11 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Captcha } from "@/components/Captcha";
 import { User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import ForgotPasswordModal from "./ForgotPasswordModal";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -43,6 +42,7 @@ export default function ClientLoginModal({ open, onOpenChange }: ClientLoginModa
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [captcha, setCaptcha] = useState({ question: "", answer: "" });
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -173,21 +173,41 @@ export default function ClientLoginModal({ open, onOpenChange }: ClientLoginModa
             </form>
           </Form>
 
-          <div className="text-center text-sm mt-4">
-            <span className="text-muted-foreground">Don't have an account? </span>
-            <Link href="/register">
+          <div className="text-center text-sm mt-4 space-y-2">
+            <div>
               <Button
                 variant="link"
-                className="p-0"
-                onClick={() => onOpenChange(false)}
-                data-testid="link-register"
+                className="p-0 text-primary"
+                onClick={() => {
+                  onOpenChange(false);
+                  setForgotPasswordOpen(true);
+                }}
+                data-testid="link-forgot-password"
               >
-                Create Account
+                Forgot Password?
               </Button>
-            </Link>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Don't have an account? </span>
+              <Link href="/register">
+                <Button
+                  variant="link"
+                  className="p-0"
+                  onClick={() => onOpenChange(false)}
+                  data-testid="link-register"
+                >
+                  Create Account
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </DialogContent>
+      
+      <ForgotPasswordModal 
+        open={forgotPasswordOpen} 
+        onOpenChange={setForgotPasswordOpen} 
+      />
     </Dialog>
   );
 }

@@ -426,6 +426,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get password hint
+  app.post('/api/auth/password-hint', async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email address is required" });
+      }
+      
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ message: "No account found with this email address" });
+      }
+      
+      res.json({ 
+        hint: user.passwordHint || null,
+        hasHint: !!user.passwordHint
+      });
+    } catch (error) {
+      console.error("Error getting password hint:", error);
+      res.status(500).json({ message: "Unable to retrieve password hint at this time" });
+    }
+  });
+
+  // Forgot password (placeholder for future email integration)
+  app.post('/api/auth/forgot-password', async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email address is required" });
+      }
+      
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ message: "No account found with this email address" });
+      }
+      
+      // TODO: Implement email sending when email integration is ready
+      // For now, just acknowledge the request
+      res.json({ 
+        message: "Password reset via email is not yet available. Please use your password hint or contact support.",
+        emailSent: false 
+      });
+    } catch (error) {
+      console.error("Error processing forgot password:", error);
+      res.status(500).json({ message: "Unable to process your request at this time" });
+    }
+  });
+
   // Calculator routes
   app.post('/api/calculations', async (req, res) => {
     try {

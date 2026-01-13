@@ -14,7 +14,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { insertUserRegistrationSchema } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
 
-// Create a form schema that includes confirm password
+// Create a form schema that includes confirm password and password hint
 const registrationFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
@@ -22,6 +22,7 @@ const registrationFormSchema = z.object({
   phone: z.string().optional(),
   password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
+  passwordHint: z.string().max(255, "Password hint must be less than 255 characters").optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -45,6 +46,7 @@ export default function Register() {
       phone: "",
       password: "",
       confirmPassword: "",
+      passwordHint: "",
     },
   });
 
@@ -222,6 +224,28 @@ export default function Register() {
                       />
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="passwordHint"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password Hint (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="A hint to help you remember your password"
+                        {...field}
+                        data-testid="input-password-hint"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                    <p className="text-xs text-muted-foreground">
+                      This hint will be shown if you forget your password
+                    </p>
                   </FormItem>
                 )}
               />
