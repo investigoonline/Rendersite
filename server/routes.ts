@@ -60,11 +60,11 @@ async function processHeroImage(buffer: Buffer, originalName: string): Promise<{
 
   console.log('[Image Upload] Processing image:', originalName);
 
-  // Process image: resize to max 1920px width, convert to WebP for optimization
+  // Process image: resize to 796x550 pixels, convert to WebP for optimization
   const processedBuffer = await sharp(buffer)
-    .resize(1920, null, { 
+    .resize(796, 550, { 
       withoutEnlargement: true,
-      fit: 'inside'
+      fit: 'cover'
     })
     .webp({ quality: 85 })
     .toBuffer({ resolveWithObject: true });
