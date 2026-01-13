@@ -33,7 +33,8 @@ export const userRoleEnum = pgEnum('user_role', [
   'content_manager',
   'guest_user',
   'preferred_client',
-  'client'
+  'client',
+  'unregistered'
 ]);
 
 // User storage table
