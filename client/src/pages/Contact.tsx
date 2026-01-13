@@ -135,11 +135,12 @@ export default function Contact() {
         )}
 
         {/* Contact Us Image Section */}
-        <div className="w-full mb-12">
+        <div className="flex justify-center mb-12">
           <img 
             src={heroImage} 
             alt="IFS Wealth Management - Contact Us" 
-            className="w-full h-auto rounded-lg shadow-lg object-cover"
+            className="rounded-lg shadow-lg object-cover"
+            style={{ width: '796px', height: '550px' }}
           />
         </div>
 

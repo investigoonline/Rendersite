@@ -171,11 +171,12 @@ export default function Services() {
         )}
 
         {/* Services Image Section */}
-        <div className="w-full mb-12 sm:mb-16 px-4">
+        <div className="flex justify-center mb-12 sm:mb-16 px-4">
           <img 
             src={heroImage} 
             alt="IFS Wealth Management professional services team" 
-            className="w-full h-auto rounded-lg shadow-lg object-cover"
+            className="rounded-lg shadow-lg object-cover"
+            style={{ width: '796px', height: '550px' }}
           />
         </div>
 

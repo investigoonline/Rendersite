@@ -117,11 +117,12 @@ export default function Landing() {
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section>
-        <div className="w-full">
+        <div className="flex justify-center py-8">
           <img
             src={heroImage}
             alt="Family enjoying financial freedom"
-            className="w-full h-auto object-cover"
+            className="object-cover"
+            style={{ width: '796px', height: '550px' }}
           />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 text-center">
