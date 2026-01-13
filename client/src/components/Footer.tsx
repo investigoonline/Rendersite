@@ -35,40 +35,47 @@ export default function Footer() {
 
   return (
     <footer className="bg-gray-900 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid lg:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Disclaimer Text */}
+        <div className="mb-4 pb-4 border-b border-gray-800">
+          <p className="text-xs text-gray-400 text-center leading-relaxed">
+            The information provided is for educational purposes only and should not be considered financial, legal, or tax advice. IFS makes no warranties regarding accuracy or completeness and disclaims liability for decisions based on this content. Please consult qualified financial, tax, and legal professionals before making any decisions.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-4 gap-4">
           {/* Company Information */}
           <div className="lg:col-span-1">
-            <div className="mb-4 bg-white p-3 rounded inline-block">
+            <div className="mb-2 bg-white p-2 rounded inline-block">
               <img 
                 src={logoSrc} 
                 alt="IFS Wealth Management" 
-                className="h-20 w-auto object-contain"
+                className="h-10 w-auto object-contain"
                 style={{ imageRendering: 'crisp-edges' }}
               />
             </div>
-            <p className="text-gray-400 text-sm mb-4" data-testid="text-footer-tagline">
+            <p className="text-gray-400 text-xs mb-2" data-testid="text-footer-tagline">
               {companyDetails?.tagline || 'Professional financial planning platform powered by 40+ years of IFS Group expertise.'}
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-3">
               <a href="#" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-linkedin">
-                <Linkedin className="h-5 w-5" />
+                <Linkedin className="h-4 w-4" />
               </a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-twitter">
-                <Twitter className="h-5 w-5" />
+                <Twitter className="h-4 w-4" />
               </a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-facebook">
-                <Facebook className="h-5 w-5" />
+                <Facebook className="h-4 w-4" />
               </a>
             </div>
           </div>
 
           {/* Platform Links */}
           <div>
-            <h4 className="text-lg font-semibold mb-4" data-testid="text-footer-platform-title">
+            <h4 className="text-sm font-semibold mb-2" data-testid="text-footer-platform-title">
               {platformLinks?.title || 'Platform'}
             </h4>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-1 text-xs">
               {platformLinks?.links?.map((link: any, index: number) => (
                 <li key={index}>
                   {link.href.startsWith('/') ? (
@@ -87,10 +94,10 @@ export default function Footer() {
 
           {/* Resources */}
           <div>
-            <h4 className="text-lg font-semibold mb-4" data-testid="text-footer-resources-title">
+            <h4 className="text-sm font-semibold mb-2" data-testid="text-footer-resources-title">
               {resourcesLinks?.title || 'Resources'}
             </h4>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-1 text-xs">
               {resourcesLinks?.links?.map((link: any, index: number) => (
                 <li key={index}>
                   {link.href.startsWith('/') ? (
@@ -109,10 +116,10 @@ export default function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="text-lg font-semibold mb-4" data-testid="text-footer-company-title">
+            <h4 className="text-sm font-semibold mb-2" data-testid="text-footer-company-title">
               {companyLinks?.title || 'Company'}
             </h4>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-1 text-xs">
               {companyLinks?.links?.map((link: any, index: number) => (
                 <li key={index}>
                   {link.href.startsWith('/') ? (
@@ -131,19 +138,19 @@ export default function Footer() {
         </div>
 
         {/* Bottom Section */}
-        <div className="mt-12 pt-8 border-t border-gray-800">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="text-sm text-gray-400">
+        <div className="mt-4 pt-4 border-t border-gray-800">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
+            <div className="text-xs text-gray-400">
               © 2024 IFS Group. All rights reserved. • 
               <Link href="/privacy-policy" className="hover:text-white transition-colors ml-1">Privacy Policy</Link> • 
               <Link href="/terms-of-service" className="hover:text-white transition-colors ml-1">Terms of Service</Link> • 
               <Link href="/disclosures" className="hover:text-white transition-colors ml-1">Disclosures</Link>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-400">Powered by</span>
-              <div className="flex items-center space-x-2">
-                <ChartLine className="text-primary h-4 w-4" />
-                <span className="text-sm font-medium">AI Financial Intelligence</span>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs text-gray-400">Powered by</span>
+              <div className="flex items-center space-x-1">
+                <ChartLine className="text-primary h-3 w-3" />
+                <span className="text-xs font-medium">AI Financial Intelligence</span>
               </div>
             </div>
           </div>
