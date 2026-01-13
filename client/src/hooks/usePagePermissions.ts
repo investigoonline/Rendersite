@@ -27,32 +27,17 @@ export function usePagePermissions() {
   const isLoading = isAuthenticated ? userLoading : guestLoading;
 
   const hasPageAccess = (pageId: string): boolean => {
-    if (user?.role === 'super_admin') {
-      return true;
-    }
-
     const pagePermissions = permissions.filter(p => p.resourceType === 'page');
-    
     return pagePermissions.some(p => p.resourceId === pageId);
   };
 
   const hasResourceTypeAccess = (resourceType: string): boolean => {
-    if (user?.role === 'super_admin') {
-      return true;
-    }
-
     const resourcePermissions = permissions.filter(p => p.resourceType === 'resource_type');
-    
     return resourcePermissions.some(p => p.resourceId === resourceType);
   };
 
   const hasCalculatorCategoryAccess = (categoryId: string): boolean => {
-    if (user?.role === 'super_admin') {
-      return true;
-    }
-
     const categoryPermissions = permissions.filter(p => p.resourceType === 'calculator_category');
-    
     return categoryPermissions.some(p => p.resourceId === categoryId);
   };
 
