@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
+import { usePagePermissions } from "@/hooks/usePagePermissions";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -29,25 +30,41 @@ export default function Header() {
   const isSuperAdmin = user?.role === 'super_admin';
   const hasContentAccess = user?.role === 'super_admin' || user?.role === 'content_manager';
 
-  const navigation = [
-    { name: "Home", href: "/" },
-    { name: "About Us", href: "/about" },
-    { name: "Services", href: "/services" },
-    { name: "Contact Us", href: "/contact" },
+  // Get page permissions for current user
+  const { hasPageAccess, hasResourceTypeAccess, hasCalculatorCategoryAccess } = usePagePermissions();
+
+  const allNavigation = [
+    { name: "Home", href: "/", pageId: "Home (Landing/Dashboard)" },
+    { name: "About Us", href: "/about", pageId: "About" },
+    { name: "Services", href: "/services", pageId: "Services" },
+    { name: "Contact Us", href: "/contact", pageId: "Contact" },
   ];
 
-  const resourceItems = [
-    
-    { name: "Frequently Asked Questions", href: "/faq" },
-    
-    { name: "Disclosures", href: "/disclosures" },
-    
-    { name: "Articles", href: "/resources?type=article" },
-    { name: "Calculators", href: "/calculators" },
-    { name: "Flipbooks", href: "/resources?type=flipbook" },
-    { name: "Newsletters", href: "/resources?type=newsletter" },
-    //{ name: "Videos", href: "/resources?type=video" },
+  const allResourceItems = [
+    { name: "Frequently Asked Questions", href: "/faq", pageId: "Resources" },
+    { name: "Disclosures", href: "/disclosures", pageId: "Disclosures" },
+    { name: "Articles", href: "/resources?type=article", pageId: "Resources" },
+    { name: "Calculators", href: "/calculators", calculatorCategory: "CALCULATORS" },
+    { name: "Flipbooks", href: "/resources?type=flipbook", pageId: "Resources" },
+    { name: "Newsletters", href: "/resources?type=newsletter", pageId: "Resources" },
   ];
+
+  // Filter navigation based on permissions
+  const navigation = useMemo(() => {
+    return allNavigation.filter(item => hasPageAccess(item.pageId));
+  }, [allNavigation, hasPageAccess]);
+
+  const resourceItems = useMemo(() => {
+    return allResourceItems.filter(item => {
+      if (item.calculatorCategory) {
+        return hasCalculatorCategoryAccess(item.calculatorCategory);
+      }
+      if (item.pageId) {
+        return hasPageAccess(item.pageId);
+      }
+      return true;
+    });
+  }, [allResourceItems, hasPageAccess, hasCalculatorCategoryAccess]);
 
   return (
     <>
