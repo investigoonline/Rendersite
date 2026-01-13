@@ -11,17 +11,23 @@ interface RolePermission {
 export function usePagePermissions() {
   const { user, isAuthenticated } = useAuth();
 
-  const { data: permissions = [], isLoading } = useQuery<RolePermission[]>({
+  // Fetch permissions for authenticated users
+  const { data: userPermissions = [], isLoading: userLoading } = useQuery<RolePermission[]>({
     queryKey: ["/api/user/permissions"],
     enabled: isAuthenticated,
   });
 
+  // Fetch guest permissions for unauthenticated users
+  const { data: guestPermissions = [], isLoading: guestLoading } = useQuery<RolePermission[]>({
+    queryKey: ["/api/guest/permissions"],
+    enabled: !isAuthenticated,
+  });
+
+  const permissions = isAuthenticated ? userPermissions : guestPermissions;
+  const isLoading = isAuthenticated ? userLoading : guestLoading;
+
   const hasPageAccess = (pageId: string): boolean => {
-    if (!isAuthenticated || !user) {
-      return true;
-    }
-    
-    if (user.role === 'super_admin') {
+    if (user?.role === 'super_admin') {
       return true;
     }
 
@@ -31,11 +37,7 @@ export function usePagePermissions() {
   };
 
   const hasResourceTypeAccess = (resourceType: string): boolean => {
-    if (!isAuthenticated || !user) {
-      return true;
-    }
-    
-    if (user.role === 'super_admin') {
+    if (user?.role === 'super_admin') {
       return true;
     }
 
@@ -45,11 +47,7 @@ export function usePagePermissions() {
   };
 
   const hasCalculatorCategoryAccess = (categoryId: string): boolean => {
-    if (!isAuthenticated || !user) {
-      return true;
-    }
-    
-    if (user.role === 'super_admin') {
+    if (user?.role === 'super_admin') {
       return true;
     }
 

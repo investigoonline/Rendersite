@@ -850,6 +850,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get guest permissions (for unauthenticated users viewing the site)
+  app.get('/api/guest/permissions', async (req, res) => {
+    try {
+      // Return permissions for guest_user role
+      const permissions = await storage.getRolePermissionsByRole('guest_user');
+      res.json(permissions);
+    } catch (error) {
+      console.error("Error fetching guest permissions:", error);
+      res.status(500).json({ message: "Unable to fetch permissions" });
+    }
+  });
+
   // Content management routes
   app.get('/api/content', async (req, res) => {
     try {

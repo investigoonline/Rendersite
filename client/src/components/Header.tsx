@@ -16,6 +16,23 @@ import GuestAccessModal from "./modals/GuestAccessModal";
 import ClientLoginModal from "./modals/ClientLoginModal";
 import defaultLogo from "@assets/image_1763735441524.jpeg";
 
+// Static navigation items - defined outside component to avoid recreating on each render
+const ALL_NAVIGATION = [
+  { name: "Home", href: "/", pageId: "Home (Landing/Dashboard)" },
+  { name: "About Us", href: "/about", pageId: "About" },
+  { name: "Services", href: "/services", pageId: "Services" },
+  { name: "Contact Us", href: "/contact", pageId: "Contact" },
+] as const;
+
+const ALL_RESOURCE_ITEMS = [
+  { name: "Frequently Asked Questions", href: "/faq", pageId: "FAQ", calculatorCategory: undefined },
+  { name: "Disclosures", href: "/disclosures", pageId: "Disclosures", calculatorCategory: undefined },
+  { name: "Articles", href: "/resources?type=article", pageId: "Resources", calculatorCategory: undefined },
+  { name: "Calculators", href: "/calculators", pageId: undefined, calculatorCategory: "CALCULATORS" },
+  { name: "Flipbooks", href: "/resources?type=flipbook", pageId: "Resources", calculatorCategory: undefined },
+  { name: "Newsletters", href: "/resources?type=newsletter", pageId: "Resources", calculatorCategory: undefined },
+] as const;
+
 export default function Header() {
   const [location] = useLocation();
   const { isAuthenticated, user, isGuestUser, isRegisteredUser, logout } = useAuth();
@@ -31,31 +48,15 @@ export default function Header() {
   const hasContentAccess = user?.role === 'super_admin' || user?.role === 'content_manager';
 
   // Get page permissions for current user
-  const { hasPageAccess, hasResourceTypeAccess, hasCalculatorCategoryAccess } = usePagePermissions();
-
-  const allNavigation = [
-    { name: "Home", href: "/", pageId: "Home (Landing/Dashboard)" },
-    { name: "About Us", href: "/about", pageId: "About" },
-    { name: "Services", href: "/services", pageId: "Services" },
-    { name: "Contact Us", href: "/contact", pageId: "Contact" },
-  ];
-
-  const allResourceItems = [
-    { name: "Frequently Asked Questions", href: "/faq", pageId: "FAQ" },
-    { name: "Disclosures", href: "/disclosures", pageId: "Disclosures" },
-    { name: "Articles", href: "/resources?type=article", pageId: "Resources" },
-    { name: "Calculators", href: "/calculators", calculatorCategory: "CALCULATORS" },
-    { name: "Flipbooks", href: "/resources?type=flipbook", pageId: "Resources" },
-    { name: "Newsletters", href: "/resources?type=newsletter", pageId: "Resources" },
-  ];
+  const { hasPageAccess, hasCalculatorCategoryAccess, permissions } = usePagePermissions();
 
   // Filter navigation based on permissions
   const navigation = useMemo(() => {
-    return allNavigation.filter(item => hasPageAccess(item.pageId));
-  }, [allNavigation, hasPageAccess]);
+    return ALL_NAVIGATION.filter(item => hasPageAccess(item.pageId));
+  }, [hasPageAccess, permissions]);
 
   const resourceItems = useMemo(() => {
-    return allResourceItems.filter(item => {
+    return ALL_RESOURCE_ITEMS.filter(item => {
       if (item.calculatorCategory) {
         return hasCalculatorCategoryAccess(item.calculatorCategory);
       }
@@ -64,7 +65,7 @@ export default function Header() {
       }
       return true;
     });
-  }, [allResourceItems, hasPageAccess, hasCalculatorCategoryAccess]);
+  }, [hasPageAccess, hasCalculatorCategoryAccess, permissions]);
 
   return (
     <>
