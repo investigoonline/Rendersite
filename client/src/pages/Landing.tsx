@@ -154,52 +154,52 @@ export default function Landing() {
       </section>
 
       {/* Wealth Pillars Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 gap-8">
             {/* Wealth Creation */}
-            <Card className="bg-white border-t-4 border-t-primary">
-              <CardContent className="p-6">
-                <h3 className="font-heading text-[22.5px] font-bold text-gray-900 mb-3">
+            <Card className="bg-white border-t-4 border-t-primary shadow-lg">
+              <CardContent className="p-10">
+                <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-4">
                   {wealthCreation?.title || 'Wealth Creation'}
                 </h3>
-                <p className="text-[13.5px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+                <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
                   {wealthCreation?.description || 'Placeholder content for Wealth Creation. Edit this from the Content Management page.'}
                 </p>
               </CardContent>
             </Card>
 
             {/* Wealth Protection */}
-            <Card className="bg-white border-t-4 border-t-blue-500">
-              <CardContent className="p-6">
-                <h3 className="font-heading text-[22.5px] font-bold text-gray-900 mb-3">
+            <Card className="bg-white border-t-4 border-t-blue-500 shadow-lg">
+              <CardContent className="p-10">
+                <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-4">
                   {wealthProtection?.title || 'Wealth Protection'}
                 </h3>
-                <p className="text-[13.5px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+                <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
                   {wealthProtection?.description || 'Placeholder content for Wealth Protection. Edit this from the Content Management page.'}
                 </p>
               </CardContent>
             </Card>
 
             {/* Wealth Preservation */}
-            <Card className="bg-white border-t-4 border-t-green-500">
-              <CardContent className="p-6">
-                <h3 className="font-heading text-[22.5px] font-bold text-gray-900 mb-3">
+            <Card className="bg-white border-t-4 border-t-green-500 shadow-lg">
+              <CardContent className="p-10">
+                <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-4">
                   {wealthPreservation?.title || 'Wealth Preservation'}
                 </h3>
-                <p className="text-[13.5px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+                <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
                   {wealthPreservation?.description || 'Placeholder content for Wealth Preservation. Edit this from the Content Management page.'}
                 </p>
               </CardContent>
             </Card>
 
             {/* Wealth Transfer & Legacy */}
-            <Card className="bg-white border-t-4 border-t-purple-500">
-              <CardContent className="p-6">
-                <h3 className="font-heading text-[22.5px] font-bold text-gray-900 mb-3">
+            <Card className="bg-white border-t-4 border-t-purple-500 shadow-lg">
+              <CardContent className="p-10">
+                <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-4">
                   {wealthTransfer?.title || 'Wealth Transfer & Legacy'}
                 </h3>
-                <p className="text-[13.5px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+                <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
                   {wealthTransfer?.description || 'Placeholder content for Wealth Transfer & Legacy. Edit this from the Content Management page.'}
                 </p>
               </CardContent>
