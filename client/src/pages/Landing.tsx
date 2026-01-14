@@ -260,11 +260,15 @@ export default function Landing() {
       {/* Calculator Access Button */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Link href="/calculators">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg">
-              Access Financial Calculators
-            </Button>
-          </Link>
+          <p className="text-gray-600 mb-4 text-lg">Explore our complete suite of financial tools</p>
+          <div className="flex flex-col items-center">
+            <ChartLine className="w-8 h-8 text-blue-600 mb-2 animate-bounce" />
+            <Link href="/calculators">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:scale-105 transition-transform">
+                Access Financial Calculators
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
