@@ -88,7 +88,7 @@ export default function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors font-sans ${
                     location === item.href
                       ? "text-primary bg-blue-50"
                       : "text-muted-foreground hover:text-gray-900 hover:bg-gray-50"
@@ -103,15 +103,15 @@ export default function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="text-muted-foreground hover:text-gray-900 hover:bg-gray-50"
+                    className="text-muted-foreground hover:text-gray-900 hover:bg-gray-50 font-sans"
                   >
                     Resources <ChevronDown className="ml-1 h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-64">
+                <DropdownMenuContent className="w-64 font-sans">
                   {resourceItems.map((item) => (
                     <DropdownMenuItem key={item.name} asChild>
-                      <Link href={item.href} className="w-full">
+                      <Link href={item.href} className="w-full font-sans">
                         {item.name}
                       </Link>
                     </DropdownMenuItem>
@@ -214,25 +214,25 @@ export default function Header() {
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-[300px]">
+                <SheetContent side="right" className="w-[300px] font-sans">
                   <div className="flex flex-col space-y-4 mt-8">
                     {navigation.map((item) => (
                       <Link
                         key={item.name}
                         href={item.href}
-                        className="block px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-50 rounded-md"
+                        className="block px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-50 rounded-md font-sans"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         {item.name}
                       </Link>
                     ))}
                     <div className="border-t pt-4">
-                      <p className="text-sm font-medium text-gray-900 mb-2">Resources</p>
+                      <p className="text-sm font-medium text-gray-900 mb-2 font-sans">Resources</p>
                       {resourceItems.map((item) => (
                         <Link
                           key={item.name}
                           href={item.href}
-                          className="block px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded-md"
+                          className="block px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded-md font-sans"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           {item.name}
