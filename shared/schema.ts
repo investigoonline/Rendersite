@@ -242,7 +242,11 @@ export const contentSectionEnum = pgEnum('content_section', [
   'dashboard_system_status',
   'legal_privacy_policy',
   'legal_terms_of_service',
-  'legal_disclosures'
+  'legal_disclosures',
+  'home_wealth_creation',
+  'home_wealth_protection',
+  'home_wealth_preservation',
+  'home_wealth_transfer'
 ]);
 
 // Content management table
