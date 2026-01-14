@@ -581,6 +581,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
     schema: z.object({
       title: z.string().min(1),
       description: z.string().min(1),
+      imageUrl: z.string().optional(),
     }),
     label: 'Wealth Creation Block',
     description: 'Wealth Creation pillar content block for landing page',
@@ -596,12 +597,19 @@ export const contentSchemas: Record<string, SectionSchema> = {
         rows: 4,
         placeholder: 'Enter description for Wealth Creation...',
       },
+      imageUrl: {
+        label: 'Image URL',
+        control: 'text',
+        placeholder: '/api/storage/hero-images/wealth-creation.png',
+        help: 'Upload image via Hero Images tab, then paste the URL here',
+      },
     },
   },
   home_wealth_protection: {
     schema: z.object({
       title: z.string().min(1),
       description: z.string().min(1),
+      imageUrl: z.string().optional(),
     }),
     label: 'Wealth Protection Block',
     description: 'Wealth Protection pillar content block for landing page',
@@ -617,12 +625,19 @@ export const contentSchemas: Record<string, SectionSchema> = {
         rows: 4,
         placeholder: 'Enter description for Wealth Protection...',
       },
+      imageUrl: {
+        label: 'Image URL',
+        control: 'text',
+        placeholder: '/api/storage/hero-images/wealth-protection.png',
+        help: 'Upload image via Hero Images tab, then paste the URL here',
+      },
     },
   },
   home_wealth_preservation: {
     schema: z.object({
       title: z.string().min(1),
       description: z.string().min(1),
+      imageUrl: z.string().optional(),
     }),
     label: 'Wealth Preservation Block',
     description: 'Wealth Preservation pillar content block for landing page',
@@ -638,12 +653,19 @@ export const contentSchemas: Record<string, SectionSchema> = {
         rows: 4,
         placeholder: 'Enter description for Wealth Preservation...',
       },
+      imageUrl: {
+        label: 'Image URL',
+        control: 'text',
+        placeholder: '/api/storage/hero-images/wealth-preservation.png',
+        help: 'Upload image via Hero Images tab, then paste the URL here',
+      },
     },
   },
   home_wealth_transfer: {
     schema: z.object({
       title: z.string().min(1),
       description: z.string().min(1),
+      imageUrl: z.string().optional(),
     }),
     label: 'Wealth Transfer & Legacy Block',
     description: 'Wealth Transfer & Legacy pillar content block for landing page',
@@ -658,6 +680,12 @@ export const contentSchemas: Record<string, SectionSchema> = {
         control: 'textarea',
         rows: 4,
         placeholder: 'Enter description for Wealth Transfer & Legacy...',
+      },
+      imageUrl: {
+        label: 'Image URL',
+        control: 'text',
+        placeholder: '/api/storage/hero-images/wealth-transfer.png',
+        help: 'Upload image via Hero Images tab, then paste the URL here',
       },
     },
   },

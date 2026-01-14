@@ -10,6 +10,10 @@ import NetWorthCalculator from "@/components/calculators/NetWorthCalculator";
 import GuestAccessModal from "@/components/modals/GuestAccessModal";
 import { HTMLContent } from "@/components/HTMLContent";
 import homeHeroImage from "@assets/Home_(2)_1765299273068.png";
+import wealthCreationDefault from "@/assets/wealth-creation.png";
+import wealthProtectionDefault from "@/assets/wealth-protection.png";
+import wealthPreservationDefault from "@/assets/wealth-preservation.png";
+import wealthTransferDefault from "@/assets/wealth-transfer.png";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
 import {
   PieChart,
@@ -159,50 +163,94 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8">
             {/* Wealth Creation */}
-            <Card className="bg-white border-t-4 border-t-primary shadow-lg">
-              <CardContent className="p-10">
-                <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-4">
-                  {wealthCreation?.title || 'Wealth Creation'}
-                </h3>
-                <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
-                  {wealthCreation?.description || 'Placeholder content for Wealth Creation. Edit this from the Content Management page.'}
-                </p>
+            <Card className="bg-white border-t-4 border-t-primary shadow-lg overflow-hidden">
+              <CardContent className="p-0">
+                <div className="flex flex-col sm:flex-row">
+                  <div className="sm:w-2/5 flex items-center justify-center p-6 bg-gradient-to-br from-green-50 to-white">
+                    <img 
+                      src={wealthCreation?.imageUrl || wealthCreationDefault} 
+                      alt="Wealth Creation"
+                      className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
+                    />
+                  </div>
+                  <div className="sm:w-3/5 p-6 sm:p-8">
+                    <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-3">
+                      {wealthCreation?.title || 'Wealth Creation'}
+                    </h3>
+                    <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+                      {wealthCreation?.description || 'Placeholder content for Wealth Creation. Edit this from the Content Management page.'}
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
             {/* Wealth Protection */}
-            <Card className="bg-white border-t-4 border-t-blue-500 shadow-lg">
-              <CardContent className="p-10">
-                <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-4">
-                  {wealthProtection?.title || 'Wealth Protection'}
-                </h3>
-                <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
-                  {wealthProtection?.description || 'Placeholder content for Wealth Protection. Edit this from the Content Management page.'}
-                </p>
+            <Card className="bg-white border-t-4 border-t-blue-500 shadow-lg overflow-hidden">
+              <CardContent className="p-0">
+                <div className="flex flex-col sm:flex-row">
+                  <div className="sm:w-2/5 flex items-center justify-center p-6 bg-gradient-to-br from-blue-50 to-white">
+                    <img 
+                      src={wealthProtection?.imageUrl || wealthProtectionDefault} 
+                      alt="Wealth Protection"
+                      className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
+                    />
+                  </div>
+                  <div className="sm:w-3/5 p-6 sm:p-8">
+                    <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-3">
+                      {wealthProtection?.title || 'Wealth Protection'}
+                    </h3>
+                    <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+                      {wealthProtection?.description || 'Placeholder content for Wealth Protection. Edit this from the Content Management page.'}
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
             {/* Wealth Preservation */}
-            <Card className="bg-white border-t-4 border-t-green-500 shadow-lg">
-              <CardContent className="p-10">
-                <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-4">
-                  {wealthPreservation?.title || 'Wealth Preservation'}
-                </h3>
-                <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
-                  {wealthPreservation?.description || 'Placeholder content for Wealth Preservation. Edit this from the Content Management page.'}
-                </p>
+            <Card className="bg-white border-t-4 border-t-yellow-500 shadow-lg overflow-hidden">
+              <CardContent className="p-0">
+                <div className="flex flex-col sm:flex-row">
+                  <div className="sm:w-2/5 flex items-center justify-center p-6 bg-gradient-to-br from-yellow-50 to-white">
+                    <img 
+                      src={wealthPreservation?.imageUrl || wealthPreservationDefault} 
+                      alt="Wealth Preservation"
+                      className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
+                    />
+                  </div>
+                  <div className="sm:w-3/5 p-6 sm:p-8">
+                    <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-3">
+                      {wealthPreservation?.title || 'Wealth Preservation'}
+                    </h3>
+                    <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+                      {wealthPreservation?.description || 'Placeholder content for Wealth Preservation. Edit this from the Content Management page.'}
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
             {/* Wealth Transfer & Legacy */}
-            <Card className="bg-white border-t-4 border-t-purple-500 shadow-lg">
-              <CardContent className="p-10">
-                <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-4">
-                  {wealthTransfer?.title || 'Wealth Transfer & Legacy'}
-                </h3>
-                <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
-                  {wealthTransfer?.description || 'Placeholder content for Wealth Transfer & Legacy. Edit this from the Content Management page.'}
-                </p>
+            <Card className="bg-white border-t-4 border-t-purple-500 shadow-lg overflow-hidden">
+              <CardContent className="p-0">
+                <div className="flex flex-col sm:flex-row">
+                  <div className="sm:w-2/5 flex items-center justify-center p-6 bg-gradient-to-br from-purple-50 to-white">
+                    <img 
+                      src={wealthTransfer?.imageUrl || wealthTransferDefault} 
+                      alt="Wealth Transfer & Legacy"
+                      className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
+                    />
+                  </div>
+                  <div className="sm:w-3/5 p-6 sm:p-8">
+                    <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-3">
+                      {wealthTransfer?.title || 'Wealth Transfer & Legacy'}
+                    </h3>
+                    <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+                      {wealthTransfer?.description || 'Placeholder content for Wealth Transfer & Legacy. Edit this from the Content Management page.'}
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
