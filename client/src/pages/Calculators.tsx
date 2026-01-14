@@ -248,12 +248,12 @@ export default function Calculators() {
           </p>
 
           {/* Hero Image */}
-          <div className="flex justify-center mb-8">
+          <div className="w-full mb-8 -mx-4 sm:-mx-6 lg:-mx-8">
             <img 
               src={heroImage} 
               alt="Financial planning and calculators" 
-              className="rounded-lg shadow-lg object-cover"
-              style={{ width: '1499px', height: '600px', maxWidth: '100%' }}
+              className="w-full object-cover"
+              style={{ height: '480px' }}
             />
           </div>
           

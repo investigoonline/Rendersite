@@ -63,12 +63,12 @@ export default function About() {
         )}
 
         {/* About Us Image Section */}
-        <div className="flex justify-center mb-20">
+        <div className="w-full mb-20 -mx-4 sm:-mx-6 lg:-mx-8">
           <img 
             src={heroImage} 
             alt="IFS Wealth Management - Family and personal service" 
-            className="rounded-lg shadow-lg object-cover"
-            style={{ width: '1499px', height: '600px', maxWidth: '100%' }}
+            className="w-full object-cover"
+            style={{ height: '480px' }}
           />
         </div>
 

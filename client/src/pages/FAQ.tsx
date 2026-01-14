@@ -120,12 +120,12 @@ export default function FAQ() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Image */}
-        <div className="flex justify-center mb-12">
+        <div className="w-full mb-12 -mx-4 sm:-mx-6 lg:-mx-8">
           <img 
             src={heroImage} 
             alt="Frequently Asked Questions" 
-            className="rounded-lg shadow-lg object-cover"
-            style={{ width: '1499px', height: '600px', maxWidth: '100%' }}
+            className="w-full object-cover"
+            style={{ height: '480px' }}
           />
         </div>
 
