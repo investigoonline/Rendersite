@@ -126,12 +126,6 @@ export default function Landing() {
           />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 text-center">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-center">
-            <span className="text-primary">
-              Welcome to IFS Wealth Management Inc- Your Trusted Partner in Wealth Management
-            </span>
-          </h1>
-
           <p className="text-xl sm:text-2xl text-gray-600 mx-auto leading-relaxed text-center">
             At IFS Wealth Management Inc, we understand that managing wealth is not just about numbers; it's about realizing your dreams, securing your future, and achieving financial freedom. As a leading wealth management firm, we are dedicated to providing personalized solutions and expert guidance to help you navigate the complexities of financial planning and investment management.
           </p>
