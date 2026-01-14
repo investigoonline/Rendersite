@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -208,23 +209,14 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Calculator Categories Section */}
-      <section id="calculators" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-6">
-              Complete Financial Calculator Suite
-            </h2>
-            <p className="text-2xl sm:text-3xl text-muted-foreground mx-auto">
-              32+ professional-grade calculators across 8 categories. From basic budgeting to complex estate planning.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {filteredCategories.map((category) => (
-              <CalculatorCard key={category.id} {...category} />
-            ))}
-          </div>
+      {/* Calculator Access Button */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Link href="/calculators">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg">
+              Access Financial Calculators
+            </Button>
+          </Link>
         </div>
       </section>
 
