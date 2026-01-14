@@ -24,7 +24,7 @@ import {
   ShieldCheck,
   Bot,
 } from "lucide-react";
-import type { RolePermission } from "@shared/schema";
+import type { RolePermission, PageContent } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
 
 const calculatorCategories = [
@@ -110,6 +110,27 @@ export default function Landing() {
     queryKey: ["/api/user/permissions"],
   });
 
+  // Fetch home page content for wealth pillars
+  const { data: homeContent } = useQuery<PageContent[]>({
+    queryKey: ['/api/content', 'home'],
+    queryFn: async () => {
+      const res = await fetch('/api/content?page=home', { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch home content');
+      return res.json();
+    },
+  });
+
+  // Helper to get content by section
+  const getSection = (sectionName: string) => {
+    return homeContent?.find(c => c.section === sectionName);
+  };
+
+  // Wealth pillar content
+  const wealthCreation = getSection('home_wealth_creation')?.content as any;
+  const wealthProtection = getSection('home_wealth_protection')?.content as any;
+  const wealthPreservation = getSection('home_wealth_preservation')?.content as any;
+  const wealthTransfer = getSection('home_wealth_transfer')?.content as any;
+
   // Show all categories without filtering
   const filteredCategories = calculatorCategories;
 
@@ -129,6 +150,61 @@ export default function Landing() {
           <p className="text-xl sm:text-2xl text-gray-600 mx-auto leading-relaxed text-center">
             At IFS Wealth Management Inc, we understand that managing wealth is not just about numbers; it's about realizing your dreams, securing your future, and achieving financial freedom. As a leading wealth management firm, we are dedicated to providing personalized solutions and expert guidance to help you navigate the complexities of financial planning and investment management.
           </p>
+        </div>
+      </section>
+
+      {/* Wealth Pillars Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Wealth Creation */}
+            <Card className="bg-white border-t-4 border-t-primary">
+              <CardContent className="p-6">
+                <h3 className="font-heading text-[22.5px] font-bold text-gray-900 mb-3">
+                  {wealthCreation?.title || 'Wealth Creation'}
+                </h3>
+                <p className="text-[13.5px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+                  {wealthCreation?.description || 'Placeholder content for Wealth Creation. Edit this from the Content Management page.'}
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Wealth Protection */}
+            <Card className="bg-white border-t-4 border-t-blue-500">
+              <CardContent className="p-6">
+                <h3 className="font-heading text-[22.5px] font-bold text-gray-900 mb-3">
+                  {wealthProtection?.title || 'Wealth Protection'}
+                </h3>
+                <p className="text-[13.5px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+                  {wealthProtection?.description || 'Placeholder content for Wealth Protection. Edit this from the Content Management page.'}
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Wealth Preservation */}
+            <Card className="bg-white border-t-4 border-t-green-500">
+              <CardContent className="p-6">
+                <h3 className="font-heading text-[22.5px] font-bold text-gray-900 mb-3">
+                  {wealthPreservation?.title || 'Wealth Preservation'}
+                </h3>
+                <p className="text-[13.5px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+                  {wealthPreservation?.description || 'Placeholder content for Wealth Preservation. Edit this from the Content Management page.'}
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Wealth Transfer & Legacy */}
+            <Card className="bg-white border-t-4 border-t-purple-500">
+              <CardContent className="p-6">
+                <h3 className="font-heading text-[22.5px] font-bold text-gray-900 mb-3">
+                  {wealthTransfer?.title || 'Wealth Transfer & Legacy'}
+                </h3>
+                <p className="text-[13.5px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+                  {wealthTransfer?.description || 'Placeholder content for Wealth Transfer & Legacy. Edit this from the Content Management page.'}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
 

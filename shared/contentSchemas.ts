@@ -577,6 +577,90 @@ export const contentSchemas: Record<string, SectionSchema> = {
       },
     },
   },
+  home_wealth_creation: {
+    schema: z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+    }),
+    label: 'Wealth Creation Block',
+    description: 'Wealth Creation pillar content block for landing page',
+    uiMeta: {
+      title: {
+        label: 'Block Title',
+        control: 'text',
+        placeholder: 'Wealth Creation',
+      },
+      description: {
+        label: 'Block Content',
+        control: 'textarea',
+        rows: 4,
+        placeholder: 'Enter description for Wealth Creation...',
+      },
+    },
+  },
+  home_wealth_protection: {
+    schema: z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+    }),
+    label: 'Wealth Protection Block',
+    description: 'Wealth Protection pillar content block for landing page',
+    uiMeta: {
+      title: {
+        label: 'Block Title',
+        control: 'text',
+        placeholder: 'Wealth Protection',
+      },
+      description: {
+        label: 'Block Content',
+        control: 'textarea',
+        rows: 4,
+        placeholder: 'Enter description for Wealth Protection...',
+      },
+    },
+  },
+  home_wealth_preservation: {
+    schema: z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+    }),
+    label: 'Wealth Preservation Block',
+    description: 'Wealth Preservation pillar content block for landing page',
+    uiMeta: {
+      title: {
+        label: 'Block Title',
+        control: 'text',
+        placeholder: 'Wealth Preservation',
+      },
+      description: {
+        label: 'Block Content',
+        control: 'textarea',
+        rows: 4,
+        placeholder: 'Enter description for Wealth Preservation...',
+      },
+    },
+  },
+  home_wealth_transfer: {
+    schema: z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+    }),
+    label: 'Wealth Transfer & Legacy Block',
+    description: 'Wealth Transfer & Legacy pillar content block for landing page',
+    uiMeta: {
+      title: {
+        label: 'Block Title',
+        control: 'text',
+        placeholder: 'Wealth Transfer & Legacy',
+      },
+      description: {
+        label: 'Block Content',
+        control: 'textarea',
+        rows: 4,
+        placeholder: 'Enter description for Wealth Transfer & Legacy...',
+      },
+    },
+  },
   services_investment: {
     schema: serviceSchema,
     label: 'Investment Advisory Service',
@@ -1290,7 +1374,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
 
 // Page to sections mapping
 export const pageSections: Record<string, string[]> = {
-  home: ['home_hero', 'home_stats', 'home_portfolio'],
+  home: ['home_hero', 'home_stats', 'home_portfolio', 'home_wealth_creation', 'home_wealth_protection', 'home_wealth_preservation', 'home_wealth_transfer'],
   services: ['services_header', 'services_stats', 'services_investment', 'services_strategic', 'services_legacy', 'services_risk', 'services_special', 'services_aggregation', 'services_process', 'services_why_choose', 'services_commitment', 'services_cta'],
   contact: [
     'contact_header',
