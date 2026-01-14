@@ -140,7 +140,7 @@ export default function Contact() {
             src={heroImage} 
             alt="IFS Wealth Management - Contact Us" 
             className="rounded-lg shadow-lg object-cover"
-            style={{ width: '796px', height: '550px' }}
+            style={{ width: '1499px', height: '600px', maxWidth: '100%' }}
           />
         </div>
 

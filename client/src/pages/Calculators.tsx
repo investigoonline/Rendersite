@@ -253,7 +253,7 @@ export default function Calculators() {
               src={heroImage} 
               alt="Financial planning and calculators" 
               className="rounded-lg shadow-lg object-cover"
-              style={{ width: '796px', height: '550px' }}
+              style={{ width: '1499px', height: '600px', maxWidth: '100%' }}
             />
           </div>
           

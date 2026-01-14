@@ -125,7 +125,7 @@ export default function FAQ() {
             src={heroImage} 
             alt="Frequently Asked Questions" 
             className="rounded-lg shadow-lg object-cover"
-            style={{ width: '796px', height: '550px' }}
+            style={{ width: '1499px', height: '600px', maxWidth: '100%' }}
           />
         </div>
 

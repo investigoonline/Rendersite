@@ -176,7 +176,7 @@ export default function Services() {
             src={heroImage} 
             alt="IFS Wealth Management professional services team" 
             className="rounded-lg shadow-lg object-cover"
-            style={{ width: '796px', height: '550px' }}
+            style={{ width: '1499px', height: '600px', maxWidth: '100%' }}
           />
         </div>
 

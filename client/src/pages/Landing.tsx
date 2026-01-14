@@ -106,7 +106,7 @@ const calculatorCategories = [
 ];
 
 export default function Landing() {
-  const heroImage = useDynamicImage('home', 'hero', homeHeroImage);
+  const heroImage = useDynamicImage("home", "hero", homeHeroImage);
   const [guestModalOpen, setGuestModalOpen] = useState(false);
   const { user } = useAuth();
 
@@ -117,24 +117,27 @@ export default function Landing() {
 
   // Fetch home page content for wealth pillars
   const { data: homeContent } = useQuery<PageContent[]>({
-    queryKey: ['/api/content', 'home'],
+    queryKey: ["/api/content", "home"],
     queryFn: async () => {
-      const res = await fetch('/api/content?page=home', { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch home content');
+      const res = await fetch("/api/content?page=home", {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to fetch home content");
       return res.json();
     },
   });
 
   // Helper to get content by section
   const getSection = (sectionName: string) => {
-    return homeContent?.find(c => c.section === sectionName);
+    return homeContent?.find((c) => c.section === sectionName);
   };
 
   // Wealth pillar content
-  const wealthCreation = getSection('home_wealth_creation')?.content as any;
-  const wealthProtection = getSection('home_wealth_protection')?.content as any;
-  const wealthPreservation = getSection('home_wealth_preservation')?.content as any;
-  const wealthTransfer = getSection('home_wealth_transfer')?.content as any;
+  const wealthCreation = getSection("home_wealth_creation")?.content as any;
+  const wealthProtection = getSection("home_wealth_protection")?.content as any;
+  const wealthPreservation = getSection("home_wealth_preservation")
+    ?.content as any;
+  const wealthTransfer = getSection("home_wealth_transfer")?.content as any;
 
   // Show all categories without filtering
   const filteredCategories = calculatorCategories;
@@ -148,12 +151,17 @@ export default function Landing() {
             src={heroImage}
             alt="Family enjoying financial freedom"
             className="object-cover"
-            style={{ width: '796px', height: '550px' }}
+            style={{ width: "1499px", height: "600px", maxWidth: "100%" }}
           />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 text-center">
           <p className="text-xl sm:text-2xl text-gray-600 mx-auto leading-relaxed text-center">
-            At IFS Wealth Management Inc, we understand that managing wealth is not just about numbers; it's about realizing your dreams, securing your future, and achieving financial freedom. As a leading wealth management firm, we are dedicated to providing personalized solutions and expert guidance to help you navigate the complexities of financial planning and investment management.
+            At IFS Wealth Management Inc, we understand that managing wealth is
+            not just about numbers; it's about realizing your dreams, securing
+            your future, and achieving financial freedom. As a leading wealth
+            management firm, we are dedicated to providing personalized
+            solutions and expert guidance to help you navigate the complexities
+            of financial planning and investment management.
           </p>
         </div>
       </section>
@@ -167,18 +175,19 @@ export default function Landing() {
               <CardContent className="p-0">
                 <div className="flex flex-col sm:flex-row">
                   <div className="sm:w-2/5 flex items-center justify-center p-6 bg-gradient-to-br from-green-50 to-white">
-                    <img 
-                      src={wealthCreation?.imageUrl || wealthCreationDefault} 
+                    <img
+                      src={wealthCreation?.imageUrl || wealthCreationDefault}
                       alt="Wealth Creation"
                       className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
                     />
                   </div>
                   <div className="sm:w-3/5 p-6 sm:p-8">
                     <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-3">
-                      {wealthCreation?.title || 'Wealth Creation'}
+                      {wealthCreation?.title || "Wealth Creation"}
                     </h3>
                     <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
-                      {wealthCreation?.description || 'Placeholder content for Wealth Creation. Edit this from the Content Management page.'}
+                      {wealthCreation?.description ||
+                        "Placeholder content for Wealth Creation. Edit this from the Content Management page."}
                     </p>
                   </div>
                 </div>
@@ -190,18 +199,21 @@ export default function Landing() {
               <CardContent className="p-0">
                 <div className="flex flex-col sm:flex-row">
                   <div className="sm:w-2/5 flex items-center justify-center p-6 bg-gradient-to-br from-blue-50 to-white">
-                    <img 
-                      src={wealthProtection?.imageUrl || wealthProtectionDefault} 
+                    <img
+                      src={
+                        wealthProtection?.imageUrl || wealthProtectionDefault
+                      }
                       alt="Wealth Protection"
                       className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
                     />
                   </div>
                   <div className="sm:w-3/5 p-6 sm:p-8">
                     <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-3">
-                      {wealthProtection?.title || 'Wealth Protection'}
+                      {wealthProtection?.title || "Wealth Protection"}
                     </h3>
                     <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
-                      {wealthProtection?.description || 'Placeholder content for Wealth Protection. Edit this from the Content Management page.'}
+                      {wealthProtection?.description ||
+                        "Placeholder content for Wealth Protection. Edit this from the Content Management page."}
                     </p>
                   </div>
                 </div>
@@ -213,18 +225,22 @@ export default function Landing() {
               <CardContent className="p-0">
                 <div className="flex flex-col sm:flex-row">
                   <div className="sm:w-2/5 flex items-center justify-center p-6 bg-gradient-to-br from-yellow-50 to-white">
-                    <img 
-                      src={wealthPreservation?.imageUrl || wealthPreservationDefault} 
+                    <img
+                      src={
+                        wealthPreservation?.imageUrl ||
+                        wealthPreservationDefault
+                      }
                       alt="Wealth Preservation"
                       className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
                     />
                   </div>
                   <div className="sm:w-3/5 p-6 sm:p-8">
                     <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-3">
-                      {wealthPreservation?.title || 'Wealth Preservation'}
+                      {wealthPreservation?.title || "Wealth Preservation"}
                     </h3>
                     <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
-                      {wealthPreservation?.description || 'Placeholder content for Wealth Preservation. Edit this from the Content Management page.'}
+                      {wealthPreservation?.description ||
+                        "Placeholder content for Wealth Preservation. Edit this from the Content Management page."}
                     </p>
                   </div>
                 </div>
@@ -236,18 +252,19 @@ export default function Landing() {
               <CardContent className="p-0">
                 <div className="flex flex-col sm:flex-row">
                   <div className="sm:w-2/5 flex items-center justify-center p-6 bg-gradient-to-br from-purple-50 to-white">
-                    <img 
-                      src={wealthTransfer?.imageUrl || wealthTransferDefault} 
+                    <img
+                      src={wealthTransfer?.imageUrl || wealthTransferDefault}
                       alt="Wealth Transfer & Legacy"
                       className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
                     />
                   </div>
                   <div className="sm:w-3/5 p-6 sm:p-8">
                     <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-3">
-                      {wealthTransfer?.title || 'Wealth Transfer & Legacy'}
+                      {wealthTransfer?.title || "Wealth Transfer & Legacy"}
                     </h3>
                     <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
-                      {wealthTransfer?.description || 'Placeholder content for Wealth Transfer & Legacy. Edit this from the Content Management page.'}
+                      {wealthTransfer?.description ||
+                        "Placeholder content for Wealth Transfer & Legacy. Edit this from the Content Management page."}
                     </p>
                   </div>
                 </div>
@@ -260,9 +277,10 @@ export default function Landing() {
       {/* Calculator Access Button */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-gray-600 mb-4 text-lg">Explore our complete suite of financial tools</p>
+          <p className="text-gray-600 mb-4 text-lg">
+            Explore Our Complete Suite Of Financial Tools
+          </p>
           <div className="flex flex-col items-center">
-            <ChartLine className="w-8 h-8 text-blue-600 mb-2 animate-bounce" />
             <Link href="/calculators">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:scale-105 transition-transform">
                 Access Financial Calculators
