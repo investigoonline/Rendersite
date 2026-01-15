@@ -131,8 +131,15 @@ export default function Services() {
         />
       </div>
 
-      {/* Content */}
+      {/* Tagline Below Hero */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <p className="text-2xl text-center text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+          A complete life-stage-aware approach to your finances-investment strategy, protection, and legacy planning with 30+ years of proven expertise.
+        </p>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         {/* Services Overview Stats */}
         {statsData?.stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-12 sm:mb-16 px-4">
