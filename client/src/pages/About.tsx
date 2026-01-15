@@ -48,27 +48,21 @@ export default function About() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section - Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {header && (
-          <div className="text-center mb-12">
-            <HTMLContent
-              content={header.description}
-              className="text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed"
-              data-testid="text-about-description"
-            />
-          </div>
-        )}
-      </div>
-
-      {/* About Us Image Section - Full Width */}
-      <div className="w-full mb-12">
+      {/* Hero Image - Full Width at Top */}
+      <div className="w-full">
         <img
           src={heroImage}
           alt="IFS Wealth Management - Family and personal service"
           className="w-full object-cover"
           style={{ height: "480px" }}
         />
+      </div>
+
+      {/* Tagline Below Hero */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <p className="text-2xl text-center text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+          Personal service, long-term financial independence, guided by fundamentals
+        </p>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
