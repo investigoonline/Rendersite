@@ -90,20 +90,8 @@ export default function Contact() {
         />
       </div>
 
-      {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {pageHeader && (
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              {pageHeader.title}
-            </h1>
-            <HTMLContent
-              content={pageHeader.description}
-              className="text-xl text-muted-foreground max-w-3xl mx-auto"
-            />
-          </div>
-        )}
-
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Contact Methods */}
         {contactMethods.length > 0 && (
           <div className="grid md:grid-cols-3 gap-6 mb-12">

@@ -131,25 +131,8 @@ export default function Services() {
         />
       </div>
 
-      {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {pageHeader && (
-          <div className="text-center mb-12 sm:mb-16 px-4">
-            {pageHeader.badge && (
-              <Badge className="bg-primary/10 text-primary border-primary/20 mb-4 sm:mb-6">
-                {pageHeader.badge}
-              </Badge>
-            )}
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 sm:mb-6">
-              {pageHeader.title}
-            </h1>
-            <HTMLContent
-              content={pageHeader.description}
-              className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto"
-            />
-          </div>
-        )}
-
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Services Overview Stats */}
         {statsData?.stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-12 sm:mb-16 px-4">
