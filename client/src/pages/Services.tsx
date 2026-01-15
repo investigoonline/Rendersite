@@ -120,9 +120,9 @@ export default function Services() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {pageHeader && (
           <div className="text-center mb-12 sm:mb-16 px-4">
             {pageHeader.badge && (
@@ -169,17 +169,19 @@ export default function Services() {
             })}
           </div>
         )}
+      </div>
 
-        {/* Services Image Section */}
-        <div className="w-full mb-12 sm:mb-16 -mx-4 sm:-mx-6 lg:-mx-8">
-          <img 
-            src={heroImage} 
-            alt="IFS Wealth Management professional services team" 
-            className="w-full object-cover"
-            style={{ height: '480px' }}
-          />
-        </div>
+      {/* Services Image Section - Full Width */}
+      <div className="w-full mb-12 sm:mb-16">
+        <img 
+          src={heroImage} 
+          alt="IFS Wealth Management professional services team" 
+          className="w-full object-cover"
+          style={{ height: '480px' }}
+        />
+      </div>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         {/* Services Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-12 sm:mb-16 px-4">
           {services.map((service, index) => {

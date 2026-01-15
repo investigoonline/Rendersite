@@ -47,11 +47,11 @@ export default function About() {
   const missionVision = getContent('about_mission_vision');
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Hero Section */}
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section - Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {header && (
-          <div className="text-center mb-20">
+          <div className="text-center mb-12">
             <Badge className="bg-primary/10 text-primary border-primary/20 mb-6" data-testid="badge-about-header">
               {header.badge}
             </Badge>
@@ -61,16 +61,19 @@ export default function About() {
             <HTMLContent content={header.description} className="text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed" data-testid="text-about-description" />
           </div>
         )}
+      </div>
 
-        {/* About Us Image Section */}
-        <div className="w-full mb-20 -mx-4 sm:-mx-6 lg:-mx-8">
-          <img 
-            src={heroImage} 
-            alt="IFS Wealth Management - Family and personal service" 
-            className="w-full object-cover"
-            style={{ height: '480px' }}
-          />
-        </div>
+      {/* About Us Image Section - Full Width */}
+      <div className="w-full mb-12">
+        <img 
+          src={heroImage} 
+          alt="IFS Wealth Management - Family and personal service" 
+          className="w-full object-cover"
+          style={{ height: '480px' }}
+        />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
 
         {/* Company Story */}
         {story && (

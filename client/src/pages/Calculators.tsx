@@ -235,9 +235,9 @@ export default function Calculators() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8 sm:mb-12 px-4">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             Financial Calculator Suite
@@ -246,18 +246,22 @@ export default function Calculators() {
             Access our complete collection of 32+ professional-grade financial calculators. 
             Make informed decisions with real-time calculations and personalized insights.
           </p>
+        </div>
+      </div>
 
-          {/* Hero Image */}
-          <div className="w-full mb-8 -mx-4 sm:-mx-6 lg:-mx-8">
-            <img 
-              src={heroImage} 
-              alt="Financial planning and calculators" 
-              className="w-full object-cover"
-              style={{ height: '480px' }}
-            />
-          </div>
-          
-          {/* Search */}
+      {/* Hero Image - Full Width */}
+      <div className="w-full mb-8">
+        <img 
+          src={heroImage} 
+          alt="Financial planning and calculators" 
+          className="w-full object-cover"
+          style={{ height: '480px' }}
+        />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        {/* Search */}
+        <div className="text-center mb-8">
           <div className="max-w-md mx-auto relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input

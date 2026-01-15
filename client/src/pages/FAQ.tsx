@@ -117,18 +117,18 @@ export default function FAQ() {
     .filter((category) => category.questions.length > 0);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header Image */}
-        <div className="w-full mb-12 -mx-4 sm:-mx-6 lg:-mx-8">
-          <img 
-            src={heroImage} 
-            alt="Frequently Asked Questions" 
-            className="w-full object-cover"
-            style={{ height: '480px' }}
-          />
-        </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header Image - Full Width */}
+      <div className="w-full mb-12">
+        <img 
+          src={heroImage} 
+          alt="Frequently Asked Questions" 
+          className="w-full object-cover"
+          style={{ height: '480px' }}
+        />
+      </div>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         {/* Search */}
         <div className="relative mb-8">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />

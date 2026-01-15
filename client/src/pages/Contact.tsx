@@ -79,9 +79,9 @@ export default function Contact() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {pageHeader && (
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -133,17 +133,19 @@ export default function Contact() {
             })}
           </div>
         )}
+      </div>
 
-        {/* Contact Us Image Section */}
-        <div className="w-full mb-12 -mx-4 sm:-mx-6 lg:-mx-8">
-          <img 
-            src={heroImage} 
-            alt="IFS Wealth Management - Contact Us" 
-            className="w-full object-cover"
-            style={{ height: '480px' }}
-          />
-        </div>
+      {/* Contact Us Image Section - Full Width */}
+      <div className="w-full mb-12">
+        <img 
+          src={heroImage} 
+          alt="IFS Wealth Management - Contact Us" 
+          className="w-full object-cover"
+          style={{ height: '480px' }}
+        />
+      </div>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Contact Form */}
           <div className="lg:col-span-2">
