@@ -118,8 +118,8 @@ export default function FAQ() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header Image - Full Width */}
-      <div className="w-full mb-12">
+      {/* Hero Image - Full Width at Top */}
+      <div className="w-full">
         <img 
           src={heroImage} 
           alt="Frequently Asked Questions" 
@@ -128,7 +128,15 @@ export default function FAQ() {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Find answers to common questions about our wealth management services and financial planning.
+          </p>
+        </div>
+
         {/* Search */}
         <div className="relative mb-8">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />

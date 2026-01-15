@@ -22,8 +22,8 @@ import contactImage from "@assets/Contact_Us_1765299919540.png";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
 
 export default function Contact() {
-  const heroImage = useDynamicImage('contact', 'hero', contactImage);
-  
+  const heroImage = useDynamicImage("contact", "hero", contactImage);
+
   // Fetch contact content with proper query parameter
   const { data: contactContent, isLoading } = useQuery<PageContent[]>({
     queryKey: ["/api/content", "contact"],
@@ -80,8 +80,18 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Hero Image - Full Width at Top */}
+      <div className="w-full">
+        <img
+          src={heroImage}
+          alt="IFS Wealth Management - Contact Us"
+          className="w-full object-cover"
+          style={{ height: "480px" }}
+        />
+      </div>
+
       {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {pageHeader && (
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -133,19 +143,6 @@ export default function Contact() {
             })}
           </div>
         )}
-      </div>
-
-      {/* Contact Us Image Section - Full Width */}
-      <div className="w-full mb-12">
-        <img 
-          src={heroImage} 
-          alt="IFS Wealth Management - Contact Us" 
-          className="w-full object-cover"
-          style={{ height: '480px' }}
-        />
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Contact Form */}
           <div className="lg:col-span-2">

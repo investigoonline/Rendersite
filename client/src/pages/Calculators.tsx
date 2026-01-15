@@ -236,8 +236,18 @@ export default function Calculators() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Hero Image - Full Width at Top */}
+      <div className="w-full">
+        <img 
+          src={heroImage} 
+          alt="Financial planning and calculators" 
+          className="w-full object-cover"
+          style={{ height: '480px' }}
+        />
+      </div>
+
       {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-8 sm:mb-12 px-4">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             Financial Calculator Suite
@@ -247,19 +257,7 @@ export default function Calculators() {
             Make informed decisions with real-time calculations and personalized insights.
           </p>
         </div>
-      </div>
 
-      {/* Hero Image - Full Width */}
-      <div className="w-full mb-8">
-        <img 
-          src={heroImage} 
-          alt="Financial planning and calculators" 
-          className="w-full object-cover"
-          style={{ height: '480px' }}
-        />
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         {/* Search */}
         <div className="text-center mb-8">
           <div className="max-w-md mx-auto relative">
