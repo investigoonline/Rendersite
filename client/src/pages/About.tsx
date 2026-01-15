@@ -48,8 +48,21 @@ export default function About() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Image - Full Width at Top */}
-      <div className="w-full">
+      {/* Hero Section - Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {header && (
+          <div className="text-center mb-12">
+            <HTMLContent
+              content={header.description}
+              className="text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed"
+              data-testid="text-about-description"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* About Us Image Section - Full Width */}
+      <div className="w-full mb-12">
         <img
           src={heroImage}
           alt="IFS Wealth Management - Family and personal service"
@@ -58,26 +71,7 @@ export default function About() {
         />
       </div>
 
-      {/* Header Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {header && (
-          <div className="text-center mb-12">
-            <Badge
-              className="bg-primary/10 text-primary border-primary/20 mb-6"
-              data-testid="badge-about-header"
-            >
-              {header.badge}
-            </Badge>
-            <h1 className="text-5xl font-bold text-gray-900 mb-8" data-testid="text-about-title">
-              {header.title}
-            </h1>
-            <HTMLContent
-              content={header.description}
-              className="text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed"
-              data-testid="text-about-description"
-            />
-          </div>
-        )}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         {/* Company Story */}
         {story && (
           <div className="max-w-6xl mx-auto mb-20">
