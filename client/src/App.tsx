@@ -14,6 +14,7 @@ import Calculators from "@/pages/Calculators";
 import Resources from "@/pages/Resources";
 import Blog from "@/pages/Blog";
 import About from "@/pages/About";
+import Process from "@/pages/Process";
 import Contact from "@/pages/Contact";
 import Services from "@/pages/Services";
 import FAQ from "@/pages/FAQ";
@@ -41,6 +42,7 @@ function Router() {
         <Route path="/resources" component={Resources} />
         <Route path="/blog" component={Blog} />
         <Route path="/about" component={About} />
+        <Route path="/about/process" component={Process} />
         <Route path="/services" component={Services} />
         <Route path="/contact" component={Contact} />
         <Route path="/faq" component={FAQ} />
