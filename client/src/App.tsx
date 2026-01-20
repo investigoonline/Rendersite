@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { PageProtectedRoute } from "@/components/PageProtectedRoute";
 import Layout from "@/components/Layout";
 import Landing from "@/pages/Landing";
 import Home from "@/pages/Home";
@@ -45,7 +46,11 @@ function Router() {
         <Route path="/about/process" component={Process} />
         <Route path="/services" component={Services} />
         <Route path="/contact" component={Contact} />
-        <Route path="/faq" component={FAQ} />
+        <Route path="/faq">
+          <PageProtectedRoute pageId="FAQ">
+            <FAQ />
+          </PageProtectedRoute>
+        </Route>
         <Route path="/become-client" component={BecomeClient} />
         <Route path="/location" component={Location} />
         <Route path="/custodian" component={Custodian} />
