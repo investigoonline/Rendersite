@@ -19,14 +19,14 @@ import defaultLogo from "@assets/image_1763735441524.jpeg";
 // Static navigation items - defined outside component to avoid recreating on each render
 const ALL_NAVIGATION = [
   { name: "Home", href: "/", pageId: "Home (Landing/Dashboard)" },
+  { name: "About Us", href: "/about", pageId: "About" },
+  { name: "Our Process", href: "/about/process", pageId: "Process" },
   { name: "Services", href: "/services", pageId: "Services" },
   { name: "Contact Us", href: "/contact", pageId: "Contact" },
 ] as const;
 
-const ABOUT_ITEMS = [
-  { name: "About Us", href: "/about", pageId: "About" },
-  { name: "Our Process", href: "/about/process", pageId: "Process" },
-] as const;
+// Empty array - About items now in main navigation
+const ABOUT_ITEMS: readonly { name: string; href: string; pageId: string }[] = [];
 
 const ALL_RESOURCE_ITEMS = [
   { name: "Frequently Asked Questions", href: "/faq", pageId: "FAQ", calculatorCategory: undefined },
