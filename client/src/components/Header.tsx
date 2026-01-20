@@ -19,9 +19,13 @@ import defaultLogo from "@assets/image_1763735441524.jpeg";
 // Static navigation items - defined outside component to avoid recreating on each render
 const ALL_NAVIGATION = [
   { name: "Home", href: "/", pageId: "Home (Landing/Dashboard)" },
-  { name: "About Us", href: "/about", pageId: "About" },
   { name: "Services", href: "/services", pageId: "Services" },
   { name: "Contact Us", href: "/contact", pageId: "Contact" },
+] as const;
+
+const ABOUT_ITEMS = [
+  { name: "About Us", href: "/about", pageId: "About" },
+  { name: "Our Process", href: "/about/process", pageId: "About" },
 ] as const;
 
 const ALL_RESOURCE_ITEMS = [
@@ -67,6 +71,10 @@ export default function Header() {
     });
   }, [hasPageAccess, hasCalculatorCategoryAccess, permissions]);
 
+  const aboutItems = useMemo(() => {
+    return ABOUT_ITEMS.filter(item => hasPageAccess(item.pageId));
+  }, [hasPageAccess, permissions]);
+
   return (
     <>
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
@@ -97,6 +105,33 @@ export default function Header() {
                   {item.name}
                 </Link>
               ))}
+
+              {/* About Us Dropdown */}
+              {aboutItems.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className={`font-sans ${
+                        location.startsWith('/about')
+                          ? "text-primary bg-blue-50"
+                          : "text-muted-foreground hover:text-gray-900 hover:bg-gray-50"
+                      }`}
+                    >
+                      About Us <ChevronDown className="ml-1 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-48 font-sans">
+                    {aboutItems.map((item) => (
+                      <DropdownMenuItem key={item.name} asChild>
+                        <Link href={item.href} className="w-full font-sans">
+                          {item.name}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
 
               {/* Resources Dropdown */}
               <DropdownMenu>
@@ -226,6 +261,19 @@ export default function Header() {
                         {item.name}
                       </Link>
                     ))}
+                    <div className="border-t pt-4">
+                      <p className="text-sm font-medium text-gray-900 mb-2 font-sans">About Us</p>
+                      {aboutItems.map((item) => (
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          className="block px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded-md font-sans"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
                     <div className="border-t pt-4">
                       <p className="text-sm font-medium text-gray-900 mb-2 font-sans">Resources</p>
                       {resourceItems.map((item) => (

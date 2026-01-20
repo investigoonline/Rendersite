@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
-import aboutHeroDefault from "@assets/hero-images/about-hero.jpg";
+import aboutHeroDefault from "@assets/About_1765299432034.png";
 
 export default function Process() {
   const heroImage = useDynamicImage("process", "hero", aboutHeroDefault);
