@@ -85,7 +85,7 @@ export default function Header() {
               <img 
                 src={logoSrc} 
                 alt="IFS Wealth Management" 
-                className="h-12 sm:h-14 w-auto object-contain"
+                className="h-14 sm:h-16 w-auto object-contain"
                 style={{ imageRendering: 'crisp-edges' }}
               />
             </Link>
