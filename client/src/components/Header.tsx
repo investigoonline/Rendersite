@@ -79,13 +79,13 @@ export default function Header() {
     <>
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20 sm:h-24">
+          <div className="flex justify-between items-center h-36 sm:h-44">
             {/* Logo */}
             <Link href="/" className="flex items-center min-w-0">
               <img 
                 src={logoSrc} 
                 alt="IFS Wealth Management" 
-                className="h-16 sm:h-20 w-auto object-contain"
+                className="h-32 sm:h-40 w-auto object-contain"
                 style={{ imageRendering: 'crisp-edges' }}
               />
             </Link>
