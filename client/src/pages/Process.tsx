@@ -2,11 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
 import aboutHeroDefault from "@assets/About_1765299432034.png";
+import type { PageContent } from "@shared/schema";
 
 export default function Process() {
   const heroImage = useDynamicImage("process", "hero", aboutHeroDefault);
 
-  const { data: pageContent, isLoading } = useQuery<any[]>({
+  const { data: pageContent, isLoading } = useQuery<PageContent[]>({
     queryKey: ["/api/content", "process"],
     queryFn: async () => {
       const res = await fetch("/api/content?page=process", {
@@ -28,7 +29,7 @@ export default function Process() {
     );
   }
 
-  const getContent = (section: string) => {
+  const getContent = (section: string): any => {
     return pageContent?.find((p) => p.section === section)?.content;
   };
 
@@ -57,50 +58,53 @@ export default function Process() {
       {/* Tagline Below Hero */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <p className="text-2xl text-center text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-          A personalized approach to financial planning that adapts to your life's journey
+          {header?.subtitle || "A personalized approach to financial planning that adapts to your life's journey"}
         </p>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         {/* Header Section */}
         {header && (
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-6">
+          <div className="max-w-6xl mx-auto mb-20">
+            <h2 className="text-4xl font-bold text-gray-900 mb-10">
               {header.title}
-            </h1>
+            </h2>
             <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
               <p className="whitespace-pre-wrap">{header.introParagraph1}</p>
               <p className="whitespace-pre-wrap">{header.introParagraph2}</p>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mt-12 mb-8">
-              {header.stepsTitle}
-            </h2>
           </div>
         )}
 
-        {/* Process Steps */}
-        <div className="space-y-8">
-          {steps.map((step: any, index: number) => (
-            <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow">
-              <CardContent className="p-0">
-                <div className="flex">
-                  <div className="bg-primary text-white flex items-center justify-center w-20 min-h-full">
-                    <span className="text-3xl font-bold">{step.stepNumber}</span>
-                  </div>
-                  <div className="p-6 flex-1">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                      {step.title}
-                    </h3>
-                    <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                      {step.description}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {/* Process Steps Section */}
+        {steps.length > 0 && (
+          <div className="mb-20">
+            <h2 className="text-4xl font-bold text-gray-900 text-center mb-12">
+              {header?.stepsTitle || "Our Process"}
+            </h2>
+            <div className="grid lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
+              {steps.map((step: any, index: number) => (
+                <Card key={index} className="border-primary/20 bg-primary/5 hover:shadow-lg transition-shadow overflow-hidden">
+                  <CardContent className="p-0">
+                    <div className="flex">
+                      <div className="bg-primary text-white flex items-center justify-center w-20 min-h-full">
+                        <span className="text-3xl font-bold">{step.stepNumber}</span>
+                      </div>
+                      <div className="p-6 flex-1">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                          {step.title}
+                        </h3>
+                        <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                          {step.description}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* CTA Section */}
         <div className="text-center mt-16">

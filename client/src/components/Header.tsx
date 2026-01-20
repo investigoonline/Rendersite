@@ -25,7 +25,7 @@ const ALL_NAVIGATION = [
 
 const ABOUT_ITEMS = [
   { name: "About Us", href: "/about", pageId: "About" },
-  { name: "Our Process", href: "/about/process", pageId: "About" },
+  { name: "Our Process", href: "/about/process", pageId: "Process" },
 ] as const;
 
 const ALL_RESOURCE_ITEMS = [
