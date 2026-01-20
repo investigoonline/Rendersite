@@ -246,7 +246,9 @@ export const contentSectionEnum = pgEnum('content_section', [
   'home_wealth_creation',
   'home_wealth_protection',
   'home_wealth_preservation',
-  'home_wealth_transfer'
+  'home_wealth_transfer',
+  'process_header',
+  'process_step'
 ]);
 
 // Content management table

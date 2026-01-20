@@ -1398,6 +1398,40 @@ export const contentSchemas: Record<string, SectionSchema> = {
       content: { label: 'Disclosures Content', control: 'richtext', placeholder: 'Enter the full disclosures content here...' },
     },
   },
+  // Process Page Schemas
+  process_header: {
+    schema: z.object({
+      title: z.string().min(1),
+      subtitle: z.string().min(1),
+      introParagraph1: z.string().min(1),
+      introParagraph2: z.string().min(1),
+      stepsTitle: z.string().min(1),
+    }),
+    label: 'Process Header',
+    description: 'Header section with intro text for the process page',
+    uiMeta: {
+      title: { label: 'Page Title', control: 'text', placeholder: 'It Starts with You' },
+      subtitle: { label: 'Tagline', control: 'text', placeholder: 'Our process begins with getting to know you...' },
+      introParagraph1: { label: 'First Intro Paragraph', control: 'textarea', rows: 4, placeholder: 'Our process begins with getting to know you and your goals...' },
+      introParagraph2: { label: 'Second Intro Paragraph', control: 'textarea', rows: 4, placeholder: 'We believe a detailed planning process...' },
+      stepsTitle: { label: 'Steps Section Title', control: 'text', placeholder: 'So what are the steps?' },
+    },
+  },
+  process_step: {
+    schema: z.object({
+      stepNumber: z.number().min(1).max(10),
+      title: z.string().min(1),
+      description: z.string().min(1),
+    }),
+    label: 'Process Step',
+    description: 'Individual step in the planning process',
+    allowMultiple: true,
+    uiMeta: {
+      stepNumber: { label: 'Step Number', control: 'number', min: 1, max: 10 },
+      title: { label: 'Step Title', control: 'text', placeholder: 'Introductory Meeting' },
+      description: { label: 'Step Description', control: 'textarea', rows: 4, placeholder: 'In our first meeting, we\'ll identify your goals...' },
+    },
+  },
 };
 
 // Page to sections mapping
@@ -1426,6 +1460,7 @@ export const pageSections: Record<string, string[]> = {
   privacy_policy: ['legal_privacy_policy'],
   terms_of_service: ['legal_terms_of_service'],
   disclosures: ['legal_disclosures'],
+  process: ['process_header', 'process_step'],
 };
 
 // Helper to get schema for a section
