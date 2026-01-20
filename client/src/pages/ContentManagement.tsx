@@ -408,6 +408,7 @@ export default function ContentManagement() {
                 <TabsTrigger value="resources" data-testid="tab-resources">Resources</TabsTrigger>
                 <TabsTrigger value="blog" data-testid="tab-blog">Blog</TabsTrigger>
                 <TabsTrigger value="about" data-testid="tab-about">About</TabsTrigger>
+                <TabsTrigger value="process" data-testid="tab-process">Process</TabsTrigger>
                 <TabsTrigger value="dashboard" data-testid="tab-dashboard">Dashboard</TabsTrigger>
                 <TabsTrigger value="privacy_policy" data-testid="tab-privacy">Privacy Policy</TabsTrigger>
                 <TabsTrigger value="terms_of_service" data-testid="tab-terms">Terms of Service</TabsTrigger>
