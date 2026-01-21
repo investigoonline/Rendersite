@@ -142,16 +142,13 @@ export default function Landing() {
   // Show all categories without filtering
   const filteredCategories = calculatorCategories;
 
-  // Extract last name from user's full name
-  const lastName = user?.name?.split(' ').slice(-1)[0] || '';
-
   return (
     <div className="min-h-screen bg-white">
       {/* Welcome Message for Logged In Users */}
-      {user && lastName && (
+      {user && user.lastName && (
         <div className="bg-primary text-white py-3 text-center">
           <p className="text-lg font-medium">
-            Welcome to IFS Financial Services {lastName}
+            Welcome to IFS Financial Services {user.lastName}
           </p>
         </div>
       )}
