@@ -146,8 +146,8 @@ export default function Landing() {
     <div className="min-h-screen bg-white">
       {/* Welcome Message for Logged In Users */}
       {user && user.lastName && (
-        <div className="bg-primary text-white py-3 text-center">
-          <p className="text-lg font-medium">
+        <div className="bg-white py-3 text-center">
+          <p className="text-lg font-bold text-primary">
             Welcome to IFS Financial Services {user.lastName}
           </p>
         </div>
