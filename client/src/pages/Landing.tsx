@@ -176,7 +176,7 @@ export default function Landing() {
       </section>
 
       {/* Wealth Pillars Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20" style={{ backgroundColor: '#eedcbc' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8">
             {/* Wealth Creation */}
@@ -284,7 +284,7 @@ export default function Landing() {
       </section>
 
       {/* Calculator Access Button */}
-      <section className="py-16 bg-white">
+      <section className="py-16" style={{ backgroundColor: '#eedcbc' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-gray-600 mb-4 text-lg">
             Explore Our Complete Suite Of Financial Tools
@@ -304,7 +304,7 @@ export default function Landing() {
       {/* Sample Calculator Interface */}
 
       {/* About Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20" style={{ backgroundColor: '#eedcbc' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
