@@ -148,7 +148,7 @@ export default function Landing() {
       {user && user.lastName && (
         <div className="bg-white py-3 text-center">
           <p className="text-lg font-bold text-primary">
-            Welcome to IFS Financial Services {user.lastName}
+            Welcome to IFS Financial Services! {user.lastName}
           </p>
         </div>
       )}
