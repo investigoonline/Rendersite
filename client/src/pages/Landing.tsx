@@ -143,7 +143,7 @@ export default function Landing() {
   const filteredCategories = calculatorCategories;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen" style={{ backgroundColor: '#eedcbc' }}>
       {/* Welcome Message for Logged In Users */}
       {user && user.lastName && (
         <div className="bg-white py-3 text-center">
