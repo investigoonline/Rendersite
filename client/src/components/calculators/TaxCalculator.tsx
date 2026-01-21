@@ -44,9 +44,26 @@ interface TaxCalculatorProps {
   calculatorName?: string;
 }
 
+// Map calculator name to tab value
+const getInitialTab = (calculatorName: string): string => {
+  const nameToTab: Record<string, string> = {
+    "Federal Income Tax Calculator": "federal_tax",
+    "federal_tax": "federal_tax",
+    "Tax-Deferred Savings Calculator": "tax_deferred",
+    "tax_deferred": "tax_deferred",
+    "IRA Eligibility Calculator": "ira_eligibility",
+    "ira_eligibility": "ira_eligibility",
+    "Roth IRA Conversion Calculator": "ira_eligibility",
+    "roth_conversion": "ira_eligibility",
+    "Estate Tax Calculator": "estate_tax",
+    "estate_tax": "estate_tax",
+  };
+  return nameToTab[calculatorName] || "federal_tax";
+};
+
 export default function TaxCalculator({ calculatorName = "Federal Income Tax Calculator" }: TaxCalculatorProps = {}) {
   const { toast } = useToast();
-  const [calculatorType, setCalculatorType] = useState("federal_tax");
+  const [calculatorType, setCalculatorType] = useState(() => getInitialTab(calculatorName));
   
   const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission(calculatorName);
   

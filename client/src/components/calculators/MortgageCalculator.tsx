@@ -39,9 +39,22 @@ interface MortgageCalculatorProps {
   calculatorName?: string;
 }
 
+// Map calculator name to tab value
+const getInitialTab = (calculatorName: string): string => {
+  const nameToTab: Record<string, string> = {
+    "Home Affordability Calculator": "affordability",
+    "home_affordability": "affordability",
+    "Mortgage Refinancing Calculator": "refinance",
+    "mortgage_refinance": "refinance",
+    "Mortgage Acceleration Calculator": "acceleration",
+    "mortgage_acceleration": "acceleration",
+  };
+  return nameToTab[calculatorName] || "affordability";
+};
+
 export default function MortgageCalculator({ calculatorName = "Home Affordability Calculator" }: MortgageCalculatorProps = {}) {
   const { toast } = useToast();
-  const [calculatorType, setCalculatorType] = useState("affordability");
+  const [calculatorType, setCalculatorType] = useState(() => getInitialTab(calculatorName));
   
   const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission(calculatorName);
   

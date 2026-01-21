@@ -40,9 +40,26 @@ interface RetirementCalculatorProps {
   calculatorName?: string;
 }
 
+// Map calculator name to tab value
+const getInitialTab = (calculatorName: string): string => {
+  const nameToTab: Record<string, string> = {
+    "Cost of Retirement Calculator": "cost",
+    "retirement_cost": "cost",
+    "Required Minimum Distributions (RMD)": "rmd",
+    "rmd": "rmd",
+    "Impact of Inflation Calculator": "inflation",
+    "inflation_impact": "inflation",
+    "Retirement Plan Early Distribution": "cost",
+    "retirement_early": "cost",
+    "Retirement Portfolio Lifespan": "lifespan",
+    "portfolio_lifespan": "lifespan",
+  };
+  return nameToTab[calculatorName] || "cost";
+};
+
 export default function RetirementCalculator({ calculatorName = "Cost of Retirement Calculator" }: RetirementCalculatorProps = {}) {
   const { toast } = useToast();
-  const [calculatorType, setCalculatorType] = useState("cost");
+  const [calculatorType, setCalculatorType] = useState(() => getInitialTab(calculatorName));
   
   const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission(calculatorName);
   
