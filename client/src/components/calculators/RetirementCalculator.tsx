@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { PiggyBank, Save, Download, Mail, Lock, TrendingUp, Clock } from "lucide-react";
+import { PiggyBank, Save, Download, Mail, Lock, TrendingUp, Clock, AlertTriangle } from "lucide-react";
 import { useCalculatorPermission } from "@/hooks/useCalculatorPermission";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import CalculatorDisclaimer from "./CalculatorDisclaimer";
@@ -49,8 +49,8 @@ const getInitialTab = (calculatorName: string): string => {
     "rmd": "rmd",
     "Impact of Inflation Calculator": "inflation",
     "inflation_impact": "inflation",
-    "Retirement Plan Early Distribution": "cost",
-    "retirement_early": "cost",
+    "Retirement Plan Early Distribution": "early",
+    "retirement_early": "early",
     "Retirement Portfolio Lifespan": "lifespan",
     "portfolio_lifespan": "lifespan",
   };
@@ -200,9 +200,10 @@ export default function RetirementCalculator({ calculatorName = "Cost of Retirem
 
       <CardContent className="p-8">
         <Tabs value={calculatorType} onValueChange={setCalculatorType} className="mb-8">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="cost">Retirement Cost</TabsTrigger>
             <TabsTrigger value="rmd">RMD Calculator</TabsTrigger>
+            <TabsTrigger value="early">Early Distribution</TabsTrigger>
             <TabsTrigger value="inflation">Inflation Impact</TabsTrigger>
             <TabsTrigger value="lifespan">Portfolio Lifespan</TabsTrigger>
           </TabsList>
@@ -575,6 +576,81 @@ export default function RetirementCalculator({ calculatorName = "Cost of Retirem
                     <Button type="submit" size="lg" className="px-8" disabled={!hasPermission || permissionLoading}>
                       {!hasPermission && <Lock className="mr-2 h-4 w-4" />}
                       Calculate RMD
+                    </Button>
+                  </div>
+                  {!hasPermission && !permissionLoading && (
+                    <Alert className="border-amber-200 bg-amber-50">
+                      <Lock className="h-4 w-4 text-amber-600" />
+                      <AlertDescription className="text-amber-800">
+                        This calculator requires an upgraded account. <a href="/contact" className="underline font-medium">Contact us to upgrade</a>.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </form>
+              </Form>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="early" className="mt-6">
+            <div className="text-center py-12">
+              <AlertTriangle className="h-16 w-16 mx-auto text-primary/30 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Retirement Plan Early Distribution</h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                Calculate the impact of early withdrawals from retirement accounts, including penalties and taxes before age 59½.
+              </p>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(calculateRetirement)} className="space-y-6 max-w-2xl mx-auto">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <FormField control={form.control} name="currentAge" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Your Current Age</FormLabel>
+                        <FormControl><Input type="number" placeholder="45" className="font-mono" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="currentSavings" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Distribution Amount</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-500">$</span>
+                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <FormField control={form.control} name="annualIncome" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Annual Income</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-500">$</span>
+                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="expectedReturn" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Federal Tax Rate (%)</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Input type="number" placeholder="22" className="font-mono" {...field} />
+                            <span className="absolute right-3 top-3 text-gray-500">%</span>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                  <div className="flex justify-center pt-4">
+                    <Button type="submit" size="lg" className="px-8" disabled={!hasPermission || permissionLoading}>
+                      {!hasPermission && <Lock className="mr-2 h-4 w-4" />}
+                      Calculate Early Distribution
                     </Button>
                   </div>
                   {!hasPermission && !permissionLoading && (
