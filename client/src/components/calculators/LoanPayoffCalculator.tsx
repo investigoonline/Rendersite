@@ -32,9 +32,15 @@ type LoanPayoffForm = z.infer<typeof loanPayoffSchema>;
 
 interface LoanPayoffCalculatorProps {
   calculatorName?: string;
+  cardTitle?: string;
+  cardDescription?: string;
 }
 
-export default function LoanPayoffCalculator({ calculatorName = "Loan Payoff Calculator" }: LoanPayoffCalculatorProps = {}) {
+export default function LoanPayoffCalculator({ 
+  calculatorName = "Loan Payoff Calculator",
+  cardTitle,
+  cardDescription 
+}: LoanPayoffCalculatorProps = {}) {
   const { toast } = useToast();
   const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission(calculatorName);
   const [results, setResults] = useState<{
@@ -130,9 +136,9 @@ export default function LoanPayoffCalculator({ calculatorName = "Loan Payoff Cal
           <div>
             <CardTitle className="text-2xl font-bold mb-2 flex items-center">
               <CreditCard className="mr-3 h-6 w-6" />
-              Loan Payoff Calculator
+              {cardTitle || "Loan Payoff Calculator"}
             </CardTitle>
-            <p className="text-blue-100">Calculate how extra payments can save you money</p>
+            <p className="text-blue-100">{cardDescription || "Calculate how extra payments can save you money"}</p>
           </div>
           {results && (
             <div className="text-right">

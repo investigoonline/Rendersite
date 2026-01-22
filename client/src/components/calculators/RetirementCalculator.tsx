@@ -38,6 +38,8 @@ type RetirementForm = z.infer<typeof retirementSchema>;
 
 interface RetirementCalculatorProps {
   calculatorName?: string;
+  cardTitle?: string;
+  cardDescription?: string;
 }
 
 // Map calculator name to tab value
@@ -57,7 +59,11 @@ const getInitialTab = (calculatorName: string): string => {
   return nameToTab[calculatorName] || "cost";
 };
 
-export default function RetirementCalculator({ calculatorName = "Cost of Retirement Calculator" }: RetirementCalculatorProps = {}) {
+export default function RetirementCalculator({ 
+  calculatorName = "Cost of Retirement Calculator",
+  cardTitle,
+  cardDescription 
+}: RetirementCalculatorProps = {}) {
   const { toast } = useToast();
   const [calculatorType, setCalculatorType] = useState(() => getInitialTab(calculatorName));
   
@@ -183,9 +189,9 @@ export default function RetirementCalculator({ calculatorName = "Cost of Retirem
           <div>
             <CardTitle className="text-2xl font-bold mb-2 flex items-center">
               <PiggyBank className="mr-3 h-6 w-6" />
-              Retirement Planning Calculator
+              {cardTitle || "Retirement Planning Calculator"}
             </CardTitle>
-            <p className="text-blue-100">Plan for a secure and comfortable retirement</p>
+            <p className="text-blue-100">{cardDescription || "Plan for a secure and comfortable retirement"}</p>
           </div>
           {results && (
             <div className="text-right">

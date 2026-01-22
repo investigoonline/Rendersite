@@ -28,6 +28,14 @@ import {
 } from "lucide-react";
 import calculatorsImage from "@assets/Calculators_1765301634531.png";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
+import type { PageContent } from "@shared/schema";
+
+interface CalculatorCMSContent {
+  pageTitle: string;
+  pageDescription: string;
+  cardTitle: string;
+  cardDescription: string;
+}
 
 const calculatorCategories = [
   {
@@ -183,6 +191,25 @@ export default function Calculators() {
     enabled: isAuthenticated,
   });
 
+  // Fetch calculator CMS content
+  const { data: calculatorContent } = useQuery<PageContent[]>({
+    queryKey: ["/api/content", "calculators"],
+    queryFn: async () => {
+      const res = await fetch("/api/content?page=calculators", {
+        credentials: "include",
+      });
+      if (!res.ok) return [];
+      return res.json();
+    },
+  });
+
+  // Helper to get CMS content for a specific calculator type
+  const getCalculatorContent = (calculatorType: string): CalculatorCMSContent | null => {
+    const sectionName = `calculator_${calculatorType}`;
+    const content = calculatorContent?.find(c => c.section === sectionName);
+    return content?.content as CalculatorCMSContent | null;
+  };
+
   // Filter categories based on access control and search term
   const accessibleCategories = calculatorCategories.filter(category => 
     hasCalculatorAccess(category.id)
@@ -216,6 +243,18 @@ export default function Calculators() {
 
   if (selectedCalculator && currentCalculatorData) {
     const CalculatorComponent = currentCalculatorData.component;
+    // Determine calculator type for CMS content lookup
+    const getCalcType = (component: any) => {
+      if (component === NetWorthCalculator) return 'net_worth';
+      if (component === LoanPayoffCalculator) return 'loan_payoff';
+      if (component === MortgageCalculator) return 'mortgage';
+      if (component === RetirementCalculator) return 'retirement';
+      if (component === TaxCalculator) return 'tax';
+      return null;
+    };
+    const calcType = getCalcType(currentCalculatorData.component);
+    const cmsContent = calcType ? getCalculatorContent(calcType) : null;
+    
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -223,12 +262,18 @@ export default function Calculators() {
             <Button variant="ghost" onClick={handleBackToList} className="mb-4">
               ← Back to Calculators
             </Button>
-            <h1 className="text-3xl font-bold text-gray-900">{currentCalculatorData.name}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {cmsContent?.pageTitle || currentCalculatorData.name}
+            </h1>
             <p className="text-muted-foreground mt-2">
-              {currentCategory?.description}
+              {cmsContent?.pageDescription || currentCategory?.description}
             </p>
           </div>
-          <CalculatorComponent calculatorName={currentCalculatorData.name} />
+          <CalculatorComponent 
+            calculatorName={currentCalculatorData.name} 
+            cardTitle={cmsContent?.cardTitle}
+            cardDescription={cmsContent?.cardDescription}
+          />
         </div>
       </div>
     );

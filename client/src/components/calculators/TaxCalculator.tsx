@@ -42,6 +42,8 @@ type TaxForm = z.infer<typeof taxSchema>;
 
 interface TaxCalculatorProps {
   calculatorName?: string;
+  cardTitle?: string;
+  cardDescription?: string;
 }
 
 // Map calculator name to tab value
@@ -61,7 +63,11 @@ const getInitialTab = (calculatorName: string): string => {
   return nameToTab[calculatorName] || "federal_tax";
 };
 
-export default function TaxCalculator({ calculatorName = "Federal Income Tax Calculator" }: TaxCalculatorProps = {}) {
+export default function TaxCalculator({ 
+  calculatorName = "Federal Income Tax Calculator",
+  cardTitle,
+  cardDescription 
+}: TaxCalculatorProps = {}) {
   const { toast } = useToast();
   const [calculatorType, setCalculatorType] = useState(() => getInitialTab(calculatorName));
   
@@ -218,9 +224,9 @@ export default function TaxCalculator({ calculatorName = "Federal Income Tax Cal
           <div>
             <CardTitle className="text-2xl font-bold mb-2 flex items-center">
               <FileText className="mr-3 h-6 w-6" />
-              Tax Planning Calculator
+              {cardTitle || "Tax Planning Calculator"}
             </CardTitle>
-            <p className="text-blue-100">Federal and state tax calculations, estate planning, and IRA analysis</p>
+            <p className="text-blue-100">{cardDescription || "Federal and state tax calculations, estate planning, and IRA analysis"}</p>
           </div>
           {results && (
             <div className="text-right">

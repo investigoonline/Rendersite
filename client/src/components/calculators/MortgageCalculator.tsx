@@ -37,6 +37,8 @@ type MortgageForm = z.infer<typeof mortgageSchema>;
 
 interface MortgageCalculatorProps {
   calculatorName?: string;
+  cardTitle?: string;
+  cardDescription?: string;
 }
 
 // Map calculator name to tab value
@@ -52,7 +54,11 @@ const getInitialTab = (calculatorName: string): string => {
   return nameToTab[calculatorName] || "affordability";
 };
 
-export default function MortgageCalculator({ calculatorName = "Home Affordability Calculator" }: MortgageCalculatorProps = {}) {
+export default function MortgageCalculator({ 
+  calculatorName = "Home Affordability Calculator",
+  cardTitle,
+  cardDescription 
+}: MortgageCalculatorProps = {}) {
   const { toast } = useToast();
   const [calculatorType, setCalculatorType] = useState(() => getInitialTab(calculatorName));
   
@@ -163,9 +169,9 @@ export default function MortgageCalculator({ calculatorName = "Home Affordabilit
           <div>
             <CardTitle className="text-2xl font-bold mb-2 flex items-center">
               <Home className="mr-3 h-6 w-6" />
-              Mortgage & Housing Calculator
+              {cardTitle || "Mortgage & Housing Calculator"}
             </CardTitle>
-            <p className="text-blue-100">Calculate home affordability and mortgage payments</p>
+            <p className="text-blue-100">{cardDescription || "Calculate home affordability and mortgage payments"}</p>
           </div>
           {results && (
             <div className="text-right">
