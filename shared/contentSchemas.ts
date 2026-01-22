@@ -1432,6 +1432,87 @@ export const contentSchemas: Record<string, SectionSchema> = {
       description: { label: 'Step Description', control: 'textarea', rows: 4, placeholder: 'In our first meeting, we\'ll identify your goals...' },
     },
   },
+  // Calculator Content Schemas
+  calculator_net_worth: {
+    schema: z.object({
+      pageTitle: z.string().min(1),
+      pageDescription: z.string().min(1),
+      cardTitle: z.string().min(1),
+      cardDescription: z.string().min(1),
+    }),
+    label: 'Net Worth Calculator',
+    description: 'Title and description for the Net Worth Calculator',
+    uiMeta: {
+      pageTitle: { label: 'Page Title', control: 'text', placeholder: 'Total Net Worth Calculator' },
+      pageDescription: { label: 'Page Description', control: 'textarea', rows: 2, placeholder: 'Net worth tracking, debt ratio analysis, and wealth building strategies' },
+      cardTitle: { label: 'Card Title', control: 'text', placeholder: 'Total Net Worth Calculator' },
+      cardDescription: { label: 'Card Description', control: 'textarea', rows: 2, placeholder: 'Calculate your complete financial position' },
+    },
+  },
+  calculator_loan_payoff: {
+    schema: z.object({
+      pageTitle: z.string().min(1),
+      pageDescription: z.string().min(1),
+      cardTitle: z.string().min(1),
+      cardDescription: z.string().min(1),
+    }),
+    label: 'Loan Payoff Calculator',
+    description: 'Title and description for the Loan Payoff Calculator',
+    uiMeta: {
+      pageTitle: { label: 'Page Title', control: 'text', placeholder: 'Loan Payoff Calculator' },
+      pageDescription: { label: 'Page Description', control: 'textarea', rows: 2, placeholder: 'Calculate loan payoff timelines and interest savings' },
+      cardTitle: { label: 'Card Title', control: 'text', placeholder: 'Loan Payoff Calculator' },
+      cardDescription: { label: 'Card Description', control: 'textarea', rows: 2, placeholder: 'Calculate your loan payoff timeline' },
+    },
+  },
+  calculator_mortgage: {
+    schema: z.object({
+      pageTitle: z.string().min(1),
+      pageDescription: z.string().min(1),
+      cardTitle: z.string().min(1),
+      cardDescription: z.string().min(1),
+    }),
+    label: 'Mortgage Calculator',
+    description: 'Title and description for the Mortgage Calculator',
+    uiMeta: {
+      pageTitle: { label: 'Page Title', control: 'text', placeholder: 'Mortgage Calculator' },
+      pageDescription: { label: 'Page Description', control: 'textarea', rows: 2, placeholder: 'Mortgage payments, refinancing, and home affordability' },
+      cardTitle: { label: 'Card Title', control: 'text', placeholder: 'Mortgage Calculator' },
+      cardDescription: { label: 'Card Description', control: 'textarea', rows: 2, placeholder: 'Calculate your mortgage payments' },
+    },
+  },
+  calculator_retirement: {
+    schema: z.object({
+      pageTitle: z.string().min(1),
+      pageDescription: z.string().min(1),
+      cardTitle: z.string().min(1),
+      cardDescription: z.string().min(1),
+    }),
+    label: 'Retirement Calculator',
+    description: 'Title and description for the Retirement Calculator',
+    uiMeta: {
+      pageTitle: { label: 'Page Title', control: 'text', placeholder: 'Retirement Calculator' },
+      pageDescription: { label: 'Page Description', control: 'textarea', rows: 2, placeholder: 'Plan for your retirement with comprehensive calculations' },
+      cardTitle: { label: 'Card Title', control: 'text', placeholder: 'Retirement Calculator' },
+      cardDescription: { label: 'Card Description', control: 'textarea', rows: 2, placeholder: 'Plan and project your retirement savings' },
+    },
+  },
+  calculator_tax: {
+    schema: z.object({
+      pageTitle: z.string().min(1),
+      pageDescription: z.string().min(1),
+      cardTitle: z.string().min(1),
+      cardDescription: z.string().min(1),
+    }),
+    label: 'Tax Calculator',
+    description: 'Title and description for the Tax Calculator',
+    uiMeta: {
+      pageTitle: { label: 'Page Title', control: 'text', placeholder: 'Tax Calculator' },
+      pageDescription: { label: 'Page Description', control: 'textarea', rows: 2, placeholder: 'Tax planning and calculations' },
+      cardTitle: { label: 'Card Title', control: 'text', placeholder: 'Tax Calculator' },
+      cardDescription: { label: 'Card Description', control: 'textarea', rows: 2, placeholder: 'Calculate your tax obligations' },
+    },
+  },
 };
 
 // Page to sections mapping
@@ -1461,6 +1542,7 @@ export const pageSections: Record<string, string[]> = {
   terms_of_service: ['legal_terms_of_service'],
   disclosures: ['legal_disclosures'],
   process: ['process_header', 'process_step'],
+  calculators: ['calculator_net_worth', 'calculator_loan_payoff', 'calculator_mortgage', 'calculator_retirement', 'calculator_tax'],
 };
 
 // Helper to get schema for a section

@@ -248,7 +248,12 @@ export const contentSectionEnum = pgEnum('content_section', [
   'home_wealth_preservation',
   'home_wealth_transfer',
   'process_header',
-  'process_step'
+  'process_step',
+  'calculator_net_worth',
+  'calculator_loan_payoff',
+  'calculator_mortgage',
+  'calculator_retirement',
+  'calculator_tax'
 ]);
 
 // Content management table
