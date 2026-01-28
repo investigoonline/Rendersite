@@ -747,6 +747,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastName: user.lastName,
         authType: user.authType,
         isEmailVerified: user.isEmailVerified,
+        isActive: user.isActive ?? true,
         createdAt: user.createdAt,
         role: user.role,
         roles: user.roles
@@ -794,6 +795,169 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error updating user role:", error);
       res.status(500).json({ message: error.message || "We're unable to update the user role at this time" });
+    }
+  });
+
+  // Update user active status - super_admin only
+  app.put('/api/admin/users/:userId/active', async (req, res) => {
+    try {
+      const authorized = await requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const { userId } = req.params;
+      const { isActive } = req.body;
+      const session = req.session as any;
+
+      if (typeof isActive !== 'boolean') {
+        return res.status(400).json({ message: "Please specify whether the user should be active or inactive" });
+      }
+
+      const updatedUser = await storage.updateUserActiveStatus(userId, isActive, session?.user?.id);
+      
+      res.json({
+        message: isActive ? "User account has been activated" : "User account has been deactivated",
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          isActive: updatedUser.isActive,
+        }
+      });
+    } catch (error: any) {
+      console.error("Error updating user active status:", error);
+      res.status(500).json({ message: error.message || "We're unable to update the user status at this time" });
+    }
+  });
+
+  // Soft delete user (move to inactive) - super_admin only
+  app.post('/api/admin/users/:userId/soft-delete', async (req, res) => {
+    try {
+      const authorized = await requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const { userId } = req.params;
+      const { reason } = req.body;
+      const session = req.session as any;
+
+      const inactiveUser = await storage.moveUserToInactive(userId, reason, session?.user?.id);
+      
+      res.json({
+        message: "User has been moved to inactive status. They can be restored later.",
+        inactiveUser: {
+          id: inactiveUser.id,
+          email: inactiveUser.email,
+          deactivatedAt: inactiveUser.deactivatedAt,
+        }
+      });
+    } catch (error: any) {
+      console.error("Error soft deleting user:", error);
+      res.status(500).json({ message: error.message || "We're unable to deactivate the user at this time" });
+    }
+  });
+
+  // Permanent delete user - super_admin only
+  app.delete('/api/admin/users/:userId/permanent', async (req, res) => {
+    try {
+      const authorized = await requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const { userId } = req.params;
+      const session = req.session as any;
+
+      await storage.permanentDeleteUser(userId, session?.user?.id);
+      
+      res.json({
+        message: "User and all associated data have been permanently deleted",
+      });
+    } catch (error: any) {
+      console.error("Error permanently deleting user:", error);
+      res.status(500).json({ message: error.message || "We're unable to delete the user at this time" });
+    }
+  });
+
+  // Get inactive users - super_admin only
+  app.get('/api/admin/inactive-users', async (req, res) => {
+    try {
+      const authorized = await requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const inactiveUsers = await storage.getInactiveUsers();
+      
+      res.json(inactiveUsers.map(user => ({
+        id: user.id,
+        originalUserId: user.originalUserId,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        deactivatedAt: user.deactivatedAt,
+        deactivatedBy: user.deactivatedBy,
+        reason: user.reason,
+        originalCreatedAt: user.originalCreatedAt,
+      })));
+    } catch (error) {
+      console.error("Error fetching inactive users:", error);
+      res.status(500).json({ message: "We're unable to retrieve inactive users at this time" });
+    }
+  });
+
+  // Restore inactive user - super_admin only
+  app.post('/api/admin/inactive-users/:inactiveUserId/restore', async (req, res) => {
+    try {
+      const authorized = await requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const { inactiveUserId } = req.params;
+      const session = req.session as any;
+
+      const restoredUser = await storage.restoreInactiveUser(inactiveUserId, session?.user?.id);
+      
+      res.json({
+        message: "User has been restored successfully",
+        user: {
+          id: restoredUser.id,
+          email: restoredUser.email,
+          firstName: restoredUser.firstName,
+          lastName: restoredUser.lastName,
+        }
+      });
+    } catch (error: any) {
+      console.error("Error restoring user:", error);
+      res.status(500).json({ message: error.message || "We're unable to restore the user at this time" });
+    }
+  });
+
+  // Permanently delete inactive user - super_admin only
+  app.delete('/api/admin/inactive-users/:inactiveUserId', async (req, res) => {
+    try {
+      const authorized = await requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const { inactiveUserId } = req.params;
+
+      await storage.deleteInactiveUser(inactiveUserId);
+      
+      res.json({
+        message: "Inactive user record has been permanently deleted",
+      });
+    } catch (error: any) {
+      console.error("Error deleting inactive user:", error);
+      res.status(500).json({ message: error.message || "We're unable to delete the inactive user at this time" });
+    }
+  });
+
+  // Get user audit history - super_admin only
+  app.get('/api/admin/audit-history', async (req, res) => {
+    try {
+      const authorized = await requireRole(req, res, ['super_admin']);
+      if (!authorized) return;
+
+      const { userId } = req.query;
+      const auditHistory = await storage.getAuditHistory(userId as string | undefined);
+      
+      res.json(auditHistory);
+    } catch (error) {
+      console.error("Error fetching audit history:", error);
+      res.status(500).json({ message: "We're unable to retrieve audit history at this time" });
     }
   });
 

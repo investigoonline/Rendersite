@@ -12,6 +12,8 @@ import {
   rolePermissions,
   imageAssets,
   siteSettings,
+  inactiveUsers,
+  userAuditHistory,
   type User,
   type UpsertUser,
   type InsertUserRegistration,
@@ -38,6 +40,8 @@ import {
   type InsertRolePermission,
   type ImageAsset,
   type InsertImageAsset,
+  type InactiveUser,
+  type UserAuditHistory,
   type SiteSetting,
 } from "@shared/schema";
 import { db } from "./db";
@@ -135,6 +139,33 @@ export interface IStorage {
   getSiteSettings(settingType?: string): Promise<SiteSetting[]>;
   getSiteSetting(settingKey: string): Promise<SiteSetting | undefined>;
   updateSiteSetting(settingKey: string, settingValue: string, updatedBy?: string): Promise<SiteSetting>;
+  
+  // User status management
+  updateUserActiveStatus(userId: string, isActive: boolean, performedBy?: string): Promise<User>;
+  getAllUsers(): Promise<User[]>;
+  
+  // Inactive users operations
+  getInactiveUsers(): Promise<InactiveUser[]>;
+  moveUserToInactive(userId: string, reason?: string, performedBy?: string): Promise<InactiveUser>;
+  restoreInactiveUser(inactiveUserId: string, performedBy?: string): Promise<User>;
+  deleteInactiveUser(inactiveUserId: string): Promise<void>;
+  
+  // User audit history operations
+  createAuditEntry(entry: {
+    userId: string;
+    userEmail?: string;
+    action: string;
+    performedBy?: string;
+    performedByEmail?: string;
+    details?: any;
+    previousState?: any;
+    newState?: any;
+    ipAddress?: string;
+  }): Promise<UserAuditHistory>;
+  getAuditHistory(userId?: string): Promise<UserAuditHistory[]>;
+  
+  // Permanent delete
+  permanentDeleteUser(userId: string, performedBy?: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -754,6 +785,193 @@ export class DatabaseStorage implements IStorage {
       .where(eq(siteSettings.settingKey, settingKey))
       .returning();
     return updatedSetting;
+  }
+
+  // User status management
+  async updateUserActiveStatus(userId: string, isActive: boolean, performedBy?: string): Promise<User> {
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    if (!user) {
+      throw new Error('User not found');
+    }
+    
+    const [updatedUser] = await db.update(users)
+      .set({ isActive, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    // Create audit entry
+    await this.createAuditEntry({
+      userId,
+      userEmail: user.email || undefined,
+      action: isActive ? 'activated' : 'deactivated',
+      performedBy,
+      previousState: { isActive: user.isActive },
+      newState: { isActive },
+    });
+    
+    return updatedUser;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return db.select().from(users).orderBy(desc(users.createdAt));
+  }
+
+  // Inactive users operations
+  async getInactiveUsers(): Promise<InactiveUser[]> {
+    return db.select().from(inactiveUsers).orderBy(desc(inactiveUsers.deactivatedAt));
+  }
+
+  async moveUserToInactive(userId: string, reason?: string, performedBy?: string): Promise<InactiveUser> {
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Insert into inactive_users table
+    const [inactiveUser] = await db.insert(inactiveUsers).values({
+      originalUserId: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone,
+      password: user.password,
+      passwordHint: user.passwordHint,
+      profileImageUrl: user.profileImageUrl,
+      role: user.role,
+      isEmailVerified: user.isEmailVerified,
+      authType: user.authType,
+      originalCreatedAt: user.createdAt,
+      deactivatedBy: performedBy,
+      reason,
+    }).returning();
+
+    // Delete user roles
+    await db.delete(userRoles).where(eq(userRoles.userId, userId));
+    
+    // Delete from users table
+    await db.delete(users).where(eq(users.id, userId));
+
+    // Create audit entry
+    await this.createAuditEntry({
+      userId,
+      userEmail: user.email || undefined,
+      action: 'soft_deleted',
+      performedBy,
+      previousState: user,
+      details: { reason, movedToInactiveId: inactiveUser.id },
+    });
+
+    return inactiveUser;
+  }
+
+  async restoreInactiveUser(inactiveUserId: string, performedBy?: string): Promise<User> {
+    const [inactiveUser] = await db.select().from(inactiveUsers).where(eq(inactiveUsers.id, inactiveUserId));
+    if (!inactiveUser) {
+      throw new Error('Inactive user not found');
+    }
+
+    // Insert back into users table with new ID
+    const [restoredUser] = await db.insert(users).values({
+      email: inactiveUser.email,
+      firstName: inactiveUser.firstName,
+      lastName: inactiveUser.lastName,
+      phone: inactiveUser.phone,
+      password: inactiveUser.password,
+      passwordHint: inactiveUser.passwordHint,
+      profileImageUrl: inactiveUser.profileImageUrl,
+      role: inactiveUser.role,
+      isEmailVerified: inactiveUser.isEmailVerified,
+      authType: inactiveUser.authType,
+      isActive: true,
+    }).returning();
+
+    // Delete from inactive_users table
+    await db.delete(inactiveUsers).where(eq(inactiveUsers.id, inactiveUserId));
+
+    // Create audit entry
+    await this.createAuditEntry({
+      userId: restoredUser.id,
+      userEmail: restoredUser.email || undefined,
+      action: 'restored',
+      performedBy,
+      previousState: inactiveUser,
+      newState: restoredUser,
+      details: { restoredFromInactiveId: inactiveUserId, originalUserId: inactiveUser.originalUserId },
+    });
+
+    return restoredUser;
+  }
+
+  async deleteInactiveUser(inactiveUserId: string): Promise<void> {
+    await db.delete(inactiveUsers).where(eq(inactiveUsers.id, inactiveUserId));
+  }
+
+  // User audit history operations
+  async createAuditEntry(entry: {
+    userId: string;
+    userEmail?: string;
+    action: string;
+    performedBy?: string;
+    performedByEmail?: string;
+    details?: any;
+    previousState?: any;
+    newState?: any;
+    ipAddress?: string;
+  }): Promise<UserAuditHistory> {
+    const [auditEntry] = await db.insert(userAuditHistory).values({
+      userId: entry.userId,
+      userEmail: entry.userEmail,
+      action: entry.action as any,
+      performedBy: entry.performedBy,
+      performedByEmail: entry.performedByEmail,
+      details: entry.details,
+      previousState: entry.previousState,
+      newState: entry.newState,
+      ipAddress: entry.ipAddress,
+    }).returning();
+    return auditEntry;
+  }
+
+  async getAuditHistory(userId?: string): Promise<UserAuditHistory[]> {
+    if (userId) {
+      return db.select().from(userAuditHistory)
+        .where(eq(userAuditHistory.userId, userId))
+        .orderBy(desc(userAuditHistory.createdAt));
+    }
+    return db.select().from(userAuditHistory).orderBy(desc(userAuditHistory.createdAt));
+  }
+
+  // Permanent delete
+  async permanentDeleteUser(userId: string, performedBy?: string): Promise<void> {
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Create audit entry before deletion
+    await this.createAuditEntry({
+      userId,
+      userEmail: user.email || undefined,
+      action: 'permanent_deleted',
+      performedBy,
+      previousState: user,
+      details: { permanentlyDeleted: true },
+    });
+
+    // Delete user roles
+    await db.delete(userRoles).where(eq(userRoles.userId, userId));
+    
+    // Delete calculations
+    await db.delete(calculations).where(eq(calculations.userId, userId));
+    
+    // Delete net worth snapshots
+    await db.delete(netWorthSnapshots).where(eq(netWorthSnapshots.userId, userId));
+    
+    // Delete login history
+    await db.delete(loginHistory).where(eq(loginHistory.userId, userId));
+    
+    // Delete the user
+    await db.delete(users).where(eq(users.id, userId));
   }
 }
 
