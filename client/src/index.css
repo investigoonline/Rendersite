@@ -41,6 +41,9 @@
   --font-sans: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-heading: 'Sanchez', Georgia, serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+  --font-size-h1: 22.5px;
+  --font-size-h2: 16.5px;
+  --font-size-content: 13.5px;
   --radius: 0.75rem;
 }
 
@@ -87,18 +90,18 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
-    font-size: 13.5px;
+    font-size: var(--font-size-content);
   }
   
   h1 {
     font-family: var(--font-heading);
-    font-size: 22.5px;
+    font-size: var(--font-size-h1);
     font-weight: 700;
   }
   
   h2 {
     font-family: var(--font-heading);
-    font-size: 16.5px;
+    font-size: var(--font-size-h2);
     font-weight: 700;
   }
   

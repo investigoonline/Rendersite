@@ -298,6 +298,18 @@ export const imageAssets = pgTable("image_assets", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Site settings table - stores global site configuration like font sizes
+export const siteSettings = pgTable("site_settings", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  settingKey: varchar("setting_key", { length: 100 }).notNull().unique(),
+  settingValue: text("setting_value").notNull(),
+  settingType: varchar("setting_type", { length: 50 }).notNull(), // 'font', 'color', 'general'
+  label: varchar("label", { length: 255 }),
+  description: text("description"),
+  updatedBy: varchar("updated_by"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Create insert schemas
 export const upsertUserSchema = createInsertSchema(users);
 export const insertUserRegistrationSchema = createInsertSchema(users).omit({
@@ -387,6 +399,10 @@ export const insertImageAssetSchema = createInsertSchema(imageAssets).omit({
   createdAt: true,
   updatedAt: true,
 });
+export const insertSiteSettingSchema = createInsertSchema(siteSettings).omit({
+  id: true,
+  updatedAt: true,
+});
 
 // Export types
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
@@ -415,3 +431,5 @@ export type LoginHistory = typeof loginHistory.$inferSelect;
 export type InsertLoginHistory = z.infer<typeof insertLoginHistorySchema>;
 export type ImageAsset = typeof imageAssets.$inferSelect;
 export type InsertImageAsset = z.infer<typeof insertImageAssetSchema>;
+export type SiteSetting = typeof siteSettings.$inferSelect;
+export type InsertSiteSetting = z.infer<typeof insertSiteSettingSchema>;
