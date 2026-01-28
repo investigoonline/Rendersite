@@ -213,6 +213,18 @@ export class DatabaseStorage implements IStorage {
         emailVerificationToken,
       })
       .returning();
+    
+    // Assign default guest_user role to new users
+    const guestRole = await db
+      .select()
+      .from(roles)
+      .where(eq(roles.name, 'guest_user'))
+      .limit(1);
+    
+    if (guestRole.length > 0) {
+      await this.assignRoleToUser(newUser.id, guestRole[0].id);
+    }
+    
     return newUser;
   }
 
