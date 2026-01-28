@@ -9,8 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Shield, Save, Plus, Trash2, Edit, Lock, Users, Image, Upload, RefreshCw } from "lucide-react";
-import type { PageContent, User, Role, ImageAsset } from "@shared/schema";
+import { Shield, Save, Plus, Trash2, Edit, Lock, Users, Image, Upload, RefreshCw, Type } from "lucide-react";
+import type { PageContent, User, Role, ImageAsset, SiteSetting } from "@shared/schema";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FormRenderer } from "@/components/FormRenderer";
 import { getSectionSchema, pageSections } from "@shared/contentSchemas";
@@ -142,6 +142,22 @@ export default function ContentManagement() {
     },
   });
 
+  // Fetch font settings
+  const { data: fontSettings, isLoading: loadingFonts } = useQuery<SiteSetting[]>({
+    queryKey: ['/api/site-settings', 'font'],
+    enabled: hasAccess === true && mainTab === "fonts",
+    queryFn: async () => {
+      const res = await fetch('/api/site-settings?type=font', { credentials: 'include' });
+      if (!res.ok) {
+        throw new Error('Failed to fetch font settings');
+      }
+      return res.json();
+    },
+  });
+
+  // Font settings state
+  const [fontFormData, setFontFormData] = useState<Record<string, string>>({});
+
   // Update content mutation
   const updateContentMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
@@ -206,6 +222,38 @@ export default function ContentManagement() {
       });
     },
   });
+
+  // Update font settings mutation
+  const updateFontSettingsMutation = useMutation({
+    mutationFn: async (settings: Array<{ key: string; value: string }>) => {
+      return apiRequest('/api/admin/site-settings', 'PUT', { settings });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Font settings updated successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/site-settings', 'font'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update font settings",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Initialize font form data when settings load
+  useEffect(() => {
+    if (fontSettings && fontSettings.length > 0) {
+      const formData: Record<string, string> = {};
+      fontSettings.forEach((setting) => {
+        formData[setting.settingKey] = setting.settingValue;
+      });
+      setFontFormData(formData);
+    }
+  }, [fontSettings]);
 
   // Assign role mutation
   const assignRoleMutation = useMutation({
@@ -387,6 +435,10 @@ export default function ContentManagement() {
             <TabsTrigger value="images" data-testid="tab-images">
               <Image className="h-4 w-4 mr-2" />
               Hero Images
+            </TabsTrigger>
+            <TabsTrigger value="fonts" data-testid="tab-fonts">
+              <Type className="h-4 w-4 mr-2" />
+              Font Settings
             </TabsTrigger>
             {isSuperAdmin && (
               <TabsTrigger value="users" data-testid="tab-users">
@@ -744,6 +796,133 @@ export default function ContentManagement() {
                 })}
               </div>
             )}
+          </TabsContent>
+
+          {/* Font Settings Tab */}
+          <TabsContent value="fonts" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Type className="h-5 w-5" />
+                  Font Size Settings
+                </CardTitle>
+                <CardDescription>
+                  Adjust the font sizes used across the website. Changes take effect immediately for all users.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {loadingFonts ? (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">Loading font settings...</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="font_size_h1">Heading 1 Size (px)</Label>
+                        <Input
+                          id="font_size_h1"
+                          type="number"
+                          step="0.5"
+                          min="12"
+                          max="48"
+                          value={fontFormData.font_size_h1 || '22.5'}
+                          onChange={(e) => setFontFormData({ ...fontFormData, font_size_h1: e.target.value })}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Main page headings. Default: 22.5px
+                        </p>
+                        <div className="mt-2 p-3 bg-gray-50 rounded border">
+                          <span style={{ fontSize: `${fontFormData.font_size_h1 || 22.5}px`, fontFamily: 'Sanchez, Georgia, serif', fontWeight: 700 }}>
+                            Sample Heading 1
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="font_size_h2">Heading 2 Size (px)</Label>
+                        <Input
+                          id="font_size_h2"
+                          type="number"
+                          step="0.5"
+                          min="10"
+                          max="36"
+                          value={fontFormData.font_size_h2 || '16.5'}
+                          onChange={(e) => setFontFormData({ ...fontFormData, font_size_h2: e.target.value })}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Subheadings and section titles. Default: 16.5px
+                        </p>
+                        <div className="mt-2 p-3 bg-gray-50 rounded border">
+                          <span style={{ fontSize: `${fontFormData.font_size_h2 || 16.5}px`, fontFamily: 'Sanchez, Georgia, serif', fontWeight: 700 }}>
+                            Sample Heading 2
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="font_size_content">Content Size (px)</Label>
+                        <Input
+                          id="font_size_content"
+                          type="number"
+                          step="0.5"
+                          min="10"
+                          max="24"
+                          value={fontFormData.font_size_content || '13.5'}
+                          onChange={(e) => setFontFormData({ ...fontFormData, font_size_content: e.target.value })}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Body text and paragraphs. Default: 13.5px
+                        </p>
+                        <div className="mt-2 p-3 bg-gray-50 rounded border">
+                          <span style={{ fontSize: `${fontFormData.font_size_content || 13.5}px`, fontFamily: 'Roboto, -apple-system, BlinkMacSystemFont, sans-serif' }}>
+                            Sample body content text for preview
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-4 border-t">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setFontFormData({
+                            font_size_h1: '22.5',
+                            font_size_h2: '16.5',
+                            font_size_content: '13.5'
+                          });
+                        }}
+                      >
+                        Reset to Defaults
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          const settings = Object.entries(fontFormData).map(([key, value]) => ({
+                            key,
+                            value: value.toString()
+                          }));
+                          updateFontSettingsMutation.mutate(settings);
+                        }}
+                        disabled={updateFontSettingsMutation.isPending}
+                      >
+                        {updateFontSettingsMutation.isPending ? (
+                          <>
+                            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4 mr-2" />
+                            Save Font Settings
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* User Roles Management Tab */}
