@@ -9,7 +9,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Shield, Save, Plus, Trash2, Edit, Lock, Users, Image, Upload, RefreshCw, Type, Calculator } from "lucide-react";
+import { Shield, Save, Plus, Trash2, Edit, Lock, Users, Image, Upload, RefreshCw, Type, Calculator, AlertTriangle, UserX, RotateCcw } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import type { PageContent, User, Role, ImageAsset, SiteSetting } from "@shared/schema";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FormRenderer } from "@/components/FormRenderer";
@@ -184,6 +196,19 @@ export default function ContentManagement() {
     { id: 'calculator_tax', name: 'Tax Calculator', description: 'Tax planning and calculations' },
   ];
 
+  // Fetch inactive users (for super admins only)
+  const { data: inactiveUsers, isLoading: loadingInactiveUsers, refetch: refetchInactiveUsers } = useQuery<any[]>({
+    queryKey: ['/api/admin/inactive-users'],
+    enabled: isSuperAdmin === true && mainTab === "inactive",
+    queryFn: async () => {
+      const res = await fetch('/api/admin/inactive-users', { credentials: 'include' });
+      if (!res.ok) {
+        throw new Error('Failed to fetch inactive users');
+      }
+      return res.json();
+    },
+  });
+
   // Update content mutation
   const updateContentMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
@@ -318,6 +343,113 @@ export default function ContentManagement() {
       toast({
         title: "Error",
         description: error.message || "Failed to remove role",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Toggle user active status mutation
+  const toggleActiveStatusMutation = useMutation({
+    mutationFn: async ({ userId, isActive }: { userId: string; isActive: boolean }) => {
+      return apiRequest(`/api/admin/users/${userId}/active`, "PUT", { isActive });
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Success",
+        description: data.message || "User status updated",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update user status",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Soft delete user mutation
+  const softDeleteUserMutation = useMutation({
+    mutationFn: async ({ userId, reason }: { userId: string; reason?: string }) => {
+      return apiRequest(`/api/admin/users/${userId}/soft-delete`, "POST", { reason });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "User moved to inactive. They can be restored later.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/inactive-users'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to deactivate user",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Permanent delete user mutation
+  const permanentDeleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      return apiRequest(`/api/admin/users/${userId}/permanent`, "DELETE", {});
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "User and all data permanently deleted",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete user",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Restore inactive user mutation
+  const restoreUserMutation = useMutation({
+    mutationFn: async (inactiveUserId: string) => {
+      return apiRequest(`/api/admin/inactive-users/${inactiveUserId}/restore`, "POST", {});
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "User has been restored successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/inactive-users'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to restore user",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Permanently delete inactive user mutation
+  const deleteInactiveUserMutation = useMutation({
+    mutationFn: async (inactiveUserId: string) => {
+      return apiRequest(`/api/admin/inactive-users/${inactiveUserId}`, "DELETE", {});
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Inactive user record permanently deleted",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/inactive-users'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete inactive user",
         variant: "destructive",
       });
     },
@@ -474,6 +606,12 @@ export default function ContentManagement() {
               <TabsTrigger value="users" data-testid="tab-users">
                 <Users className="h-4 w-4 mr-2" />
                 User Roles
+              </TabsTrigger>
+            )}
+            {isSuperAdmin && (
+              <TabsTrigger value="inactive" data-testid="tab-inactive">
+                <UserX className="h-4 w-4 mr-2" />
+                Inactive Users
               </TabsTrigger>
             )}
           </TabsList>
@@ -1172,8 +1310,10 @@ export default function ContentManagement() {
                         <TableHead>Email</TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>Auth Type</TableHead>
+                        <TableHead>Active</TableHead>
                         <TableHead>Current Roles</TableHead>
                         <TableHead>Assign Role</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1185,6 +1325,23 @@ export default function ContentManagement() {
                           </TableCell>
                           <TableCell>
                             <Badge variant="outline">{userItem.authType}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={(userItem as any).isActive !== false}
+                                onCheckedChange={(checked) => {
+                                  toggleActiveStatusMutation.mutate({
+                                    userId: userItem.id,
+                                    isActive: checked
+                                  });
+                                }}
+                                disabled={toggleActiveStatusMutation.isPending}
+                              />
+                              <span className="text-sm">
+                                {(userItem as any).isActive !== false ? 'Yes' : 'No'}
+                              </span>
+                            </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-wrap gap-1">
@@ -1244,10 +1401,206 @@ export default function ContentManagement() {
                               </SelectContent>
                             </Select>
                           </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="outline" size="sm">
+                                    <UserX className="h-4 w-4 mr-1" />
+                                    Temporary
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Move User to Inactive?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This will temporarily delete {userItem.email}. The user can be restored later from the Inactive Users section.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => {
+                                        softDeleteUserMutation.mutate({
+                                          userId: userItem.id,
+                                          reason: 'Admin action - temporary delete'
+                                        });
+                                      }}
+                                    >
+                                      Move to Inactive
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="destructive" size="sm">
+                                    <Trash2 className="h-4 w-4 mr-1" />
+                                    Permanent
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                                      <AlertTriangle className="h-5 w-5" />
+                                      Permanently Delete User?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription className="space-y-2">
+                                      <p><strong>Warning:</strong> This action cannot be undone!</p>
+                                      <p>Deleting {userItem.email} will permanently purge:</p>
+                                      <ul className="list-disc list-inside ml-2 space-y-1">
+                                        <li>All user account information</li>
+                                        <li>All saved calculations</li>
+                                        <li>All net worth snapshots</li>
+                                        <li>All login history</li>
+                                        <li>All role assignments</li>
+                                      </ul>
+                                      <p className="font-semibold mt-2">This data cannot be recovered.</p>
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                      onClick={() => {
+                                        permanentDeleteUserMutation.mutate(userItem.id);
+                                      }}
+                                    >
+                                      Yes, Permanently Delete
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Inactive Users Management Tab */}
+          <TabsContent value="inactive" className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-lg font-semibold">Inactive Users Management</h2>
+                <p className="text-sm text-muted-foreground">
+                  View and restore users that have been temporarily deleted.
+                </p>
+              </div>
+              <Button variant="outline" onClick={() => refetchInactiveUsers()} disabled={loadingInactiveUsers}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${loadingInactiveUsers ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+            </div>
+
+            {loadingInactiveUsers ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Loading inactive users...</p>
+              </div>
+            ) : inactiveUsers && inactiveUsers.length > 0 ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Inactive Users</CardTitle>
+                  <CardDescription>
+                    These users have been temporarily deleted and can be restored with their original credentials.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>Deactivated</TableHead>
+                        <TableHead>Reason</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {inactiveUsers.map((inactiveUser) => (
+                        <TableRow key={inactiveUser.id}>
+                          <TableCell className="font-medium">{inactiveUser.email}</TableCell>
+                          <TableCell>
+                            {inactiveUser.firstName} {inactiveUser.lastName}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{inactiveUser.role}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            {inactiveUser.deactivatedAt ? new Date(inactiveUser.deactivatedAt).toLocaleDateString() : 'N/A'}
+                          </TableCell>
+                          <TableCell className="max-w-[200px] truncate">
+                            {inactiveUser.reason || 'No reason provided'}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  if (confirm(`Restore ${inactiveUser.email} to active users?`)) {
+                                    restoreUserMutation.mutate(inactiveUser.id);
+                                  }
+                                }}
+                                disabled={restoreUserMutation.isPending}
+                              >
+                                <RotateCcw className="h-4 w-4 mr-1" />
+                                Restore
+                              </Button>
+
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="destructive" size="sm">
+                                    <Trash2 className="h-4 w-4 mr-1" />
+                                    Delete Forever
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                                      <AlertTriangle className="h-5 w-5" />
+                                      Permanently Delete Inactive User?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This will permanently delete the inactive user record for {inactiveUser.email}. This action cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                      onClick={() => {
+                                        deleteInactiveUserMutation.mutate(inactiveUser.id);
+                                      }}
+                                    >
+                                      Delete Forever
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <UserX className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No Inactive Users</h3>
+                  <p className="text-muted-foreground">
+                    There are no temporarily deleted users. Users moved to inactive status will appear here.
+                  </p>
                 </CardContent>
               </Card>
             )}
