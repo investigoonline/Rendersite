@@ -1064,6 +1064,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Site settings routes - font settings are public for CSS application
+  app.get('/api/site-settings', async (req, res) => {
+    try {
+      const settingType = req.query.type as string | undefined;
+      const settings = await storage.getSiteSettings(settingType);
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching site settings:", error);
+      res.status(500).json({ message: "Unable to fetch site settings" });
+    }
+  });
+
+  // Update site settings - requires admin or content manager role
+  app.put('/api/admin/site-settings/:settingKey', async (req, res) => {
+    try {
+      const authorized = requireRole(req, res, ['super_admin', 'admin', 'content_manager']);
+      if (!authorized) return;
+
+      const { settingKey } = req.params;
+      const { value } = req.body;
+
+      if (value === undefined) {
+        return res.status(400).json({ message: "Value is required" });
+      }
+
+      const updatedSetting = await storage.updateSiteSetting(
+        settingKey,
+        String(value),
+        req.session.user?.email
+      );
+
+      if (!updatedSetting) {
+        return res.status(404).json({ message: "Setting not found" });
+      }
+
+      res.json(updatedSetting);
+    } catch (error) {
+      console.error("Error updating site setting:", error);
+      res.status(500).json({ message: "Unable to update site setting" });
+    }
+  });
+
+  // Batch update site settings
+  app.put('/api/admin/site-settings', async (req, res) => {
+    try {
+      const authorized = requireRole(req, res, ['super_admin', 'admin', 'content_manager']);
+      if (!authorized) return;
+
+      const { settings } = req.body;
+      if (!settings || !Array.isArray(settings)) {
+        return res.status(400).json({ message: "Settings array is required" });
+      }
+
+      const results = [];
+      for (const setting of settings) {
+        if (setting.key && setting.value !== undefined) {
+          const updated = await storage.updateSiteSetting(
+            setting.key,
+            String(setting.value),
+            req.session.user?.email
+          );
+          if (updated) results.push(updated);
+        }
+      }
+
+      res.json(results);
+    } catch (error) {
+      console.error("Error updating site settings:", error);
+      res.status(500).json({ message: "Unable to update site settings" });
+    }
+  });
+
   // Proxy endpoint to serve images from object storage
   // This is needed because the bucket has public access prevention enabled
   app.get('/api/storage/hero-images/:fileName', async (req, res) => {

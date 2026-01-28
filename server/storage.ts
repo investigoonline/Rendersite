@@ -11,6 +11,7 @@ import {
   loginHistory,
   rolePermissions,
   imageAssets,
+  siteSettings,
   type User,
   type UpsertUser,
   type InsertUserRegistration,
@@ -37,6 +38,7 @@ import {
   type InsertRolePermission,
   type ImageAsset,
   type InsertImageAsset,
+  type SiteSetting,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, sql } from "drizzle-orm";
@@ -128,6 +130,11 @@ export interface IStorage {
   createImageAsset(asset: InsertImageAsset): Promise<ImageAsset>;
   updateImageAsset(id: string, asset: Partial<InsertImageAsset>): Promise<ImageAsset>;
   deleteImageAsset(id: string): Promise<void>;
+  
+  // Site settings operations
+  getSiteSettings(settingType?: string): Promise<SiteSetting[]>;
+  getSiteSetting(settingKey: string): Promise<SiteSetting | undefined>;
+  updateSiteSetting(settingKey: string, settingValue: string, updatedBy?: string): Promise<SiteSetting>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -726,6 +733,27 @@ export class DatabaseStorage implements IStorage {
 
   async deleteImageAsset(id: string): Promise<void> {
     await db.delete(imageAssets).where(eq(imageAssets.id, id));
+  }
+
+  // Site settings operations
+  async getSiteSettings(settingType?: string): Promise<SiteSetting[]> {
+    if (settingType) {
+      return db.select().from(siteSettings).where(eq(siteSettings.settingType, settingType));
+    }
+    return db.select().from(siteSettings);
+  }
+
+  async getSiteSetting(settingKey: string): Promise<SiteSetting | undefined> {
+    const [setting] = await db.select().from(siteSettings).where(eq(siteSettings.settingKey, settingKey));
+    return setting;
+  }
+
+  async updateSiteSetting(settingKey: string, settingValue: string, updatedBy?: string): Promise<SiteSetting> {
+    const [updatedSetting] = await db.update(siteSettings)
+      .set({ settingValue, updatedBy, updatedAt: new Date() })
+      .where(eq(siteSettings.settingKey, settingKey))
+      .returning();
+    return updatedSetting;
   }
 }
 
