@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Shield, Save, Plus, Trash2, Edit, Lock, Users, Image, Upload, RefreshCw, Type } from "lucide-react";
+import { Shield, Save, Plus, Trash2, Edit, Lock, Users, Image, Upload, RefreshCw, Type, Calculator } from "lucide-react";
 import type { PageContent, User, Role, ImageAsset, SiteSetting } from "@shared/schema";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FormRenderer } from "@/components/FormRenderer";
@@ -65,6 +65,10 @@ export default function ContentManagement() {
   const hasAccess = user?.role === 'super_admin' || user?.role === 'content_manager';
   const isSuperAdmin = user?.role === 'super_admin';
   const checkingAccess = false;
+  
+  // Calculator editing state
+  const [editingCalculator, setEditingCalculator] = useState<string | null>(null);
+  const [calculatorFormData, setCalculatorFormData] = useState<Record<string, any>>({});
   
   // Image upload state
   const [uploadingImage, setUploadingImage] = useState<string | null>(null);
@@ -157,6 +161,28 @@ export default function ContentManagement() {
 
   // Font settings state
   const [fontFormData, setFontFormData] = useState<Record<string, string>>({});
+
+  // Fetch calculator content
+  const { data: calculatorContent, isLoading: loadingCalculators, refetch: refetchCalculators } = useQuery<PageContent[]>({
+    queryKey: ['/api/content', 'calculators'],
+    enabled: hasAccess === true && mainTab === "calculators",
+    queryFn: async () => {
+      const res = await fetch('/api/content?page=calculators', { credentials: 'include' });
+      if (!res.ok) {
+        throw new Error('Failed to fetch calculator content');
+      }
+      return res.json();
+    },
+  });
+
+  // Calculator definitions for display
+  const calculatorDefinitions = [
+    { id: 'calculator_net_worth', name: 'Net Worth Calculator', description: 'Calculate total assets minus liabilities' },
+    { id: 'calculator_loan_payoff', name: 'Loan Payoff Calculator', description: 'Calculate loan payoff timelines and savings' },
+    { id: 'calculator_mortgage', name: 'Mortgage Calculator', description: 'Mortgage payments and affordability' },
+    { id: 'calculator_retirement', name: 'Retirement Calculator', description: 'Retirement planning and projections' },
+    { id: 'calculator_tax', name: 'Tax Calculator', description: 'Tax planning and calculations' },
+  ];
 
   // Update content mutation
   const updateContentMutation = useMutation({
@@ -439,6 +465,10 @@ export default function ContentManagement() {
             <TabsTrigger value="fonts" data-testid="tab-fonts">
               <Type className="h-4 w-4 mr-2" />
               Font Settings
+            </TabsTrigger>
+            <TabsTrigger value="calculators" data-testid="tab-calculators">
+              <Calculator className="h-4 w-4 mr-2" />
+              Calculators
             </TabsTrigger>
             {isSuperAdmin && (
               <TabsTrigger value="users" data-testid="tab-users">
@@ -923,6 +953,198 @@ export default function ContentManagement() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Calculators Management Tab */}
+          <TabsContent value="calculators" className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-lg font-semibold">Calculator Content Management</h2>
+                <p className="text-sm text-muted-foreground">
+                  Edit titles and descriptions for all financial calculators. Changes are visible site-wide.
+                </p>
+              </div>
+              <Button variant="outline" onClick={() => refetchCalculators()} disabled={loadingCalculators}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${loadingCalculators ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+            </div>
+
+            {loadingCalculators ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Loading calculators...</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-6">
+                {calculatorDefinitions.map((calc) => {
+                  const existingContent = calculatorContent?.find(c => c.section === calc.id);
+                  const isEditing = editingCalculator === calc.id;
+                  const schemaInfo = getSectionSchema(calc.id);
+                  
+                  return (
+                    <Card key={calc.id} data-testid={`calculator-card-${calc.id}`}>
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="flex items-center gap-2">
+                              <Calculator className="h-5 w-5 text-primary" />
+                              {calc.name}
+                            </CardTitle>
+                            <CardDescription>{calc.description}</CardDescription>
+                          </div>
+                          <Badge variant={existingContent ? "default" : "secondary"}>
+                            {existingContent ? "Customized" : "Using Defaults"}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        {isEditing ? (
+                          <div className="space-y-4">
+                            <div className="space-y-2">
+                              <Label htmlFor={`${calc.id}-pageTitle`}>Page Title</Label>
+                              <Input
+                                id={`${calc.id}-pageTitle`}
+                                value={calculatorFormData.pageTitle || ''}
+                                onChange={(e) => setCalculatorFormData({ ...calculatorFormData, pageTitle: e.target.value })}
+                                placeholder="Enter page title"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor={`${calc.id}-pageDescription`}>Page Description</Label>
+                              <Textarea
+                                id={`${calc.id}-pageDescription`}
+                                value={calculatorFormData.pageDescription || ''}
+                                onChange={(e) => setCalculatorFormData({ ...calculatorFormData, pageDescription: e.target.value })}
+                                placeholder="Enter page description"
+                                rows={2}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor={`${calc.id}-cardTitle`}>Card Title</Label>
+                              <Input
+                                id={`${calc.id}-cardTitle`}
+                                value={calculatorFormData.cardTitle || ''}
+                                onChange={(e) => setCalculatorFormData({ ...calculatorFormData, cardTitle: e.target.value })}
+                                placeholder="Enter card title"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor={`${calc.id}-cardDescription`}>Card Description</Label>
+                              <Textarea
+                                id={`${calc.id}-cardDescription`}
+                                value={calculatorFormData.cardDescription || ''}
+                                onChange={(e) => setCalculatorFormData({ ...calculatorFormData, cardDescription: e.target.value })}
+                                placeholder="Enter card description"
+                                rows={2}
+                              />
+                            </div>
+                            <div className="flex gap-2 pt-2">
+                              <Button
+                                onClick={() => {
+                                  if (existingContent) {
+                                    updateContentMutation.mutate({
+                                      id: existingContent.id,
+                                      data: { content: calculatorFormData }
+                                    }, {
+                                      onSuccess: () => {
+                                        queryClient.invalidateQueries({ queryKey: ['/api/content', 'calculators'] });
+                                        setEditingCalculator(null);
+                                        setCalculatorFormData({});
+                                      }
+                                    });
+                                  } else {
+                                    createContentMutation.mutate({
+                                      page: 'calculators',
+                                      section: calc.id,
+                                      content: calculatorFormData
+                                    }, {
+                                      onSuccess: () => {
+                                        queryClient.invalidateQueries({ queryKey: ['/api/content', 'calculators'] });
+                                        setEditingCalculator(null);
+                                        setCalculatorFormData({});
+                                      }
+                                    });
+                                  }
+                                }}
+                                disabled={updateContentMutation.isPending || createContentMutation.isPending}
+                              >
+                                {(updateContentMutation.isPending || createContentMutation.isPending) ? (
+                                  <>
+                                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                                    Saving...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Save className="h-4 w-4 mr-2" />
+                                    Save Changes
+                                  </>
+                                )}
+                              </Button>
+                              <Button
+                                variant="outline"
+                                onClick={() => {
+                                  setEditingCalculator(null);
+                                  setCalculatorFormData({});
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-4">
+                            {existingContent ? (
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <p className="text-sm font-medium text-muted-foreground">Page Title</p>
+                                  <p className="text-sm">{(existingContent.content as any)?.pageTitle || 'Not set'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium text-muted-foreground">Page Description</p>
+                                  <p className="text-sm whitespace-pre-wrap">{(existingContent.content as any)?.pageDescription || 'Not set'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium text-muted-foreground">Card Title</p>
+                                  <p className="text-sm">{(existingContent.content as any)?.cardTitle || 'Not set'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium text-muted-foreground">Card Description</p>
+                                  <p className="text-sm whitespace-pre-wrap">{(existingContent.content as any)?.cardDescription || 'Not set'}</p>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-sm text-muted-foreground italic">
+                                No custom content set. Click Edit to customize this calculator's titles and descriptions.
+                              </p>
+                            )}
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setEditingCalculator(calc.id);
+                                if (existingContent) {
+                                  setCalculatorFormData(existingContent.content as any || {});
+                                } else {
+                                  setCalculatorFormData({
+                                    pageTitle: calc.name,
+                                    pageDescription: calc.description,
+                                    cardTitle: calc.name,
+                                    cardDescription: calc.description
+                                  });
+                                }
+                              }}
+                            >
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit Content
+                            </Button>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
           </TabsContent>
 
           {/* User Roles Management Tab */}
