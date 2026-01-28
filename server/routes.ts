@@ -392,6 +392,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "The email or password you entered is incorrect" });
       }
       
+      // Check if user account is disabled
+      if (user.isActive === false) {
+        return res.status(403).json({ message: "Your account was disabled. Contact IFS Admin to enable your account." });
+      }
+      
       // Email verification removed - users can login immediately after registration
       
       // Create session (store user in session including role)
