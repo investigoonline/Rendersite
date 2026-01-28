@@ -1057,7 +1057,10 @@ export default function ContentManagement() {
                                     createContentMutation.mutate({
                                       page: 'calculators',
                                       section: calc.id,
-                                      content: calculatorFormData
+                                      content: calculatorFormData,
+                                      published: true,
+                                      createdBy: user?.id,
+                                      updatedBy: user?.id,
                                     }, {
                                       onSuccess: () => {
                                         queryClient.invalidateQueries({ queryKey: ['/api/content', 'calculators'] });
