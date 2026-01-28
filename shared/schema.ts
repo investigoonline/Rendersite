@@ -53,8 +53,58 @@ export const users = pgTable("users", {
   resetPasswordToken: varchar("reset_password_token"),
   resetPasswordExpires: timestamp("reset_password_expires"),
   authType: varchar("auth_type").default("traditional"),
+  isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Inactive users table - for temporarily deleted users
+export const inactiveUsers = pgTable("inactive_users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  originalUserId: varchar("original_user_id").notNull(),
+  email: varchar("email"),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  phone: varchar("phone", { length: 20 }),
+  password: varchar("password", { length: 255 }),
+  passwordHint: varchar("password_hint", { length: 255 }),
+  profileImageUrl: varchar("profile_image_url"),
+  role: userRoleEnum("role").default('client'),
+  isEmailVerified: boolean("is_email_verified").default(false),
+  authType: varchar("auth_type").default("traditional"),
+  originalCreatedAt: timestamp("original_created_at"),
+  deactivatedAt: timestamp("deactivated_at").defaultNow(),
+  deactivatedBy: varchar("deactivated_by"),
+  reason: text("reason"),
+});
+
+// User audit action enum
+export const userAuditActionEnum = pgEnum('user_audit_action', [
+  'created',
+  'updated',
+  'activated',
+  'deactivated',
+  'soft_deleted',
+  'restored',
+  'permanent_deleted',
+  'role_changed',
+  'login',
+  'logout'
+]);
+
+// User audit history table - tracks all user changes
+export const userAuditHistory = pgTable("user_audit_history", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  userEmail: varchar("user_email"),
+  action: userAuditActionEnum("action").notNull(),
+  performedBy: varchar("performed_by"),
+  performedByEmail: varchar("performed_by_email"),
+  details: jsonb("details"),
+  previousState: jsonb("previous_state"),
+  newState: jsonb("new_state"),
+  ipAddress: varchar("ip_address", { length: 45 }),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Calculator categories enum
@@ -433,3 +483,5 @@ export type ImageAsset = typeof imageAssets.$inferSelect;
 export type InsertImageAsset = z.infer<typeof insertImageAssetSchema>;
 export type SiteSetting = typeof siteSettings.$inferSelect;
 export type InsertSiteSetting = z.infer<typeof insertSiteSettingSchema>;
+export type InactiveUser = typeof inactiveUsers.$inferSelect;
+export type UserAuditHistory = typeof userAuditHistory.$inferSelect;
