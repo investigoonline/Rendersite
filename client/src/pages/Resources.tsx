@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,10 +34,8 @@ import {
 } from "lucide-react";
 import type { PageContent, ImageAsset } from "@shared/schema";
 import { HTMLContent } from "@/components/HTMLContent";
-import cashImage from "@assets/image_1765301156968.png";
-import riskImage from "@assets/image_1765301191599.png";
-import retirementImage from "@assets/image_1765301218910.png";
-import investingImage from "@assets/image_1765301276527.png";
+import { useDynamicImage } from "@/hooks/useDynamicImage";
+import resourcesHeroDefault from "@assets/image_1765301156968.png";
 
 interface ResourceType {
   id: string;
@@ -46,48 +44,15 @@ interface ResourceType {
   description: string;
 }
 
-const defaultCarouselImages = [
-  cashImage,
-  riskImage,
-  retirementImage,
-  investingImage,
-];
-
 export default function Resources() {
   const { toast } = useToast();
   const [selectedType, setSelectedType] = useState("article");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [viewingResource, setViewingResource] = useState<any | null>(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  // Fetch dynamic carousel images from CMS
-  const { data: dynamicImages } = useQuery<ImageAsset[]>({
-    queryKey: ['/api/images', 'articles'],
-    staleTime: 1000 * 60 * 5,
-    queryFn: async () => {
-      const res = await fetch('/api/images?page=articles', { credentials: 'include' });
-      if (!res.ok) return [];
-      return res.json();
-    },
-  });
-
-  // Build carousel images array: use dynamic images if available, fall back to defaults
-  const carouselImages = useMemo(() => {
-    const slots = ['carousel_1', 'carousel_2', 'carousel_3', 'carousel_4'];
-    return slots.map((section, index) => {
-      const dynamicImage = dynamicImages?.find(img => img.section === section);
-      return dynamicImage?.filePath || defaultCarouselImages[index];
-    });
-  }, [dynamicImages]);
-
-  // Rotate carousel images every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % carouselImages.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [carouselImages.length]);
+  
+  // Hero image with CMS support
+  const heroImage = useDynamicImage("resources", "hero", resourcesHeroDefault);
 
   // Fetch resource types content
   const { data: resourceTypesContent } = useQuery<PageContent[]>({
@@ -197,8 +162,20 @@ export default function Resources() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen" style={{ backgroundColor: '#f5f5f5' }}>
+      {/* Hero Section - Same sizing as Landing page */}
+      <section>
+        <div className="w-full">
+          <img
+            src={heroImage}
+            alt="Financial Resources"
+            className="w-full object-cover"
+            style={{ height: "480px" }}
+          />
+        </div>
+      </section>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         {pageHeader && (
           <div className="text-center mb-12">
@@ -206,17 +183,6 @@ export default function Resources() {
               {pageHeader.title}
             </h1>
             <HTMLContent content={pageHeader.description} className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8" />
-          </div>
-        )}
-
-        {/* Rotating Image Carousel for Articles */}
-        {selectedType === "article" && (
-          <div className="w-full mb-8">
-            <img 
-              src={carouselImages[currentImageIndex]} 
-              alt="Resource carousel" 
-              className="w-full h-auto rounded-lg shadow-lg object-cover"
-            />
           </div>
         )}
 
