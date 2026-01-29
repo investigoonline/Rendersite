@@ -7,7 +7,8 @@ import defaultLogo from "@assets/image_1763735441524.jpeg";
 
 export default function Footer() {
   // Dynamic logo from CMS with fallback to bundled asset
-  const logoSrc = useDynamicImage('global', 'logo', defaultLogo);
+  // First try footer-specific logo, then fall back to global header logo
+  const footerLogoSrc = useDynamicImage('footer', 'logo', defaultLogo);
   
   // Fetch footer content
   const { data: footerContent } = useQuery<PageContent[]>({
@@ -48,7 +49,7 @@ export default function Footer() {
           <div className="lg:col-span-1">
             <div className="mb-2 bg-white p-2 rounded inline-block">
               <img 
-                src={logoSrc} 
+                src={footerLogoSrc} 
                 alt="IFS Wealth Management" 
                 className="h-10 w-auto object-contain"
                 style={{ imageRendering: 'crisp-edges' }}
