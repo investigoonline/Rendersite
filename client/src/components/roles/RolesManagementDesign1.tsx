@@ -27,8 +27,16 @@ const permissions: Permission[] = [
   { resource: "Location", type: "page", icon: "📍" },
   { resource: "Disclosures", type: "page", icon: "📋" },
   { resource: "Custodian", type: "page", icon: "🏦" },
+  { resource: "Privacy Policy", type: "page", icon: "🔒" },
+  { resource: "Terms of Service", type: "page", icon: "📄" },
+  { resource: "Process", type: "page", icon: "🔄" },
   { resource: "Content Management", type: "page", icon: "⚙️" },
   { resource: "Admin Dashboard", type: "page", icon: "🎛️" },
+  { resource: "FOOTER LINKS", type: "category", icon: "🔗" },
+  { resource: "Footer - Platform Links", type: "page", parentId: "FOOTER LINKS", icon: "🖥️" },
+  { resource: "Footer - Resources Links", type: "page", parentId: "FOOTER LINKS", icon: "📚" },
+  { resource: "Footer - Company Links", type: "page", parentId: "FOOTER LINKS", icon: "🏢" },
+  { resource: "Footer - Social Media Links", type: "page", parentId: "FOOTER LINKS", icon: "📱" },
   { resource: "CALCULATORS", type: "category", icon: "🧮" },
   { resource: "Wealth Management", type: "category", parentId: "CALCULATORS", icon: "💰" },
   { resource: "Total Net Worth Calculator", type: "calculator", parentId: "Wealth Management" },
@@ -78,19 +86,23 @@ const defaultPermissions: Record<string, string[]> = {
   "content_manager": [
     "Home (Landing/Dashboard)", "Register", "Resources", "About", "Contact", 
     "Services", "FAQ", "Become Client", "Location", "Disclosures", "Custodian", 
-    "Content Management"
+    "Privacy Policy", "Terms of Service", "Process", "Content Management",
+    "FOOTER LINKS", "Footer - Platform Links", "Footer - Resources Links", "Footer - Company Links", "Footer - Social Media Links"
   ],
   "guest_user": [
     "Home (Landing/Dashboard)", "Register", "Resources", "About", "Contact",
     "Services", "FAQ", "Become Client", "Location", "Disclosures", "Custodian",
-    "CALCULATORS", "Vehicle Financing", "Lease Payment Calculator", "Car Affordability Calculator"
+    "Privacy Policy", "Terms of Service", "Process",
+    "CALCULATORS", "Vehicle Financing", "Lease Payment Calculator", "Car Affordability Calculator",
+    "FOOTER LINKS", "Footer - Platform Links", "Footer - Resources Links", "Footer - Company Links", "Footer - Social Media Links"
   ],
   "preferred_client": permissions.filter(p => p.resource !== "Content Management" && p.resource !== "Admin Dashboard").map(p => p.resource),
   "client": permissions.filter(p => p.resource !== "Content Management" && p.resource !== "Admin Dashboard").map(p => p.resource),
   "unregistered": [
     "Home (Landing/Dashboard)", "Register", "About", "Contact",
     "Services", "FAQ", "Become Client", "Location", "Disclosures", "Custodian",
-    "Privacy Policy", "Terms of Service"
+    "Privacy Policy", "Terms of Service", "Resources", "Process",
+    "FOOTER LINKS", "Footer - Platform Links", "Footer - Resources Links", "Footer - Company Links", "Footer - Social Media Links"
   ],
 };
 
