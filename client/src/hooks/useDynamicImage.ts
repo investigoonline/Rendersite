@@ -5,6 +5,7 @@ export function useDynamicImage(page: string, section: string, fallbackImage: st
   const { data: images } = useQuery<ImageAsset[]>({
     queryKey: ['/api/images'],
     staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const res = await fetch('/api/images', { credentials: 'include' });
       if (!res.ok) return [];
@@ -13,5 +14,9 @@ export function useDynamicImage(page: string, section: string, fallbackImage: st
   });
 
   const dynamicImage = images?.find(img => img.page === page && img.section === section);
-  return dynamicImage?.filePath || fallbackImage;
+  if (dynamicImage?.filePath) {
+    const updatedAt = dynamicImage.updatedAt ? new Date(dynamicImage.updatedAt).getTime() : Date.now();
+    return `${dynamicImage.filePath}?v=${updatedAt}`;
+  }
+  return fallbackImage;
 }
