@@ -193,6 +193,9 @@ const footerCompanyDetailsSchema = z.object({
   address: z.string().min(1).max(300),
   phone: z.string().min(1).max(50),
   email: z.string().email().max(100),
+  linkedinUrl: z.string().max(500).optional().or(z.literal('')),
+  twitterUrl: z.string().max(500).optional().or(z.literal('')),
+  facebookUrl: z.string().max(500).optional().or(z.literal('')),
 });
 
 // Page Header Schemas
@@ -1145,13 +1148,16 @@ export const contentSchemas: Record<string, SectionSchema> = {
   footer_company_details: {
     schema: footerCompanyDetailsSchema,
     label: 'Company Details',
-    description: 'Footer company information',
+    description: 'Footer company information and social media links',
     uiMeta: {
       name: { label: 'Company Name', control: 'text', placeholder: 'IFS Group' },
       tagline: { label: 'Tagline', control: 'textarea', rows: 2 },
       address: { label: 'Address', control: 'textarea', rows: 2 },
       phone: { label: 'Phone', control: 'text', placeholder: '+46 13 123 4567' },
       email: { label: 'Email', control: 'text', placeholder: 'contact@ifsgroup.com' },
+      linkedinUrl: { label: 'LinkedIn URL', control: 'text', placeholder: 'https://linkedin.com/company/yourcompany' },
+      twitterUrl: { label: 'Twitter/X URL', control: 'text', placeholder: 'https://twitter.com/yourcompany' },
+      facebookUrl: { label: 'Facebook URL', control: 'text', placeholder: 'https://facebook.com/yourcompany' },
     },
   },
   dashboard_header: {

@@ -59,15 +59,34 @@ export default function Footer() {
               {companyDetails?.tagline || 'Professional financial planning platform powered by 40+ years of IFS Group expertise.'}
             </p>
             <div className="flex space-x-3">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-linkedin">
-                <Linkedin className="h-4 w-4" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-twitter">
-                <Twitter className="h-4 w-4" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-facebook">
-                <Facebook className="h-4 w-4" />
-              </a>
+              {companyDetails?.linkedinUrl && (
+                <a href={companyDetails.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-linkedin">
+                  <Linkedin className="h-4 w-4" />
+                </a>
+              )}
+              {companyDetails?.twitterUrl && (
+                <a href={companyDetails.twitterUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-twitter">
+                  <Twitter className="h-4 w-4" />
+                </a>
+              )}
+              {companyDetails?.facebookUrl && (
+                <a href={companyDetails.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-facebook">
+                  <Facebook className="h-4 w-4" />
+                </a>
+              )}
+              {!companyDetails?.linkedinUrl && !companyDetails?.twitterUrl && !companyDetails?.facebookUrl && (
+                <>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-linkedin">
+                    <Linkedin className="h-4 w-4" />
+                  </a>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-twitter">
+                    <Twitter className="h-4 w-4" />
+                  </a>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-facebook">
+                    <Facebook className="h-4 w-4" />
+                  </a>
+                </>
+              )}
             </div>
           </div>
 
