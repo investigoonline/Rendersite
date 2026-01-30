@@ -2,13 +2,10 @@ import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ChartLine, Linkedin, Twitter, Facebook } from "lucide-react";
 import type { PageContent } from "@shared/schema";
-import { useDynamicImage } from "@/hooks/useDynamicImage";
-import defaultLogo from "@assets/image_1763735441524.jpeg";
+import { usePagePermissions } from "@/hooks/usePagePermissions";
 
 export default function Footer() {
-  // Dynamic logo from CMS with fallback to bundled asset
-  // First try footer-specific logo, then fall back to global header logo
-  const footerLogoSrc = useDynamicImage('footer', 'logo', defaultLogo);
+  const { hasPageAccess } = usePagePermissions();
   
   // Fetch footer content
   const { data: footerContent } = useQuery<PageContent[]>({
@@ -45,116 +42,101 @@ export default function Footer() {
         </div>
 
         <div className="grid lg:grid-cols-4 gap-4">
-          {/* Company Information */}
+          {/* Company Information - Tagline and Social Links */}
           <div className="lg:col-span-1">
-            <div className="mb-2 bg-white p-2 rounded inline-block">
-              <img 
-                src={footerLogoSrc} 
-                alt="IFS Wealth Management" 
-                className="h-10 w-auto object-contain"
-                style={{ imageRendering: 'crisp-edges' }}
-              />
-            </div>
             <p className="text-gray-400 text-xs mb-2" data-testid="text-footer-tagline">
               {companyDetails?.tagline || 'Professional financial planning platform powered by 40+ years of IFS Group expertise.'}
             </p>
             <div className="flex space-x-3">
-              {companyDetails?.linkedinUrl && (
+              {hasPageAccess('LinkedIn') && companyDetails?.linkedinUrl && (
                 <a href={companyDetails.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-linkedin">
                   <Linkedin className="h-4 w-4" />
                 </a>
               )}
-              {companyDetails?.twitterUrl && (
+              {hasPageAccess('Twitter/X') && companyDetails?.twitterUrl && (
                 <a href={companyDetails.twitterUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-twitter">
                   <Twitter className="h-4 w-4" />
                 </a>
               )}
-              {companyDetails?.facebookUrl && (
+              {hasPageAccess('Facebook') && companyDetails?.facebookUrl && (
                 <a href={companyDetails.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-facebook">
                   <Facebook className="h-4 w-4" />
                 </a>
-              )}
-              {!companyDetails?.linkedinUrl && !companyDetails?.twitterUrl && !companyDetails?.facebookUrl && (
-                <>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-linkedin">
-                    <Linkedin className="h-4 w-4" />
-                  </a>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-twitter">
-                    <Twitter className="h-4 w-4" />
-                  </a>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-facebook">
-                    <Facebook className="h-4 w-4" />
-                  </a>
-                </>
               )}
             </div>
           </div>
 
           {/* Platform Links */}
-          <div>
-            <h4 className="text-sm font-semibold mb-2" data-testid="text-footer-platform-title">
-              {platformLinks?.title || 'Platform'}
-            </h4>
-            <ul className="space-y-1 text-xs">
-              {platformLinks?.links?.map((link: any, index: number) => (
-                <li key={index}>
-                  {link.href.startsWith('/') ? (
-                    <Link href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-platform-${index}`}>
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <a href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-platform-${index}`}>
-                      {link.label}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
+          {hasPageAccess('Footer - Platform Links') && (
+            <div>
+              <h4 className="text-sm font-semibold mb-2" data-testid="text-footer-platform-title">
+                {platformLinks?.title || 'Platform'}
+              </h4>
+              <ul className="space-y-1 text-xs">
+                {platformLinks?.links?.filter((link: any) => hasPageAccess(link.label)).map((link: any, index: number) => (
+                  <li key={index}>
+                    {link.href.startsWith('/') ? (
+                      <Link href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-platform-${index}`}>
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-platform-${index}`}>
+                        {link.label}
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Resources */}
-          <div>
-            <h4 className="text-sm font-semibold mb-2" data-testid="text-footer-resources-title">
-              {resourcesLinks?.title || 'Resources'}
-            </h4>
-            <ul className="space-y-1 text-xs">
-              {resourcesLinks?.links?.map((link: any, index: number) => (
-                <li key={index}>
-                  {link.href.startsWith('/') ? (
-                    <Link href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-resources-${index}`}>
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <a href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-resources-${index}`}>
-                      {link.label}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
+          {hasPageAccess('Footer - Resources Links') && (
+            <div>
+              <h4 className="text-sm font-semibold mb-2" data-testid="text-footer-resources-title">
+                {resourcesLinks?.title || 'Resources'}
+              </h4>
+              <ul className="space-y-1 text-xs">
+                {resourcesLinks?.links?.filter((link: any) => hasPageAccess(link.label)).map((link: any, index: number) => (
+                  <li key={index}>
+                    {link.href.startsWith('/') ? (
+                      <Link href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-resources-${index}`}>
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-resources-${index}`}>
+                        {link.label}
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Company */}
-          <div>
-            <h4 className="text-sm font-semibold mb-2" data-testid="text-footer-company-title">
-              {companyLinks?.title || 'Company'}
-            </h4>
-            <ul className="space-y-1 text-xs">
-              {companyLinks?.links?.map((link: any, index: number) => (
-                <li key={index}>
-                  {link.href.startsWith('/') ? (
-                    <Link href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-company-${index}`}>
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <a href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-company-${index}`}>
-                      {link.label}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
+          {hasPageAccess('Footer - Company Links') && (
+            <div>
+              <h4 className="text-sm font-semibold mb-2" data-testid="text-footer-company-title">
+                {companyLinks?.title || 'Company'}
+              </h4>
+              <ul className="space-y-1 text-xs">
+                {companyLinks?.links?.filter((link: any) => hasPageAccess(link.label)).map((link: any, index: number) => (
+                  <li key={index}>
+                    {link.href.startsWith('/') ? (
+                      <Link href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-company-${index}`}>
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-company-${index}`}>
+                        {link.label}
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Bottom Section */}
