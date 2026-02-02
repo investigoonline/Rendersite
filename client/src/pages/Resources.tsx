@@ -108,24 +108,23 @@ const flipbookData = [
 export default function Resources() {
   const { toast } = useToast();
   const [location] = useLocation();
-  const tabsRef = useRef<HTMLDivElement>(null);
+  const tabsSectionRef = useRef<HTMLDivElement>(null);
   
-  const urlParams = new URLSearchParams(window.location.search);
-  const typeParam = urlParams.get('type');
-  
-  const [selectedType, setSelectedType] = useState(typeParam || "article");
+  const [selectedType, setSelectedType] = useState("article");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [viewingResource, setViewingResource] = useState<any | null>(null);
   
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const typeParam = urlParams.get('type');
     if (typeParam) {
       setSelectedType(typeParam);
       setTimeout(() => {
-        tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        tabsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
     }
-  }, [typeParam]);
+  }, [location]);
   
   // Hero image with CMS support
   const heroImage = useDynamicImage("resources", "hero", resourcesHeroDefault);
@@ -275,7 +274,8 @@ export default function Resources() {
           </div>
         </div>
 
-        <Tabs ref={tabsRef} value={selectedType} onValueChange={setSelectedType} className="space-y-8">
+        <div ref={tabsSectionRef}>
+        <Tabs value={selectedType} onValueChange={setSelectedType} className="space-y-8">
           {/* Resource Type Tabs */}
           <TabsList className="grid w-full grid-cols-5">
             {resourceTypes.map((type) => {
@@ -382,8 +382,9 @@ export default function Resources() {
                 </div>
               )}
 
-              {/* Resource Grid */}
-              {isLoading ? (
+              {/* Resource Grid - Skip for flipbook since it has its own section */}
+              {type.id !== "flipbook" && (
+                isLoading ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[...Array(6)].map((_, i) => (
                     <Card key={i} className="animate-pulse">
@@ -473,10 +474,12 @@ export default function Resources() {
                     </p>
                   </CardContent>
                 </Card>
+              )
               )}
             </TabsContent>
           ))}
         </Tabs>
+        </div>
 
         {/* Additional Resources Section */}
         {(becomeClientData || needHelpData) && (
