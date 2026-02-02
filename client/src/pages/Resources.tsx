@@ -200,6 +200,39 @@ export default function Resources() {
   // Use CMS flipbooks if available, otherwise use hardcoded data
   const displayFlipbooks = cmsFlipbooks.length > 0 ? cmsFlipbooks : flipbookData;
 
+  // Fetch newsletter content from CMS
+  const { data: newsletterContent } = useQuery<PageContent[]>({
+    queryKey: ['/api/content', 'newsletters'],
+    queryFn: async () => {
+      const res = await fetch('/api/content?page=newsletters', {
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch newsletters: ${res.statusText}`);
+      }
+      return res.json();
+    },
+  });
+
+  // Extract newsletter header from CMS
+  const newsletterHeader = newsletterContent?.find(c => c.section === 'newsletter_header')?.content as { title: string; subtitle: string; description: string } | undefined;
+
+  // Extract newsletter articles from CMS (grouped by month)
+  const newsletterArticles = newsletterContent
+    ?.filter(c => c.section === 'newsletter_article')
+    .map(content => content.content as { title: string; description: string; month: string; year: number; isHotTopic: boolean; linkUrl?: string; sortOrder: number })
+    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)) || [];
+
+  // Group newsletter articles by month and year
+  const newslettersByMonthYear = newsletterArticles.reduce((acc, article) => {
+    const key = `${article.month} ${article.year}`;
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(article);
+    return acc;
+  }, {} as Record<string, typeof newsletterArticles>);
+
   // Extract resource types from database content (excluding header and additional sections)
   // Keep the database ID for unique keys
   const resourceTypes: (ResourceType & { dbId: string })[] = resourceTypesContent
@@ -331,20 +364,65 @@ export default function Resources() {
 
               {/* Special handling for Newsletter */}
               {type.id === "newsletter" && (
-                <Card className="border-secondary/20 bg-secondary/5 mb-6">
-                  <CardContent className="p-6 text-center">
-                    <Mail className="h-12 w-12 text-secondary mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      Subscribe to Weekly Insights
-                    </h3>
-                    <p className="text-muted-foreground mb-4">
-                      Get the latest market analysis and financial planning tips delivered to your inbox every week.
+                <div className="space-y-8">
+                  {/* Newsletter Header */}
+                  <div className="mb-8">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                      {newsletterHeader?.title || "Newsletters"}
+                    </h2>
+                    <p className="text-muted-foreground mb-2 italic">
+                      {newsletterHeader?.subtitle || "Will you outlive your retirement income? Are your financial expectations for the coming year realistic?"}
                     </p>
-                    <Button onClick={handleSubscribeNewsletter}>
-                      Subscribe Now
-                    </Button>
-                  </CardContent>
-                </Card>
+                    <p className="text-muted-foreground whitespace-pre-wrap">
+                      {newsletterHeader?.description || "Our financial newsletters are designed to provide helpful information on a wide variety of financial topics. Simply click on one of the newsletter topics below to read the article in its entirety."}
+                    </p>
+                  </div>
+
+                  {/* Newsletter Articles Grid by Month/Year */}
+                  {Object.keys(newslettersByMonthYear).length > 0 ? (
+                    <div className="grid md:grid-cols-2 gap-8">
+                      {Object.entries(newslettersByMonthYear).map(([monthYear, articles]) => (
+                        <div key={monthYear} className="space-y-4">
+                          <h3 className="text-lg font-semibold text-gray-500 border-b pb-2">{monthYear}</h3>
+                          <div className="space-y-6">
+                            {articles.map((article, index) => (
+                              <div key={`${monthYear}-${index}`} className="space-y-1">
+                                <h4 className="font-semibold text-[#1a5276] hover:underline cursor-pointer">
+                                  {article.isHotTopic && (
+                                    <span className="text-[#1a5276] font-bold">HOT TOPIC: </span>
+                                  )}
+                                  {article.linkUrl ? (
+                                    <a href={article.linkUrl} target="_blank" rel="noopener noreferrer">
+                                      {article.title}
+                                    </a>
+                                  ) : (
+                                    article.title
+                                  )}
+                                </h4>
+                                <p className="text-sm text-gray-600">{article.description}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <Card className="border-secondary/20 bg-secondary/5">
+                      <CardContent className="p-6 text-center">
+                        <Mail className="h-12 w-12 text-secondary mx-auto mb-4" />
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                          No Newsletters Yet
+                        </h3>
+                        <p className="text-muted-foreground mb-4">
+                          Newsletter articles will appear here once they are published via Content Management.
+                        </p>
+                        <Button onClick={handleSubscribeNewsletter}>
+                          Subscribe for Updates
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
               )}
 
               {/* Special handling for Flipbooks */}

@@ -1569,6 +1569,61 @@ export const contentSchemas: Record<string, SectionSchema> = {
       sortOrder: { label: 'Display Order', control: 'number', min: 1, max: 20 },
     },
   },
+  // Newsletter Content Schemas
+  newsletter_header: {
+    schema: z.object({
+      title: z.string().min(1),
+      subtitle: z.string().min(1),
+      description: z.string().min(1),
+    }),
+    label: 'Newsletter Section Header',
+    description: 'Header for the newsletters section',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'Newsletters' },
+      subtitle: { label: 'Subtitle', control: 'text', placeholder: 'Financial Insights' },
+      description: { label: 'Description', control: 'textarea', rows: 3, placeholder: 'Our financial newsletters are designed to provide helpful information on a wide variety of financial topics...' },
+    },
+  },
+  newsletter_article: {
+    schema: z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      month: z.string().min(1),
+      year: z.number().min(2020).max(2030),
+      isHotTopic: z.boolean(),
+      linkUrl: z.string().optional(),
+      sortOrder: z.number().min(1).max(100),
+    }),
+    label: 'Newsletter Article',
+    description: 'Individual newsletter article entry',
+    allowMultiple: true,
+    uiMeta: {
+      title: { label: 'Article Title', control: 'text', placeholder: 'AI Expectations Underpin the Economic Outlook for 2026' },
+      description: { label: 'Article Description', control: 'textarea', rows: 3, placeholder: 'This article discusses economic forecasts and the trends that are influencing them...' },
+      month: { 
+        label: 'Month', 
+        control: 'select',
+        options: [
+          { label: 'January', value: 'January' },
+          { label: 'February', value: 'February' },
+          { label: 'March', value: 'March' },
+          { label: 'April', value: 'April' },
+          { label: 'May', value: 'May' },
+          { label: 'June', value: 'June' },
+          { label: 'July', value: 'July' },
+          { label: 'August', value: 'August' },
+          { label: 'September', value: 'September' },
+          { label: 'October', value: 'October' },
+          { label: 'November', value: 'November' },
+          { label: 'December', value: 'December' },
+        ]
+      },
+      year: { label: 'Year', control: 'number', min: 2020, max: 2030 },
+      isHotTopic: { label: 'Mark as HOT TOPIC', control: 'switch' },
+      linkUrl: { label: 'Article Link URL (optional)', control: 'text', placeholder: 'https://...' },
+      sortOrder: { label: 'Display Order within Month', control: 'number', min: 1, max: 100 },
+    },
+  },
 };
 
 // Page to sections mapping
@@ -1600,6 +1655,7 @@ export const pageSections: Record<string, string[]> = {
   process: ['process_header', 'process_step'],
   calculators: ['calculator_net_worth', 'calculator_loan_payoff', 'calculator_mortgage', 'calculator_retirement', 'calculator_tax'],
   flipbooks: ['flipbook_header', 'flipbook_item'],
+  newsletters: ['newsletter_header', 'newsletter_article'],
 };
 
 // Helper to get schema for a section
