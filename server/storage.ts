@@ -62,6 +62,7 @@ export interface IStorage {
   
   // Traditional registration operations
   createUser(user: InsertUserBackend): Promise<User>;
+  updateUser(userId: string, updates: Partial<User>): Promise<User | undefined>;
   updateUserPassword(userId: string, hashedPassword: string): Promise<void>;
   verifyUserEmail(userId: string, token: string): Promise<boolean>;
   
@@ -226,6 +227,15 @@ export class DatabaseStorage implements IStorage {
     }
     
     return newUser;
+  }
+
+  async updateUser(userId: string, updates: Partial<User>): Promise<User | undefined> {
+    const [updatedUser] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, userId))
+      .returning();
+    return updatedUser;
   }
 
   async updateUserPassword(userId: string, hashedPassword: string): Promise<void> {

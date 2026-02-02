@@ -26,6 +26,7 @@ import LegalPage from "@/pages/LegalPage";
 import ResourceManagement from "@/pages/admin/ResourceManagement";
 import Dashboard from "@/pages/Dashboard";
 import UnderConstruction from "@/pages/UnderConstruction";
+import Profile from "@/pages/Profile";
 import BackgroundPreview from "@/pages/BackgroundPreview";
 import NotFound from "@/pages/not-found";
 
@@ -66,9 +67,11 @@ function Router() {
           {() => <BackgroundPreview onSelect={(opt) => alert(`You selected Option ${opt}. Tell me which one you want!`)} />}
         </Route>
         
+        {/* Profile page */}
+        <Route path="/profile" component={Profile} />
+        
         {/* Under Construction pages */}
         <Route path="/auth/login" component={UnderConstruction} />
-        <Route path="/profile" component={UnderConstruction} />
         <Route path="/guest-access" component={UnderConstruction} />
         <Route path="/client-login" component={UnderConstruction} />
         <Route path="/mobile-app" component={UnderConstruction} />

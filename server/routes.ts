@@ -481,6 +481,149 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Profile routes
+  app.get('/api/profile', async (req: any, res) => {
+    try {
+      if (!req.session?.user?.id) {
+        return res.status(401).json({ message: "Please log in to view your profile" });
+      }
+
+      const user = await storage.getUser(req.session.user.id);
+      if (!user) {
+        return res.status(404).json({ message: "Profile not found" });
+      }
+
+      res.json({
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        profileImageUrl: user.profileImageUrl,
+        role: user.role,
+        authType: user.authType,
+        isEmailVerified: user.isEmailVerified,
+        createdAt: user.createdAt,
+      });
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      res.status(500).json({ message: "Unable to retrieve profile at this time" });
+    }
+  });
+
+  const updateProfileSchema = z.object({
+    firstName: z.string().max(100).optional().nullable(),
+    lastName: z.string().max(100).optional().nullable(),
+    phone: z.string().max(20).optional().nullable(),
+  });
+
+  app.patch('/api/profile', async (req: any, res) => {
+    try {
+      if (!req.session?.user?.id) {
+        return res.status(401).json({ message: "Please log in to update your profile" });
+      }
+
+      const validation = updateProfileSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: "Invalid profile data", errors: validation.error.errors });
+      }
+
+      const { firstName, lastName, phone } = validation.data;
+      const userId = req.session.user.id;
+
+      const updatedUser = await storage.updateUser(userId, {
+        firstName: firstName || null,
+        lastName: lastName || null,
+        phone: phone || null,
+        updatedAt: new Date(),
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: "Profile not found" });
+      }
+
+      // Update session data
+      req.session.user.firstName = updatedUser.firstName;
+      req.session.user.lastName = updatedUser.lastName;
+
+      res.json({
+        id: updatedUser.id,
+        email: updatedUser.email,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        phone: updatedUser.phone,
+        profileImageUrl: updatedUser.profileImageUrl,
+        role: updatedUser.role,
+        authType: updatedUser.authType,
+        isEmailVerified: updatedUser.isEmailVerified,
+        createdAt: updatedUser.createdAt,
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ message: "Unable to update profile at this time" });
+    }
+  });
+
+  app.post('/api/profile/image', upload.single('image'), async (req: any, res) => {
+    try {
+      if (!req.session?.user?.id) {
+        return res.status(401).json({ message: "Please log in to upload a profile image" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided" });
+      }
+
+      const userId = req.session.user.id;
+      const file = req.file;
+
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      if (!validTypes.includes(file.mimetype)) {
+        return res.status(400).json({ message: "Invalid file type. Please upload a JPEG, PNG, WebP, or GIF image." });
+      }
+
+      // Process image with Sharp - resize to max 400x400 for profile images
+      const sharp = (await import('sharp')).default;
+      const processedImageBuffer = await sharp(file.buffer)
+        .resize(400, 400, { fit: 'cover', position: 'center' })
+        .webp({ quality: 85 })
+        .toBuffer();
+
+      // Upload to object storage
+      const { ObjectStorageService } = await import('./replit_integrations/object_storage');
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
+
+      await fetch(uploadURL, {
+        method: 'PUT',
+        body: processedImageBuffer,
+        headers: {
+          'Content-Type': 'image/webp',
+        },
+      });
+
+      // The objectPath is like /objects/uploads/uuid and is served by the registered route
+      const updatedUser = await storage.updateUser(userId, {
+        profileImageUrl: objectPath,
+        updatedAt: new Date(),
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: "Profile not found" });
+      }
+
+      res.json({
+        message: "Profile image uploaded successfully",
+        profileImageUrl: objectPath,
+      });
+    } catch (error: any) {
+      console.error("Error uploading profile image:", error);
+      res.status(500).json({ message: "Unable to upload profile image at this time", error: error?.message });
+    }
+  });
+
   // Calculator routes
   app.post('/api/calculations', async (req, res) => {
     try {
