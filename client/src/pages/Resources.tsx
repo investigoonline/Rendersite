@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +32,7 @@ import {
   Filter,
   Eye,
   Calendar,
+  BookOpen,
 } from "lucide-react";
 import type { PageContent, ImageAsset } from "@shared/schema";
 import { HTMLContent } from "@/components/HTMLContent";
@@ -44,12 +46,86 @@ interface ResourceType {
   description: string;
 }
 
+const flipbookData = [
+  {
+    id: "financial-management",
+    title: "Financial Management Insight:",
+    subtitle: "Strategies to Help Build Your Future",
+    description: "The decisions you make about money form the basis for your financial future and can help you pursue your goals.",
+    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop",
+    bgColor: "from-purple-900 to-purple-700",
+  },
+  {
+    id: "social-security",
+    title: "Understanding Social Security and Medicare:",
+    subtitle: "America's Retirement Safety Net",
+    description: "Social Security and Medicare rules can be complex. To help maximize benefits, it pays to understand your options.",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop",
+    bgColor: "from-teal-700 to-teal-500",
+  },
+  {
+    id: "higher-education",
+    title: "Higher Education:",
+    subtitle: "College Saving and Funding Strategies",
+    description: "College is an investment in your child's future. It requires a savings commitment and knowledge of funding methods.",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop",
+    bgColor: "from-blue-600 to-blue-400",
+  },
+  {
+    id: "investing-basics",
+    title: "Investing Basics:",
+    subtitle: "Embark on Your Wealth-Building Journey",
+    description: "Weighing the risks and rewards of various investment options can help you develop a sound investment strategy.",
+    image: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&h=300&fit=crop",
+    bgColor: "from-amber-700 to-amber-500",
+  },
+  {
+    id: "tax-savvy",
+    title: "Time to Get Tax-Savvy:",
+    subtitle: "Managing Your Tax Burden",
+    description: "Understanding tax rules and spotting tax-saving opportunities might help you put the money to better use.",
+    image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop",
+    bgColor: "from-yellow-600 to-yellow-400",
+  },
+  {
+    id: "wealth-preservation",
+    title: "Wealth Preservation:",
+    subtitle: "Planning to Leave a Legacy",
+    description: "An estate planning strategy could increase the value of your estate and help avoid potential conflicts and delays.",
+    image: "https://images.unsplash.com/photo-1434626881859-194d67b2b86f?w=400&h=300&fit=crop",
+    bgColor: "from-emerald-700 to-emerald-500",
+  },
+  {
+    id: "financial-protection",
+    title: "Financial Protection:",
+    subtitle: "Using Insurance to Help Manage Life's Risks",
+    description: "Home, auto, life, disability — Protect your financial interests by having the appropriate insurance coverage.",
+    image: "https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=400&h=300&fit=crop",
+    bgColor: "from-gray-700 to-gray-500",
+  },
+];
+
 export default function Resources() {
   const { toast } = useToast();
-  const [selectedType, setSelectedType] = useState("article");
+  const [location] = useLocation();
+  const tabsRef = useRef<HTMLDivElement>(null);
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const typeParam = urlParams.get('type');
+  
+  const [selectedType, setSelectedType] = useState(typeParam || "article");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [viewingResource, setViewingResource] = useState<any | null>(null);
+  
+  useEffect(() => {
+    if (typeParam) {
+      setSelectedType(typeParam);
+      setTimeout(() => {
+        tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [typeParam]);
   
   // Hero image with CMS support
   const heroImage = useDynamicImage("resources", "hero", resourcesHeroDefault);
@@ -199,7 +275,7 @@ export default function Resources() {
           </div>
         </div>
 
-        <Tabs value={selectedType} onValueChange={setSelectedType} className="space-y-8">
+        <Tabs ref={tabsRef} value={selectedType} onValueChange={setSelectedType} className="space-y-8">
           {/* Resource Type Tabs */}
           <TabsList className="grid w-full grid-cols-5">
             {resourceTypes.map((type) => {
@@ -243,6 +319,67 @@ export default function Resources() {
                     </Button>
                   </CardContent>
                 </Card>
+              )}
+
+              {/* Special handling for Flipbooks */}
+              {type.id === "flipbook" && (
+                <div className="space-y-8">
+                  <div className="text-center">
+                    <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">Flipbooks</h2>
+                    <p className="text-muted-foreground max-w-2xl mx-auto">
+                      These magazine-style flipbooks provide helpful information on a variety of financial topics and illustrate key financial concepts. Select one of the flipbooks below and click the image to view it.
+                    </p>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {flipbookData.slice(0, 4).map((flipbook) => (
+                      <div key={flipbook.id} className="group cursor-pointer">
+                        <div className={`relative aspect-[4/3] rounded-lg overflow-hidden mb-3 bg-gradient-to-br ${flipbook.bgColor} shadow-lg group-hover:shadow-xl transition-shadow`}>
+                          <div className="absolute inset-0 p-4 flex flex-col justify-center text-white">
+                            <p className="text-xs font-medium opacity-90 mb-1">{flipbook.title}</p>
+                            <p className="text-sm font-bold leading-tight">{flipbook.subtitle}</p>
+                          </div>
+                          <img 
+                            src={flipbook.image} 
+                            alt={flipbook.title}
+                            className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay"
+                          />
+                        </div>
+                        <h3 className="font-semibold text-gray-900 text-sm mb-1">
+                          {flipbook.title} <span className="font-normal">{flipbook.subtitle}</span>
+                        </h3>
+                        <p className="text-xs text-muted-foreground line-clamp-3">
+                          {flipbook.description}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:px-16">
+                    {flipbookData.slice(4).map((flipbook) => (
+                      <div key={flipbook.id} className="group cursor-pointer">
+                        <div className={`relative aspect-[4/3] rounded-lg overflow-hidden mb-3 bg-gradient-to-br ${flipbook.bgColor} shadow-lg group-hover:shadow-xl transition-shadow`}>
+                          <div className="absolute inset-0 p-4 flex flex-col justify-center text-white">
+                            <p className="text-xs font-medium opacity-90 mb-1">{flipbook.title}</p>
+                            <p className="text-sm font-bold leading-tight">{flipbook.subtitle}</p>
+                          </div>
+                          <img 
+                            src={flipbook.image} 
+                            alt={flipbook.title}
+                            className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay"
+                          />
+                        </div>
+                        <h3 className="font-semibold text-gray-900 text-sm mb-1">
+                          {flipbook.title} <span className="font-normal">{flipbook.subtitle}</span>
+                        </h3>
+                        <p className="text-xs text-muted-foreground line-clamp-3">
+                          {flipbook.description}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
 
               {/* Resource Grid */}
