@@ -1519,6 +1519,169 @@ export const contentSchemas: Record<string, SectionSchema> = {
       cardDescription: { label: 'Card Description', control: 'textarea', rows: 2, placeholder: 'Calculate your tax obligations' },
     },
   },
+  // Calculator Page Header
+  calculator_page_header: {
+    schema: z.object({
+      title: z.string().min(1),
+      subtitle: z.string().min(1),
+      description: z.string().min(1),
+      searchPlaceholder: z.string().min(1),
+    }),
+    label: 'Calculator Page Header',
+    description: 'Main header for the Calculators page',
+    uiMeta: {
+      title: { label: 'Page Title', control: 'text', placeholder: 'Financial Calculators' },
+      subtitle: { label: 'Subtitle', control: 'text', placeholder: 'Professional Planning Tools' },
+      description: { label: 'Description', control: 'textarea', rows: 3, placeholder: 'Access our suite of 32+ professional-grade financial calculators...' },
+      searchPlaceholder: { label: 'Search Placeholder', control: 'text', placeholder: 'Search calculators...' },
+    },
+  },
+  // Calculator Category Schemas - 8 categories
+  calculator_category_wealth_management: {
+    schema: z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      icon: z.string().min(1),
+    }),
+    label: 'Wealth Management Category',
+    description: 'Wealth Management calculator category settings',
+    uiMeta: {
+      title: { label: 'Category Title', control: 'text', placeholder: 'Wealth Management' },
+      description: { label: 'Category Description', control: 'textarea', rows: 2, placeholder: 'Net worth tracking, debt ratio analysis, and wealth building strategies.' },
+      icon: { label: 'Icon', control: 'icon' },
+    },
+  },
+  calculator_category_loans_credit: {
+    schema: z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      icon: z.string().min(1),
+    }),
+    label: 'Loans & Credit Cards Category',
+    description: 'Loans & Credit Cards calculator category settings',
+    uiMeta: {
+      title: { label: 'Category Title', control: 'text', placeholder: 'Loans & Credit Cards' },
+      description: { label: 'Category Description', control: 'textarea', rows: 2, placeholder: 'Payoff strategies, payment schedules, and debt optimization tools.' },
+      icon: { label: 'Icon', control: 'icon' },
+    },
+  },
+  calculator_category_real_estate: {
+    schema: z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      icon: z.string().min(1),
+    }),
+    label: 'Real Estate & Housing Category',
+    description: 'Real Estate & Housing calculator category settings',
+    uiMeta: {
+      title: { label: 'Category Title', control: 'text', placeholder: 'Real Estate & Housing' },
+      description: { label: 'Category Description', control: 'textarea', rows: 2, placeholder: 'Home affordability, mortgage refinancing, and acceleration strategies.' },
+      icon: { label: 'Icon', control: 'icon' },
+    },
+  },
+  calculator_category_vehicle_financing: {
+    schema: z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      icon: z.string().min(1),
+    }),
+    label: 'Vehicle Financing Category',
+    description: 'Vehicle Financing calculator category settings',
+    uiMeta: {
+      title: { label: 'Category Title', control: 'text', placeholder: 'Vehicle Financing' },
+      description: { label: 'Category Description', control: 'textarea', rows: 2, placeholder: 'Lease vs buy analysis, payment calculations, and affordability assessment.' },
+      icon: { label: 'Icon', control: 'icon' },
+    },
+  },
+  calculator_category_retirement_inflation: {
+    schema: z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      icon: z.string().min(1),
+    }),
+    label: 'Retirement & Inflation Category',
+    description: 'Retirement & Inflation calculator category settings',
+    uiMeta: {
+      title: { label: 'Category Title', control: 'text', placeholder: 'Retirement & Inflation' },
+      description: { label: 'Category Description', control: 'textarea', rows: 2, placeholder: 'Retirement cost planning, RMD calculations, and inflation impact analysis.' },
+      icon: { label: 'Icon', control: 'icon' },
+    },
+  },
+  calculator_category_estate_planning: {
+    schema: z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      icon: z.string().min(1),
+    }),
+    label: 'Estate Planning Category',
+    description: 'Estate Planning calculator category settings',
+    uiMeta: {
+      title: { label: 'Category Title', control: 'text', placeholder: 'Estate Planning' },
+      description: { label: 'Category Description', control: 'textarea', rows: 2, placeholder: 'Estate tax calculations and planning recommendations for asset transfer.' },
+      icon: { label: 'Icon', control: 'icon' },
+    },
+  },
+  calculator_category_taxes_iras: {
+    schema: z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      icon: z.string().min(1),
+    }),
+    label: 'Taxes & IRAs Category',
+    description: 'Taxes & IRAs calculator category settings',
+    uiMeta: {
+      title: { label: 'Category Title', control: 'text', placeholder: 'Taxes & IRAs' },
+      description: { label: 'Category Description', control: 'textarea', rows: 2, placeholder: 'Income tax calculations, IRA eligibility, and Roth conversion analysis.' },
+      icon: { label: 'Icon', control: 'icon' },
+    },
+  },
+  calculator_category_credit_debt: {
+    schema: z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      icon: z.string().min(1),
+    }),
+    label: 'Credit & Debt Management Category',
+    description: 'Credit & Debt Management calculator category settings',
+    uiMeta: {
+      title: { label: 'Category Title', control: 'text', placeholder: 'Credit & Debt Management' },
+      description: { label: 'Category Description', control: 'textarea', rows: 2, placeholder: 'Credit optimization strategies and debt management planning tools.' },
+      icon: { label: 'Icon', control: 'icon' },
+    },
+  },
+  // Individual Calculator Item Schema
+  calculator_item: {
+    schema: z.object({
+      categoryId: z.string().min(1),
+      calculatorId: z.string().min(1),
+      name: z.string().min(1),
+      description: z.string().min(1),
+      sortOrder: z.number().min(1).max(50),
+    }),
+    label: 'Calculator Item',
+    description: 'Individual calculator name and description within a category',
+    allowMultiple: true,
+    uiMeta: {
+      categoryId: { 
+        label: 'Category', 
+        control: 'select',
+        options: [
+          { label: 'Wealth Management', value: 'wealth_management' },
+          { label: 'Loans & Credit Cards', value: 'loans_credit' },
+          { label: 'Real Estate & Housing', value: 'real_estate' },
+          { label: 'Vehicle Financing', value: 'vehicle_financing' },
+          { label: 'Retirement & Inflation', value: 'retirement_inflation' },
+          { label: 'Estate Planning', value: 'estate_planning' },
+          { label: 'Taxes & IRAs', value: 'taxes_iras' },
+          { label: 'Credit & Debt Management', value: 'credit_debt' },
+        ]
+      },
+      calculatorId: { label: 'Calculator ID', control: 'text', placeholder: 'net_worth' },
+      name: { label: 'Calculator Name', control: 'text', placeholder: 'Total Net Worth Calculator' },
+      description: { label: 'Calculator Description', control: 'textarea', rows: 2, placeholder: 'Calculate your complete financial position including assets and liabilities' },
+      sortOrder: { label: 'Display Order', control: 'number', min: 1, max: 50 },
+    },
+  },
   // Flipbook Content Schemas
   flipbook_header: {
     schema: z.object({
@@ -1653,7 +1816,23 @@ export const pageSections: Record<string, string[]> = {
   terms_of_service: ['legal_terms_of_service'],
   disclosures: ['legal_disclosures'],
   process: ['process_header', 'process_step'],
-  calculators: ['calculator_net_worth', 'calculator_loan_payoff', 'calculator_mortgage', 'calculator_retirement', 'calculator_tax'],
+  calculators: [
+    'calculator_page_header',
+    'calculator_category_wealth_management',
+    'calculator_category_loans_credit',
+    'calculator_category_real_estate',
+    'calculator_category_vehicle_financing',
+    'calculator_category_retirement_inflation',
+    'calculator_category_estate_planning',
+    'calculator_category_taxes_iras',
+    'calculator_category_credit_debt',
+    'calculator_item',
+    'calculator_net_worth',
+    'calculator_loan_payoff',
+    'calculator_mortgage',
+    'calculator_retirement',
+    'calculator_tax'
+  ],
   flipbooks: ['flipbook_header', 'flipbook_item'],
   newsletters: ['newsletter_header', 'newsletter_article'],
 };

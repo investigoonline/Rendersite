@@ -189,11 +189,21 @@ export default function ContentManagement() {
 
   // Calculator definitions for display
   const calculatorDefinitions = [
-    { id: 'calculator_net_worth', name: 'Net Worth Calculator', description: 'Calculate total assets minus liabilities' },
-    { id: 'calculator_loan_payoff', name: 'Loan Payoff Calculator', description: 'Calculate loan payoff timelines and savings' },
-    { id: 'calculator_mortgage', name: 'Mortgage Calculator', description: 'Mortgage payments and affordability' },
-    { id: 'calculator_retirement', name: 'Retirement Calculator', description: 'Retirement planning and projections' },
-    { id: 'calculator_tax', name: 'Tax Calculator', description: 'Tax planning and calculations' },
+    { id: 'calculator_page_header', name: 'Page Header', description: 'Main title, subtitle, and description for the Calculators page' },
+    { id: 'calculator_category_wealth_management', name: 'Wealth Management Category', description: 'Title, description, and icon for Wealth Management category' },
+    { id: 'calculator_category_loans_credit', name: 'Loans & Credit Cards Category', description: 'Title, description, and icon for Loans & Credit Cards category' },
+    { id: 'calculator_category_real_estate', name: 'Real Estate & Housing Category', description: 'Title, description, and icon for Real Estate category' },
+    { id: 'calculator_category_vehicle_financing', name: 'Vehicle Financing Category', description: 'Title, description, and icon for Vehicle Financing category' },
+    { id: 'calculator_category_retirement_inflation', name: 'Retirement & Inflation Category', description: 'Title, description, and icon for Retirement category' },
+    { id: 'calculator_category_estate_planning', name: 'Estate Planning Category', description: 'Title, description, and icon for Estate Planning category' },
+    { id: 'calculator_category_taxes_iras', name: 'Taxes & IRAs Category', description: 'Title, description, and icon for Taxes & IRAs category' },
+    { id: 'calculator_category_credit_debt', name: 'Credit & Debt Management Category', description: 'Title, description, and icon for Credit & Debt category' },
+    { id: 'calculator_item', name: 'Calculator Items', description: 'Individual calculator names and descriptions (add multiple)' },
+    { id: 'calculator_net_worth', name: 'Net Worth Calculator Settings', description: 'Page title and card content for Net Worth Calculator' },
+    { id: 'calculator_loan_payoff', name: 'Loan Payoff Calculator Settings', description: 'Page title and card content for Loan Payoff Calculator' },
+    { id: 'calculator_mortgage', name: 'Mortgage Calculator Settings', description: 'Page title and card content for Mortgage Calculator' },
+    { id: 'calculator_retirement', name: 'Retirement Calculator Settings', description: 'Page title and card content for Retirement Calculator' },
+    { id: 'calculator_tax', name: 'Tax Calculator Settings', description: 'Page title and card content for Tax Calculator' },
   ];
 
   // Fetch inactive users (for super admins only)

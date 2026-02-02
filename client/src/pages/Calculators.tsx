@@ -14,6 +14,7 @@ import RetirementCalculator from "@/components/calculators/RetirementCalculator"
 import TaxCalculator from "@/components/calculators/TaxCalculator";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import * as LucideIcons from "lucide-react";
 import {
   PieChart,
   CreditCard,
@@ -25,6 +26,7 @@ import {
   TrendingUp,
   Search,
   Calculator,
+  type LucideIcon,
 } from "lucide-react";
 import calculatorsImage from "@assets/Calculators_1765301634531.png";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
@@ -36,6 +38,33 @@ interface CalculatorCMSContent {
   cardTitle: string;
   cardDescription: string;
 }
+
+interface PageHeaderCMS {
+  title: string;
+  subtitle: string;
+  description: string;
+  searchPlaceholder: string;
+}
+
+interface CategoryCMS {
+  title: string;
+  description: string;
+  icon: string;
+}
+
+interface CalculatorItemCMS {
+  categoryId: string;
+  calculatorId: string;
+  name: string;
+  description: string;
+  sortOrder: number;
+}
+
+// Helper to get icon from string name
+const getIconByName = (iconName: string): LucideIcon => {
+  const icon = (LucideIcons as Record<string, unknown>)[iconName];
+  return (icon as LucideIcon) || Calculator;
+};
 
 const calculatorCategories = [
   {
@@ -210,6 +239,43 @@ export default function Calculators() {
     return content?.content as CalculatorCMSContent | null;
   };
 
+  // Helper to get page header from CMS
+  const getPageHeader = (): PageHeaderCMS | null => {
+    const content = calculatorContent?.find(c => c.section === 'calculator_page_header');
+    return content?.content as PageHeaderCMS | null;
+  };
+
+  // Helper to get category content from CMS
+  const getCategoryContent = (categoryId: string): CategoryCMS | null => {
+    const sectionName = `calculator_category_${categoryId}`;
+    const content = calculatorContent?.find(c => c.section === sectionName);
+    return content?.content as CategoryCMS | null;
+  };
+
+  // Helper to get calculator items from CMS
+  const getCalculatorItems = (): CalculatorItemCMS[] => {
+    return calculatorContent
+      ?.filter(c => c.section === 'calculator_item')
+      .map(c => c.content as CalculatorItemCMS)
+      .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)) || [];
+  };
+
+  // Helper to get calculator name from CMS
+  const getCalculatorName = (categoryId: string, calculatorId: string, defaultName: string): string => {
+    const items = getCalculatorItems();
+    const item = items.find(i => i.categoryId === categoryId && i.calculatorId === calculatorId);
+    return item?.name || defaultName;
+  };
+
+  // Helper to get calculator description from CMS  
+  const getCalculatorDescription = (categoryId: string, calculatorId: string): string | null => {
+    const items = getCalculatorItems();
+    const item = items.find(i => i.categoryId === categoryId && i.calculatorId === calculatorId);
+    return item?.description || null;
+  };
+
+  const pageHeader = getPageHeader();
+
   // Filter categories based on access control and search term
   const accessibleCategories = calculatorCategories.filter(category => 
     hasCalculatorAccess(category.id)
@@ -241,9 +307,13 @@ export default function Calculators() {
     window.history.pushState({}, '', url.toString());
   };
 
-  if (selectedCalculator && currentCalculatorData) {
+  if (selectedCalculator && currentCalculatorData && currentCategory) {
     const CalculatorComponent = currentCalculatorData.component;
-    // Determine calculator type for CMS content lookup
+    // Get CMS calculator name
+    const calcName = getCalculatorName(currentCategory.id, currentCalculatorData.id, currentCalculatorData.name);
+    const calcDesc = getCalculatorDescription(currentCategory.id, currentCalculatorData.id);
+    
+    // Determine calculator type for CMS content lookup (for page-level settings)
     const getCalcType = (component: any) => {
       if (component === NetWorthCalculator) return 'net_worth';
       if (component === LoanPayoffCalculator) return 'loan_payoff';
@@ -255,6 +325,10 @@ export default function Calculators() {
     const calcType = getCalcType(currentCalculatorData.component);
     const cmsContent = calcType ? getCalculatorContent(calcType) : null;
     
+    // Get category CMS content
+    const catCMS = getCategoryContent(currentCategory.id);
+    const catDesc = catCMS?.description || currentCategory.description;
+    
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -263,14 +337,14 @@ export default function Calculators() {
               ← Back to Calculators
             </Button>
             <h1 className="text-3xl font-bold text-gray-900">
-              {cmsContent?.pageTitle || currentCalculatorData.name}
+              {cmsContent?.pageTitle || calcName}
             </h1>
-            <p className="text-muted-foreground mt-2">
-              {cmsContent?.pageDescription || currentCategory?.description}
+            <p className="text-muted-foreground mt-2 whitespace-pre-wrap">
+              {cmsContent?.pageDescription || calcDesc || catDesc}
             </p>
           </div>
           <CalculatorComponent 
-            calculatorName={currentCalculatorData.name} 
+            calculatorName={calcName} 
             cardTitle={cmsContent?.cardTitle}
             cardDescription={cmsContent?.cardDescription}
           />
@@ -294,12 +368,16 @@ export default function Calculators() {
       {/* Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-8 sm:mb-12 px-4">
+          {pageHeader?.subtitle && (
+            <p className="text-sm font-medium text-primary uppercase tracking-wide mb-2">
+              {pageHeader.subtitle}
+            </p>
+          )}
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Financial Calculator Suite
+            {pageHeader?.title || "Financial Calculator Suite"}
           </h1>
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto mb-6 sm:mb-8">
-            Access our complete collection of 32+ professional-grade financial calculators. 
-            Make informed decisions with real-time calculations and personalized insights.
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto mb-6 sm:mb-8 whitespace-pre-wrap">
+            {pageHeader?.description || "Access our complete collection of 32+ professional-grade financial calculators. Make informed decisions with real-time calculations and personalized insights."}
           </p>
         </div>
 
@@ -308,7 +386,7 @@ export default function Calculators() {
           <div className="max-w-md mx-auto relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search calculators..."
+              placeholder={pageHeader?.searchPlaceholder || "Search calculators..."}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -357,57 +435,74 @@ export default function Calculators() {
             accessibleCategories.length <= 4 ? 'grid-cols-2 sm:grid-cols-4' :
             'grid-cols-2 sm:grid-cols-4 lg:grid-cols-8'
           }`}>
-            {accessibleCategories.map((category) => (
-              <TabsTrigger
-                key={category.id}
-                value={category.id}
-                className="text-xs flex-col h-auto py-2 px-1 sm:px-3"
-                data-testid={`tab-${category.id}`}
-              >
-                <category.icon className="h-4 w-4 mr-1" />
-                <span className="hidden lg:inline">{category.title.split(' ')[0]}</span>
-              </TabsTrigger>
-            ))}
+            {accessibleCategories.map((category) => {
+              const catCMS = getCategoryContent(category.id);
+              const CategoryIcon = catCMS?.icon ? getIconByName(catCMS.icon) : category.icon;
+              const catTitle = catCMS?.title || category.title;
+              return (
+                <TabsTrigger
+                  key={category.id}
+                  value={category.id}
+                  className="text-xs flex-col h-auto py-2 px-1 sm:px-3"
+                  data-testid={`tab-${category.id}`}
+                >
+                  <CategoryIcon className="h-4 w-4 mr-1" />
+                  <span className="hidden lg:inline">{catTitle.split(' ')[0]}</span>
+                </TabsTrigger>
+              );
+            })}
           </TabsList>
 
           {/* Category Content */}
-          {accessibleCategories.map((category) => (
-            <TabsContent key={category.id} value={category.id} className="space-y-6">
-              <div className="text-center">
-                <Badge className="mb-4">
-                  <category.icon className="h-4 w-4 mr-1" />
-                  {category.title}
-                </Badge>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">{category.title}</h2>
-                <p className="text-muted-foreground">{category.description}</p>
-              </div>
+          {accessibleCategories.map((category) => {
+            const catCMS = getCategoryContent(category.id);
+            const CategoryIcon = catCMS?.icon ? getIconByName(catCMS.icon) : category.icon;
+            const catTitle = catCMS?.title || category.title;
+            const catDesc = catCMS?.description || category.description;
+            
+            return (
+              <TabsContent key={category.id} value={category.id} className="space-y-6">
+                <div className="text-center">
+                  <Badge className="mb-4">
+                    <CategoryIcon className="h-4 w-4 mr-1" />
+                    {catTitle}
+                  </Badge>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{catTitle}</h2>
+                  <p className="text-muted-foreground whitespace-pre-wrap">{catDesc}</p>
+                </div>
 
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {category.calculators.map((calculator) => (
-                  <Card
-                    key={calculator.id}
-                    className="hover:shadow-lg transition-shadow cursor-pointer group border border-gray-200"
-                    onClick={() => handleCalculatorSelect(calculator.id)}
-                  >
-                    <CardHeader>
-                      <CardTitle className="flex items-center text-lg">
-                        <category.icon className="h-5 w-5 text-primary mr-2" />
-                        {calculator.name}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Professional calculator for {calculator.name.toLowerCase()}
-                      </p>
-                      <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-white">
-                        Open Calculator
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </TabsContent>
-          ))}
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {category.calculators.map((calculator) => {
+                    const calcName = getCalculatorName(category.id, calculator.id, calculator.name);
+                    const calcDesc = getCalculatorDescription(category.id, calculator.id);
+                    
+                    return (
+                      <Card
+                        key={calculator.id}
+                        className="hover:shadow-lg transition-shadow cursor-pointer group border border-gray-200"
+                        onClick={() => handleCalculatorSelect(calculator.id)}
+                      >
+                        <CardHeader>
+                          <CardTitle className="flex items-center text-lg">
+                            <CategoryIcon className="h-5 w-5 text-primary mr-2" />
+                            {calcName}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground mb-4 whitespace-pre-wrap">
+                            {calcDesc || `Professional calculator for ${calcName.toLowerCase()}`}
+                          </p>
+                          <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-white">
+                            Open Calculator
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </TabsContent>
+            );
+          })}
         </Tabs>
 
         {/* Access Notice based on user type */}
