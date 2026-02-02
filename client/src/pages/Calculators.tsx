@@ -37,7 +37,33 @@ interface CalculatorCMSContent {
   pageDescription: string;
   cardTitle: string;
   cardDescription: string;
+  disclaimer: string;
 }
+
+// Map calculator IDs to CMS section names
+const calculatorIdToSection: Record<string, string> = {
+  net_worth: 'calc_net_worth',
+  debt_ratio: 'calc_debt_ratio',
+  loan_payoff: 'calc_loan_payoff',
+  credit_card_debt: 'calc_credit_card_debt',
+  home_affordability: 'calc_home_affordability',
+  mortgage_refinance: 'calc_mortgage_refinance',
+  mortgage_acceleration: 'calc_mortgage_acceleration',
+  lease_payment: 'calc_lease_payment',
+  car_affordability: 'calc_car_affordability',
+  retirement_cost: 'calc_retirement_cost',
+  rmd: 'calc_rmd',
+  inflation_impact: 'calc_inflation_impact',
+  retirement_early: 'calc_retirement_early',
+  portfolio_lifespan: 'calc_portfolio_lifespan',
+  estate_tax: 'calc_estate_tax',
+  federal_tax: 'calc_federal_tax',
+  tax_deferred: 'calc_tax_deferred',
+  ira_eligibility: 'calc_ira_eligibility',
+  roth_conversion: 'calc_roth_conversion',
+  credit_impact: 'calc_credit_impact',
+  debt_consolidation: 'calc_debt_consolidation',
+};
 
 interface PageHeaderCMS {
   title: string;
@@ -232,9 +258,10 @@ export default function Calculators() {
     },
   });
 
-  // Helper to get CMS content for a specific calculator type
-  const getCalculatorContent = (calculatorType: string): CalculatorCMSContent | null => {
-    const sectionName = `calculator_${calculatorType}`;
+  // Helper to get CMS content for a specific calculator by its ID
+  const getIndividualCalculatorContent = (calculatorId: string): CalculatorCMSContent | null => {
+    const sectionName = calculatorIdToSection[calculatorId];
+    if (!sectionName) return null;
     const content = calculatorContent?.find(c => c.section === sectionName);
     return content?.content as CalculatorCMSContent | null;
   };
@@ -307,27 +334,30 @@ export default function Calculators() {
     window.history.pushState({}, '', url.toString());
   };
 
+  // Default disclaimer text
+  const defaultDisclaimer = "This example is for illustrative purposes only, and actual outcomes may differ. The information provided does not constitute tax, legal, investment, or retirement advice and should not be used to avoid federal tax penalties. Readers are advised to consult an independent tax, legal, or financial professional before making any decisions. While the content is based on sources believed to be reliable, no guarantee is made for accuracy or completeness. Nothing herein should be interpreted as an offer or solicitation to buy or sell any security.";
+
   if (selectedCalculator && currentCalculatorData && currentCategory) {
     const CalculatorComponent = currentCalculatorData.component;
-    // Get CMS calculator name
-    const calcName = getCalculatorName(currentCategory.id, currentCalculatorData.id, currentCalculatorData.name);
-    const calcDesc = getCalculatorDescription(currentCategory.id, currentCalculatorData.id);
     
-    // Determine calculator type for CMS content lookup (for page-level settings)
-    const getCalcType = (component: any) => {
-      if (component === NetWorthCalculator) return 'net_worth';
-      if (component === LoanPayoffCalculator) return 'loan_payoff';
-      if (component === MortgageCalculator) return 'mortgage';
-      if (component === RetirementCalculator) return 'retirement';
-      if (component === TaxCalculator) return 'tax';
-      return null;
-    };
-    const calcType = getCalcType(currentCalculatorData.component);
-    const cmsContent = calcType ? getCalculatorContent(calcType) : null;
+    // Get CMS content for this specific calculator
+    const cmsContent = getIndividualCalculatorContent(currentCalculatorData.id);
     
-    // Get category CMS content
+    // Get calculator name - use CMS pageTitle, then calculator_item name, then default
+    const calcItemName = getCalculatorName(currentCategory.id, currentCalculatorData.id, currentCalculatorData.name);
+    const displayTitle = cmsContent?.pageTitle || calcItemName;
+    
+    // Get description - use CMS pageDescription, then calculator_item description, then category description
+    const calcItemDesc = getCalculatorDescription(currentCategory.id, currentCalculatorData.id);
     const catCMS = getCategoryContent(currentCategory.id);
-    const catDesc = catCMS?.description || currentCategory.description;
+    const displayDescription = cmsContent?.pageDescription || calcItemDesc || catCMS?.description || currentCategory.description;
+    
+    // Get card title and description
+    const cardTitle = cmsContent?.cardTitle || displayTitle;
+    const cardDescription = cmsContent?.cardDescription || "Calculate your complete financial position";
+    
+    // Get disclaimer
+    const disclaimer = cmsContent?.disclaimer || defaultDisclaimer;
     
     return (
       <div className="min-h-screen bg-gray-50 py-8">
@@ -337,16 +367,17 @@ export default function Calculators() {
               ← Back to Calculators
             </Button>
             <h1 className="text-3xl font-bold text-gray-900">
-              {cmsContent?.pageTitle || calcName}
+              {displayTitle}
             </h1>
             <p className="text-muted-foreground mt-2 whitespace-pre-wrap">
-              {cmsContent?.pageDescription || calcDesc || catDesc}
+              {displayDescription}
             </p>
           </div>
           <CalculatorComponent 
-            calculatorName={calcName} 
-            cardTitle={cmsContent?.cardTitle}
-            cardDescription={cmsContent?.cardDescription}
+            calculatorName={currentCalculatorData.name}
+            cardTitle={cardTitle}
+            cardDescription={cardDescription}
+            disclaimer={disclaimer}
           />
         </div>
       </div>

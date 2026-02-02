@@ -40,7 +40,10 @@ interface RetirementCalculatorProps {
   calculatorName?: string;
   cardTitle?: string;
   cardDescription?: string;
+  disclaimer?: string;
 }
+
+const defaultDisclaimer = "This example is for illustrative purposes only, and actual outcomes may differ. The information provided does not constitute tax, legal, investment, or retirement advice and should not be used to avoid federal tax penalties. Readers are advised to consult an independent tax, legal, or financial professional before making any decisions. While the content is based on sources believed to be reliable, no guarantee is made for accuracy or completeness. Nothing herein should be interpreted as an offer or solicitation to buy or sell any security.";
 
 // Map calculator name to tab value
 const getInitialTab = (calculatorName: string): string => {
@@ -62,7 +65,8 @@ const getInitialTab = (calculatorName: string): string => {
 export default function RetirementCalculator({ 
   calculatorName = "Cost of Retirement Calculator",
   cardTitle,
-  cardDescription 
+  cardDescription,
+  disclaimer = defaultDisclaimer
 }: RetirementCalculatorProps = {}) {
   const { toast } = useToast();
   const [calculatorType, setCalculatorType] = useState(() => getInitialTab(calculatorName));
@@ -780,7 +784,7 @@ export default function RetirementCalculator({
             </div>
           </TabsContent>
         </Tabs>
-        <CalculatorDisclaimer />
+        <CalculatorDisclaimer text={disclaimer} />
       </CardContent>
     </Card>
   );

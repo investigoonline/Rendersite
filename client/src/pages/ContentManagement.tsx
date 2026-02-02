@@ -187,8 +187,8 @@ export default function ContentManagement() {
     },
   });
 
-  // Calculator definitions for display
-  const calculatorDefinitions = [
+  // Calculator definitions for display - Page settings and categories
+  const calculatorPageSettings = [
     { id: 'calculator_page_header', name: 'Page Header', description: 'Main title, subtitle, and description for the Calculators page' },
     { id: 'calculator_category_wealth_management', name: 'Wealth Management Category', description: 'Title, description, and icon for Wealth Management category' },
     { id: 'calculator_category_loans_credit', name: 'Loans & Credit Cards Category', description: 'Title, description, and icon for Loans & Credit Cards category' },
@@ -199,11 +199,31 @@ export default function ContentManagement() {
     { id: 'calculator_category_taxes_iras', name: 'Taxes & IRAs Category', description: 'Title, description, and icon for Taxes & IRAs category' },
     { id: 'calculator_category_credit_debt', name: 'Credit & Debt Management Category', description: 'Title, description, and icon for Credit & Debt category' },
     { id: 'calculator_item', name: 'Calculator Items', description: 'Individual calculator names and descriptions (add multiple)' },
-    { id: 'calculator_net_worth', name: 'Net Worth Calculator Settings', description: 'Page title and card content for Net Worth Calculator' },
-    { id: 'calculator_loan_payoff', name: 'Loan Payoff Calculator Settings', description: 'Page title and card content for Loan Payoff Calculator' },
-    { id: 'calculator_mortgage', name: 'Mortgage Calculator Settings', description: 'Page title and card content for Mortgage Calculator' },
-    { id: 'calculator_retirement', name: 'Retirement Calculator Settings', description: 'Page title and card content for Retirement Calculator' },
-    { id: 'calculator_tax', name: 'Tax Calculator Settings', description: 'Page title and card content for Tax Calculator' },
+  ];
+  
+  // Individual calculator content - all 21 calculators
+  const calculatorDefinitions = [
+    { id: 'calc_net_worth', name: 'Total Net Worth Calculator', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_debt_ratio', name: 'Income to Debt Ratio Calculator', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_loan_payoff', name: 'Loan Payoff Calculator', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_credit_card_debt', name: 'Credit Card Debt Calculator', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_home_affordability', name: 'Home Affordability Calculator', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_mortgage_refinance', name: 'Mortgage Refinancing Calculator', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_mortgage_acceleration', name: 'Mortgage Acceleration Calculator', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_lease_payment', name: 'Lease Payment Calculator', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_car_affordability', name: 'Car Affordability Calculator', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_retirement_cost', name: 'Cost of Retirement Calculator', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_rmd', name: 'Required Minimum Distributions (RMD)', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_inflation_impact', name: 'Impact of Inflation Calculator', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_retirement_early', name: 'Retirement Plan Early Distribution', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_portfolio_lifespan', name: 'Retirement Portfolio Lifespan', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_estate_tax', name: 'Estate Tax Calculator', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_federal_tax', name: 'Federal Income Tax Calculator', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_tax_deferred', name: 'Tax-Deferred Savings Calculator', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_ira_eligibility', name: 'IRA Eligibility Calculator', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_roth_conversion', name: 'Roth IRA Conversion Calculator', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_credit_impact', name: 'Credit Score Impact Analysis', description: 'Page title, card header, and disclaimer text' },
+    { id: 'calc_debt_consolidation', name: 'Debt Consolidation Calculator', description: 'Page title, card header, and disclaimer text' },
   ];
 
   // Fetch inactive users (for super admins only)
@@ -1189,6 +1209,16 @@ export default function ContentManagement() {
                                 rows={2}
                               />
                             </div>
+                            <div className="space-y-2">
+                              <Label htmlFor={`${calc.id}-disclaimer`}>Disclaimer Text</Label>
+                              <Textarea
+                                id={`${calc.id}-disclaimer`}
+                                value={calculatorFormData.disclaimer || ''}
+                                onChange={(e) => setCalculatorFormData({ ...calculatorFormData, disclaimer: e.target.value })}
+                                placeholder="Enter disclaimer text (e.g., This example is for illustrative purposes only...)"
+                                rows={4}
+                              />
+                            </div>
                             <div className="flex gap-2 pt-2">
                               <Button
                                 onClick={() => {
@@ -1264,6 +1294,10 @@ export default function ContentManagement() {
                                 <div>
                                   <p className="text-sm font-medium text-muted-foreground">Card Description</p>
                                   <p className="text-sm whitespace-pre-wrap">{(existingContent.content as any)?.cardDescription || 'Not set'}</p>
+                                </div>
+                                <div className="md:col-span-2">
+                                  <p className="text-sm font-medium text-muted-foreground">Disclaimer Text</p>
+                                  <p className="text-sm whitespace-pre-wrap">{(existingContent.content as any)?.disclaimer || 'Using default disclaimer'}</p>
                                 </div>
                               </div>
                             ) : (

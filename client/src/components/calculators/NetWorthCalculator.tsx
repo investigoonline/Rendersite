@@ -42,12 +42,16 @@ interface NetWorthCalculatorProps {
   calculatorName?: string;
   cardTitle?: string;
   cardDescription?: string;
+  disclaimer?: string;
 }
+
+const defaultDisclaimer = "This example is for illustrative purposes only, and actual outcomes may differ. The information provided does not constitute tax, legal, investment, or retirement advice and should not be used to avoid federal tax penalties. Readers are advised to consult an independent tax, legal, or financial professional before making any decisions. While the content is based on sources believed to be reliable, no guarantee is made for accuracy or completeness. Nothing herein should be interpreted as an offer or solicitation to buy or sell any security.";
 
 export default function NetWorthCalculator({ 
   calculatorName = "Total Net Worth Calculator",
   cardTitle,
-  cardDescription 
+  cardDescription,
+  disclaimer = defaultDisclaimer
 }: NetWorthCalculatorProps = {}) {
   const { toast } = useToast();
   const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission(calculatorName);
@@ -477,7 +481,7 @@ export default function NetWorthCalculator({
             )}
           </form>
         </Form>
-        <CalculatorDisclaimer />
+        <CalculatorDisclaimer text={disclaimer} />
       </CardContent>
     </Card>
   );
