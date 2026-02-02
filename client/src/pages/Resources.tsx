@@ -174,6 +174,32 @@ export default function Resources() {
   const becomeClientData = getSection('resources_become_client')?.content as any;
   const needHelpData = getSection('resources_need_help')?.content as any;
 
+  // Fetch flipbook content from CMS
+  const { data: flipbookContent } = useQuery<PageContent[]>({
+    queryKey: ['/api/content', 'flipbooks'],
+    queryFn: async () => {
+      const res = await fetch('/api/content?page=flipbooks', {
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch flipbooks: ${res.statusText}`);
+      }
+      return res.json();
+    },
+  });
+
+  // Extract flipbook header from CMS
+  const flipbookHeader = flipbookContent?.find(c => c.section === 'flipbook_header')?.content as { title: string; subtitle: string; description: string } | undefined;
+
+  // Extract flipbook items from CMS (sorted by sortOrder)
+  const cmsFlipbooks = flipbookContent
+    ?.filter(c => c.section === 'flipbook_item')
+    .map(content => content.content as { title: string; subtitle: string; description: string; imageUrl: string; bgColor: string; sortOrder: number })
+    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)) || [];
+
+  // Use CMS flipbooks if available, otherwise use hardcoded data
+  const displayFlipbooks = cmsFlipbooks.length > 0 ? cmsFlipbooks : flipbookData;
+
   // Extract resource types from database content (excluding header and additional sections)
   // Keep the database ID for unique keys
   const resourceTypes: (ResourceType & { dbId: string })[] = resourceTypesContent
@@ -326,22 +352,24 @@ export default function Resources() {
                 <div className="space-y-8">
                   <div className="text-center">
                     <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2">Flipbooks</h2>
-                    <p className="text-muted-foreground max-w-2xl mx-auto">
-                      These magazine-style flipbooks provide helpful information on a variety of financial topics and illustrate key financial concepts. Select one of the flipbooks below and click the image to view it.
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                      {flipbookHeader?.title || "Flipbooks"}
+                    </h2>
+                    <p className="text-muted-foreground max-w-2xl mx-auto whitespace-pre-wrap">
+                      {flipbookHeader?.description || "These magazine-style flipbooks provide helpful information on a variety of financial topics and illustrate key financial concepts. Select one of the flipbooks below and click the image to view it."}
                     </p>
                   </div>
                   
                   <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {flipbookData.slice(0, 4).map((flipbook) => (
-                      <div key={flipbook.id} className="group cursor-pointer">
+                    {displayFlipbooks.slice(0, 4).map((flipbook, index) => (
+                      <div key={`flipbook-${index}`} className="group cursor-pointer">
                         <div className={`relative aspect-[4/3] rounded-lg overflow-hidden mb-3 bg-gradient-to-br ${flipbook.bgColor} shadow-lg group-hover:shadow-xl transition-shadow`}>
                           <div className="absolute inset-0 p-4 flex flex-col justify-center text-white">
                             <p className="text-xs font-medium opacity-90 mb-1">{flipbook.title}</p>
                             <p className="text-sm font-bold leading-tight">{flipbook.subtitle}</p>
                           </div>
                           <img 
-                            src={flipbook.image} 
+                            src={'imageUrl' in flipbook ? flipbook.imageUrl : (flipbook as any).image} 
                             alt={flipbook.title}
                             className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay"
                           />
@@ -357,15 +385,15 @@ export default function Resources() {
                   </div>
                   
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:px-16">
-                    {flipbookData.slice(4).map((flipbook) => (
-                      <div key={flipbook.id} className="group cursor-pointer">
+                    {displayFlipbooks.slice(4).map((flipbook, index) => (
+                      <div key={`flipbook-extra-${index}`} className="group cursor-pointer">
                         <div className={`relative aspect-[4/3] rounded-lg overflow-hidden mb-3 bg-gradient-to-br ${flipbook.bgColor} shadow-lg group-hover:shadow-xl transition-shadow`}>
                           <div className="absolute inset-0 p-4 flex flex-col justify-center text-white">
                             <p className="text-xs font-medium opacity-90 mb-1">{flipbook.title}</p>
                             <p className="text-sm font-bold leading-tight">{flipbook.subtitle}</p>
                           </div>
                           <img 
-                            src={flipbook.image} 
+                            src={'imageUrl' in flipbook ? flipbook.imageUrl : (flipbook as any).image} 
                             alt={flipbook.title}
                             className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay"
                           />

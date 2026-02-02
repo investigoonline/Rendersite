@@ -303,7 +303,9 @@ export const contentSectionEnum = pgEnum('content_section', [
   'calculator_loan_payoff',
   'calculator_mortgage',
   'calculator_retirement',
-  'calculator_tax'
+  'calculator_tax',
+  'flipbook_header',
+  'flipbook_item'
 ]);
 
 // Content management table

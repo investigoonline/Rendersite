@@ -1519,6 +1519,56 @@ export const contentSchemas: Record<string, SectionSchema> = {
       cardDescription: { label: 'Card Description', control: 'textarea', rows: 2, placeholder: 'Calculate your tax obligations' },
     },
   },
+  // Flipbook Content Schemas
+  flipbook_header: {
+    schema: z.object({
+      title: z.string().min(1),
+      subtitle: z.string().min(1),
+      description: z.string().min(1),
+    }),
+    label: 'Flipbook Section Header',
+    description: 'Header for the flipbooks section on Resources page',
+    uiMeta: {
+      title: { label: 'Section Title', control: 'text', placeholder: 'Financial Flipbooks' },
+      subtitle: { label: 'Subtitle', control: 'text', placeholder: 'Interactive Guides' },
+      description: { label: 'Description', control: 'textarea', rows: 3, placeholder: 'Explore our collection of interactive financial guides...' },
+    },
+  },
+  flipbook_item: {
+    schema: z.object({
+      title: z.string().min(1),
+      subtitle: z.string().min(1),
+      description: z.string().min(1),
+      imageUrl: z.string().min(1),
+      bgColor: z.string().min(1),
+      sortOrder: z.number().min(1).max(20),
+    }),
+    label: 'Flipbook Item',
+    description: 'Individual flipbook magazine card',
+    allowMultiple: true,
+    uiMeta: {
+      title: { label: 'Title', control: 'text', placeholder: 'Financial Management Insight:' },
+      subtitle: { label: 'Subtitle', control: 'text', placeholder: 'Strategies to Help Build Your Future' },
+      description: { label: 'Description', control: 'textarea', rows: 3, placeholder: 'The decisions you make about money form the basis for your financial future...' },
+      imageUrl: { label: 'Cover Image URL', control: 'text', placeholder: 'https://images.unsplash.com/photo-...' },
+      bgColor: { 
+        label: 'Background Gradient', 
+        control: 'select', 
+        options: [
+          { label: 'Purple', value: 'from-purple-900 to-purple-700' },
+          { label: 'Teal', value: 'from-teal-700 to-teal-500' },
+          { label: 'Blue', value: 'from-blue-600 to-blue-400' },
+          { label: 'Amber', value: 'from-amber-700 to-amber-500' },
+          { label: 'Yellow', value: 'from-yellow-600 to-yellow-400' },
+          { label: 'Emerald', value: 'from-emerald-700 to-emerald-500' },
+          { label: 'Gray', value: 'from-gray-700 to-gray-500' },
+          { label: 'Rose', value: 'from-rose-700 to-rose-500' },
+          { label: 'Indigo', value: 'from-indigo-700 to-indigo-500' },
+        ]
+      },
+      sortOrder: { label: 'Display Order', control: 'number', min: 1, max: 20 },
+    },
+  },
 };
 
 // Page to sections mapping
@@ -1549,6 +1599,7 @@ export const pageSections: Record<string, string[]> = {
   disclosures: ['legal_disclosures'],
   process: ['process_header', 'process_step'],
   calculators: ['calculator_net_worth', 'calculator_loan_payoff', 'calculator_mortgage', 'calculator_retirement', 'calculator_tax'],
+  flipbooks: ['flipbook_header', 'flipbook_item'],
 };
 
 // Helper to get schema for a section
