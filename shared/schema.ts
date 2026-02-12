@@ -293,6 +293,7 @@ export const contentSectionEnum = pgEnum('content_section', [
   'legal_privacy_policy',
   'legal_terms_of_service',
   'legal_disclosures',
+  'disclosures_header',
   'home_wealth_creation',
   'home_wealth_protection',
   'home_wealth_preservation',

@@ -27,6 +27,7 @@ import ResourceManagement from "@/pages/admin/ResourceManagement";
 import Dashboard from "@/pages/Dashboard";
 import UnderConstruction from "@/pages/UnderConstruction";
 import Profile from "@/pages/Profile";
+import Disclosures from "@/pages/Disclosures";
 import BackgroundPreview from "@/pages/BackgroundPreview";
 import NotFound from "@/pages/not-found";
 
@@ -60,9 +61,7 @@ function Router() {
         <Route path="/terms-of-service">
           {() => <LegalPage pageType="terms_of_service" />}
         </Route>
-        <Route path="/disclosures">
-          {() => <LegalPage pageType="disclosures" />}
-        </Route>
+        <Route path="/disclosures" component={Disclosures} />
         <Route path="/background-preview">
           {() => <BackgroundPreview onSelect={(opt) => alert(`You selected Option ${opt}. Tell me which one you want!`)} />}
         </Route>

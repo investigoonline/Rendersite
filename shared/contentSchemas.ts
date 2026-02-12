@@ -1404,6 +1404,21 @@ export const contentSchemas: Record<string, SectionSchema> = {
       content: { label: 'Disclosures Content', control: 'richtext', placeholder: 'Enter the full disclosures content here...' },
     },
   },
+  // Disclosures Page Schemas
+  disclosures_header: {
+    schema: z.object({
+      badge: z.string().optional(),
+      title: z.string().min(1),
+      subtitle: z.string().optional(),
+    }),
+    label: 'Disclosures Header',
+    description: 'Hero banner section for the disclosures page',
+    uiMeta: {
+      badge: { label: 'Badge Text', control: 'text', placeholder: 'Legal & Compliance' },
+      title: { label: 'Page Title', control: 'text', placeholder: 'Disclosures & Legal Documents' },
+      subtitle: { label: 'Subtitle', control: 'textarea', rows: 2, placeholder: 'Access important legal documents, regulatory disclosures, and compliance information.' },
+    },
+  },
   // Process Page Schemas
   process_header: {
     schema: z.object({
@@ -2120,7 +2135,7 @@ export const pageSections: Record<string, string[]> = {
   footer: ['footer_company', 'footer_platform', 'footer_resources', 'footer_company_details'],
   privacy_policy: ['legal_privacy_policy'],
   terms_of_service: ['legal_terms_of_service'],
-  disclosures: ['legal_disclosures'],
+  disclosures: ['disclosures_header', 'legal_disclosures'],
   process: ['process_header', 'process_step'],
   calculators: [
     'calculator_page_header',

@@ -1,6 +1,11 @@
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Download, ExternalLink } from "lucide-react";
+import { HTMLContent } from "@/components/HTMLContent";
+import { useDynamicImage } from "@/hooks/useDynamicImage";
+import disclosuresHeroDefault from "@assets/Disclosures_hero.png";
+import type { PageContent } from "@shared/schema";
 
 const disclosures = [
   {
@@ -76,23 +81,73 @@ const importantNotices = [
 ];
 
 export default function Disclosures() {
+  const heroImage = useDynamicImage("disclosures", "hero", disclosuresHeroDefault);
+
+  const { data: pageContent } = useQuery<PageContent[]>({
+    queryKey: ["/api/content", "disclosures"],
+    queryFn: async () => {
+      const res = await fetch("/api/content?page=disclosures", { credentials: "include" });
+      if (!res.ok) return [];
+      return res.json();
+    },
+  });
+
+  const headerContent = pageContent?.find((c) => c.section === "disclosures_header")?.content as any;
+  const legalContent = pageContent?.find((c) => c.section === "legal_disclosures")?.content as any;
+
+  const badgeText = headerContent?.badge || "Legal & Compliance";
+  const titleText = headerContent?.title || "Disclosures & Legal Documents";
+  const subtitleText = headerContent?.subtitle || "Access important legal documents, regulatory disclosures, and compliance information.";
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="w-full">
+        <img
+          src={heroImage}
+          alt="IFS Wealth Management disclosures and compliance"
+          className="w-full object-cover"
+          style={{ height: "480px" }}
+        />
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-12">
           <Badge className="bg-primary/10 text-primary border-primary/20 mb-6">
-            Legal & Compliance
+            {badgeText}
           </Badge>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Disclosures & Legal Documents
+            {titleText}
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Access important legal documents, regulatory disclosures, and
-            compliance information.
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto whitespace-pre-wrap">
+            {subtitleText}
           </p>
         </div>
 
-        {/* Important Notices */}
+        {legalContent?.content && (
+          <Card className="mb-8">
+            <CardHeader className="border-b">
+              <div className="flex items-center space-x-3">
+                <FileText className="h-8 w-8 text-primary" />
+                <div>
+                  <CardTitle className="text-2xl">
+                    {legalContent.title || "Disclosures"}
+                  </CardTitle>
+                  {legalContent.lastUpdated && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Last Updated: {legalContent.lastUpdated}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="prose prose-gray max-w-none">
+                <HTMLContent content={legalContent.content} />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>Important Notices</CardTitle>
@@ -113,17 +168,6 @@ export default function Disclosures() {
           </CardContent>
         </Card>
 
-        {/* Regulatory Information */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-        
-
-         
-        </div>
-
-        {/* Additional Resources */}
-       
-
-        {/* Legal Notice */}
         <div className="mt-8 p-6 bg-gray-100 rounded-lg">
           <p className="text-xs text-muted-foreground leading-relaxed">
             <strong>Legal Notice:</strong> The information provided on this page
