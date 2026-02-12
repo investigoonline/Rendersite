@@ -102,7 +102,7 @@ export default function Flipbooks() {
     <div className="min-h-screen" style={{ backgroundColor: "#f5f5f5" }}>
       <section>
         <div className="w-full">
-          <img src={heroImage} alt="Financial Flipbooks" className="w-full object-cover" style={{ height: "480px" }} />
+          <img src={heroImage} alt="Financial Flipbooks" className="w-full object-cover h-[200px] sm:h-[300px] md:h-[400px] lg:h-[480px]" />
         </div>
       </section>
 

@@ -44,6 +44,10 @@ app.get("/api/health", (_req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
+app.get("/api/login", (_req, res) => {
+  res.redirect("/");
+});
+
 (async () => {
   const server = await registerRoutes(app);
 

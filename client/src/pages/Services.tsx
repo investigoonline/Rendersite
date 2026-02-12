@@ -126,8 +126,7 @@ export default function Services() {
         <img
           src={heroImage}
           alt="IFS Wealth Management professional services team"
-          className="w-full object-cover"
-          style={{ height: "480px" }}
+          className="w-full object-cover h-[200px] sm:h-[300px] md:h-[400px] lg:h-[480px]"
         />
       </div>
 
