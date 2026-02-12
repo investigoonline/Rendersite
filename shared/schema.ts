@@ -318,7 +318,9 @@ export const contentSectionEnum = pgEnum('content_section', [
   'flipbook_header',
   'flipbook_item',
   'newsletter_header',
-  'newsletter_article'
+  'newsletter_article',
+  'privacy_policy_header',
+  'terms_of_service_header'
 ]);
 
 // Content management table

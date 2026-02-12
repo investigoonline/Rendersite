@@ -31,10 +31,10 @@ const ABOUT_ITEMS = [
 const ALL_RESOURCE_ITEMS = [
   { name: "Frequently Asked Questions", href: "/faq", pageId: "FAQ", calculatorCategory: undefined },
   { name: "Disclosures", href: "/disclosures", pageId: "Disclosures", calculatorCategory: undefined },
-  { name: "Articles", href: "/resources?type=article", pageId: "Resources", calculatorCategory: undefined },
+  { name: "Articles", href: "/resources/articles", pageId: "Resources", calculatorCategory: undefined },
   { name: "Calculators", href: "/calculators", pageId: undefined, calculatorCategory: "CALCULATORS" },
-  { name: "Flipbooks", href: "/resources?type=flipbook", pageId: "Resources", calculatorCategory: undefined },
-  { name: "Newsletters", href: "/resources?type=newsletter", pageId: "Resources", calculatorCategory: undefined },
+  { name: "Flipbooks", href: "/resources/flipbooks", pageId: "Resources", calculatorCategory: undefined },
+  { name: "Newsletters", href: "/resources/newsletters", pageId: "Resources", calculatorCategory: undefined },
 ] as const;
 
 export default function Header() {

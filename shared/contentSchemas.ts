@@ -1404,6 +1404,36 @@ export const contentSchemas: Record<string, SectionSchema> = {
       content: { label: 'Disclosures Content', control: 'richtext', placeholder: 'Enter the full disclosures content here...' },
     },
   },
+  // Privacy Policy Page Schemas
+  privacy_policy_header: {
+    schema: z.object({
+      badge: z.string().optional(),
+      title: z.string().min(1),
+      subtitle: z.string().optional(),
+    }),
+    label: 'Privacy Policy Header',
+    description: 'Hero banner section for the privacy policy page',
+    uiMeta: {
+      badge: { label: 'Badge Text', control: 'text', placeholder: 'Privacy & Security' },
+      title: { label: 'Page Title', control: 'text', placeholder: 'Privacy Policy' },
+      subtitle: { label: 'Subtitle', control: 'textarea', rows: 2, placeholder: 'Learn how we protect your personal and financial information.' },
+    },
+  },
+  // Terms of Service Page Schemas
+  terms_of_service_header: {
+    schema: z.object({
+      badge: z.string().optional(),
+      title: z.string().min(1),
+      subtitle: z.string().optional(),
+    }),
+    label: 'Terms of Service Header',
+    description: 'Hero banner section for the terms of service page',
+    uiMeta: {
+      badge: { label: 'Badge Text', control: 'text', placeholder: 'Legal Agreement' },
+      title: { label: 'Page Title', control: 'text', placeholder: 'Terms of Service' },
+      subtitle: { label: 'Subtitle', control: 'textarea', rows: 2, placeholder: 'Please review our terms and conditions for using IFS Wealth Management services.' },
+    },
+  },
   // Disclosures Page Schemas
   disclosures_header: {
     schema: z.object({
@@ -2133,8 +2163,8 @@ export const pageSections: Record<string, string[]> = {
   about: ['about_header', 'about_stats', 'about_story', 'about_mission_vision', 'about_values', 'about_leadership', 'about_headquarters', 'about_innovation', 'about_security', 'about_cta'],
   dashboard: ['dashboard_header', 'dashboard_stats', 'dashboard_user_distribution', 'dashboard_engagement', 'dashboard_system_status'],
   footer: ['footer_company', 'footer_platform', 'footer_resources', 'footer_company_details'],
-  privacy_policy: ['legal_privacy_policy'],
-  terms_of_service: ['legal_terms_of_service'],
+  privacy_policy: ['privacy_policy_header', 'legal_privacy_policy'],
+  terms_of_service: ['terms_of_service_header', 'legal_terms_of_service'],
   disclosures: ['disclosures_header', 'legal_disclosures'],
   process: ['process_header', 'process_step'],
   calculators: [

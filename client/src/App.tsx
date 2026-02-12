@@ -28,6 +28,11 @@ import Dashboard from "@/pages/Dashboard";
 import UnderConstruction from "@/pages/UnderConstruction";
 import Profile from "@/pages/Profile";
 import Disclosures from "@/pages/Disclosures";
+import TermsOfService from "@/pages/TermsOfService";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import Articles from "@/pages/Articles";
+import Flipbooks from "@/pages/Flipbooks";
+import Newsletters from "@/pages/Newsletters";
 import BackgroundPreview from "@/pages/BackgroundPreview";
 import NotFound from "@/pages/not-found";
 
@@ -40,6 +45,9 @@ function Router() {
         <Route path="/home-designs" component={HomeDesignOptions} />
         <Route path="/calculators" component={Calculators} />
         <Route path="/resources" component={Resources} />
+        <Route path="/resources/articles" component={Articles} />
+        <Route path="/resources/flipbooks" component={Flipbooks} />
+        <Route path="/resources/newsletters" component={Newsletters} />
         <Route path="/blog" component={Blog} />
         <Route path="/about" component={About} />
         <Route path="/about/process" component={Process} />
@@ -55,12 +63,8 @@ function Router() {
         <Route path="/custodian" component={Custodian} />
         
         {/* Legal pages with CMS content */}
-        <Route path="/privacy-policy">
-          {() => <LegalPage pageType="privacy_policy" />}
-        </Route>
-        <Route path="/terms-of-service">
-          {() => <LegalPage pageType="terms_of_service" />}
-        </Route>
+        <Route path="/privacy-policy" component={PrivacyPolicy} />
+        <Route path="/terms-of-service" component={TermsOfService} />
         <Route path="/disclosures" component={Disclosures} />
         <Route path="/background-preview">
           {() => <BackgroundPreview onSelect={(opt) => alert(`You selected Option ${opt}. Tell me which one you want!`)} />}

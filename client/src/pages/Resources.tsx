@@ -1,651 +1,172 @@
-import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import ResourceCard from "@/components/resources/ResourceCard";
-import { useToast } from "@/hooks/use-toast";
 import {
   FileText,
-  Video,
   Mail,
   Book,
   HelpCircle,
   UserPlus,
-  Search,
-  Filter,
-  Eye,
-  Calendar,
   BookOpen,
+  ArrowRight,
 } from "lucide-react";
-import type { PageContent, ImageAsset } from "@shared/schema";
+import type { PageContent } from "@shared/schema";
 import { HTMLContent } from "@/components/HTMLContent";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
 import resourcesHeroDefault from "@assets/image_1765301156968.png";
+import { Link } from "wouter";
 
-interface ResourceType {
-  id: string;
-  name: string;
-  icon: string;
-  description: string;
-}
-
-const flipbookData = [
+const resourcePages = [
   {
-    id: "financial-management",
-    title: "Financial Management Insight:",
-    subtitle: "Strategies to Help Build Your Future",
-    description: "The decisions you make about money form the basis for your financial future and can help you pursue your goals.",
-    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop",
-    bgColor: "from-purple-900 to-purple-700",
+    title: "Articles",
+    description: "Browse our library of financial articles covering investment strategies, market insights, and personal finance topics.",
+    href: "/resources/articles",
+    icon: FileText,
+    color: "text-blue-600",
+    bgColor: "bg-blue-50",
   },
   {
-    id: "social-security",
-    title: "Understanding Social Security and Medicare:",
-    subtitle: "America's Retirement Safety Net",
-    description: "Social Security and Medicare rules can be complex. To help maximize benefits, it pays to understand your options.",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop",
-    bgColor: "from-teal-700 to-teal-500",
+    title: "Flipbooks",
+    description: "Interactive magazine-style flipbooks that illustrate key financial concepts in an engaging visual format.",
+    href: "/resources/flipbooks",
+    icon: BookOpen,
+    color: "text-purple-600",
+    bgColor: "bg-purple-50",
   },
   {
-    id: "higher-education",
-    title: "Higher Education:",
-    subtitle: "College Saving and Funding Strategies",
-    description: "College is an investment in your child's future. It requires a savings commitment and knowledge of funding methods.",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop",
-    bgColor: "from-blue-600 to-blue-400",
+    title: "Frequently Asked Questions",
+    description: "Find answers to common questions about financial planning, account management, and our services.",
+    href: "/faq",
+    icon: HelpCircle,
+    color: "text-green-600",
+    bgColor: "bg-green-50",
   },
   {
-    id: "investing-basics",
-    title: "Investing Basics:",
-    subtitle: "Embark on Your Wealth-Building Journey",
-    description: "Weighing the risks and rewards of various investment options can help you develop a sound investment strategy.",
-    image: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&h=300&fit=crop",
-    bgColor: "from-amber-700 to-amber-500",
-  },
-  {
-    id: "tax-savvy",
-    title: "Time to Get Tax-Savvy:",
-    subtitle: "Managing Your Tax Burden",
-    description: "Understanding tax rules and spotting tax-saving opportunities might help you put the money to better use.",
-    image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop",
-    bgColor: "from-yellow-600 to-yellow-400",
-  },
-  {
-    id: "wealth-preservation",
-    title: "Wealth Preservation:",
-    subtitle: "Planning to Leave a Legacy",
-    description: "An estate planning strategy could increase the value of your estate and help avoid potential conflicts and delays.",
-    image: "https://images.unsplash.com/photo-1434626881859-194d67b2b86f?w=400&h=300&fit=crop",
-    bgColor: "from-emerald-700 to-emerald-500",
-  },
-  {
-    id: "financial-protection",
-    title: "Financial Protection:",
-    subtitle: "Using Insurance to Help Manage Life's Risks",
-    description: "Home, auto, life, disability — Protect your financial interests by having the appropriate insurance coverage.",
-    image: "https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=400&h=300&fit=crop",
-    bgColor: "from-gray-700 to-gray-500",
+    title: "Newsletters",
+    description: "Stay informed with our periodic newsletters covering current financial topics and market updates.",
+    href: "/resources/newsletters",
+    icon: Mail,
+    color: "text-amber-600",
+    bgColor: "bg-amber-50",
   },
 ];
 
 export default function Resources() {
-  const { toast } = useToast();
-  const [location] = useLocation();
-  const tabsSectionRef = useRef<HTMLDivElement>(null);
-  
-  const [selectedType, setSelectedType] = useState("article");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [viewingResource, setViewingResource] = useState<any | null>(null);
-  
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const typeParam = urlParams.get('type');
-    if (typeParam) {
-      setSelectedType(typeParam);
-      setTimeout(() => {
-        tabsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
-  }, [location]);
-  
-  // Hero image with CMS support
   const heroImage = useDynamicImage("resources", "hero", resourcesHeroDefault);
 
-  // Fetch resource types content
   const { data: resourceTypesContent } = useQuery<PageContent[]>({
-    queryKey: ['/api/content', 'resources'],
+    queryKey: ["/api/content", "resources"],
     queryFn: async () => {
-      const res = await fetch('/api/content?page=resources', {
-        credentials: 'include',
-      });
-      if (!res.ok) {
-        throw new Error(`Failed to fetch resources: ${res.statusText}`);
-      }
+      const res = await fetch("/api/content?page=resources", { credentials: "include" });
+      if (!res.ok) return [];
       return res.json();
     },
   });
 
-  // Helper to get icon component by name with type safety
-  type ResourceIcon = 'FileText' | 'Video' | 'Mail' | 'Book' | 'HelpCircle' | 'UserPlus' | 'Calendar';
-  
-  const iconMap: Record<ResourceIcon, typeof FileText> = {
-    FileText,
-    Video,
-    Mail,
-    Book,
-    HelpCircle,
-    UserPlus,
-    Calendar,
+  const getSection = (sectionName: string) => {
+    return resourceTypesContent?.find((c) => c.section === sectionName);
   };
-  
+
+  const pageHeader = getSection("resources_header")?.content as any;
+  const becomeClientData = getSection("resources_become_client")?.content as any;
+  const needHelpData = getSection("resources_need_help")?.content as any;
+
+  type ResourceIcon = "FileText" | "Book" | "HelpCircle" | "UserPlus" | "Mail";
+  const iconMap: Record<ResourceIcon, typeof FileText> = { FileText, Book, HelpCircle, UserPlus, Mail };
   const getIcon = (iconName: string): typeof FileText => {
-    if (iconName in iconMap) {
-      return iconMap[iconName as ResourceIcon];
-    }
-    console.warn(`Unknown icon name: ${iconName}, falling back to FileText`);
+    if (iconName in iconMap) return iconMap[iconName as ResourceIcon];
     return FileText;
   };
 
-  // Helper to get content by section
-  const getSection = (sectionName: string) => {
-    return resourceTypesContent?.find(c => c.section === sectionName);
-  };
-
-  // Extract sections
-  const pageHeader = getSection('resources_header')?.content as any;
-  const becomeClientData = getSection('resources_become_client')?.content as any;
-  const needHelpData = getSection('resources_need_help')?.content as any;
-
-  // Fetch flipbook content from CMS
-  const { data: flipbookContent } = useQuery<PageContent[]>({
-    queryKey: ['/api/content', 'flipbooks'],
-    queryFn: async () => {
-      const res = await fetch('/api/content?page=flipbooks', {
-        credentials: 'include',
-      });
-      if (!res.ok) {
-        throw new Error(`Failed to fetch flipbooks: ${res.statusText}`);
-      }
-      return res.json();
-    },
-  });
-
-  // Extract flipbook header from CMS
-  const flipbookHeader = flipbookContent?.find(c => c.section === 'flipbook_header')?.content as { title: string; subtitle: string; description: string } | undefined;
-
-  // Extract flipbook items from CMS (sorted by sortOrder)
-  const cmsFlipbooks = flipbookContent
-    ?.filter(c => c.section === 'flipbook_item')
-    .map(content => content.content as { title: string; subtitle: string; description: string; imageUrl: string; bgColor: string; sortOrder: number })
-    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)) || [];
-
-  // Use CMS flipbooks if available, otherwise use hardcoded data
-  const displayFlipbooks = cmsFlipbooks.length > 0 ? cmsFlipbooks : flipbookData;
-
-  // Fetch newsletter content from CMS
-  const { data: newsletterContent } = useQuery<PageContent[]>({
-    queryKey: ['/api/content', 'newsletters'],
-    queryFn: async () => {
-      const res = await fetch('/api/content?page=newsletters', {
-        credentials: 'include',
-      });
-      if (!res.ok) {
-        throw new Error(`Failed to fetch newsletters: ${res.statusText}`);
-      }
-      return res.json();
-    },
-  });
-
-  // Extract newsletter header from CMS
-  const newsletterHeader = newsletterContent?.find(c => c.section === 'newsletter_header')?.content as { title: string; subtitle: string; description: string } | undefined;
-
-  // Extract newsletter articles from CMS (grouped by month)
-  const newsletterArticles = newsletterContent
-    ?.filter(c => c.section === 'newsletter_article')
-    .map(content => content.content as { title: string; description: string; month: string; year: number; isHotTopic: boolean; linkUrl?: string; sortOrder: number })
-    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)) || [];
-
-  // Group newsletter articles by month and year
-  const newslettersByMonthYear = newsletterArticles.reduce((acc, article) => {
-    const key = `${article.month} ${article.year}`;
-    if (!acc[key]) {
-      acc[key] = [];
-    }
-    acc[key].push(article);
-    return acc;
-  }, {} as Record<string, typeof newsletterArticles>);
-
-  // Extract resource types from database content (excluding header and additional sections)
-  // Keep the database ID for unique keys
-  const resourceTypes: (ResourceType & { dbId: string })[] = resourceTypesContent
-    ?.filter(c => !['resources_header', 'resources_become_client', 'resources_need_help'].includes(c.section))
-    .map(content => ({ ...(content.content as ResourceType), dbId: content.id }))
-    .filter(type => type && type.id && type.name) || [];
-
-  const { data: resources, isLoading } = useQuery({
-    queryKey: ["/api/resources", selectedType, selectedCategory],
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      if (selectedType) params.append("type", selectedType);
-      if (selectedCategory) params.append("category", selectedCategory);
-      
-      const response = await fetch(`/api/resources?${params}`);
-      if (!response.ok) throw new Error("Failed to fetch resources");
-      return response.json();
-    },
-  });
-
-  const filteredResources = resources?.filter((resource: any) =>
-    resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    resource.description?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
-
-  const handleSubscribeNewsletter = () => {
-    toast({
-      title: "Newsletter Subscription",
-      description: "You've been subscribed to our weekly financial insights newsletter.",
-    });
-  };
-
-  const handleViewResource = async (resourceId: string) => {
-    try {
-      // Fetch full resource with content
-      const response = await fetch(`/api/resources/${resourceId}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) throw new Error('Failed to fetch resource');
-      
-      const resource = await response.json();
-      
-      // If resource has a URL, open it in new tab
-      if (resource.url) {
-        window.open(resource.url, '_blank');
-        toast({
-          title: "Resource Opened",
-          description: "View count updated successfully.",
-        });
-      } else {
-        // Otherwise, show in dialog
-        setViewingResource(resource);
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to open resource.",
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f5f5f5' }}>
-      {/* Hero Section - Same sizing as Landing page */}
+    <div className="min-h-screen" style={{ backgroundColor: "#f5f5f5" }}>
       <section>
         <div className="w-full">
-          <img
-            src={heroImage}
-            alt="Financial Resources"
-            className="w-full object-cover"
-            style={{ height: "480px" }}
-          />
+          <img src={heroImage} alt="Financial Resources" className="w-full object-cover" style={{ height: "480px" }} />
         </div>
       </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         {pageHeader && (
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              {pageHeader.title}
-            </h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">{pageHeader.title}</h1>
             <HTMLContent content={pageHeader.description} className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8" />
           </div>
         )}
 
-        {/* Search and Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search resources..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </div>
-
-        <div ref={tabsSectionRef}>
-        <Tabs value={selectedType} onValueChange={setSelectedType} className="space-y-8">
-          {/* Resource Type Tabs */}
-          <TabsList className="grid w-full grid-cols-5">
-            {resourceTypes.map((type) => {
-              const IconComponent = getIcon(type.icon);
-              return (
-              <TabsTrigger key={type.dbId} value={type.id} className="flex items-center gap-1">
-                <IconComponent className="h-4 w-4" />
-                <span className="hidden sm:inline">{type.name}</span>
-              </TabsTrigger>
-              );
-            })}
-          </TabsList>
-
-          {/* Content for each resource type */}
-          {resourceTypes.map((type: any) => (
-            <TabsContent key={type.dbId} value={type.id} className="space-y-6">
-              <div>
-                {type.showBadge !== false && (
-                  <div className="mb-4">
-                    <HTMLContent content={type.badgeText || type.name} className="" />
-                  </div>
-                )}
-                <div className="text-center">
-                  <HTMLContent content={type.description} className="text-muted-foreground" />
-                </div>
-              </div>
-
-              {/* Special handling for Newsletter */}
-              {type.id === "newsletter" && (
-                <div className="space-y-8">
-                  {/* Newsletter Header */}
-                  <div className="mb-8">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                      {newsletterHeader?.title || "Newsletters"}
-                    </h2>
-                    <p className="text-muted-foreground mb-2 italic">
-                      {newsletterHeader?.subtitle || "Will you outlive your retirement income? Are your financial expectations for the coming year realistic?"}
-                    </p>
-                    <p className="text-muted-foreground whitespace-pre-wrap">
-                      {newsletterHeader?.description || "Our financial newsletters are designed to provide helpful information on a wide variety of financial topics. Simply click on one of the newsletter topics below to read the article in its entirety."}
-                    </p>
-                  </div>
-
-                  {/* Newsletter Articles Grid by Month/Year */}
-                  {Object.keys(newslettersByMonthYear).length > 0 ? (
-                    <div className="grid md:grid-cols-2 gap-8">
-                      {Object.entries(newslettersByMonthYear).map(([monthYear, articles]) => (
-                        <div key={monthYear} className="space-y-4">
-                          <h3 className="text-lg font-semibold text-gray-500 border-b pb-2">{monthYear}</h3>
-                          <div className="space-y-6">
-                            {articles.map((article, index) => (
-                              <div key={`${monthYear}-${index}`} className="space-y-1">
-                                <h4 className="font-semibold text-[#1a5276] hover:underline cursor-pointer">
-                                  {article.isHotTopic && (
-                                    <span className="text-[#1a5276] font-bold">HOT TOPIC: </span>
-                                  )}
-                                  {article.linkUrl ? (
-                                    <a href={article.linkUrl} target="_blank" rel="noopener noreferrer">
-                                      {article.title}
-                                    </a>
-                                  ) : (
-                                    article.title
-                                  )}
-                                </h4>
-                                <p className="text-sm text-gray-600">{article.description}</p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
+        <div className="grid md:grid-cols-2 gap-6 mb-16">
+          {resourcePages.map((page) => {
+            const Icon = page.icon;
+            return (
+              <Link key={page.href} href={page.href}>
+                <Card className="group cursor-pointer hover:shadow-lg transition-shadow h-full">
+                  <CardContent className="p-6 flex items-start gap-4">
+                    <div className={`p-3 rounded-lg ${page.bgColor} flex-shrink-0`}>
+                      <Icon className={`h-8 w-8 ${page.color}`} />
                     </div>
-                  ) : (
-                    <Card className="border-secondary/20 bg-secondary/5">
-                      <CardContent className="p-6 text-center">
-                        <Mail className="h-12 w-12 text-secondary mx-auto mb-4" />
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                          No Newsletters Yet
-                        </h3>
-                        <p className="text-muted-foreground mb-4">
-                          Newsletter articles will appear here once they are published via Content Management.
-                        </p>
-                        <Button onClick={handleSubscribeNewsletter}>
-                          Subscribe for Updates
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
-              )}
-
-              {/* Special handling for Flipbooks */}
-              {type.id === "flipbook" && (
-                <div className="space-y-8">
-                  <div className="text-center">
-                    <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                      {flipbookHeader?.title || "Flipbooks"}
-                    </h2>
-                    <p className="text-muted-foreground max-w-2xl mx-auto whitespace-pre-wrap">
-                      {flipbookHeader?.description || "These magazine-style flipbooks provide helpful information on a variety of financial topics and illustrate key financial concepts. Select one of the flipbooks below and click the image to view it."}
-                    </p>
-                  </div>
-                  
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {displayFlipbooks.slice(0, 4).map((flipbook, index) => (
-                      <div key={`flipbook-${index}`} className="group cursor-pointer">
-                        <div className={`relative aspect-[4/3] rounded-lg overflow-hidden mb-3 bg-gradient-to-br ${flipbook.bgColor} shadow-lg group-hover:shadow-xl transition-shadow`}>
-                          <div className="absolute inset-0 p-4 flex flex-col justify-center text-white">
-                            <p className="text-xs font-medium opacity-90 mb-1">{flipbook.title}</p>
-                            <p className="text-sm font-bold leading-tight">{flipbook.subtitle}</p>
-                          </div>
-                          <img 
-                            src={'imageUrl' in flipbook ? flipbook.imageUrl : (flipbook as any).image} 
-                            alt={flipbook.title}
-                            className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay"
-                          />
-                        </div>
-                        <h3 className="font-semibold text-gray-900 text-sm mb-1">
-                          {flipbook.title} <span className="font-normal">{flipbook.subtitle}</span>
-                        </h3>
-                        <p className="text-xs text-muted-foreground line-clamp-3">
-                          {flipbook.description}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:px-16">
-                    {displayFlipbooks.slice(4).map((flipbook, index) => (
-                      <div key={`flipbook-extra-${index}`} className="group cursor-pointer">
-                        <div className={`relative aspect-[4/3] rounded-lg overflow-hidden mb-3 bg-gradient-to-br ${flipbook.bgColor} shadow-lg group-hover:shadow-xl transition-shadow`}>
-                          <div className="absolute inset-0 p-4 flex flex-col justify-center text-white">
-                            <p className="text-xs font-medium opacity-90 mb-1">{flipbook.title}</p>
-                            <p className="text-sm font-bold leading-tight">{flipbook.subtitle}</p>
-                          </div>
-                          <img 
-                            src={'imageUrl' in flipbook ? flipbook.imageUrl : (flipbook as any).image} 
-                            alt={flipbook.title}
-                            className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay"
-                          />
-                        </div>
-                        <h3 className="font-semibold text-gray-900 text-sm mb-1">
-                          {flipbook.title} <span className="font-normal">{flipbook.subtitle}</span>
-                        </h3>
-                        <p className="text-xs text-muted-foreground line-clamp-3">
-                          {flipbook.description}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Resource Grid - Skip for flipbook since it has its own section */}
-              {type.id !== "flipbook" && (
-                isLoading ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[...Array(6)].map((_, i) => (
-                    <Card key={i} className="animate-pulse">
-                      <CardHeader>
-                        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="h-20 bg-gray-200 rounded mb-4"></div>
-                        <div className="h-8 bg-gray-200 rounded"></div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              ) : filteredResources.length > 0 ? (
-                type.id === 'article' ? (
-                  // Collapsible sections for articles grouped by category
-                  (() => {
-                    // Group articles by category
-                    const categorizedArticles = filteredResources.reduce((acc: any, resource: any) => {
-                      const category = resource.category || 'Uncategorized';
-                      if (!acc[category]) {
-                        acc[category] = [];
-                      }
-                      acc[category].push(resource);
-                      return acc;
-                    }, {});
-
-                    const categories = Object.keys(categorizedArticles).sort();
-
-                    return (
-                      <Accordion type="multiple" defaultValue={categories.slice(0, 2)} className="space-y-4">
-                        {categories.map((category) => (
-                          <AccordionItem key={category} value={category} className="border rounded-lg px-4">
-                            <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                              <div className="flex items-center gap-2">
-                                <FileText className="h-5 w-5 text-primary" />
-                                <span>{category}</span>
-                                <Badge variant="secondary" className="ml-2">
-                                  {categorizedArticles[category].length}
-                                </Badge>
-                              </div>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
-                                {categorizedArticles[category].map((resource: any) => (
-                                  <ResourceCard
-                                    key={resource.id}
-                                    resource={resource}
-                                    onView={() => handleViewResource(resource.id)}
-                                  />
-                                ))}
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
-                        ))}
-                      </Accordion>
-                    );
-                  })()
-                ) : (
-                  // Regular grid for other resource types
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredResources.map((resource: any) => (
-                      <ResourceCard
-                        key={resource.id}
-                        resource={resource}
-                        onView={() => handleViewResource(resource.id)}
-                      />
-                    ))}
-                  </div>
-                )
-              ) : (
-                <Card>
-                  <CardContent className="p-12 text-center">
-                    {(() => {
-                      const IconComponent = getIcon(type.icon);
-                      return <IconComponent className="h-12 w-12 text-muted-foreground mx-auto mb-4" />;
-                    })()}
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      No {type.name} Found
-                    </h3>
-                    <p className="text-muted-foreground">
-                      {searchTerm 
-                        ? `No ${type.name.toLowerCase()} match your search criteria. Try adjusting your filters.`
-                        : `No ${type.name.toLowerCase()} are available at the moment. Check back soon for new content.`
-                      }
-                    </p>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary transition-colors">
+                        {page.title}
+                      </h3>
+                      <p className="text-muted-foreground mb-3">{page.description}</p>
+                      <span className="inline-flex items-center text-primary font-medium text-sm group-hover:gap-2 transition-all">
+                        View {page.title} <ArrowRight className="h-4 w-4 ml-1" />
+                      </span>
+                    </div>
                   </CardContent>
                 </Card>
-              )
-              )}
-            </TabsContent>
-          ))}
-        </Tabs>
+              </Link>
+            );
+          })}
         </div>
 
-        {/* Additional Resources Section */}
         {(becomeClientData || needHelpData) && (
-          <div className="mt-16 grid md:grid-cols-2 gap-8" data-testid="section-additional-resources">
+          <div className="grid md:grid-cols-2 gap-8">
             {becomeClientData && (
-              <Card data-testid="card-become-client">
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     {(() => {
                       const IconComponent = getIcon(becomeClientData.icon);
                       return <IconComponent className="h-5 w-5 mr-2 text-primary" />;
                     })()}
-                    <span data-testid="text-become-client-title">{becomeClientData.title}</span>
+                    <span>{becomeClientData.title}</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <HTMLContent content={becomeClientData.description} className="text-muted-foreground mb-4" data-testid="text-become-client-description" />
+                  <HTMLContent content={becomeClientData.description} className="text-muted-foreground mb-4" />
                   {becomeClientData.benefits && becomeClientData.benefits.length > 0 && (
                     <ul className="space-y-2 text-sm text-muted-foreground mb-4">
                       {becomeClientData.benefits.map((benefit: string, index: number) => (
-                        <li key={index} data-testid={`text-benefit-${index}`}>• {benefit}</li>
+                        <li key={index}>• {benefit}</li>
                       ))}
                     </ul>
                   )}
-                  <Button 
-                    className="w-full"
-                    onClick={() => window.location.href = becomeClientData.buttonHref}
-                    data-testid="button-become-client"
-                  >
+                  <Button className="w-full" onClick={() => (window.location.href = becomeClientData.buttonHref)}>
                     {becomeClientData.buttonText}
                   </Button>
                 </CardContent>
               </Card>
             )}
-
             {needHelpData && (
-              <Card data-testid="card-need-help">
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     {(() => {
                       const IconComponent = getIcon(needHelpData.icon);
                       return <IconComponent className="h-5 w-5 mr-2 text-secondary" />;
                     })()}
-                    <span data-testid="text-need-help-title">{needHelpData.title}</span>
+                    <span>{needHelpData.title}</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <HTMLContent content={needHelpData.description} className="text-muted-foreground mb-4" data-testid="text-need-help-description" />
+                  <HTMLContent content={needHelpData.description} className="text-muted-foreground mb-4" />
                   {needHelpData.actions && needHelpData.actions.length > 0 && (
                     <div className="space-y-3">
                       {needHelpData.actions.map((action: any, index: number) => {
                         const ActionIcon = getIcon(action.icon);
                         return (
-                          <Button 
-                            key={index}
-                            variant="outline" 
-                            className="w-full justify-start"
-                            onClick={() => window.location.href = action.href}
-                            data-testid={`button-help-action-${index}`}
-                          >
+                          <Button key={index} variant="outline" className="w-full justify-start" onClick={() => (window.location.href = action.href)}>
                             <ActionIcon className="h-4 w-4 mr-2" />
                             {action.label}
                           </Button>
@@ -658,54 +179,6 @@ export default function Resources() {
             )}
           </div>
         )}
-
-        {/* Article Viewer Dialog */}
-        <Dialog open={!!viewingResource} onOpenChange={(open) => !open && setViewingResource(null)}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            {viewingResource && (
-              <>
-                <DialogHeader>
-                  <div className="flex items-center gap-2 mb-2">
-                    {viewingResource.category && (
-                      <Badge variant="outline">{viewingResource.category}</Badge>
-                    )}
-                    {viewingResource.publishDate && (
-                      <span className="text-sm text-muted-foreground">
-                        {new Date(viewingResource.publishDate).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </span>
-                    )}
-                  </div>
-                  <DialogTitle className="text-2xl">{viewingResource.title}</DialogTitle>
-                  {viewingResource.description && (
-                    <DialogDescription asChild>
-                      <HTMLContent content={viewingResource.description} className="text-base" />
-                    </DialogDescription>
-                  )}
-                </DialogHeader>
-                
-                <div className="mt-6">
-                  {viewingResource.content ? (
-                    <HTMLContent content={viewingResource.content} className="prose max-w-none" />
-                  ) : (
-                    <p className="text-muted-foreground italic">No content available</p>
-                  )}
-                </div>
-
-                {viewingResource.tags && viewingResource.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-6 pt-6 border-t">
-                    {viewingResource.tags.map((tag: string, index: number) => (
-                      <Badge key={index} variant="secondary">{tag}</Badge>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-          </DialogContent>
-        </Dialog>
       </div>
     </div>
   );
