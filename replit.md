@@ -8,6 +8,23 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## Resource Pages Separation (February 2026)
+- **Feature**: Separated Articles, Flipbooks, FAQs, and Newsletters into standalone pages instead of tabs
+- **Routes**: `/resources/articles`, `/resources/flipbooks`, `/resources/newsletters` (FAQ already at `/faq`)
+- **Resources Hub**: `/resources` now shows overview cards linking to each sub-page
+- **Navigation**: Header links updated to point to new standalone routes
+- **New Pages**: `Articles.tsx`, `Flipbooks.tsx`, `Newsletters.tsx`
+- **Impact**: Each resource type has its own dedicated page for better navigation
+
+## Legal Page Hero Banners (February 2026)
+- **Feature**: Added hero banners with CMS-editable headers to Terms of Service, Privacy Policy, and Disclosures pages
+- **Pages Created**: `TermsOfService.tsx`, `PrivacyPolicy.tsx` (standalone pages replacing LegalPage wrapper)
+- **Schemas**: Added `privacy_policy_header`, `terms_of_service_header` with badge/title/subtitle fields
+- **Database**: Added enum values for new header sections
+- **Hero Images**: All three legal pages have CMS-uploadable hero banners in Content Manager
+- **Process Page**: Added hero image entry to Content Manager for Our Process page banner editing
+- **Impact**: Content managers can edit banners and headers for all legal pages and Our Process page
+
 ## Blog Page Implementation (October 2025)
 - **Feature**: Created dedicated Blog page redesigning flipbook articles section as a standalone blog
 - **Route**: Added `/blog` route accessible to all users
