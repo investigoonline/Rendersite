@@ -14,6 +14,7 @@ import RetirementCalculator from "@/components/calculators/RetirementCalculator"
 import TaxCalculator from "@/components/calculators/TaxCalculator";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import ClientLoginModal from "@/components/modals/ClientLoginModal";
 import * as LucideIcons from "lucide-react";
 import {
   PieChart,
@@ -188,6 +189,7 @@ export default function Calculators() {
   const [selectedCategory, setSelectedCategory] = useState("wealth_management");
   const [selectedCalculator, setSelectedCalculator] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   // Synchronize selectedCategory with user access level to prevent empty tabs
   useEffect(() => {
@@ -553,7 +555,7 @@ export default function Calculators() {
                 </Button>
                 <Button 
                   variant="outline"
-                  onClick={() => window.location.href = "/api/login"}
+                  onClick={() => setLoginModalOpen(true)}
                   data-testid="button-login-guest"
                 >
                   Login Existing Account
@@ -579,7 +581,7 @@ export default function Calculators() {
                 </Button>
                 <Button 
                   variant="outline"
-                  onClick={() => window.location.href = "/api/login"}
+                  onClick={() => setLoginModalOpen(true)}
                   data-testid="button-login-full"
                 >
                   Login Existing Account
@@ -589,6 +591,7 @@ export default function Calculators() {
           </Card>
         )}
       </div>
+      <ClientLoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
     </div>
   );
 }
