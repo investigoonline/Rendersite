@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import calculatorsImage from "@assets/Calculators_1765301634531.png";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
+import { usePagePermissions } from "@/hooks/usePagePermissions";
 import type { PageContent } from "@shared/schema";
 
 interface CalculatorCMSContent {
@@ -183,7 +184,8 @@ const calculatorCategories = [
 
 export default function Calculators() {
   const heroImage = useDynamicImage('calculators', 'hero', calculatorsImage);
-  const { isAuthenticated, isGuestUser, isRegisteredUser, hasCalculatorAccess, accessLevel } = useAuth();
+  const { isAuthenticated, isGuestUser, isRegisteredUser, user } = useAuth();
+  const { hasCalculatorCategoryAccess, permissions, isLoading: permissionsLoading } = usePagePermissions();
   const { toast } = useToast();
   const [location] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState("wealth_management");
@@ -191,56 +193,58 @@ export default function Calculators() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loginModalOpen, setLoginModalOpen] = useState(false);
 
+  const hasCalcAccess = (categoryId: string): boolean => {
+    if (user?.role === 'super_admin') return true;
+    return hasCalculatorCategoryAccess(categoryId);
+  };
+
   // Synchronize selectedCategory with user access level to prevent empty tabs
   useEffect(() => {
-    // Only update if current category is not accessible
-    if (!hasCalculatorAccess(selectedCategory)) {
-      const defaultCategory = isGuestUser ? "vehicle_financing" : "wealth_management";
-      setSelectedCategory(defaultCategory);
+    if (permissionsLoading) return;
+    if (!hasCalcAccess(selectedCategory)) {
+      const firstAccessible = calculatorCategories.find(cat => hasCalcAccess(cat.id));
+      if (firstAccessible) {
+        setSelectedCategory(firstAccessible.id);
+      }
     }
-  }, [isGuestUser, hasCalculatorAccess, selectedCategory]);
+  }, [permissions, permissionsLoading, selectedCategory]);
 
   // Handle URL parameters for direct calculator access with access control
   useEffect(() => {
+    if (permissionsLoading) return;
     const urlParams = new URLSearchParams(window.location.search);
     const calculator = urlParams.get('calculator');
     const category = urlParams.get('category');
     
     if (calculator) {
-      // Find the category for this calculator
       const foundCategory = calculatorCategories.find(cat => 
         cat.calculators.some(calc => calc.id === calculator)
       );
       
-      // Check if user has access to this calculator's category
-      if (foundCategory && hasCalculatorAccess(foundCategory.id)) {
+      if (foundCategory && hasCalcAccess(foundCategory.id)) {
         setSelectedCalculator(calculator);
         setSelectedCategory(foundCategory.id);
       } else {
-        // Redirect to accessible default category if no access
-        setSelectedCategory(isGuestUser ? "vehicle_financing" : "wealth_management");
+        const firstAccessible = calculatorCategories.find(cat => hasCalcAccess(cat.id));
+        if (firstAccessible) setSelectedCategory(firstAccessible.id);
         toast({
           title: "Access Restricted",
-          description: isGuestUser 
-            ? "Guest users have access to Vehicle Financing calculators only. Create a full account for access to all calculators."
-            : "You need to log in to access this calculator.",
+          description: "You don't have access to this calculator. Please log in or contact support.",
           variant: "destructive",
         });
       }
-    } else if (category && hasCalculatorAccess(category)) {
+    } else if (category && hasCalcAccess(category)) {
       setSelectedCategory(category);
     } else if (category) {
-      // Set default accessible category if user doesn't have access
-      setSelectedCategory(isGuestUser ? "vehicle_financing" : "wealth_management");
+      const firstAccessible = calculatorCategories.find(cat => hasCalcAccess(cat.id));
+      if (firstAccessible) setSelectedCategory(firstAccessible.id);
       toast({
         title: "Access Restricted",
-        description: isGuestUser 
-          ? "Guest users have access to Vehicle Financing calculators only."
-          : "You need to log in to access this category.",
+        description: "You don't have access to this category.",
         variant: "destructive",
       });
     }
-  }, [location, isGuestUser, hasCalculatorAccess]);
+  }, [location, permissions, permissionsLoading]);
 
   // Get user's saved calculations
   const { data: savedCalculations } = useQuery<any[]>({
@@ -305,10 +309,10 @@ export default function Calculators() {
 
   const pageHeader = getPageHeader();
 
-  // Filter categories based on access control and search term
-  const accessibleCategories = calculatorCategories.filter(category => 
-    hasCalculatorAccess(category.id)
-  );
+  // Filter categories based on database-driven role permissions
+  const accessibleCategories = permissionsLoading 
+    ? [] 
+    : calculatorCategories.filter(category => hasCalcAccess(category.id));
 
   const filteredCategories = accessibleCategories.filter(category =>
     category.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -435,7 +439,7 @@ export default function Calculators() {
                 {accessibleCategories.reduce((total, cat) => total + cat.calculators.length, 0)}
               </div>
               <div className="text-sm text-muted-foreground">
-                {accessLevel === "limited" ? "Available" : "Total"} Calculators
+                {isAuthenticated ? "Total" : "Available"} Calculators
               </div>
             </CardContent>
           </Card>
@@ -444,7 +448,7 @@ export default function Calculators() {
               <PieChart className="h-8 w-8 text-secondary mx-auto mb-2" />
               <div className="text-2xl font-bold text-gray-900">{accessibleCategories.length}</div>
               <div className="text-sm text-muted-foreground">
-                {accessLevel === "limited" ? "Available" : "Total"} Categories
+                {isAuthenticated ? "Total" : "Available"} Categories
               </div>
             </CardContent>
           </Card>
@@ -537,54 +541,24 @@ export default function Calculators() {
           })}
         </Tabs>
 
-        {/* Access Notice based on user type */}
-        {isGuestUser && (
-          <Card className="mt-12 border-secondary/20 bg-secondary/5">
-            <CardContent className="p-8 text-center">
-              <Car className="h-12 w-12 text-secondary mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Guest Access - Vehicle Financing Only
-              </h3>
-              <p className="text-muted-foreground mb-6">
-                You currently have access to 2 Vehicle Financing calculators. 
-                Create a full account to unlock all 32+ calculators across 8 categories.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button onClick={() => window.location.href = "/register"} data-testid="button-upgrade-guest">
-                  Upgrade to Full Access
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => setLoginModalOpen(true)}
-                  data-testid="button-login-guest"
-                >
-                  Login Existing Account
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-        
-        {!isAuthenticated && !isGuestUser && (
+        {/* Login CTA for non-authenticated visitors */}
+        {!isAuthenticated && (
           <Card className="mt-12 border-primary/20 bg-primary/5">
             <CardContent className="p-8 text-center">
               <Calculator className="h-12 w-12 text-primary mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Full Calculator Access Available
+                Want to Save Your Calculations?
               </h3>
               <p className="text-muted-foreground mb-6">
-                Get unlimited access to all 32+ calculators, save your results, and export professional reports.
+                Log in to save your results, track your progress over time, and export professional reports.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button onClick={() => window.location.href = "/register"} data-testid="button-register-full">
-                  Create Full Account
-                </Button>
                 <Button 
                   variant="outline"
                   onClick={() => setLoginModalOpen(true)}
                   data-testid="button-login-full"
                 >
-                  Login Existing Account
+                  Login to Save Results
                 </Button>
               </div>
             </CardContent>

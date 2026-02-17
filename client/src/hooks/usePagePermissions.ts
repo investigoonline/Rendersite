@@ -38,7 +38,18 @@ export function usePagePermissions() {
 
   const hasCalculatorCategoryAccess = (categoryId: string): boolean => {
     const categoryPermissions = permissions.filter(p => p.resourceType === 'calculator_category');
-    return categoryPermissions.some(p => p.resourceId === categoryId);
+    const categoryIdToName: Record<string, string> = {
+      wealth_management: 'Wealth Management',
+      loans_credit: 'Loans & Credit Cards',
+      real_estate: 'Real Estate & Housing',
+      vehicle_financing: 'Vehicle Financing',
+      retirement_inflation: 'Retirement & Inflation',
+      estate_planning: 'Estate Planning',
+      taxes_iras: 'Taxes & IRAs',
+      credit_debt: 'Credit & Debt Management',
+    };
+    const displayName = categoryIdToName[categoryId] || categoryId;
+    return categoryPermissions.some(p => p.resourceId === displayName || p.resourceId === categoryId);
   };
 
   return {
