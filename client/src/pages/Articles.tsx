@@ -127,7 +127,7 @@ export default function Articles() {
             ))}
           </div>
         ) : categories.length > 0 ? (
-          <Accordion type="multiple" defaultValue={categories.slice(0, 2)} className="space-y-4">
+          <Accordion type="multiple" defaultValue={[]} className="space-y-4">
             {categories.map((category) => (
               <AccordionItem key={category} value={category} className="border rounded-lg px-4">
                 <AccordionTrigger className="text-lg font-semibold hover:no-underline">
