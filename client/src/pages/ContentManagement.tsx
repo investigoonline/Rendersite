@@ -100,6 +100,8 @@ export default function ContentManagement() {
     { page: 'terms_of_service', section: 'hero', label: 'Terms of Service Page Hero', description: 'Terms of service page header image' },
     { page: 'privacy_policy', section: 'hero', label: 'Privacy Policy Page Hero', description: 'Privacy policy page header image' },
     { page: 'disclosures', section: 'hero', label: 'Disclosures Page Hero', description: 'Disclosures page header image' },
+    { page: 'flipbooks', section: 'hero', label: 'Flipbooks Page Hero', description: 'Flipbooks page header image (falls back to Resources hero if not set)' },
+    { page: 'newsletters', section: 'hero', label: 'Newsletters Page Hero', description: 'Newsletters page header image (falls back to Resources hero if not set)' },
     { page: 'articles', section: 'carousel_1', label: 'Articles Carousel Image 1', description: 'First rotating image on the Articles page' },
     { page: 'articles', section: 'carousel_2', label: 'Articles Carousel Image 2', description: 'Second rotating image on the Articles page' },
     { page: 'articles', section: 'carousel_3', label: 'Articles Carousel Image 3', description: 'Third rotating image on the Articles page' },

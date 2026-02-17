@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { BookOpen } from "lucide-react";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
 import resourcesHeroDefault from "@assets/image_1765301156968.png";
-import type { PageContent } from "@shared/schema";
+import type { PageContent, ImageAsset } from "@shared/schema";
 
 const flipbookDataFallback = [
   {
@@ -65,7 +65,9 @@ const flipbookDataFallback = [
 ];
 
 export default function Flipbooks() {
-  const heroImage = useDynamicImage("resources", "hero", resourcesHeroDefault);
+  const resourcesHeroImage = useDynamicImage("resources", "hero", resourcesHeroDefault);
+  const flipbooksHeroImage = useDynamicImage("flipbooks", "hero", "");
+  const heroImage = flipbooksHeroImage || resourcesHeroImage;
 
   const { data: flipbookContent } = useQuery<PageContent[]>({
     queryKey: ["/api/content", "flipbooks"],
@@ -76,9 +78,26 @@ export default function Flipbooks() {
     },
   });
 
+  const { data: resourcesContent } = useQuery<PageContent[]>({
+    queryKey: ["/api/content", "resources"],
+    queryFn: async () => {
+      const res = await fetch("/api/content?page=resources", { credentials: "include" });
+      if (!res.ok) return [];
+      return res.json();
+    },
+  });
+
   const flipbookHeader = flipbookContent?.find((c) => c.section === "flipbook_header")?.content as
     | { title: string; subtitle: string; description: string }
     | undefined;
+
+  const resourcesFlipbookSection = resourcesContent?.find(
+    (c) => c.section === "resources_flipbooks"
+  )?.content as { name: string; description: string } | undefined;
+
+  const headerTitle = flipbookHeader?.title || resourcesFlipbookSection?.name || "Flipbooks";
+  const headerDescription = flipbookHeader?.description || resourcesFlipbookSection?.description ||
+    "These magazine-style flipbooks provide helpful information on a variety of financial topics and illustrate key financial concepts. Select one of the flipbooks below and click the image to view it.";
 
   const cmsFlipbooks =
     flipbookContent
@@ -111,11 +130,10 @@ export default function Flipbooks() {
           <Badge className="bg-primary/10 text-primary border-primary/20 mb-4">Resources</Badge>
           <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            {flipbookHeader?.title || "Flipbooks"}
+            {headerTitle}
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto whitespace-pre-wrap">
-            {flipbookHeader?.description ||
-              "These magazine-style flipbooks provide helpful information on a variety of financial topics and illustrate key financial concepts. Select one of the flipbooks below and click the image to view it."}
+            {headerDescription}
           </p>
         </div>
 

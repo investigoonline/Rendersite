@@ -10,7 +10,9 @@ import type { PageContent } from "@shared/schema";
 
 export default function Newsletters() {
   const { toast } = useToast();
-  const heroImage = useDynamicImage("resources", "hero", resourcesHeroDefault);
+  const resourcesHeroImage = useDynamicImage("resources", "hero", resourcesHeroDefault);
+  const newslettersHeroImage = useDynamicImage("newsletters", "hero", "");
+  const heroImage = newslettersHeroImage || resourcesHeroImage;
 
   const { data: newsletterContent } = useQuery<PageContent[]>({
     queryKey: ["/api/content", "newsletters"],
@@ -21,9 +23,28 @@ export default function Newsletters() {
     },
   });
 
+  const { data: resourcesContent } = useQuery<PageContent[]>({
+    queryKey: ["/api/content", "resources"],
+    queryFn: async () => {
+      const res = await fetch("/api/content?page=resources", { credentials: "include" });
+      if (!res.ok) return [];
+      return res.json();
+    },
+  });
+
   const newsletterHeader = newsletterContent?.find((c) => c.section === "newsletter_header")?.content as
     | { title: string; subtitle: string; description: string }
     | undefined;
+
+  const resourcesNewsletterSection = resourcesContent?.find(
+    (c) => c.section === "resources_newsletters"
+  )?.content as { name: string; description: string } | undefined;
+
+  const headerTitle = newsletterHeader?.title || resourcesNewsletterSection?.name || "Newsletters";
+  const headerSubtitle = newsletterHeader?.subtitle ||
+    "Will you outlive your retirement income? Are your financial expectations for the coming year realistic?";
+  const headerDescription = newsletterHeader?.description || resourcesNewsletterSection?.description ||
+    "Our financial newsletters are designed to provide helpful information on a wide variety of financial topics. Simply click on one of the newsletter topics below to read the article in its entirety.";
 
   const newsletterArticles =
     newsletterContent
@@ -71,15 +92,13 @@ export default function Newsletters() {
         <div className="text-center mb-8">
           <Badge className="bg-primary/10 text-primary border-primary/20 mb-4">Resources</Badge>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            {newsletterHeader?.title || "Newsletters"}
+            {headerTitle}
           </h1>
           <p className="text-muted-foreground mb-2 italic">
-            {newsletterHeader?.subtitle ||
-              "Will you outlive your retirement income? Are your financial expectations for the coming year realistic?"}
+            {headerSubtitle}
           </p>
           <p className="text-muted-foreground max-w-3xl mx-auto whitespace-pre-wrap">
-            {newsletterHeader?.description ||
-              "Our financial newsletters are designed to provide helpful information on a wide variety of financial topics. Simply click on one of the newsletter topics below to read the article in its entirety."}
+            {headerDescription}
           </p>
         </div>
 
