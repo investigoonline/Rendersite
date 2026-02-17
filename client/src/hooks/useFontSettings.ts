@@ -16,7 +16,7 @@ export function useFontSettings() {
   useEffect(() => {
     if (fontSettings && fontSettings.length > 0) {
       const root = document.documentElement;
-      
+
       fontSettings.forEach((setting) => {
         switch (setting.settingKey) {
           case 'font_size_h1':

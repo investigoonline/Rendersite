@@ -138,3 +138,28 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 }
+
+/* CMS Font Size Overrides - outside @layer to override Tailwind utilities */
+h1 {
+  font-size: var(--font-size-h1) !important;
+  font-family: var(--font-heading);
+}
+
+h2 {
+  font-size: var(--font-size-h2) !important;
+  font-family: var(--font-heading);
+}
+
+h3 {
+  font-size: var(--font-size-h2) !important;
+  font-family: var(--font-heading);
+}
+
+body {
+  font-size: var(--font-size-content) !important;
+  font-family: var(--font-sans);
+}
+
+p, li, td, th, label, .text-sm, .text-base, .text-lg {
+  font-size: var(--font-size-content) !important;
+}
