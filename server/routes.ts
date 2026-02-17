@@ -1212,14 +1212,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get unregistered permissions (for visitors who haven't logged in)
+  // Get guest permissions (for visitors who haven't logged in - they get guest_user level access)
   app.get('/api/guest/permissions', async (req, res) => {
     try {
-      // Return permissions for unregistered role (visitors who haven't logged in at all)
-      const permissions = await storage.getRolePermissionsByRole('unregistered');
+      const permissions = await storage.getRolePermissionsByRole('guest_user');
       res.json(permissions);
     } catch (error) {
-      console.error("Error fetching unregistered permissions:", error);
+      console.error("Error fetching guest permissions:", error);
       res.status(500).json({ message: "Unable to fetch permissions" });
     }
   });

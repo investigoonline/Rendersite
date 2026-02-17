@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ChartLine, ChevronDown, Menu, User } from "lucide-react";
-import GuestAccessModal from "./modals/GuestAccessModal";
 import ClientLoginModal from "./modals/ClientLoginModal";
 import defaultLogo from "@assets/image_1763735441524.jpeg";
 
@@ -40,7 +39,6 @@ const ALL_RESOURCE_ITEMS = [
 export default function Header() {
   const [location] = useLocation();
   const { isAuthenticated, user, isGuestUser, isRegisteredUser, logout } = useAuth();
-  const [guestModalOpen, setGuestModalOpen] = useState(false);
   const [clientModalOpen, setClientModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
@@ -227,9 +225,6 @@ export default function Header() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem onClick={() => setGuestModalOpen(true)} data-testid="menu-guest-access">
-                      Guest Access
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setClientModalOpen(true)} data-testid="menu-login">
                       Login
                     </DropdownMenuItem>
@@ -347,17 +342,6 @@ export default function Header() {
                           variant="outline"
                           className="w-full justify-start"
                           onClick={() => {
-                            setGuestModalOpen(true);
-                            setMobileMenuOpen(false);
-                          }}
-                          data-testid="mobile-button-guest"
-                        >
-                          Guest Access
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start"
-                          onClick={() => {
                             setClientModalOpen(true);
                             setMobileMenuOpen(false);
                           }}
@@ -385,7 +369,6 @@ export default function Header() {
         </nav>
       </header>
 
-      <GuestAccessModal open={guestModalOpen} onOpenChange={setGuestModalOpen} />
       <ClientLoginModal open={clientModalOpen} onOpenChange={setClientModalOpen} />
     </>
   );

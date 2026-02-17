@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import GuestSignupForm from "@/components/guest/GuestSignupForm";
 import CalculatorCard from "@/components/calculators/CalculatorCard";
 import NetWorthCalculator from "@/components/calculators/NetWorthCalculator";
-import GuestAccessModal from "@/components/modals/GuestAccessModal";
 import { HTMLContent } from "@/components/HTMLContent";
 import homeHeroImage from "@assets/Home_(2)_1765299273068.png";
 import wealthCreationDefault from "@/assets/wealth-creation.png";
@@ -107,7 +105,6 @@ const calculatorCategories = [
 
 export default function Landing() {
   const heroImage = useDynamicImage("home", "hero", homeHeroImage);
-  const [guestModalOpen, setGuestModalOpen] = useState(false);
   const { user } = useAuth();
 
   // Fetch user permissions
@@ -318,10 +315,6 @@ export default function Landing() {
         </div>
       </section>
 
-      <GuestAccessModal
-        open={guestModalOpen}
-        onOpenChange={setGuestModalOpen}
-      />
     </div>
   );
 }

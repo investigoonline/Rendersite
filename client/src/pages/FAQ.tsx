@@ -11,14 +11,14 @@ const faqData = [
     category: "Getting Started",
     questions: [
       {
-        question: "How do I create a guest account?",
+        question: "What can I access as a guest?",
         answer:
-          "Click on 'Guest Access' in the top navigation, enter your email, and choose your access level. You'll receive a verification email to activate your 30-day trial.",
+          "As a guest, you can browse the site and access Vehicle Financing calculators without needing to register or log in. To unlock all 32+ calculators and save your results, create a full account.",
       },
       {
         question: "What's the difference between guest and client accounts?",
         answer:
-          "Guest accounts provide 30-day trial access to basic calculators and resources. Client accounts offer unlimited access, personalized advice, portfolio management, and priority support.",
+          "Guests can browse and use basic calculators without signing up. Client accounts offer unlimited access to all calculators, personalized advice, portfolio management, and priority support.",
       },
       {
         question: "How do I upgrade to a full client account?",

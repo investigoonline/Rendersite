@@ -94,7 +94,6 @@ const roles = [
   { id: "guest_user", name: "Guest User" },
   { id: "preferred_client", name: "Preferred Client" },
   { id: "client", name: "Client" },
-  { id: "unregistered", name: "Unregistered" },
 ];
 
 // Default permissions mapping
@@ -122,15 +121,6 @@ const defaultPermissions: Record<string, string[]> = {
   ],
   "preferred_client": permissions.filter(p => p.resource !== "Content Management" && p.resource !== "Admin Dashboard").map(p => p.resource),
   "client": permissions.filter(p => p.resource !== "Content Management" && p.resource !== "Admin Dashboard").map(p => p.resource),
-  "unregistered": [
-    "Home (Landing/Dashboard)", "Register", "About", "Contact",
-    "Services", "FAQ", "Become Client", "Location", "Disclosures", "Custodian",
-    "Privacy Policy", "Terms of Service", "Resources", "Process",
-    "FOOTER LINKS", "Footer - Platform Links", "Financial Calculators", "Guest Access", "Client Login", "Mobile App", "API Documentation",
-    "Footer - Resources Links", "Articles & Insights", "Video Library", "Market Newsletters", "FAQ Database", "Help Center",
-    "Footer - Company Links", "About IFS Group", "Leadership Team", "Careers", "Press & Media", "Contact Us",
-    "Footer - Social Media Links", "LinkedIn", "Twitter/X", "Facebook"
-  ],
 };
 
 export default function RolesManagementDesign1() {
