@@ -80,6 +80,11 @@ export default function RetirementCalculator({
     shortfall: number;
     rmdAmount?: number;
     portfolioLifespan?: number;
+    earlyDistributionPenalty?: number;
+    earlyDistributionTax?: number;
+    earlyDistributionNet?: number;
+    inflationAdjustedValue?: number;
+    inflationLoss?: number;
   } | null>(null);
 
   const form = useForm<RetirementForm>({
@@ -143,17 +148,50 @@ export default function RetirementCalculator({
     const monthlyNeeded = shortfall > 0 ? 
       (shortfall * realReturn) / (12 * (Math.pow(1 + realReturn, yearsToRetirement) - 1)) : 0;
 
-    // Calculate RMD if user is 73+
+    // Calculate RMD
     let rmdAmount;
-    if (data.currentAge >= 73) {
-      const distributionPeriod = 27.4; // Simplified uniform lifetime table
-      rmdAmount = data.currentSavings / distributionPeriod;
+    if (calculatorType === "rmd") {
+      const age = data.currentAge;
+      const distributionPeriods: Record<number, number> = {
+        73: 26.5, 74: 25.5, 75: 24.6, 76: 23.7, 77: 22.9, 78: 22.0,
+        79: 21.1, 80: 20.2, 81: 19.4, 82: 18.5, 83: 17.7, 84: 16.8,
+        85: 16.0, 86: 15.2, 87: 14.4, 88: 13.7, 89: 12.9, 90: 12.2,
+      };
+      const period = distributionPeriods[age] || Math.max(10, 27.4 - (age - 72) * 0.9);
+      rmdAmount = data.currentSavings / period;
+    }
+
+    // Calculate early distribution
+    let earlyDistributionPenalty, earlyDistributionTax, earlyDistributionNet;
+    if (calculatorType === "early") {
+      const distributionAmount = data.currentSavings;
+      const taxRate = (data.expectedReturn || 22) / 100;
+      earlyDistributionPenalty = data.currentAge < 59.5 ? distributionAmount * 0.10 : 0;
+      earlyDistributionTax = distributionAmount * taxRate;
+      earlyDistributionNet = distributionAmount - earlyDistributionPenalty - earlyDistributionTax;
+    }
+
+    // Calculate inflation impact
+    let inflationAdjustedValue, inflationLoss;
+    if (calculatorType === "inflation") {
+      const years = 10;
+      const rate = data.inflationRate / 100;
+      inflationAdjustedValue = data.currentSavings / Math.pow(1 + rate, years);
+      inflationLoss = data.currentSavings - inflationAdjustedValue;
     }
 
     // Calculate portfolio lifespan
-    const withdrawalRate = 0.04; // 4% rule
-    const annualWithdrawal = data.currentSavings * withdrawalRate;
-    const portfolioLifespan = data.currentSavings / annualWithdrawal;
+    let portfolioLifespan;
+    if (calculatorType === "lifespan") {
+      const annualWithdrawal = data.annualIncome > 0 ? data.annualIncome : data.currentSavings * 0.04;
+      const returnRate = (data.expectedReturn || 7) / 100;
+      if (annualWithdrawal >= data.currentSavings * returnRate) {
+        portfolioLifespan = data.currentSavings / (annualWithdrawal - data.currentSavings * returnRate + annualWithdrawal * 0.01);
+      } else {
+        portfolioLifespan = 100;
+      }
+      portfolioLifespan = Math.min(portfolioLifespan, 100);
+    }
 
     setResults({
       retirementGoal,
@@ -162,6 +200,11 @@ export default function RetirementCalculator({
       shortfall,
       rmdAmount,
       portfolioLifespan,
+      earlyDistributionPenalty,
+      earlyDistributionTax,
+      earlyDistributionNet,
+      inflationAdjustedValue,
+      inflationLoss,
     });
   };
 
@@ -460,94 +503,6 @@ export default function RetirementCalculator({
               )}
             </div>
 
-            {/* Results Section */}
-            {results && (
-              <div className="mt-8 pt-8 border-t border-gray-200">
-                {calculatorType === "cost" && (
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div className="text-center p-6 bg-primary/5 rounded-lg">
-                      <div className="text-2xl font-bold font-mono text-primary mb-2">
-                        {formatCurrency(results.retirementGoal)}
-                      </div>
-                      <div className="text-sm font-medium text-gray-700">Retirement Goal</div>
-                    </div>
-                    <div className="text-center p-6 bg-secondary/5 rounded-lg">
-                      <div className="text-2xl font-bold font-mono text-secondary mb-2">
-                        {formatCurrency(results.projectedSavings)}
-                      </div>
-                      <div className="text-sm font-medium text-gray-700">Projected Savings</div>
-                    </div>
-                    <div className="text-center p-6 bg-accent/5 rounded-lg">
-                      <div className="text-2xl font-bold font-mono text-accent mb-2">
-                        {formatCurrency(results.shortfall)}
-                      </div>
-                      <div className="text-sm font-medium text-gray-700">Shortfall</div>
-                    </div>
-                    <div className="text-center p-6 bg-gray-50 rounded-lg">
-                      <div className="text-2xl font-bold font-mono text-gray-900 mb-2">
-                        {formatCurrency(results.monthlyNeeded)}
-                      </div>
-                      <div className="text-sm font-medium text-gray-700">Monthly Needed</div>
-                    </div>
-                  </div>
-                )}
-
-                {calculatorType === "rmd" && results.rmdAmount && (
-                    <div className="text-center p-8 bg-primary/5 rounded-lg mb-8">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                        Required Minimum Distribution
-                      </h3>
-                      <div className="text-3xl font-bold font-mono text-primary mb-2">
-                        {formatCurrency(results.rmdAmount)}
-                      </div>
-                      <p className="text-muted-foreground">Annual RMD amount for current age</p>
-                    </div>
-                )}
-
-                {calculatorType === "lifespan" && results.portfolioLifespan && (
-                    <div className="text-center p-8 bg-secondary/5 rounded-lg mb-8">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                        Portfolio Lifespan
-                      </h3>
-                      <div className="text-3xl font-bold font-mono text-secondary mb-2">
-                        {results.portfolioLifespan.toFixed(1)} years
-                      </div>
-                      <p className="text-muted-foreground">
-                        How long your current savings will last using 4% withdrawal rule
-                      </p>
-                    </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
-                  <Button
-                    type="button"
-                    onClick={handleSave}
-                    className="flex-1"
-                    disabled={saveCalculationMutation.isPending}
-                  >
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Results
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="flex-1"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Export PDF
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="flex-1"
-                  >
-                    <Mail className="mr-2 h-4 w-4" />
-                    Email Results
-                  </Button>
-                </div>
-              </div>
-            )}
           </form>
             </Form>
           </TabsContent>
@@ -784,6 +739,120 @@ export default function RetirementCalculator({
             </div>
           </TabsContent>
         </Tabs>
+
+        {results && (
+          <div className="mt-8 pt-8 border-t border-gray-200">
+            {calculatorType === "cost" && (
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div className="text-center p-6 bg-primary/5 rounded-lg">
+                  <div className="text-2xl font-bold font-mono text-primary mb-2">
+                    {formatCurrency(results.retirementGoal)}
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">Retirement Goal</div>
+                </div>
+                <div className="text-center p-6 bg-secondary/5 rounded-lg">
+                  <div className="text-2xl font-bold font-mono text-secondary mb-2">
+                    {formatCurrency(results.projectedSavings)}
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">Projected Savings</div>
+                </div>
+                <div className="text-center p-6 bg-accent/5 rounded-lg">
+                  <div className="text-2xl font-bold font-mono text-accent mb-2">
+                    {formatCurrency(results.shortfall)}
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">Shortfall</div>
+                </div>
+                <div className="text-center p-6 bg-gray-50 rounded-lg">
+                  <div className="text-2xl font-bold font-mono text-gray-900 mb-2">
+                    {formatCurrency(results.monthlyNeeded)}
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">Monthly Needed</div>
+                </div>
+              </div>
+            )}
+
+            {calculatorType === "rmd" && results.rmdAmount !== undefined && (
+              <div className="text-center p-8 bg-primary/5 rounded-lg mb-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Required Minimum Distribution</h3>
+                <div className="text-3xl font-bold font-mono text-primary mb-2">
+                  {formatCurrency(results.rmdAmount)}
+                </div>
+                <p className="text-muted-foreground">Annual RMD amount based on your age and account balance</p>
+              </div>
+            )}
+
+            {calculatorType === "early" && results.earlyDistributionNet !== undefined && (
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
+                <div className="text-center p-6 bg-red-50 rounded-lg">
+                  <div className="text-2xl font-bold font-mono text-red-600 mb-2">
+                    {formatCurrency(results.earlyDistributionPenalty || 0)}
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">Early Withdrawal Penalty (10%)</div>
+                </div>
+                <div className="text-center p-6 bg-amber-50 rounded-lg">
+                  <div className="text-2xl font-bold font-mono text-amber-600 mb-2">
+                    {formatCurrency(results.earlyDistributionTax || 0)}
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">Income Tax Withholding</div>
+                </div>
+                <div className="text-center p-6 bg-green-50 rounded-lg">
+                  <div className="text-2xl font-bold font-mono text-green-600 mb-2">
+                    {formatCurrency(results.earlyDistributionNet)}
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">Net Amount Received</div>
+                </div>
+              </div>
+            )}
+
+            {calculatorType === "inflation" && results.inflationAdjustedValue !== undefined && (
+              <div className="grid md:grid-cols-2 gap-6 mb-8">
+                <div className="text-center p-6 bg-primary/5 rounded-lg">
+                  <div className="text-2xl font-bold font-mono text-primary mb-2">
+                    {formatCurrency(results.inflationAdjustedValue)}
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">Purchasing Power in 10 Years</div>
+                </div>
+                <div className="text-center p-6 bg-red-50 rounded-lg">
+                  <div className="text-2xl font-bold font-mono text-red-600 mb-2">
+                    {formatCurrency(results.inflationLoss || 0)}
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">Lost to Inflation</div>
+                </div>
+              </div>
+            )}
+
+            {calculatorType === "lifespan" && results.portfolioLifespan !== undefined && (
+              <div className="text-center p-8 bg-secondary/5 rounded-lg mb-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Portfolio Lifespan</h3>
+                <div className="text-3xl font-bold font-mono text-secondary mb-2">
+                  {results.portfolioLifespan >= 100 ? "100+ years" : `${results.portfolioLifespan.toFixed(1)} years`}
+                </div>
+                <p className="text-muted-foreground">Estimated duration your portfolio will sustain withdrawals</p>
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+              <Button
+                type="button"
+                onClick={handleSave}
+                className="flex-1"
+                disabled={saveCalculationMutation.isPending}
+              >
+                <Save className="mr-2 h-4 w-4" />
+                Save Results
+              </Button>
+              <Button type="button" variant="outline" className="flex-1">
+                <Download className="mr-2 h-4 w-4" />
+                Export PDF
+              </Button>
+              <Button type="button" variant="secondary" className="flex-1">
+                <Mail className="mr-2 h-4 w-4" />
+                Email Results
+              </Button>
+            </div>
+          </div>
+        )}
+
         <CalculatorDisclaimer text={disclaimer} />
       </CardContent>
     </Card>

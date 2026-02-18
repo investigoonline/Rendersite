@@ -487,113 +487,6 @@ export default function TaxCalculator({
               )}
             </div>
 
-            {/* Results Section */}
-            {results && (
-              <div className="mt-8 pt-8 border-t border-gray-200">
-                {calculatorType === "federal_tax" && (
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div className="text-center p-6 bg-primary/5 rounded-lg">
-                      <div className="text-2xl font-bold font-mono text-primary mb-2">
-                        {formatCurrency(results.federalTax)}
-                      </div>
-                      <div className="text-sm font-medium text-gray-700">Federal Tax</div>
-                    </div>
-                    <div className="text-center p-6 bg-secondary/5 rounded-lg">
-                      <div className="text-2xl font-bold font-mono text-secondary mb-2">
-                        {formatCurrency(results.stateTax)}
-                      </div>
-                      <div className="text-sm font-medium text-gray-700">State Tax</div>
-                    </div>
-                    <div className="text-center p-6 bg-accent/5 rounded-lg">
-                      <div className="text-2xl font-bold font-mono text-accent mb-2">
-                        {results.effectiveRate.toFixed(1)}%
-                      </div>
-                      <div className="text-sm font-medium text-gray-700">Effective Rate</div>
-                    </div>
-                    <div className="text-center p-6 bg-gray-50 rounded-lg">
-                      <div className="text-2xl font-bold font-mono text-gray-900 mb-2">
-                        {formatCurrency(results.afterTaxIncome)}
-                      </div>
-                      <div className="text-sm font-medium text-gray-700">After-Tax Income</div>
-                    </div>
-                  </div>
-                )}
-
-                {calculatorType === "estate_tax" && results.estateRax !== undefined && (
-                    <div className="text-center p-8 bg-primary/5 rounded-lg mb-8">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                        Federal Estate Tax
-                      </h3>
-                      <div className="text-3xl font-bold font-mono text-primary mb-2">
-                        {formatCurrency(results.estateRax)}
-                      </div>
-                      <p className="text-muted-foreground">
-                        Tax owed on estate value above federal exemption
-                      </p>
-                    </div>
-                )}
-
-                {calculatorType === "ira_eligibility" && results.iraEligible !== undefined && (
-                    <div className="grid md:grid-cols-2 gap-6 mb-8">
-                      <div className="text-center p-6 bg-primary/5 rounded-lg">
-                        <div className="text-2xl font-bold text-primary mb-2">
-                          {results.iraEligible ? "Eligible" : "Not Eligible"}
-                        </div>
-                        <div className="text-sm font-medium text-gray-700">IRA Eligibility</div>
-                      </div>
-                      <div className="text-center p-6 bg-secondary/5 rounded-lg">
-                        <div className="text-2xl font-bold font-mono text-secondary mb-2">
-                          {formatCurrency(results.iraContributionLimit || 0)}
-                        </div>
-                        <div className="text-sm font-medium text-gray-700">Contribution Limit</div>
-                      </div>
-                    </div>
-                )}
-
-                {calculatorType === "tax_deferred" && results.taxSavings !== undefined && (
-                    <div className="text-center p-8 bg-secondary/5 rounded-lg mb-8">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                        Tax Savings from IRA Contribution
-                      </h3>
-                      <div className="text-3xl font-bold font-mono text-secondary mb-2">
-                        {formatCurrency(results.taxSavings)}
-                      </div>
-                      <p className="text-muted-foreground">
-                        Annual tax savings from traditional IRA contributions
-                      </p>
-                    </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
-                  <Button
-                    type="button"
-                    onClick={handleSave}
-                    className="flex-1"
-                    disabled={saveCalculationMutation.isPending}
-                  >
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Results
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="flex-1"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Export PDF
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="flex-1"
-                  >
-                    <Mail className="mr-2 h-4 w-4" />
-                    Email Results
-                  </Button>
-                </div>
-              </div>
-            )}
           </form>
             </Form>
           </TabsContent>
@@ -719,7 +612,7 @@ export default function TaxCalculator({
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(calculateTaxes)} className="space-y-6 max-w-2xl mx-auto">
                   <div className="grid md:grid-cols-2 gap-6">
-                    <FormField control={form.control} name="annualIncome" render={({ field }) => (
+                    <FormField control={form.control} name="estateValue" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Total Estate Value</FormLabel>
                         <FormControl>
@@ -763,6 +656,97 @@ export default function TaxCalculator({
             </div>
           </TabsContent>
         </Tabs>
+
+        {results && (
+          <div className="mt-8 pt-8 border-t border-gray-200">
+            {calculatorType === "federal_tax" && (
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div className="text-center p-6 bg-primary/5 rounded-lg">
+                  <div className="text-2xl font-bold font-mono text-primary mb-2">
+                    {formatCurrency(results.federalTax)}
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">Federal Tax</div>
+                </div>
+                <div className="text-center p-6 bg-secondary/5 rounded-lg">
+                  <div className="text-2xl font-bold font-mono text-secondary mb-2">
+                    {formatCurrency(results.stateTax)}
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">State Tax</div>
+                </div>
+                <div className="text-center p-6 bg-accent/5 rounded-lg">
+                  <div className="text-2xl font-bold font-mono text-accent mb-2">
+                    {results.effectiveRate.toFixed(1)}%
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">Effective Rate</div>
+                </div>
+                <div className="text-center p-6 bg-gray-50 rounded-lg">
+                  <div className="text-2xl font-bold font-mono text-gray-900 mb-2">
+                    {formatCurrency(results.afterTaxIncome)}
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">After-Tax Income</div>
+                </div>
+              </div>
+            )}
+
+            {calculatorType === "estate_tax" && results.estateRax !== undefined && (
+              <div className="text-center p-8 bg-primary/5 rounded-lg mb-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Federal Estate Tax</h3>
+                <div className="text-3xl font-bold font-mono text-primary mb-2">
+                  {formatCurrency(results.estateRax)}
+                </div>
+                <p className="text-muted-foreground">Tax owed on estate value above federal exemption</p>
+              </div>
+            )}
+
+            {calculatorType === "ira_eligibility" && results.iraEligible !== undefined && (
+              <div className="grid md:grid-cols-2 gap-6 mb-8">
+                <div className="text-center p-6 bg-primary/5 rounded-lg">
+                  <div className="text-2xl font-bold text-primary mb-2">
+                    {results.iraEligible ? "Eligible" : "Not Eligible"}
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">IRA Eligibility</div>
+                </div>
+                <div className="text-center p-6 bg-secondary/5 rounded-lg">
+                  <div className="text-2xl font-bold font-mono text-secondary mb-2">
+                    {formatCurrency(results.iraContributionLimit || 0)}
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">Contribution Limit</div>
+                </div>
+              </div>
+            )}
+
+            {calculatorType === "tax_deferred" && results.taxSavings !== undefined && (
+              <div className="text-center p-8 bg-secondary/5 rounded-lg mb-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Tax Savings from IRA Contribution</h3>
+                <div className="text-3xl font-bold font-mono text-secondary mb-2">
+                  {formatCurrency(results.taxSavings)}
+                </div>
+                <p className="text-muted-foreground">Annual tax savings from traditional IRA contributions</p>
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+              <Button
+                type="button"
+                onClick={handleSave}
+                className="flex-1"
+                disabled={saveCalculationMutation.isPending}
+              >
+                <Save className="mr-2 h-4 w-4" />
+                Save Results
+              </Button>
+              <Button type="button" variant="outline" className="flex-1">
+                <Download className="mr-2 h-4 w-4" />
+                Export PDF
+              </Button>
+              <Button type="button" variant="secondary" className="flex-1">
+                <Mail className="mr-2 h-4 w-4" />
+                Email Results
+              </Button>
+            </div>
+          </div>
+        )}
+
         <CalculatorDisclaimer text={disclaimer} />
       </CardContent>
     </Card>
