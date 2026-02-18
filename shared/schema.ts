@@ -320,7 +320,8 @@ export const contentSectionEnum = pgEnum('content_section', [
   'newsletter_header',
   'newsletter_article',
   'privacy_policy_header',
-  'terms_of_service_header'
+  'terms_of_service_header',
+  'font_settings'
 ]);
 
 // Content management table

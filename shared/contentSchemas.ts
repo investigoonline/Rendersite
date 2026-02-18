@@ -2138,13 +2138,30 @@ export const contentSchemas: Record<string, SectionSchema> = {
       sortOrder: { label: 'Display Order within Month', control: 'number', min: 1, max: 100 },
     },
   },
+  font_settings: {
+    schema: z.object({
+      h1Size: z.string().min(1),
+      h2Size: z.string().min(1),
+      contentSize: z.string().min(1),
+      useGlobalDefaults: z.boolean(),
+    }),
+    label: 'Page Font Settings',
+    description: 'Custom font sizes for this page. Toggle off "Use Global Defaults" to set page-specific sizes.',
+    uiMeta: {
+      h1Size: { label: 'Heading 1 Size (px)', control: 'text', placeholder: '22.5' },
+      h2Size: { label: 'Heading 2 Size (px)', control: 'text', placeholder: '16.5' },
+      contentSize: { label: 'Content Size (px)', control: 'text', placeholder: '13.5' },
+      useGlobalDefaults: { label: 'Use Global Defaults', control: 'switch' },
+    },
+  },
 };
 
 // Page to sections mapping
 export const pageSections: Record<string, string[]> = {
-  home: ['home_hero', 'home_stats', 'home_portfolio', 'home_wealth_creation', 'home_wealth_protection', 'home_wealth_preservation', 'home_wealth_transfer'],
-  services: ['services_header', 'services_stats', 'services_investment', 'services_strategic', 'services_legacy', 'services_risk', 'services_special', 'services_aggregation', 'services_process', 'services_why_choose', 'services_commitment', 'services_cta'],
+  home: ['font_settings', 'home_hero', 'home_stats', 'home_portfolio', 'home_wealth_creation', 'home_wealth_protection', 'home_wealth_preservation', 'home_wealth_transfer'],
+  services: ['font_settings', 'services_header', 'services_stats', 'services_investment', 'services_strategic', 'services_legacy', 'services_risk', 'services_special', 'services_aggregation', 'services_process', 'services_why_choose', 'services_commitment', 'services_cta'],
   contact: [
+    'font_settings',
     'contact_header',
     'contact_office', 
     'contact_phone', 
@@ -2158,16 +2175,17 @@ export const pageSections: Record<string, string[]> = {
     'contact_prospective_clients',
     'contact_current_clients'
   ],
-  resources: ['resources_header', 'resources_articles', 'resources_videos', 'resources_newsletters', 'resources_flipbooks', 'resources_faq', 'resources_become_client', 'resources_need_help'],
-  blog: ['blog_header', 'blog_featured', 'blog_categories', 'blog_cta'],
-  about: ['about_header', 'about_stats', 'about_story', 'about_mission_vision', 'about_values', 'about_leadership', 'about_headquarters', 'about_innovation', 'about_security', 'about_cta'],
+  resources: ['font_settings', 'resources_header', 'resources_articles', 'resources_videos', 'resources_newsletters', 'resources_flipbooks', 'resources_faq', 'resources_become_client', 'resources_need_help'],
+  blog: ['font_settings', 'blog_header', 'blog_featured', 'blog_categories', 'blog_cta'],
+  about: ['font_settings', 'about_header', 'about_stats', 'about_story', 'about_mission_vision', 'about_values', 'about_leadership', 'about_headquarters', 'about_innovation', 'about_security', 'about_cta'],
   dashboard: ['dashboard_header', 'dashboard_stats', 'dashboard_user_distribution', 'dashboard_engagement', 'dashboard_system_status'],
-  footer: ['footer_company', 'footer_platform', 'footer_resources', 'footer_company_details'],
-  privacy_policy: ['privacy_policy_header', 'legal_privacy_policy'],
-  terms_of_service: ['terms_of_service_header', 'legal_terms_of_service'],
-  disclosures: ['disclosures_header', 'legal_disclosures'],
-  process: ['process_header', 'process_step'],
+  footer: ['font_settings', 'footer_company', 'footer_platform', 'footer_resources', 'footer_company_details'],
+  privacy_policy: ['font_settings', 'privacy_policy_header', 'legal_privacy_policy'],
+  terms_of_service: ['font_settings', 'terms_of_service_header', 'legal_terms_of_service'],
+  disclosures: ['font_settings', 'disclosures_header', 'legal_disclosures'],
+  process: ['font_settings', 'process_header', 'process_step'],
   calculators: [
+    'font_settings',
     'calculator_page_header',
     'calculator_category_wealth_management',
     'calculator_category_loans_credit',
@@ -2200,8 +2218,8 @@ export const pageSections: Record<string, string[]> = {
     'calc_credit_impact',
     'calc_debt_consolidation'
   ],
-  flipbooks: ['flipbook_header', 'flipbook_item'],
-  newsletters: ['newsletter_header', 'newsletter_article'],
+  flipbooks: ['font_settings', 'flipbook_header', 'flipbook_item'],
+  newsletters: ['font_settings', 'newsletter_header', 'newsletter_article'],
 };
 
 // Helper to get schema for a section

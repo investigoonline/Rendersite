@@ -78,6 +78,15 @@ export default function ContentManagement() {
   const isSuperAdmin = user?.role === 'super_admin';
   const checkingAccess = false;
   
+  // Per-page font settings state
+  const [pageFontData, setPageFontData] = useState<Record<string, string>>({
+    h1Size: '22.5',
+    h2Size: '16.5',
+    contentSize: '13.5',
+  });
+  const [pageFontUseGlobal, setPageFontUseGlobal] = useState(true);
+  const [pageFontSectionId, setPageFontSectionId] = useState<string | null>(null);
+
   // Calculator editing state
   const [editingCalculator, setEditingCalculator] = useState<string | null>(null);
   const [calculatorFormData, setCalculatorFormData] = useState<Record<string, any>>({});
@@ -341,6 +350,61 @@ export default function ContentManagement() {
       setFontFormData(formData);
     }
   }, [fontSettings]);
+
+  // Load per-page font settings when page content loads
+  useEffect(() => {
+    if (pageContent) {
+      const fontSection = pageContent.find((s) => s.section === 'font_settings');
+      if (fontSection) {
+        const content = fontSection.content as any;
+        setPageFontData({
+          h1Size: content.h1Size || '22.5',
+          h2Size: content.h2Size || '16.5',
+          contentSize: content.contentSize || '13.5',
+        });
+        setPageFontUseGlobal(content.useGlobalDefaults !== false);
+        setPageFontSectionId(fontSection.id);
+      } else {
+        setPageFontData({ h1Size: '22.5', h2Size: '16.5', contentSize: '13.5' });
+        setPageFontUseGlobal(true);
+        setPageFontSectionId(null);
+      }
+    }
+  }, [pageContent, selectedPage]);
+
+  // Save per-page font settings mutation
+  const savePageFontMutation = useMutation({
+    mutationFn: async () => {
+      const content = {
+        h1Size: pageFontData.h1Size,
+        h2Size: pageFontData.h2Size,
+        contentSize: pageFontData.contentSize,
+        useGlobalDefaults: pageFontUseGlobal,
+      };
+      if (pageFontSectionId) {
+        return apiRequest(`/api/content/${pageFontSectionId}`, "PATCH", {
+          content,
+          updatedBy: user?.id,
+        });
+      } else {
+        return apiRequest("/api/content", "POST", {
+          page: selectedPage,
+          section: 'font_settings',
+          content,
+          published: true,
+          createdBy: user?.id,
+          updatedBy: user?.id,
+        });
+      }
+    },
+    onSuccess: () => {
+      toast({ title: "Success", description: `Font settings saved for ${selectedPage} page` });
+      queryClient.invalidateQueries({ queryKey: ['/api/content', selectedPage] });
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to save font settings", variant: "destructive" });
+    },
+  });
 
   // Assign role mutation
   const assignRoleMutation = useMutation({
@@ -695,9 +759,8 @@ export default function ContentManagement() {
                       <div className="space-y-2">
                         <Label>Select Section Type</Label>
                         <div className="grid grid-cols-1 gap-2">
-                          {pageSections[selectedPage]?.map((sectionType) => {
+                          {pageSections[selectedPage]?.filter(s => s !== 'font_settings').map((sectionType) => {
                             const schema = getSectionSchema(sectionType);
-                            // Check if section already exists
                             const exists = pageContent?.some(s => s.section === sectionType);
                             
                             return (
@@ -757,6 +820,102 @@ export default function ContentManagement() {
                 </Dialog>
               </div>
 
+              {/* Per-Page Font Settings Card */}
+              {selectedPage !== 'dashboard' && (
+                <Card className="border-blue-200 bg-blue-50/30">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <Type className="h-4 w-4" />
+                        Page Font Settings
+                      </CardTitle>
+                      <div className="flex items-center gap-2">
+                        <Label htmlFor="use-global-toggle" className="text-sm text-muted-foreground">
+                          Use Global Defaults
+                        </Label>
+                        <Switch
+                          id="use-global-toggle"
+                          checked={pageFontUseGlobal}
+                          onCheckedChange={(checked) => setPageFontUseGlobal(checked)}
+                        />
+                      </div>
+                    </div>
+                    <CardDescription>
+                      {pageFontUseGlobal
+                        ? "Using global font sizes. Toggle off to set custom sizes for this page."
+                        : `Custom font sizes for the ${selectedPage} page.`}
+                    </CardDescription>
+                  </CardHeader>
+                  {!pageFontUseGlobal && (
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-1">
+                          <Label>Heading 1 (px)</Label>
+                          <Input
+                            type="number"
+                            step="0.5"
+                            min="12"
+                            max="48"
+                            value={pageFontData.h1Size}
+                            onChange={(e) => setPageFontData({ ...pageFontData, h1Size: e.target.value })}
+                          />
+                          <div className="mt-1 p-2 bg-white rounded border">
+                            <span style={{ fontSize: `${pageFontData.h1Size}px`, fontFamily: 'Sanchez, Georgia, serif', fontWeight: 700 }}>
+                              Sample H1
+                            </span>
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <Label>Heading 2 (px)</Label>
+                          <Input
+                            type="number"
+                            step="0.5"
+                            min="10"
+                            max="36"
+                            value={pageFontData.h2Size}
+                            onChange={(e) => setPageFontData({ ...pageFontData, h2Size: e.target.value })}
+                          />
+                          <div className="mt-1 p-2 bg-white rounded border">
+                            <span style={{ fontSize: `${pageFontData.h2Size}px`, fontFamily: 'Sanchez, Georgia, serif', fontWeight: 700 }}>
+                              Sample H2
+                            </span>
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <Label>Content (px)</Label>
+                          <Input
+                            type="number"
+                            step="0.5"
+                            min="10"
+                            max="24"
+                            value={pageFontData.contentSize}
+                            onChange={(e) => setPageFontData({ ...pageFontData, contentSize: e.target.value })}
+                          />
+                          <div className="mt-1 p-2 bg-white rounded border">
+                            <span style={{ fontSize: `${pageFontData.contentSize}px`, fontFamily: 'Roboto, sans-serif' }}>
+                              Sample body text
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  )}
+                  <div className="px-6 pb-4 flex justify-end">
+                    <Button
+                      size="sm"
+                      onClick={() => savePageFontMutation.mutate()}
+                      disabled={savePageFontMutation.isPending}
+                    >
+                      {savePageFontMutation.isPending ? (
+                        <><RefreshCw className="h-3 w-3 mr-1 animate-spin" /> Saving...</>
+                      ) : (
+                        <><Save className="h-3 w-3 mr-1" /> Save Font Settings</>
+                      )}
+                    </Button>
+                  </div>
+                </Card>
+              )}
+
               {/* Content Sections */}
               {isLoading ? (
                 <div className="text-center py-12">
@@ -765,8 +924,8 @@ export default function ContentManagement() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {pageContent && pageContent.length > 0 ? (
-                    pageContent.map((section) => (
+                  {pageContent && pageContent.filter(s => s.section !== 'font_settings').length > 0 ? (
+                    pageContent.filter(s => s.section !== 'font_settings').map((section) => (
                       <Card key={section.id} data-testid={`content-section-${section.section}`}>
                     <CardHeader>
                       <div className="flex items-center justify-between">
