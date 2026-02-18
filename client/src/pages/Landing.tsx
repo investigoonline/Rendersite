@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import type { RolePermission, PageContent } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
+import { getFieldFontStyle } from "@/hooks/useFieldFontStyles";
 
 const calculatorCategories = [
   {
@@ -187,10 +188,10 @@ export default function Landing() {
                     />
                   </div>
                   <div className="sm:w-3/5 p-6 sm:p-8">
-                    <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-3">
+                    <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-3" style={getFieldFontStyle(wealthCreation, 'title')}>
                       {wealthCreation?.title || "Wealth Creation"}
                     </h3>
-                    <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+                    <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap" style={getFieldFontStyle(wealthCreation, 'description')}>
                       {wealthCreation?.description ||
                         "Placeholder content for Wealth Creation. Edit this from the Content Management page."}
                     </p>
@@ -213,10 +214,10 @@ export default function Landing() {
                     />
                   </div>
                   <div className="sm:w-3/5 p-6 sm:p-8">
-                    <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-3">
+                    <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-3" style={getFieldFontStyle(wealthProtection, 'title')}>
                       {wealthProtection?.title || "Wealth Protection"}
                     </h3>
-                    <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+                    <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap" style={getFieldFontStyle(wealthProtection, 'description')}>
                       {wealthProtection?.description ||
                         "Placeholder content for Wealth Protection. Edit this from the Content Management page."}
                     </p>
@@ -240,10 +241,10 @@ export default function Landing() {
                     />
                   </div>
                   <div className="sm:w-3/5 p-6 sm:p-8">
-                    <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-3">
+                    <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-3" style={getFieldFontStyle(wealthPreservation, 'title')}>
                       {wealthPreservation?.title || "Wealth Preservation"}
                     </h3>
-                    <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+                    <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap" style={getFieldFontStyle(wealthPreservation, 'description')}>
                       {wealthPreservation?.description ||
                         "Placeholder content for Wealth Preservation. Edit this from the Content Management page."}
                     </p>
@@ -264,10 +265,10 @@ export default function Landing() {
                     />
                   </div>
                   <div className="sm:w-3/5 p-6 sm:p-8">
-                    <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-3">
+                    <h3 className="font-heading text-[28px] font-bold text-gray-900 mb-3" style={getFieldFontStyle(wealthTransfer, 'title')}>
                       {wealthTransfer?.title || "Wealth Transfer & Legacy"}
                     </h3>
-                    <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+                    <p className="text-[16px] text-gray-600 leading-relaxed whitespace-pre-wrap" style={getFieldFontStyle(wealthTransfer, 'description')}>
                       {wealthTransfer?.description ||
                         "Placeholder content for Wealth Transfer & Legacy. Edit this from the Content Management page."}
                     </p>

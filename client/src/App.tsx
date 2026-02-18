@@ -1,4 +1,4 @@
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -116,31 +116,7 @@ function Router() {
 }
 
 function FontSettingsProvider({ children }: { children: React.ReactNode }) {
-  const [location] = useLocation();
-  const pageMap: Record<string, string> = {
-    '/': 'home',
-    '/about': 'about',
-    '/about/process': 'process',
-    '/services': 'services',
-    '/contact': 'contact',
-    '/calculators': 'calculators',
-    '/resources': 'resources',
-    '/resources/articles': 'resources',
-    '/resources/flipbooks': 'flipbooks',
-    '/resources/newsletters': 'newsletters',
-    '/blog': 'blog',
-    '/faq': 'resources',
-    '/privacy-policy': 'privacy_policy',
-    '/terms-of-service': 'terms_of_service',
-    '/disclosures': 'disclosures',
-    '/admin-dashboard': 'dashboard',
-    '/become-client': 'home',
-    '/location': 'about',
-    '/custodian': 'about',
-    '/profile': 'home',
-  };
-  const currentPage = pageMap[location] || 'home';
-  useFontSettings(currentPage);
+  useFontSettings();
   return <>{children}</>;
 }
 

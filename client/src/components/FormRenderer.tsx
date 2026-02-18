@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,6 +27,34 @@ import type { SectionSchema } from "@shared/contentSchemas";
 import { ArrayFieldEditor } from "./ArrayFieldEditor";
 import { RichTextEditor } from "./RichTextEditor";
 import * as LucideIcons from "lucide-react";
+import { Type, ChevronDown, ChevronUp } from "lucide-react";
+
+const fontFamilyOptions = [
+  { label: "Default", value: "" },
+  { label: "Roboto", value: "Roboto, sans-serif" },
+  { label: "Sanchez", value: "Sanchez, Georgia, serif" },
+  { label: "Inter", value: "Inter, sans-serif" },
+  { label: "Georgia", value: "Georgia, serif" },
+  { label: "Arial", value: "Arial, Helvetica, sans-serif" },
+  { label: "Times New Roman", value: "Times New Roman, serif" },
+  { label: "Verdana", value: "Verdana, sans-serif" },
+];
+
+const fontWeightOptions = [
+  { label: "Default", value: "" },
+  { label: "Light (300)", value: "300" },
+  { label: "Normal (400)", value: "400" },
+  { label: "Medium (500)", value: "500" },
+  { label: "Semi-Bold (600)", value: "600" },
+  { label: "Bold (700)", value: "700" },
+  { label: "Extra Bold (800)", value: "800" },
+];
+
+interface FieldFontStyle {
+  fontSize?: string;
+  fontFamily?: string;
+  fontWeight?: string;
+}
 
 interface FormRendererProps {
   schema: SectionSchema;
@@ -35,6 +64,111 @@ interface FormRendererProps {
   isSubmitting?: boolean;
 }
 
+function InlineFontSettings({
+  fieldName,
+  fontStyle,
+  onChange,
+}: {
+  fieldName: string;
+  fontStyle: FieldFontStyle;
+  onChange: (style: FieldFontStyle) => void;
+}) {
+  const [expanded, setExpanded] = useState(
+    !!(fontStyle.fontSize || fontStyle.fontFamily || fontStyle.fontWeight)
+  );
+
+  return (
+    <div className="mt-1 mb-2">
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <Type className="h-3 w-3" />
+        <span>Font Settings</span>
+        {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+      </button>
+      {expanded && (
+        <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-200 space-y-3">
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Size (px)</Label>
+              <Input
+                type="number"
+                step="0.5"
+                min="8"
+                max="72"
+                placeholder="Default"
+                value={fontStyle.fontSize || ""}
+                onChange={(e) => onChange({ ...fontStyle, fontSize: e.target.value })}
+                className="h-8 text-xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Family</Label>
+              <Select
+                value={fontStyle.fontFamily || ""}
+                onValueChange={(val) => onChange({ ...fontStyle, fontFamily: val })}
+              >
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue placeholder="Default" />
+                </SelectTrigger>
+                <SelectContent>
+                  {fontFamilyOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value || "__default__"}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Weight</Label>
+              <Select
+                value={fontStyle.fontWeight || ""}
+                onValueChange={(val) => onChange({ ...fontStyle, fontWeight: val })}
+              >
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue placeholder="Default" />
+                </SelectTrigger>
+                <SelectContent>
+                  {fontWeightOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value || "__default__"}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          {(fontStyle.fontSize || fontStyle.fontFamily || fontStyle.fontWeight) && (
+            <div className="p-2 bg-white rounded border">
+              <span
+                style={{
+                  fontSize: fontStyle.fontSize ? `${fontStyle.fontSize}px` : undefined,
+                  fontFamily: fontStyle.fontFamily && fontStyle.fontFamily !== "__default__" ? fontStyle.fontFamily : undefined,
+                  fontWeight: fontStyle.fontWeight && fontStyle.fontWeight !== "__default__" ? fontStyle.fontWeight : undefined,
+                }}
+              >
+                Preview: The quick brown fox
+              </span>
+            </div>
+          )}
+          {(fontStyle.fontSize || fontStyle.fontFamily || fontStyle.fontWeight) && (
+            <button
+              type="button"
+              onClick={() => onChange({ fontSize: "", fontFamily: "", fontWeight: "" })}
+              className="text-xs text-red-500 hover:text-red-700"
+            >
+              Reset to defaults
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function FormRenderer({
   schema,
   defaultValues,
@@ -42,10 +176,42 @@ export function FormRenderer({
   onCancel,
   isSubmitting = false,
 }: FormRendererProps) {
+  const cleanDefaults = { ...(defaultValues || {}) };
+  const initialFontStyles: Record<string, FieldFontStyle> = cleanDefaults._fontStyles || {};
+  delete cleanDefaults._fontStyles;
+
   const form = useForm({
     resolver: zodResolver(schema.schema),
-    defaultValues: defaultValues || {},
+    defaultValues: cleanDefaults,
   });
+
+  const [fontStyles, setFontStyles] = useState<Record<string, FieldFontStyle>>(initialFontStyles);
+
+  const updateFieldFontStyle = (fieldName: string, style: FieldFontStyle) => {
+    setFontStyles((prev) => ({ ...prev, [fieldName]: style }));
+  };
+
+  const handleSubmit = (data: any) => {
+    const cleanedStyles: Record<string, FieldFontStyle> = {};
+    for (const [key, style] of Object.entries(fontStyles)) {
+      const fs = style.fontSize || "";
+      const ff = style.fontFamily === "__default__" ? "" : (style.fontFamily || "");
+      const fw = style.fontWeight === "__default__" ? "" : (style.fontWeight || "");
+      if (fs || ff || fw) {
+        cleanedStyles[key] = {
+          ...(fs ? { fontSize: fs } : {}),
+          ...(ff ? { fontFamily: ff } : {}),
+          ...(fw ? { fontWeight: fw } : {}),
+        };
+      }
+    }
+    const hasStyles = Object.keys(cleanedStyles).length > 0;
+    onSubmit({ ...data, ...(hasStyles ? { _fontStyles: cleanedStyles } : {}) });
+  };
+
+  const isTextField = (control: string) => {
+    return control === "text" || control === "textarea" || control === "richtext";
+  };
 
   const renderField = (fieldName: string, meta: any) => {
     const { control, label, placeholder, help, options, min, max, rows } = meta;
@@ -205,7 +371,6 @@ export function FormRenderer({
       );
     }
 
-    // Handle icon picker (uses select with icon preview)
     if (control === "icon") {
       return (
         <FormField
@@ -258,7 +423,6 @@ export function FormRenderer({
       );
     }
 
-    // Default fallback to text input
     return (
       <FormField
         control={form.control}
@@ -279,10 +443,8 @@ export function FormRenderer({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         {Object.entries(schema.uiMeta).map(([fieldName, meta]) => {
-          // Check if this is an array field by looking at the fieldName
-          // Array fields like "stats", "features", "content", "links", "categories" need special handling
           const value = form.watch(fieldName);
           const isArrayField = Array.isArray(value) || 
             fieldName === 'stats' || 
@@ -304,7 +466,18 @@ export function FormRenderer({
             );
           }
 
-          return <div key={fieldName}>{renderField(fieldName, meta)}</div>;
+          return (
+            <div key={fieldName}>
+              {renderField(fieldName, meta)}
+              {isTextField(meta.control) && (
+                <InlineFontSettings
+                  fieldName={fieldName}
+                  fontStyle={fontStyles[fieldName] || {}}
+                  onChange={(style) => updateFieldFontStyle(fieldName, style)}
+                />
+              )}
+            </div>
+          );
         })}
 
         <div className="flex gap-2 pt-4">

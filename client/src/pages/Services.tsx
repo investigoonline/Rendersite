@@ -8,6 +8,7 @@ import type { PageContent } from "@shared/schema";
 import { HTMLContent } from "@/components/HTMLContent";
 import servicesImage from "@assets/Services_1765299577367.png";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
+import { getFieldFontStyle } from "@/hooks/useFieldFontStyles";
 
 interface ServiceContent {
   id: string;
@@ -63,7 +64,7 @@ export default function Services() {
   const ctaData = getSection("services_cta")?.content as any;
 
   // Extract services (excluding header, stats, and new sections)
-  const services: ServiceContent[] =
+  const services: (ServiceContent & { _fontStyles?: any })[] =
     servicesContent
       ?.filter(
         (c) =>
@@ -76,7 +77,7 @@ export default function Services() {
             "services_cta",
           ].includes(c.section),
       )
-      .map((content) => content.content as ServiceContent)
+      .map((content) => content.content as ServiceContent & { _fontStyles?: any })
       .filter((service) => service && service.id && service.title) || [];
 
   // Show loading state
@@ -187,12 +188,13 @@ export default function Services() {
                       />
                     </div>
                     <div>
-                      <CardTitle className="text-xl">{service.title}</CardTitle>
+                      <CardTitle className="text-xl" style={getFieldFontStyle(service, 'title')}>{service.title}</CardTitle>
                     </div>
                   </div>
                   <HTMLContent
                     content={service.description}
                     className="text-muted-foreground text-sm"
+                    style={getFieldFontStyle(service, 'description')}
                   />
                 </CardHeader>
                 <CardContent>

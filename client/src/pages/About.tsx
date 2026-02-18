@@ -8,6 +8,7 @@ import { HTMLContent } from "@/components/HTMLContent";
 import type { PageContent } from "@shared/schema";
 import aboutImage from "@assets/About_1765299432034.png";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
+import { getFieldFontStyle } from "@/hooks/useFieldFontStyles";
 
 export default function About() {
   const heroImage = useDynamicImage("about", "hero", aboutImage);
@@ -71,6 +72,7 @@ export default function About() {
             <h2
               className="text-4xl font-bold text-gray-900 mb-10"
               data-testid="text-story-title"
+              style={getFieldFontStyle(story, 'title')}
             >
               {story.title}
             </h2>
@@ -90,6 +92,7 @@ export default function About() {
             <h2
               className="text-4xl font-bold text-gray-900 text-center mb-12"
               data-testid="text-approach-section-title"
+              style={getFieldFontStyle(missionVision, 'title')}
             >
               {missionVision.title}
             </h2>

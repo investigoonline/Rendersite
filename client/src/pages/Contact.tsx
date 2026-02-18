@@ -20,6 +20,7 @@ import * as Icons from "lucide-react";
 import type { PageContent } from "@shared/schema";
 import contactImage from "@assets/Contact_Us_1765299919540.png";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
+import { getFieldFontStyle } from "@/hooks/useFieldFontStyles";
 
 export default function Contact() {
   const heroImage = useDynamicImage("contact", "hero", contactImage);
@@ -142,12 +143,13 @@ export default function Contact() {
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl" data-testid="text-form-title">
+                <CardTitle className="text-2xl" data-testid="text-form-title" style={getFieldFontStyle(formHeader, 'title')}>
                   {formHeader?.title || "Send us a Message"}
                 </CardTitle>
                 <p
                   className="text-muted-foreground"
                   data-testid="text-form-description"
+                  style={getFieldFontStyle(formHeader, 'description')}
                 >
                   {formHeader?.description ||
                     "Fill out the form below and we'll get back to you within 24 hours."}
