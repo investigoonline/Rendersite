@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText } from "lucide-react";
 import { HTMLContent } from "@/components/HTMLContent";
+import { getFieldFontStyle } from "@/hooks/useFieldFontStyles";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
 import termsHeroDefault from "@assets/TermsOfService_hero.png";
 import type { PageContent } from "@shared/schema";
@@ -52,10 +53,10 @@ export default function TermsOfService() {
           <Badge className="bg-primary/10 text-primary border-primary/20 mb-6">
             {badgeText}
           </Badge>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4" style={getFieldFontStyle(headerContent, 'title')}>
             {titleText}
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto whitespace-pre-wrap">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto whitespace-pre-wrap" style={getFieldFontStyle(headerContent, 'subtitle')}>
             {subtitleText}
           </p>
         </div>
@@ -65,7 +66,7 @@ export default function TermsOfService() {
             <div className="flex items-center space-x-3">
               <FileText className="h-8 w-8 text-primary" />
               <div>
-                <CardTitle className="text-2xl">
+                <CardTitle className="text-2xl" style={getFieldFontStyle(legalContent, 'title')}>
                   {legalContent?.title || "Terms of Service"}
                 </CardTitle>
                 {legalContent?.lastUpdated && (
@@ -79,7 +80,7 @@ export default function TermsOfService() {
           <CardContent className="pt-6">
             <div className="prose prose-gray max-w-none">
               {legalContent?.content ? (
-                <HTMLContent content={legalContent.content} />
+                <HTMLContent content={legalContent.content} style={getFieldFontStyle(legalContent, 'content')} />
               ) : (
                 <p className="text-muted-foreground">Terms of service content is being prepared. Please check back soon.</p>
               )}

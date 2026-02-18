@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import type { PageContent, RolePermission } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
+import { getFieldFontStyle } from "@/hooks/useFieldFontStyles";
 
 export default function Home() {
   const { user } = useAuth();
@@ -72,11 +73,11 @@ export default function Home() {
         {/* Hero Section */}
         <div className="space-y-6">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
-            <span className="text-gray-900">{heroContent?.titlePart1 || "Your Complete"} </span>
-            <span className="text-primary">{heroContent?.titleHighlight || "Financial Intelligence"} </span>
-            <span className="text-gray-900">{heroContent?.titlePart2 || "Platform"}</span>
+            <span className="text-gray-900" style={getFieldFontStyle(heroContent, 'titlePart1')}>{heroContent?.titlePart1 || "Your Complete"} </span>
+            <span className="text-primary" style={getFieldFontStyle(heroContent, 'titleHighlight')}>{heroContent?.titleHighlight || "Financial Intelligence"} </span>
+            <span className="text-gray-900" style={getFieldFontStyle(heroContent, 'titlePart2')}>{heroContent?.titlePart2 || "Platform"}</span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed" style={getFieldFontStyle(heroContent, 'subtitle')}>
             {heroContent?.subtitle || "Comprehensive financial planning tools, AI-driven insights, and personalized recommendations. From wealth management to retirement planning - all in one secure platform."}
           </p>
         </div>
@@ -85,10 +86,10 @@ export default function Home() {
         {calculatorCategoriesContent && filteredCategories.length > 0 && (
           <div className="mt-12">
             <div className="text-center mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3" style={getFieldFontStyle(calculatorCategoriesContent, 'title')}>
                 {calculatorCategoriesContent.title}
               </h2>
-              <p className="text-base text-gray-600 max-w-3xl mx-auto">
+              <p className="text-base text-gray-600 max-w-3xl mx-auto" style={getFieldFontStyle(calculatorCategoriesContent, 'subtitle')}>
                 {calculatorCategoriesContent.subtitle}
               </p>
             </div>

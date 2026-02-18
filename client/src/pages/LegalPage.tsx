@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HTMLContent } from "@/components/HTMLContent";
+import { getFieldFontStyle } from "@/hooks/useFieldFontStyles";
 import { FileText, Scale, Shield } from "lucide-react";
 
 interface LegalPageProps {
@@ -66,7 +67,7 @@ export default function LegalPage({ pageType }: LegalPageProps) {
             <div className="flex items-center space-x-3">
               <Icon className="h-8 w-8 text-primary" />
               <div>
-                <CardTitle className="text-2xl">
+                <CardTitle className="text-2xl" style={getFieldFontStyle(content, 'title')}>
                   {content?.title || config.defaultTitle}
                 </CardTitle>
                 {content?.lastUpdated && (
@@ -80,7 +81,7 @@ export default function LegalPage({ pageType }: LegalPageProps) {
           <CardContent className="pt-6">
             <div className="prose prose-gray max-w-none">
               {content?.content ? (
-                <HTMLContent content={content.content} />
+                <HTMLContent content={content.content} style={getFieldFontStyle(content, 'content')} />
               ) : (
                 <p className="text-muted-foreground">{config.defaultContent}</p>
               )}

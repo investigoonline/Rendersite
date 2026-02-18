@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import type { PageContent } from "@shared/schema";
 import { HTMLContent } from "@/components/HTMLContent";
+import { getFieldFontStyle } from "@/hooks/useFieldFontStyles";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
 import resourcesHeroDefault from "@assets/image_1765301156968.png";
 import { Link } from "wouter";
@@ -89,8 +90,8 @@ export default function Resources() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {pageHeader && (
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">{pageHeader.title}</h1>
-            <HTMLContent content={pageHeader.description} className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8" />
+            <h1 className="text-4xl font-bold text-gray-900 mb-4" style={getFieldFontStyle(pageHeader, 'title')}>{pageHeader.title}</h1>
+            <HTMLContent content={pageHeader.description} className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8" style={getFieldFontStyle(pageHeader, 'description')} />
           </div>
         )}
 
@@ -130,11 +131,11 @@ export default function Resources() {
                       const IconComponent = getIcon(becomeClientData.icon);
                       return <IconComponent className="h-5 w-5 mr-2 text-primary" />;
                     })()}
-                    <span>{becomeClientData.title}</span>
+                    <span style={getFieldFontStyle(becomeClientData, 'title')}>{becomeClientData.title}</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <HTMLContent content={becomeClientData.description} className="text-muted-foreground mb-4" />
+                  <HTMLContent content={becomeClientData.description} className="text-muted-foreground mb-4" style={getFieldFontStyle(becomeClientData, 'description')} />
                   {becomeClientData.benefits && becomeClientData.benefits.length > 0 && (
                     <ul className="space-y-2 text-sm text-muted-foreground mb-4">
                       {becomeClientData.benefits.map((benefit: string, index: number) => (
@@ -156,11 +157,11 @@ export default function Resources() {
                       const IconComponent = getIcon(needHelpData.icon);
                       return <IconComponent className="h-5 w-5 mr-2 text-secondary" />;
                     })()}
-                    <span>{needHelpData.title}</span>
+                    <span style={getFieldFontStyle(needHelpData, 'title')}>{needHelpData.title}</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <HTMLContent content={needHelpData.description} className="text-muted-foreground mb-4" />
+                  <HTMLContent content={needHelpData.description} className="text-muted-foreground mb-4" style={getFieldFontStyle(needHelpData, 'description')} />
                   {needHelpData.actions && needHelpData.actions.length > 0 && (
                     <div className="space-y-3">
                       {needHelpData.actions.map((action: any, index: number) => {

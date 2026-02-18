@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
 import aboutHeroDefault from "@assets/About_1765299432034.png";
 import type { PageContent } from "@shared/schema";
+import { getFieldFontStyle } from "@/hooks/useFieldFontStyles";
 
 export default function Process() {
   const heroImage = useDynamicImage("process", "hero", aboutHeroDefault);
@@ -56,7 +57,7 @@ export default function Process() {
 
       {/* Tagline Below Hero */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <p className="text-2xl text-center text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+        <p className="text-2xl text-center text-muted-foreground max-w-4xl mx-auto leading-relaxed" style={getFieldFontStyle(header, 'subtitle')}>
           {header?.subtitle || "A personalized approach to financial planning that adapts to your life's journey"}
         </p>
       </div>
@@ -65,12 +66,12 @@ export default function Process() {
         {/* Header Section */}
         {header && (
           <div className="max-w-6xl mx-auto mb-20">
-            <h2 className="text-4xl font-bold text-gray-900 mb-10">
+            <h2 className="text-4xl font-bold text-gray-900 mb-10" style={getFieldFontStyle(header, 'title')}>
               {header.title}
             </h2>
             <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
-              <p className="whitespace-pre-wrap">{header.introParagraph1}</p>
-              <p className="whitespace-pre-wrap">{header.introParagraph2}</p>
+              <p className="whitespace-pre-wrap" style={getFieldFontStyle(header, 'introParagraph1')}>{header.introParagraph1}</p>
+              <p className="whitespace-pre-wrap" style={getFieldFontStyle(header, 'introParagraph2')}>{header.introParagraph2}</p>
             </div>
           </div>
         )}
@@ -78,7 +79,7 @@ export default function Process() {
         {/* Process Steps Section */}
         {steps.length > 0 && (
           <div className="mb-20">
-            <h2 className="text-4xl font-bold text-gray-900 text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 text-center mb-12" style={getFieldFontStyle(header, 'stepsTitle')}>
               {header?.stepsTitle || "Our Process"}
             </h2>
             <div className="grid lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
@@ -90,10 +91,10 @@ export default function Process() {
                         <span className="text-3xl font-bold">{step.stepNumber}</span>
                       </div>
                       <div className="p-6 flex-1">
-                        <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-3" style={getFieldFontStyle(step, 'title')}>
                           {step.title}
                         </h3>
-                        <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                        <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap" style={getFieldFontStyle(step, 'description')}>
                           {step.description}
                         </p>
                       </div>

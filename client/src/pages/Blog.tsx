@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import type { PageContent } from "@shared/schema";
 import { HTMLContent } from "@/components/HTMLContent";
+import { getFieldFontStyle } from "@/hooks/useFieldFontStyles";
 
 export default function Blog() {
   const { toast } = useToast();
@@ -103,10 +104,10 @@ export default function Blog() {
                 {pageHeader.badge}
               </Badge>
             )}
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4" style={getFieldFontStyle(pageHeader, 'title')}>
               {pageHeader.title}
             </h1>
-            <HTMLContent content={pageHeader.description} className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8" />
+            <HTMLContent content={pageHeader.description} className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8" style={getFieldFontStyle(pageHeader, 'description')} />
           </div>
         )}
 
@@ -115,11 +116,11 @@ export default function Blog() {
           <div className="mb-12">
             <div className="flex items-center gap-2 mb-6">
               <Star className="h-5 w-5 text-primary" />
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-gray-900" style={getFieldFontStyle(featuredSection, 'title')}>
                 {featuredSection.title}
               </h2>
             </div>
-            <HTMLContent content={featuredSection.description} className="text-muted-foreground mb-6" />
+            <HTMLContent content={featuredSection.description} className="text-muted-foreground mb-6" style={getFieldFontStyle(featuredSection, 'description')} />
             <div className="grid md:grid-cols-3 gap-6">
               {featuredPosts.map((post: any) => (
                 <Card key={post.id} className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
@@ -136,7 +137,7 @@ export default function Blog() {
         {/* Categories Section */}
         {categoriesSection && categoriesSection.categories && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4" style={getFieldFontStyle(categoriesSection, 'title')}>
               {categoriesSection.title}
             </h2>
             <div className="flex flex-wrap gap-2">
@@ -243,10 +244,10 @@ export default function Blog() {
           <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
             <CardContent className="p-8 text-center">
               <TrendingUp className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4" style={getFieldFontStyle(ctaSection, 'title')}>
                 {ctaSection.title}
               </h2>
-              <HTMLContent content={ctaSection.description} className="text-muted-foreground mb-6 max-w-2xl mx-auto" />
+              <HTMLContent content={ctaSection.description} className="text-muted-foreground mb-6 max-w-2xl mx-auto" style={getFieldFontStyle(ctaSection, 'description')} />
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 {ctaSection.primaryButtonText && (
                   <Button
