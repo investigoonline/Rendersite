@@ -123,30 +123,37 @@ export default function RetirementCalculator({
   });
 
   const calculateRetirement = (data: RetirementForm) => {
-    const yearsToRetirement = data.retirementAge - data.currentAge;
-    const yearsInRetirement = data.lifeExpectancy - data.retirementAge;
+    const yearsToRetirement = Math.max(0, data.retirementAge - data.currentAge);
+    const yearsInRetirement = Math.max(1, data.lifeExpectancy - data.retirementAge);
     const realReturn = (data.expectedReturn - data.inflationRate) / 100;
-    const monthlyReturn = realReturn / 12;
     
-    // Calculate desired annual retirement income
     const desiredAnnualIncome = data.annualIncome * (data.desiredReplacement / 100);
     
-    // Calculate retirement goal (present value of annuity)
-    const retirementGoal = desiredAnnualIncome * 
-      (1 - Math.pow(1 + realReturn, -yearsInRetirement)) / realReturn;
+    let retirementGoal: number;
+    let projectedSavings: number;
     
-    // Calculate projected savings at retirement
-    const futureValueCurrentSavings = data.currentSavings * 
-      Math.pow(1 + realReturn, yearsToRetirement);
-    
-    const futureValueContributions = data.monthlyContribution * 12 * 
-      (Math.pow(1 + realReturn, yearsToRetirement) - 1) / realReturn;
-    
-    const projectedSavings = futureValueCurrentSavings + futureValueContributions;
+    if (Math.abs(realReturn) < 0.0001) {
+      retirementGoal = desiredAnnualIncome * yearsInRetirement;
+      projectedSavings = data.currentSavings + (data.monthlyContribution * 12 * yearsToRetirement);
+    } else {
+      retirementGoal = desiredAnnualIncome * 
+        (1 - Math.pow(1 + realReturn, -yearsInRetirement)) / realReturn;
+      const futureValueCurrentSavings = data.currentSavings * 
+        Math.pow(1 + realReturn, yearsToRetirement);
+      const futureValueContributions = data.monthlyContribution * 12 * 
+        (Math.pow(1 + realReturn, yearsToRetirement) - 1) / realReturn;
+      projectedSavings = futureValueCurrentSavings + futureValueContributions;
+    }
     
     const shortfall = Math.max(0, retirementGoal - projectedSavings);
-    const monthlyNeeded = shortfall > 0 ? 
-      (shortfall * realReturn) / (12 * (Math.pow(1 + realReturn, yearsToRetirement) - 1)) : 0;
+    let monthlyNeeded = 0;
+    if (shortfall > 0) {
+      if (Math.abs(realReturn) < 0.0001) {
+        monthlyNeeded = yearsToRetirement > 0 ? shortfall / (12 * yearsToRetirement) : shortfall;
+      } else {
+        monthlyNeeded = (shortfall * realReturn) / (12 * (Math.pow(1 + realReturn, yearsToRetirement) - 1));
+      }
+    }
 
     // Calculate RMD
     let rmdAmount;

@@ -175,7 +175,29 @@ export default function MortgageCalculator({
       let months = 0;
       let totalPaid = 0;
       const acceleratedPayment = basePayment + extraPayment;
-      while (balance > 0 && months < normalPayments) {
+      
+      if (monthlyRate > 0 && acceleratedPayment <= currentBalance * monthlyRate) {
+        accelerationMonthsSaved = 0;
+        accelerationInterestSaved = 0;
+        accelerationNewPayoff = remainingTerm;
+        setResults({
+          monthlyPayment: basePayment,
+          principal: currentBalance,
+          totalInterest: normalTotal - currentBalance,
+          totalPayments: normalTotal,
+          loanAmount: currentBalance,
+          downPaymentPercent: 0,
+          monthlyTaxInsurance: 0,
+          totalMonthlyPayment: acceleratedPayment,
+          accelerationMonthsSaved: 0,
+          accelerationInterestSaved: 0,
+          accelerationNewPayoff: remainingTerm,
+        });
+        return;
+      }
+      
+      const maxIterations = normalPayments * 3;
+      while (balance > 0 && months < maxIterations) {
         const interest = balance * monthlyRate;
         const principalPaid = Math.min(acceleratedPayment - interest, balance);
         balance = Math.max(0, balance - principalPaid);

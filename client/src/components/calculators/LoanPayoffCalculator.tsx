@@ -90,13 +90,48 @@ export default function LoanPayoffCalculator({
     const regularPayment = data.currentPayment;
     const totalPayment = regularPayment + data.extraPayment;
 
-    // Calculate regular payoff
+    if (regularPayment <= 0) {
+      toast({
+        title: "Invalid Input",
+        description: "Monthly payment must be greater than zero.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const monthlyInterest = data.principal * monthlyRate;
+    if (monthlyRate > 0 && regularPayment <= monthlyInterest) {
+      toast({
+        title: "Payment Too Low",
+        description: `Your monthly payment ($${regularPayment.toFixed(2)}) must exceed the monthly interest ($${monthlyInterest.toFixed(2)}) to pay off the loan.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (totalPayment <= 0) {
+      toast({
+        title: "Invalid Input",
+        description: "Total payment (current + extra) must be greater than zero.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (monthlyRate > 0 && totalPayment <= monthlyInterest) {
+      toast({
+        title: "Payment Too Low",
+        description: `Your total payment ($${totalPayment.toFixed(2)}) must exceed the monthly interest ($${monthlyInterest.toFixed(2)}) to pay off the loan.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     const regularMonths = monthlyRate > 0 
       ? -Math.log(1 - (data.principal * monthlyRate) / regularPayment) / Math.log(1 + monthlyRate)
       : data.principal / regularPayment;
 
-    // Calculate with extra payments
-    const acceleratedMonths = monthlyRate > 0 && totalPayment > 0
+    const acceleratedMonths = monthlyRate > 0
       ? -Math.log(1 - (data.principal * monthlyRate) / totalPayment) / Math.log(1 + monthlyRate)
       : data.principal / totalPayment;
 
@@ -105,10 +140,10 @@ export default function LoanPayoffCalculator({
 
     setResults({
       monthsToPayoff: Math.ceil(acceleratedMonths),
-      totalInterest: acceleratedTotalPayments - data.principal,
+      totalInterest: Math.max(0, acceleratedTotalPayments - data.principal),
       totalPayments: acceleratedTotalPayments,
-      interestSaved: (regularTotalPayments - data.principal) - (acceleratedTotalPayments - data.principal),
-      monthsSaved: Math.ceil(regularMonths - acceleratedMonths),
+      interestSaved: Math.max(0, (regularTotalPayments - data.principal) - (acceleratedTotalPayments - data.principal)),
+      monthsSaved: Math.max(0, Math.ceil(regularMonths - acceleratedMonths)),
     });
   };
 
