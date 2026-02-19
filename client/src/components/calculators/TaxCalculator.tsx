@@ -74,6 +74,8 @@ export default function TaxCalculator({
 }: TaxCalculatorProps = {}) {
   const { toast } = useToast();
   const [calculatorType, setCalculatorType] = useState(() => getInitialTab(calculatorName));
+  const initialTab = getInitialTab(calculatorName);
+  const showEstateTab = initialTab === "estate_tax";
   
   const { hasPermission, isLoading: permissionLoading } = useCalculatorPermission(calculatorName);
   
@@ -267,11 +269,11 @@ export default function TaxCalculator({
 
       <CardContent className="p-8">
         <Tabs value={calculatorType} onValueChange={setCalculatorType} className="mb-8">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className={`grid w-full ${showEstateTab ? 'grid-cols-4' : 'grid-cols-3'}`}>
             <TabsTrigger value="federal_tax">Federal Tax</TabsTrigger>
             <TabsTrigger value="tax_deferred">Tax-Deferred</TabsTrigger>
             <TabsTrigger value="ira_eligibility">IRA Eligibility</TabsTrigger>
-            <TabsTrigger value="estate_tax">Estate Tax</TabsTrigger>
+            {showEstateTab && <TabsTrigger value="estate_tax">Estate Tax</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="federal_tax" className="mt-6">
