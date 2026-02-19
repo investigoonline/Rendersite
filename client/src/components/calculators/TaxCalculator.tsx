@@ -85,8 +85,11 @@ export default function TaxCalculator({
     effectiveRate: number;
     marginalRate: number;
     estateRax?: number;
+    taxableEstate?: number;
     iraEligible?: boolean;
     iraContributionLimit?: number;
+    rothConversionTax?: number;
+    rothConversionNet?: number;
     taxSavings?: number;
   } | null>(null);
 
@@ -168,9 +171,12 @@ export default function TaxCalculator({
     const afterTaxIncome = data.annualIncome - totalTax;
     const effectiveRate = data.annualIncome > 0 ? (totalTax / data.annualIncome) * 100 : 0;
 
-    // Estate tax calculation
+    // Estate tax calculation - factor in charitable deductions
+    const taxableEstate = calculatorType === "estate_tax"
+      ? Math.max(0, data.estateValue - data.deductions - data.exemptionAmount)
+      : 0;
     const estateRax = calculatorType === "estate_tax" 
-      ? Math.max(0, (data.estateValue - data.exemptionAmount) * 0.40) 
+      ? taxableEstate * 0.40 
       : undefined;
 
     // IRA eligibility calculation
@@ -186,6 +192,14 @@ export default function TaxCalculator({
       ? data.iraContribution * marginalRate 
       : undefined;
 
+    // Roth IRA conversion calculation
+    const rothConversionTax = calculatorType === "ira_eligibility"
+      ? data.iraContribution * marginalRate
+      : undefined;
+    const rothConversionNet = calculatorType === "ira_eligibility"
+      ? data.iraContribution - (rothConversionTax || 0)
+      : undefined;
+
     setResults({
       federalTax,
       stateTax,
@@ -194,8 +208,11 @@ export default function TaxCalculator({
       effectiveRate: effectiveRate,
       marginalRate: marginalRate * 100,
       estateRax,
+      taxableEstate: calculatorType === "estate_tax" ? taxableEstate : undefined,
       iraEligible,
       iraContributionLimit,
+      rothConversionTax,
+      rothConversionNet,
       taxSavings,
     });
   };
@@ -548,9 +565,9 @@ export default function TaxCalculator({
           <TabsContent value="ira_eligibility" className="mt-6">
             <div className="text-center py-12">
               <FileText className="h-16 w-16 mx-auto text-primary/30 mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">IRA Eligibility Calculator</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">IRA Eligibility & Roth Conversion Calculator</h3>
               <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                Determine your eligibility for Traditional IRA and Roth IRA contributions based on income.
+                Determine your eligibility for Traditional IRA and Roth IRA contributions, and analyze conversion tax impact.
               </p>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(calculateTaxes)} className="space-y-6 max-w-2xl mx-auto">
@@ -583,10 +600,33 @@ export default function TaxCalculator({
                       </FormItem>
                     )} />
                   </div>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <FormField control={form.control} name="age" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Your Age</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="30" className="font-mono" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="iraContribution" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Conversion / Contribution Amount</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-500">$</span>
+                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
                   <div className="flex justify-center pt-4">
                     <Button type="submit" size="lg" className="px-8" disabled={!hasPermission || permissionLoading}>
                       {!hasPermission && <Lock className="mr-2 h-4 w-4" />}
-                      Check Eligibility
+                      Check Eligibility & Calculate
                     </Button>
                   </div>
                   {!hasPermission && !permissionLoading && (
@@ -624,6 +664,20 @@ export default function TaxCalculator({
                         <FormMessage />
                       </FormItem>
                     )} />
+                    <FormField control={form.control} name="exemptionAmount" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Federal Exemption Amount</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-500">$</span>
+                            <Input type="number" placeholder="12920000" className="pl-8 font-mono" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                  <div className="grid md:grid-cols-1 gap-6">
                     <FormField control={form.control} name="deductions" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Charitable Deductions</FormLabel>
@@ -689,28 +743,73 @@ export default function TaxCalculator({
             )}
 
             {calculatorType === "estate_tax" && results.estateRax !== undefined && (
-              <div className="text-center p-8 bg-primary/5 rounded-lg mb-8">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Federal Estate Tax</h3>
-                <div className="text-3xl font-bold font-mono text-primary mb-2">
-                  {formatCurrency(results.estateRax)}
+              <div className="space-y-6 mb-8">
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="text-center p-6 bg-primary/5 rounded-lg">
+                    <div className="text-2xl font-bold font-mono text-primary mb-2">
+                      {formatCurrency(form.getValues().estateValue)}
+                    </div>
+                    <div className="text-sm font-medium text-gray-700">Total Estate Value</div>
+                  </div>
+                  <div className="text-center p-6 bg-amber-50 rounded-lg">
+                    <div className="text-2xl font-bold font-mono text-amber-600 mb-2">
+                      {formatCurrency(results.taxableEstate || 0)}
+                    </div>
+                    <div className="text-sm font-medium text-gray-700">Taxable Estate</div>
+                  </div>
+                  <div className="text-center p-6 bg-red-50 rounded-lg">
+                    <div className="text-2xl font-bold font-mono text-red-600 mb-2">
+                      {formatCurrency(results.estateRax)}
+                    </div>
+                    <div className="text-sm font-medium text-gray-700">Federal Estate Tax (40%)</div>
+                  </div>
                 </div>
-                <p className="text-muted-foreground">Tax owed on estate value above federal exemption</p>
+                {results.estateRax === 0 && (
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <p className="text-green-700 font-medium">
+                      No estate tax owed — your estate value is below the federal exemption of {formatCurrency(form.getValues().exemptionAmount)}.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 
             {calculatorType === "ira_eligibility" && results.iraEligible !== undefined && (
-              <div className="grid md:grid-cols-2 gap-6 mb-8">
-                <div className="text-center p-6 bg-primary/5 rounded-lg">
-                  <div className="text-2xl font-bold text-primary mb-2">
-                    {results.iraEligible ? "Eligible" : "Not Eligible"}
+              <div className="space-y-6 mb-8">
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="text-center p-6 bg-primary/5 rounded-lg">
+                    <div className="text-2xl font-bold text-primary mb-2">
+                      {results.iraEligible ? "Eligible" : "Not Eligible"}
+                    </div>
+                    <div className="text-sm font-medium text-gray-700">IRA Eligibility</div>
                   </div>
-                  <div className="text-sm font-medium text-gray-700">IRA Eligibility</div>
+                  <div className="text-center p-6 bg-secondary/5 rounded-lg">
+                    <div className="text-2xl font-bold font-mono text-secondary mb-2">
+                      {formatCurrency(results.iraContributionLimit || 0)}
+                    </div>
+                    <div className="text-sm font-medium text-gray-700">Annual Contribution Limit</div>
+                  </div>
+                  {results.rothConversionTax !== undefined && results.rothConversionTax > 0 && (
+                    <>
+                      <div className="text-center p-6 bg-amber-50 rounded-lg">
+                        <div className="text-2xl font-bold font-mono text-amber-600 mb-2">
+                          {formatCurrency(results.rothConversionTax)}
+                        </div>
+                        <div className="text-sm font-medium text-gray-700">Conversion Tax Cost</div>
+                      </div>
+                      <div className="text-center p-6 bg-green-50 rounded-lg">
+                        <div className="text-2xl font-bold font-mono text-green-600 mb-2">
+                          {formatCurrency(results.rothConversionNet || 0)}
+                        </div>
+                        <div className="text-sm font-medium text-gray-700">Net After Conversion Tax</div>
+                      </div>
+                    </>
+                  )}
                 </div>
-                <div className="text-center p-6 bg-secondary/5 rounded-lg">
-                  <div className="text-2xl font-bold font-mono text-secondary mb-2">
-                    {formatCurrency(results.iraContributionLimit || 0)}
-                  </div>
-                  <div className="text-sm font-medium text-gray-700">Contribution Limit</div>
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <p className="text-gray-600 text-sm">
+                    Marginal tax rate: {results.marginalRate.toFixed(1)}% • Effective rate: {results.effectiveRate.toFixed(1)}%
+                  </p>
                 </div>
               </div>
             )}
