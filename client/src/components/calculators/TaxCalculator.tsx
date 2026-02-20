@@ -769,7 +769,17 @@ export default function TaxCalculator({
                 {results.estateRax === 0 && (
                   <div className="text-center p-4 bg-green-50 rounded-lg">
                     <p className="text-green-700 font-medium">
-                      No estate tax owed — your estate value is below the federal exemption of {formatCurrency(form.getValues().exemptionAmount)}.
+                      {form.getValues().estateValue <= form.getValues().exemptionAmount
+                        ? `No estate tax owed — your estate value of ${formatCurrency(form.getValues().estateValue)} is below the federal exemption of ${formatCurrency(form.getValues().exemptionAmount)}.`
+                        : `No estate tax owed — after applying the federal exemption of ${formatCurrency(form.getValues().exemptionAmount)} and charitable deductions of ${formatCurrency(form.getValues().deductions)}, your taxable estate is $0.`
+                      }
+                    </p>
+                  </div>
+                )}
+                {results.estateRax !== undefined && results.estateRax > 0 && (
+                  <div className="text-center p-4 bg-red-50 rounded-lg">
+                    <p className="text-red-700 font-medium">
+                      Your estate of {formatCurrency(form.getValues().estateValue)} exceeds the federal exemption of {formatCurrency(form.getValues().exemptionAmount)} by {formatCurrency(results.taxableEstate || 0)}, resulting in an estimated federal estate tax of {formatCurrency(results.estateRax)}.
                     </p>
                   </div>
                 )}
