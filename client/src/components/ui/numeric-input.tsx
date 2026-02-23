@@ -64,9 +64,15 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
       return sanitized;
     };
 
+    const stripLeadingZeros = (val: string): string => {
+      if (val === "" || val === "0") return val;
+      if (val.startsWith("0.")) return val;
+      return val.replace(/^0+/, "") || "0";
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const raw = e.target.value;
-      const sanitized = sanitize(raw);
+      const sanitized = stripLeadingZeros(sanitize(raw));
 
       Object.defineProperty(e, 'target', {
         writable: true,
