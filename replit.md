@@ -1,208 +1,74 @@
 # Overview
 
-InvestigooOnline is a financial planning platform built by IFS Group that provides comprehensive financial calculators, resources, and planning tools. The application serves both authenticated users and guest users, offering features like net worth tracking, loan calculations, mortgage planning, retirement planning, and educational resources. The platform emphasizes professional financial guidance with 40+ years of IFS Group expertise.
+InvestigooOnline is a financial planning platform by IFS Group offering comprehensive financial calculators, resources, and planning tools. It serves both authenticated and guest users with features like net worth tracking, loan, mortgage, and retirement planning, alongside educational content. The platform leverages over 40 years of IFS Group expertise to provide professional financial guidance.
 
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
 
-# Recent Changes
-
-## Resource Pages Separation (February 2026)
-- **Feature**: Separated Articles, Flipbooks, FAQs, and Newsletters into standalone pages instead of tabs
-- **Routes**: `/resources/articles`, `/resources/flipbooks`, `/resources/newsletters` (FAQ already at `/faq`)
-- **Resources Hub**: `/resources` now shows overview cards linking to each sub-page
-- **Navigation**: Header links updated to point to new standalone routes
-- **New Pages**: `Articles.tsx`, `Flipbooks.tsx`, `Newsletters.tsx`
-- **Impact**: Each resource type has its own dedicated page for better navigation
-
-## Legal Page Hero Banners (February 2026)
-- **Feature**: Added hero banners with CMS-editable headers to Terms of Service, Privacy Policy, and Disclosures pages
-- **Pages Created**: `TermsOfService.tsx`, `PrivacyPolicy.tsx` (standalone pages replacing LegalPage wrapper)
-- **Schemas**: Added `privacy_policy_header`, `terms_of_service_header` with badge/title/subtitle fields
-- **Database**: Added enum values for new header sections
-- **Hero Images**: All three legal pages have CMS-uploadable hero banners in Content Manager
-- **Process Page**: Added hero image entry to Content Manager for Our Process page banner editing
-- **Impact**: Content managers can edit banners and headers for all legal pages and Our Process page
-
-## Blog Page Implementation (October 2025)
-- **Feature**: Created dedicated Blog page redesigning flipbook articles section as a standalone blog
-- **Route**: Added `/blog` route accessible to all users
-- **Database**: Added blog sections to `content_section` enum (blog_header, blog_featured, blog_categories, blog_cta)
-- **Content Schemas**: Created 4 CMS-driven blog content schemas in contentSchemas.ts
-- **Page Sections**: Header with badge/title/description, Featured posts, Categories filter, Call-to-action
-- **Functionality**: Displays flipbook resources, category filtering, search, featured posts highlighting
-- **CMS Integration**: Fully editable from Content Management interface - no hardcoded content
-- **Impact**: Blog content completely manageable by Content Managers without code changes
-
-## Description Field Formatting Preservation (October 2025)
-- **Issue**: Content managers unable to save longer descriptions and formatting (line breaks, paragraphs) was not preserved when pasting content
-- **Solution**: 
-  - Removed all character limits from description fields across all content schemas
-  - Added `whitespace-pre-wrap` CSS class to all description display elements across all pages
-- **Database**: Already using `text` type in PostgreSQL (unlimited storage)
-- **Validation**: Removed `.max()` constraints from Zod schemas
-- **Display**: Added `whitespace-pre-wrap` to preserve line breaks and formatting while allowing text wrapping
-- **Pages Updated**: Services, Resources, Home (Landing), About, Contact
-- **Impact**: Content managers can now add descriptions of any length with preserved formatting (line breaks, paragraphs)
-
-## Dynamic Icon Support Fix (October 2025)
-- **Issue**: "Unknown icon name: Globe" error when using icons not in hardcoded iconMap
-- **Root Cause**: Services page had hardcoded list of only 6 icons (TrendingUp, Shield, PiggyBank, FileText, Users, Database)
-- **Solution**: Updated Services.tsx to dynamically import all Lucide icons using `import * as LucideIcons` and dynamic lookup
-- **Impact**: Services page now supports ALL Lucide React icons, not just the hardcoded 6
-
-## Icon Picker Fix (October 2025)
-- **Issue**: Icons were not updating when changed in content forms
-- **Root Cause**: Icon fields were using generic 'select' control instead of specialized 'icon' control
-- **Solution**: Changed all icon field controls from `control: 'select'` to `control: 'icon'` in contentSchemas
-- **Impact**: Icon picker now displays visual icon previews and updates work correctly
-
-## Content Section Title Display Fix (October 2025)
-- **Issue**: Multiple instances of same section type (e.g., two "Services Strategic") showed identical titles, making them hard to distinguish
-- **Root Cause**: Card titles displayed section type name instead of actual content title
-- **Solution**: Updated ContentManagement to display content.title when available, falling back to section type name
-- **Impact**: Each content section now shows its unique title (e.g., "Strategic Planning" vs "Strategic Investment")
-
-## Add Section Feature Fix (October 2025)
-- **Critical Fix**: Unable to add new service sections due to missing `allowMultiple` property
-- **Issue**: All service sections showed "Already exists" preventing content managers from adding multiple services
-- **Root Cause**: Service schemas didn't have `allowMultiple: true` flag, treating them as single-instance sections
-- **Solution**: Added `allowMultiple: true` to all 6 service section types (investment, strategic, legacy, risk, special, aggregation)
-- **Impact**: Content managers can now add multiple service items to services page
-
-## Content Update 500 Error Fix (October 2025)
-- **Critical Fix**: Database schema mismatch causing content updates to fail with 500 error
-- **Issue**: `page_content_history` table had `old_content`/`new_content` columns instead of single `content` column
-- **Root Cause**: Database table structure was out of sync with code schema
-- **Solution**: Altered table to match schema - dropped old columns, added `content`, `published`, `created_at`, `change_type`
-- **Impact**: Content updates now work reliably on first attempt
-
-## Application Pages and Routes Update (October 2025)
-- **Under Construction Page**: Created `/pages/UnderConstruction.tsx` for links not yet implemented
-- **New Routes Added**: Profile, Guest Access, Client Login, Mobile App, API Docs, Help Center, Leadership, Careers, Press, Privacy Policy, Terms of Service
-- **Link Audit**: Completed end-to-end testing of all navigation links across the application
-- **Missing Pages Inventory**: Documented all existing vs missing pages for future development
-- **Code Cleanup**: Removed external references from client-side code
-
-## User Role Persistence Fix (October 2025)
-- **Critical Fix**: Added `role` field to session data and login response
-- **Issue**: When user roles were updated in database, changes weren't reflected after logout/login
-- **Root Cause**: Login route only stored id, email, name, authType in session - role was missing
-- **Solution**: Include `role: user.role` in both session storage and login response
-- **Impact**: Role changes now persist correctly across login sessions
-
-## Production Login Fix (October 2025)
-- **Critical Fix**: Added explicit `session.save()` callback in login route to ensure session persists before response
-- **Issue**: In production, sessions weren't saving to database before redirect, causing login failures
-- **Solution**: Wrap response in `session.save()` callback to guarantee session persistence
-- **Impact**: Login now works reliably in both development and production environments
-
-## Roles Management System (October 2025)
-- **Database Schema**: Created `role_permissions` table with resource-based access control
-- **API Endpoints**: GET/POST `/api/admin/role-permissions` for reading and updating permissions
-- **Matrix View**: Hierarchical permission matrix with expandable categories and role checkboxes
-- **Database Integration**: Permissions persist across sessions, fully integrated with PostgreSQL
-- **Resource Types**: Pages, calculators, calculator categories, and resource types
-
-## Hero Image Management System (December 2025)
-- **Feature**: CMS-driven hero image upload and management for all major pages
-- **Database**: Added `image_assets` table to store uploaded image metadata (page, section, filePath, dimensions)
-- **Image Processing**: Sharp library for automatic resizing (max 1920px width) and WebP conversion
-- **File Handling**: Multer for multipart uploads with 10MB limit and type validation (JPEG, PNG, WebP, GIF)
-- **Storage**: Images stored in `/uploads/hero-images/` with static file serving
-- **CMS UI**: Added "Hero Images" tab to Content Management with upload/replace functionality per page
-- **Dynamic Loading**: `useDynamicImage` hook fetches dynamic images with bundled asset fallbacks
-- **Pages Updated**: Landing, About, Services, Contact, Calculators, FAQ, Resources
-- **Security**: Upload/delete endpoints protected by role middleware (super_admin, content_manager)
-- **Impact**: Content managers can upload/replace hero images without code changes; pages gracefully fall back to bundled images if no custom image is uploaded
-
 # System Architecture
 
-## Full-Stack Architecture
-The application follows a monorepo structure with separate client and server directories, built as a modern web application with React frontend and Express.js backend.
+The application is a monorepo with a React/TypeScript frontend and an Express.js/TypeScript backend, designed for modern web applications.
 
-### Frontend Architecture
-- **Framework**: React with TypeScript for type safety
-- **Routing**: Wouter for lightweight client-side routing
-- **State Management**: TanStack Query for server state management and caching
-- **UI Framework**: shadcn/ui components built on Radix UI primitives
-- **Styling**: Tailwind CSS with custom design tokens and CSS variables
-- **Forms**: React Hook Form with Zod validation for type-safe form handling
-- **Build Tool**: Vite for fast development and optimized production builds
+## Frontend Architecture
+- **Framework**: React with TypeScript.
+- **Routing**: Wouter.
+- **State Management**: TanStack Query for server state.
+- **UI Framework**: shadcn/ui built on Radix UI.
+- **Styling**: Tailwind CSS with custom design tokens.
+- **Forms**: React Hook Form with Zod validation.
+- **Build Tool**: Vite.
 
-### Backend Architecture
-- **Framework**: Express.js with TypeScript
-- **Database ORM**: Drizzle ORM for type-safe database operations
-- **API Design**: RESTful endpoints with consistent error handling
-- **Session Management**: Express sessions with PostgreSQL store
-- **File Structure**: Modular route handlers and storage layer abstraction
+## Backend Architecture
+- **Framework**: Express.js with TypeScript.
+- **Database ORM**: Drizzle ORM.
+- **API Design**: RESTful.
+- **Session Management**: Express sessions with PostgreSQL store.
 
-### Authentication System
-- **Primary Auth**: OpenID Connect integration for client authentication
-- **Guest Access**: Custom guest account system with email verification
-- **Session Storage**: PostgreSQL-backed sessions with configurable TTL
-- **Security**: HTTPS-only cookies, secure session management
+## Authentication System
+- **Primary Auth**: OpenID Connect.
+- **Guest Access**: Custom system with email verification.
+- **Session Storage**: PostgreSQL-backed sessions.
 
-### Database Design
-- **Primary Database**: PostgreSQL with Neon serverless driver
-- **Schema Management**: Drizzle migrations with type-safe schema definitions
-- **Key Tables**: Users, guest accounts, calculations, resources, contact messages, net worth snapshots
-- **Data Types**: Support for JSON storage, enums, UUIDs, and temporal data
+## Database Design
+- **Primary Database**: PostgreSQL with Neon serverless driver.
+- **Schema Management**: Drizzle migrations.
+- **Key Tables**: Users, guest accounts, calculations, resources, contact messages, net worth snapshots.
 
-### Calculator System
-- **Architecture**: Modular calculator components with shared validation schemas
-- **Data Flow**: Form validation → calculation logic → result display → optional persistence
-- **Calculator Types**: Net worth, loan payoff, mortgage, retirement, tax calculations
-- **Persistence**: Calculations can be saved for authenticated users and guests
+## Calculator System
+- **Architecture**: Modular components with shared validation schemas.
+- **Functionality**: Net worth, loan, mortgage, retirement, tax calculations.
+- **Persistence**: Calculations can be saved for authenticated users and guests.
 
-### Resource Management
-- **Content Types**: Articles, videos, newsletters, flipbooks, FAQs
-- **Categorization**: Type-based filtering and search functionality
-- **View Tracking**: Analytics for resource engagement
-- **Storage**: Database-driven content management
+## Resource Management
+- **Content Types**: Articles, videos, newsletters, flipbooks, FAQs.
+- **Functionality**: Type-based filtering, search, view tracking.
 
-### Content Management System (CMS)
-- **Role-Based Access**: Super Admins and Content Managers can manage all website content
-- **Schema-Driven Forms**: Content editing uses Zod schemas with UI metadata for type-safe validation
-- **Form Controls**: Text fields, textareas, numbers, dropdowns, switches, icon pickers, and array editors
-- **Dynamic Sections**: Content organized by page (home, services, contact, resources, footer)
-- **Add Section Feature**: Content managers can create new sections from predefined types per page
-- **Section Types**: Heroes, stats, features, service lists, contact methods, resource highlights
-- **Icon Integration**: Lucide React icons selectable via dropdown with type-safe mappings
-- **Array Management**: ArrayFieldEditor handles repeatable content (stats, features, links) with add/remove/reorder
-- **Security**: All CMS endpoints protected with requireRole middleware for super_admin and content_manager roles
+## Content Management System (CMS)
+- **Access**: Role-based (Super Admins, Content Managers).
+- **Content Editing**: Schema-driven forms using Zod with UI metadata.
+- **Controls**: Supports text, numbers, dropdowns, switches, icon pickers, and array editors.
+- **Dynamic Sections**: Content organized by page with ability to add new sections from predefined types.
+- **Icon Integration**: Lucide React icons are selectable.
+- **Hero Image Management**: CMS-driven upload and management for major pages, with automatic resizing and WebP conversion.
 
-## External Dependencies
+# External Dependencies
 
-### Database Services
-- **Neon PostgreSQL**: Serverless PostgreSQL hosting with connection pooling
-- **Connection**: WebSocket-based connections for serverless compatibility
+## Database Services
+- **Neon PostgreSQL**: Serverless PostgreSQL hosting.
 
-### Authentication Provider
-- **OpenID Connect**: Secure authentication integration for user access
-- **Environment**: Configured for production and development environments
+## Authentication Provider
+- **OpenID Connect**: For secure user authentication.
 
-### Development Tools
-- **Development Environment**: Plugins and runtime error handling for enhanced developer experience
-- **Vite Plugins**: Development visualization tools and runtime error modal
+## UI Dependencies
+- **Radix UI**: Accessible component primitives.
+- **Lucide Icons**: SVG icon library.
+- **Google Fonts**: Inter, JetBrains Mono.
 
-### UI Dependencies
-- **Radix UI**: Comprehensive accessible component primitives
-- **Lucide Icons**: SVG icon library for consistent iconography
-- **Font Loading**: Google Fonts integration (Inter, JetBrains Mono)
+## Form and Validation
+- **Zod**: Runtime type validation and schema definition.
+- **React Hook Form**: Form management.
 
-### Form and Validation
-- **Zod**: Runtime type validation and schema definition
-- **React Hook Form**: Performance-optimized form management
-- **Hookform Resolvers**: Zod integration for form validation
-
-### Data Fetching
-- **TanStack Query**: Server state management with caching and background updates
-- **Native Fetch**: HTTP client with credential support for API requests
-
-### Build and Development
-- **TypeScript**: Full type safety across client and server
-- **PostCSS**: CSS processing with Tailwind and Autoprefixer
-- **ESBuild**: Fast bundling for server-side code
-- **Path Aliases**: Simplified imports with @ and @shared prefixes
+## Data Fetching
+- **TanStack Query**: Server state management.
+- **Native Fetch**: HTTP client for API requests.

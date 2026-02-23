@@ -31,7 +31,6 @@ import {
 } from "lucide-react";
 import calculatorsImage from "@assets/Calculators_1765301634531.png";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
-import { usePagePermissions } from "@/hooks/usePagePermissions";
 import type { PageContent } from "@shared/schema";
 
 interface CalculatorCMSContent {
@@ -185,7 +184,6 @@ const calculatorCategories = [
 export default function Calculators() {
   const heroImage = useDynamicImage('calculators', 'hero', calculatorsImage);
   const { isAuthenticated, isGuestUser, isRegisteredUser, user } = useAuth();
-  const { hasCalculatorCategoryAccess, permissions, isLoading: permissionsLoading } = usePagePermissions();
   const { toast } = useToast();
   const [location] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState("wealth_management");
@@ -193,25 +191,12 @@ export default function Calculators() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loginModalOpen, setLoginModalOpen] = useState(false);
 
-  const hasCalcAccess = (categoryId: string): boolean => {
-    if (user?.role === 'super_admin') return true;
-    return hasCalculatorCategoryAccess(categoryId);
+  const hasCalcAccess = (_categoryId: string): boolean => {
+    return true;
   };
 
-  // Synchronize selectedCategory with user access level to prevent empty tabs
+  // Handle URL parameters for direct calculator access
   useEffect(() => {
-    if (permissionsLoading) return;
-    if (!hasCalcAccess(selectedCategory)) {
-      const firstAccessible = calculatorCategories.find(cat => hasCalcAccess(cat.id));
-      if (firstAccessible) {
-        setSelectedCategory(firstAccessible.id);
-      }
-    }
-  }, [permissions, permissionsLoading, selectedCategory]);
-
-  // Handle URL parameters for direct calculator access with access control
-  useEffect(() => {
-    if (permissionsLoading) return;
     const urlParams = new URLSearchParams(window.location.search);
     const calculator = urlParams.get('calculator');
     const category = urlParams.get('category');
@@ -221,30 +206,14 @@ export default function Calculators() {
         cat.calculators.some(calc => calc.id === calculator)
       );
       
-      if (foundCategory && hasCalcAccess(foundCategory.id)) {
+      if (foundCategory) {
         setSelectedCalculator(calculator);
         setSelectedCategory(foundCategory.id);
-      } else {
-        const firstAccessible = calculatorCategories.find(cat => hasCalcAccess(cat.id));
-        if (firstAccessible) setSelectedCategory(firstAccessible.id);
-        toast({
-          title: "Access Restricted",
-          description: "You don't have access to this calculator. Please log in or contact support.",
-          variant: "destructive",
-        });
       }
-    } else if (category && hasCalcAccess(category)) {
-      setSelectedCategory(category);
     } else if (category) {
-      const firstAccessible = calculatorCategories.find(cat => hasCalcAccess(cat.id));
-      if (firstAccessible) setSelectedCategory(firstAccessible.id);
-      toast({
-        title: "Access Restricted",
-        description: "You don't have access to this category.",
-        variant: "destructive",
-      });
+      setSelectedCategory(category);
     }
-  }, [location, permissions, permissionsLoading]);
+  }, [location]);
 
   // Get user's saved calculations
   const { data: savedCalculations } = useQuery<any[]>({
@@ -309,10 +278,7 @@ export default function Calculators() {
 
   const pageHeader = getPageHeader();
 
-  // Filter categories based on database-driven role permissions
-  const accessibleCategories = permissionsLoading 
-    ? [] 
-    : calculatorCategories.filter(category => hasCalcAccess(category.id));
+  const accessibleCategories = calculatorCategories;
 
   const filteredCategories = accessibleCategories.filter(category =>
     category.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -439,7 +405,7 @@ export default function Calculators() {
                 {accessibleCategories.reduce((total, cat) => total + cat.calculators.length, 0)}
               </div>
               <div className="text-sm text-muted-foreground">
-                {isAuthenticated ? "Total" : "Available"} Calculators
+Total Calculators
               </div>
             </CardContent>
           </Card>
@@ -448,7 +414,7 @@ export default function Calculators() {
               <PieChart className="h-8 w-8 text-secondary mx-auto mb-2" />
               <div className="text-2xl font-bold text-gray-900">{accessibleCategories.length}</div>
               <div className="text-sm text-muted-foreground">
-                {isAuthenticated ? "Total" : "Available"} Categories
+                Total Categories
               </div>
             </CardContent>
           </Card>
