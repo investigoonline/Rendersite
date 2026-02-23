@@ -12,6 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -314,8 +315,7 @@ export default function MortgageCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input
-                              type="number"
+                            <NumericInput
                               placeholder="0"
                               className="pl-8 font-mono"
                               {...field}
@@ -336,8 +336,7 @@ export default function MortgageCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input
-                              type="number"
+                            <NumericInput
                               placeholder="0"
                               className="pl-8 font-mono"
                               {...field}
@@ -358,8 +357,7 @@ export default function MortgageCalculator({
                           <FormLabel>Loan Term</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <Input
-                                type="number"
+                              <NumericInput
                                 placeholder="30"
                                 className="pr-16 font-mono"
                                 {...field}
@@ -380,9 +378,8 @@ export default function MortgageCalculator({
                           <FormLabel>Interest Rate</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <Input
-                                type="number"
-                                step="0.01"
+                              <NumericInput
+                               
                                 placeholder="0"
                                 className="pr-8 font-mono"
                                 {...field}
@@ -412,8 +409,7 @@ export default function MortgageCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input
-                              type="number"
+                            <NumericInput
                               placeholder="0"
                               className="pl-8 font-mono"
                               {...field}
@@ -434,8 +430,7 @@ export default function MortgageCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input
-                              type="number"
+                            <NumericInput
                               placeholder="0"
                               className="pl-8 font-mono"
                               {...field}
@@ -456,8 +451,7 @@ export default function MortgageCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input
-                              type="number"
+                            <NumericInput
                               placeholder="0"
                               className="pl-8 font-mono"
                               {...field}
@@ -478,8 +472,7 @@ export default function MortgageCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input
-                              type="number"
+                            <NumericInput
                               placeholder="0"
                               className="pl-8 font-mono"
                               {...field}
@@ -542,7 +535,7 @@ export default function MortgageCalculator({
                           <FormControl>
                             <div className="relative">
                               <span className="absolute left-3 top-3 text-gray-500">$</span>
-                              <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                              <NumericInput placeholder="0" className="pl-8 font-mono" {...field} />
                             </div>
                           </FormControl>
                           <FormMessage />
@@ -557,7 +550,7 @@ export default function MortgageCalculator({
                           <FormLabel>Current Interest Rate</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <Input type="number" step="0.01" placeholder="0" className="pr-8 font-mono" {...field} />
+                              <NumericInput placeholder="0" className="pr-8 font-mono" {...field} />
                               <span className="absolute right-3 top-3 text-gray-500">%</span>
                             </div>
                           </FormControl>
@@ -573,7 +566,7 @@ export default function MortgageCalculator({
                           <FormLabel>Remaining Term</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <Input type="number" placeholder="30" className="pr-16 font-mono" {...field} />
+                              <NumericInput placeholder="30" className="pr-16 font-mono" {...field} />
                               <span className="absolute right-3 top-3 text-gray-500">years</span>
                             </div>
                           </FormControl>
@@ -589,7 +582,7 @@ export default function MortgageCalculator({
                           <FormLabel>New Interest Rate</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <Input type="number" step="0.01" placeholder="0" className="pr-8 font-mono" {...field} />
+                              <NumericInput placeholder="0" className="pr-8 font-mono" {...field} />
                               <span className="absolute right-3 top-3 text-gray-500">%</span>
                             </div>
                           </FormControl>
@@ -636,7 +629,7 @@ export default function MortgageCalculator({
                           <FormControl>
                             <div className="relative">
                               <span className="absolute left-3 top-3 text-gray-500">$</span>
-                              <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                              <NumericInput placeholder="0" className="pl-8 font-mono" {...field} />
                             </div>
                           </FormControl>
                           <FormMessage />
@@ -651,7 +644,7 @@ export default function MortgageCalculator({
                           <FormLabel>Interest Rate</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <Input type="number" step="0.01" placeholder="0" className="pr-8 font-mono" {...field} />
+                              <NumericInput placeholder="0" className="pr-8 font-mono" {...field} />
                               <span className="absolute right-3 top-3 text-gray-500">%</span>
                             </div>
                           </FormControl>
@@ -667,7 +660,7 @@ export default function MortgageCalculator({
                           <FormLabel>Remaining Term</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <Input type="number" placeholder="30" className="pr-16 font-mono" {...field} />
+                              <NumericInput placeholder="30" className="pr-16 font-mono" {...field} />
                               <span className="absolute right-3 top-3 text-gray-500">years</span>
                             </div>
                           </FormControl>
@@ -684,7 +677,7 @@ export default function MortgageCalculator({
                           <FormControl>
                             <div className="relative">
                               <span className="absolute left-3 top-3 text-gray-500">$</span>
-                              <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                              <NumericInput placeholder="0" className="pl-8 font-mono" {...field} />
                             </div>
                           </FormControl>
                           <FormMessage />

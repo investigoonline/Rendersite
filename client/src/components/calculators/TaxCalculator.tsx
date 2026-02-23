@@ -12,6 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -318,8 +319,7 @@ export default function TaxCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input
-                              type="number"
+                            <NumericInput
                               placeholder="0"
                               className="pl-8 font-mono"
                               {...field}
@@ -340,8 +340,7 @@ export default function TaxCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input
-                              type="number"
+                            <NumericInput
                               placeholder="14600"
                               className="pl-8 font-mono"
                               {...field}
@@ -361,9 +360,7 @@ export default function TaxCalculator({
                         <FormLabel>State Tax Rate</FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <Input
-                              type="number"
-                              step="0.1"
+                            <NumericInput
                               placeholder="0"
                               className="pr-8 font-mono"
                               {...field}
@@ -398,8 +395,7 @@ export default function TaxCalculator({
                             <FormControl>
                               <div className="relative">
                                 <span className="absolute left-3 top-3 text-gray-500">$</span>
-                                <Input
-                                  type="number"
+                                <NumericInput
                                   placeholder="0"
                                   className="pl-8 font-mono"
                                   {...field}
@@ -419,8 +415,7 @@ export default function TaxCalculator({
                             <FormControl>
                               <div className="relative">
                                 <span className="absolute left-3 top-3 text-gray-500">$</span>
-                                <Input
-                                  type="number"
+                                <NumericInput
                                   placeholder="12920000"
                                   className="pl-8 font-mono"
                                   {...field}
@@ -443,8 +438,7 @@ export default function TaxCalculator({
                           <FormItem>
                             <FormLabel>Age</FormLabel>
                             <FormControl>
-                              <Input
-                                type="number"
+                              <NumericInput
                                 placeholder="30"
                                 className="font-mono"
                                 {...field}
@@ -463,8 +457,7 @@ export default function TaxCalculator({
                             <FormControl>
                               <div className="relative">
                                 <span className="absolute left-3 top-3 text-gray-500">$</span>
-                                <Input
-                                  type="number"
+                                <NumericInput
                                   placeholder="0"
                                   className="pl-8 font-mono"
                                   {...field}
@@ -526,7 +519,7 @@ export default function TaxCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                            <NumericInput placeholder="0" className="pl-8 font-mono" {...field} />
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -538,7 +531,7 @@ export default function TaxCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                            <NumericInput placeholder="0" className="pl-8 font-mono" {...field} />
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -595,7 +588,7 @@ export default function TaxCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                            <NumericInput placeholder="0" className="pl-8 font-mono" {...field} />
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -607,7 +600,7 @@ export default function TaxCalculator({
                       <FormItem>
                         <FormLabel>Your Age</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="30" className="font-mono" {...field} />
+                          <NumericInput placeholder="30" className="font-mono" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -618,7 +611,7 @@ export default function TaxCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                            <NumericInput placeholder="0" className="pl-8 font-mono" {...field} />
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -660,7 +653,7 @@ export default function TaxCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                            <NumericInput placeholder="0" className="pl-8 font-mono" {...field} />
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -672,7 +665,7 @@ export default function TaxCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input type="number" placeholder="12920000" className="pl-8 font-mono" {...field} />
+                            <NumericInput placeholder="12920000" className="pl-8 font-mono" {...field} />
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -686,7 +679,7 @@ export default function TaxCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input type="number" placeholder="0" className="pl-8 font-mono" {...field} />
+                            <NumericInput placeholder="0" className="pl-8 font-mono" {...field} />
                           </div>
                         </FormControl>
                         <FormMessage />

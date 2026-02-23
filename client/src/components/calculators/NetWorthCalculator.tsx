@@ -12,6 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -194,8 +195,7 @@ export default function NetWorthCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input
-                              type="number"
+                            <NumericInput
                               placeholder="0"
                               className="pl-8 font-mono"
                               {...field}
@@ -216,8 +216,7 @@ export default function NetWorthCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input
-                              type="number"
+                            <NumericInput
                               placeholder="0"
                               className="pl-8 font-mono"
                               {...field}
@@ -238,8 +237,7 @@ export default function NetWorthCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input
-                              type="number"
+                            <NumericInput
                               placeholder="0"
                               className="pl-8 font-mono"
                               {...field}
@@ -260,8 +258,7 @@ export default function NetWorthCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input
-                              type="number"
+                            <NumericInput
                               placeholder="0"
                               className="pl-8 font-mono"
                               {...field}
@@ -304,8 +301,7 @@ export default function NetWorthCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input
-                              type="number"
+                            <NumericInput
                               placeholder="0"
                               className="pl-8 font-mono"
                               {...field}
@@ -326,8 +322,7 @@ export default function NetWorthCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input
-                              type="number"
+                            <NumericInput
                               placeholder="0"
                               className="pl-8 font-mono"
                               {...field}
@@ -348,8 +343,7 @@ export default function NetWorthCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input
-                              type="number"
+                            <NumericInput
                               placeholder="0"
                               className="pl-8 font-mono"
                               {...field}
@@ -370,8 +364,7 @@ export default function NetWorthCalculator({
                         <FormControl>
                           <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-500">$</span>
-                            <Input
-                              type="number"
+                            <NumericInput
                               placeholder="0"
                               className="pl-8 font-mono"
                               {...field}
