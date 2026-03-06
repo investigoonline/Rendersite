@@ -129,7 +129,7 @@ export default function Flipbooks() {
         <div className="text-center mb-12">
           <Badge className="bg-primary/10 text-primary border-primary/20 mb-4">Resources</Badge>
           <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             {headerTitle}
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto whitespace-pre-wrap">

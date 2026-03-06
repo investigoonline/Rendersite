@@ -104,7 +104,7 @@ export default function Blog() {
                 {pageHeader.badge}
               </Badge>
             )}
-            <h1 className="text-4xl font-bold text-gray-900 mb-4" style={getFieldFontStyle(pageHeader, 'title')}>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4" style={getFieldFontStyle(pageHeader, 'title')}>
               {pageHeader.title}
             </h1>
             <HTMLContent content={pageHeader.description} className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8" style={getFieldFontStyle(pageHeader, 'description')} />

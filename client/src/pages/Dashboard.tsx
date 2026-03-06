@@ -113,7 +113,7 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900" data-testid="text-dashboard-title">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900" data-testid="text-dashboard-title">
             {headerContent?.title || 'System Admin Dashboard'}
           </h1>
           <p className="text-muted-foreground mt-2">

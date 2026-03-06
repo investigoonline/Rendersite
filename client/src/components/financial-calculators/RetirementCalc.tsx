@@ -99,7 +99,7 @@ export default function RetirementCalc() {
       <Card>
         <CardContent className="pt-6">
           <SectionTitle title="Personal & Timeline" />
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-2">
             <div>
               <label className="text-xs font-medium text-gray-700 block mb-1">Current Age</label>
               <NumericInput value={age} onChange={e => setAge(e.target.value)} allowDecimal={false} />
@@ -124,7 +124,7 @@ export default function RetirementCalc() {
           <Field label="Monthly contribution toward retirement?" value={monthlyContrib} onChange={setMonthlyContrib}
             tooltip="How much you contribute to retirement savings each month." />
           <SectionTitle title="Investment Assumptions" />
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <div className="flex items-center gap-1 mb-1">
                 <label className="text-xs font-medium text-gray-700">Pre-Ret. Return</label>

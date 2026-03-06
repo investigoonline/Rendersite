@@ -77,7 +77,7 @@ export default function CAGRCalc() {
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2">
               <Card>
                 <CardContent className="pt-4 text-center">
                   <p className="text-xs text-gray-500">Absolute Return</p>

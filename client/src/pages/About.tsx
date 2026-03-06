@@ -60,7 +60,7 @@ export default function About() {
 
       {/* Tagline Below Hero */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <p className="text-2xl text-center text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+        <p className="text-base sm:text-xl lg:text-2xl text-center text-muted-foreground max-w-4xl mx-auto leading-relaxed">
           Personal service, long-term financial independence, guided by fundamentals
         </p>
       </div>
@@ -70,13 +70,13 @@ export default function About() {
         {story && (
           <div className="max-w-6xl mx-auto mb-20">
             <h2
-              className="text-4xl font-bold text-gray-900 mb-10"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6 sm:mb-10"
               data-testid="text-story-title"
               style={getFieldFontStyle(story, 'title')}
             >
               {story.title}
             </h2>
-            <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
+            <div className="space-y-6 text-base sm:text-lg text-muted-foreground leading-relaxed">
               {story.paragraphs?.map((paragraph: string, index: number) => (
                 <p key={index} data-testid={`text-story-paragraph-${index}`}>
                   {paragraph}
@@ -90,7 +90,7 @@ export default function About() {
         {missionVision && (
           <div className="mb-20">
             <h2
-              className="text-4xl font-bold text-gray-900 text-center mb-12"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 text-center mb-8 sm:mb-12"
               data-testid="text-approach-section-title"
               style={getFieldFontStyle(missionVision, 'title')}
             >

@@ -95,7 +95,7 @@ export default function Articles() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
           <Badge className="bg-primary/10 text-primary border-primary/20 mb-4">Resources</Badge>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Articles</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">Articles</h1>
           {articleSection?.description && (
             <HTMLContent content={articleSection.description} className="text-muted-foreground max-w-3xl mx-auto" />
           )}

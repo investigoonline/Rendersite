@@ -64,7 +64,7 @@ export default function Location() {
           <Badge className="bg-primary/10 text-primary border-primary/20 mb-6">
             Global Presence
           </Badge>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Our Global Offices
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">

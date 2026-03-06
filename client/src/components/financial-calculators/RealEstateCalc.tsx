@@ -258,11 +258,11 @@ export default function RealEstateCalc() {
   return (
     <div>
       <Tabs defaultValue="equity">
-        <TabsList className="grid grid-cols-4 mb-6 w-full">
-          <TabsTrigger value="equity" className="text-xs sm:text-sm"><Home className="h-3 w-3 mr-1 hidden sm:inline" />Equity</TabsTrigger>
-          <TabsTrigger value="roi" className="text-xs sm:text-sm"><TrendingUp className="h-3 w-3 mr-1 hidden sm:inline" />ROI</TabsTrigger>
-          <TabsTrigger value="emi" className="text-xs sm:text-sm"><DollarSign className="h-3 w-3 mr-1 hidden sm:inline" />Mortgage EMI</TabsTrigger>
-          <TabsTrigger value="dti" className="text-xs sm:text-sm"><Shield className="h-3 w-3 mr-1 hidden sm:inline" />Affordability</TabsTrigger>
+        <TabsList className="grid grid-cols-2 sm:grid-cols-4 mb-6 w-full h-auto">
+          <TabsTrigger value="equity" className="text-xs sm:text-sm py-2"><Home className="h-3 w-3 mr-1 hidden sm:inline" />Equity</TabsTrigger>
+          <TabsTrigger value="roi" className="text-xs sm:text-sm py-2"><TrendingUp className="h-3 w-3 mr-1 hidden sm:inline" />ROI</TabsTrigger>
+          <TabsTrigger value="emi" className="text-xs sm:text-sm py-2"><DollarSign className="h-3 w-3 mr-1 hidden sm:inline" />Mortgage EMI</TabsTrigger>
+          <TabsTrigger value="dti" className="text-xs sm:text-sm py-2"><Shield className="h-3 w-3 mr-1 hidden sm:inline" />Affordability</TabsTrigger>
         </TabsList>
         <TabsContent value="equity"><EquityTab /></TabsContent>
         <TabsContent value="roi"><ROITab /></TabsContent>

@@ -115,7 +115,7 @@ export default function Disclosures() {
           <Badge className="bg-primary/10 text-primary border-primary/20 mb-6">
             {badgeText}
           </Badge>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4" style={getFieldFontStyle(headerContent, 'title')}>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4" style={getFieldFontStyle(headerContent, 'title')}>
             {titleText}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto whitespace-pre-wrap" style={getFieldFontStyle(headerContent, 'subtitle')}>

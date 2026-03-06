@@ -57,10 +57,10 @@ export default function BecomeClient() {
           <Badge className="bg-primary/10 text-primary border-primary/20 mb-6">
             Premium Client Services
           </Badge>
-          <h1 className="text-4xl font-bold text-gray-900 mb-6">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6">
             Take Your Financial Future to the Next Level
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-base sm:text-xl text-muted-foreground max-w-3xl mx-auto">
             Partner with our experienced financial advisors to create a comprehensive plan 
             tailored to your unique goals, backed by 40+ years of IFS Group expertise.
           </p>
@@ -100,7 +100,7 @@ export default function BecomeClient() {
         {/* Services */}
         <div className="mb-16">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Services</h2>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4">Our Services</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Comprehensive financial services designed to help you achieve your goals
             </p>
@@ -131,7 +131,7 @@ export default function BecomeClient() {
         {/* Client Benefits */}
         <div className="grid lg:grid-cols-2 gap-12 mb-16">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Client Benefits</h2>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-6">Client Benefits</h2>
             <p className="text-lg text-muted-foreground mb-8">
               As an IFS Group client, you'll enjoy exclusive access to our full suite of 
               financial planning tools and personalized advisory services.
@@ -238,8 +238,8 @@ export default function BecomeClient() {
 
         {/* Contact CTA */}
         <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
-          <CardContent className="p-12 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <CardContent className="p-6 sm:p-12 text-center">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4">
               Ready to Get Started?
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">

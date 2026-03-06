@@ -133,7 +133,7 @@ export default function Services() {
 
       {/* Tagline Below Hero */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <p className="text-2xl text-center text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+        <p className="text-base sm:text-xl lg:text-2xl text-center text-muted-foreground max-w-4xl mx-auto leading-relaxed">
           A complete life-stage-aware approach to your finances-investment strategy, protection, and legacy planning with 30+ years of proven expertise.
         </p>
       </div>
@@ -280,7 +280,7 @@ export default function Services() {
           >
             <div>
               <h2
-                className="text-3xl font-bold text-gray-900 mb-6"
+                className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6"
                 data-testid="text-why-choose-title"
               >
                 {whyChooseData.title}
@@ -364,16 +364,16 @@ export default function Services() {
             className="border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5"
             data-testid="section-cta"
           >
-            <CardContent className="p-12 text-center">
+            <CardContent className="p-6 sm:p-12 text-center">
               <h2
-                className="text-3xl font-bold text-gray-900 mb-4"
+                className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4"
                 data-testid="text-cta-title"
               >
                 {ctaData.title}
               </h2>
               <HTMLContent
                 content={ctaData.description}
-                className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto"
+                className="text-base sm:text-lg text-muted-foreground mb-8 max-w-2xl mx-auto"
                 data-testid="text-cta-description"
               />
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

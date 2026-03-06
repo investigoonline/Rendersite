@@ -92,7 +92,7 @@ export default function Contact() {
 
       {/* Tagline Below Hero */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <p className="text-2xl text-center text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+        <p className="text-base sm:text-xl lg:text-2xl text-center text-muted-foreground max-w-4xl mx-auto leading-relaxed">
           Ready to take control? Begin with a free consultation or connect with our expert team for personalized guidance
         </p>
       </div>

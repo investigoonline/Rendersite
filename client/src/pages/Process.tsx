@@ -57,7 +57,7 @@ export default function Process() {
 
       {/* Tagline Below Hero */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <p className="text-2xl text-center text-muted-foreground max-w-4xl mx-auto leading-relaxed" style={getFieldFontStyle(header, 'subtitle')}>
+        <p className="text-base sm:text-xl lg:text-2xl text-center text-muted-foreground max-w-4xl mx-auto leading-relaxed" style={getFieldFontStyle(header, 'subtitle')}>
           {header?.subtitle || "A personalized approach to financial planning that adapts to your life's journey"}
         </p>
       </div>
@@ -66,10 +66,10 @@ export default function Process() {
         {/* Header Section */}
         {header && (
           <div className="max-w-6xl mx-auto mb-20">
-            <h2 className="text-4xl font-bold text-gray-900 mb-10" style={getFieldFontStyle(header, 'title')}>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6 sm:mb-10" style={getFieldFontStyle(header, 'title')}>
               {header.title}
             </h2>
-            <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
+            <div className="space-y-6 text-base sm:text-lg text-muted-foreground leading-relaxed">
               <p className="whitespace-pre-wrap" style={getFieldFontStyle(header, 'introParagraph1')}>{header.introParagraph1}</p>
               <p className="whitespace-pre-wrap" style={getFieldFontStyle(header, 'introParagraph2')}>{header.introParagraph2}</p>
             </div>
@@ -79,7 +79,7 @@ export default function Process() {
         {/* Process Steps Section */}
         {steps.length > 0 && (
           <div className="mb-20">
-            <h2 className="text-4xl font-bold text-gray-900 text-center mb-12" style={getFieldFontStyle(header, 'stepsTitle')}>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 text-center mb-8 sm:mb-12" style={getFieldFontStyle(header, 'stepsTitle')}>
               {header?.stepsTitle || "Our Process"}
             </h2>
             <div className="grid lg:grid-cols-2 gap-6 max-w-6xl mx-auto">

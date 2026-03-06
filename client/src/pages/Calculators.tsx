@@ -338,7 +338,7 @@ export default function Calculators() {
             <Button variant="ghost" onClick={handleBackToList} className="mb-4">
               ← Back to Calculators
             </Button>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
               {displayTitle}
             </h1>
             <p className="text-muted-foreground mt-2 whitespace-pre-wrap">
@@ -469,7 +469,7 @@ Total Calculators
                     <CategoryIcon className="h-4 w-4 mr-1" />
                     {catTitle}
                   </Badge>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{catTitle}</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{catTitle}</h2>
                   <p className="text-muted-foreground whitespace-pre-wrap">{catDesc}</p>
                 </div>
 
