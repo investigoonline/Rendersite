@@ -93,13 +93,13 @@ function Field({ label, value, onChange, tooltip, suffix }: {
 }
 
 export default function IRACalc() {
-  const [age, setAge] = useState("35");
-  const [filingStatus, setFilingStatus] = useState<FilingStatus>("single");
-  const [magi, setMagi] = useState("85000");
-  const [earnedIncome, setEarnedIncome] = useState("90000");
-  const [employerPlan, setEmployerPlan] = useState("yes");
-  const [spousePlan, setSpousePlan] = useState("na");
-  const [plannedContrib, setPlannedContrib] = useState("6000");
+  const [age, setAge] = useState("");
+  const [filingStatus, setFilingStatus] = useState<FilingStatus | "">("");
+  const [magi, setMagi] = useState("");
+  const [earnedIncome, setEarnedIncome] = useState("");
+  const [employerPlan, setEmployerPlan] = useState("");
+  const [spousePlan, setSpousePlan] = useState("");
+  const [plannedContrib, setPlannedContrib] = useState("");
 
   const ageNum = nv(age);
   const magiNum = nv(magi);
@@ -112,8 +112,8 @@ export default function IRACalc() {
   const coveredByEmployer = employerPlan === "yes";
   const spouseCoveredBool = spousePlan === "yes";
 
-  const roth = getRothEligibility(magiNum, filingStatus);
-  const trad = getTradDeductibility(magiNum, filingStatus, coveredByEmployer, isMarried && spouseCoveredBool);
+  const roth = filingStatus ? getRothEligibility(magiNum, filingStatus as FilingStatus) : { eligibility: "ineligible" as const, allowedContrib: 0, reason: "Please select a filing status." };
+  const trad = filingStatus ? getTradDeductibility(magiNum, filingStatus as FilingStatus, coveredByEmployer, isMarried && spouseCoveredBool) : { status: "none" as const, reason: "Please select a filing status." };
   const plannedOk = plannedNum <= roth.allowedContrib && plannedNum <= effectiveLimit;
 
   return (
@@ -135,8 +135,8 @@ export default function IRACalc() {
 
           <div className="mb-4">
             <label className="text-sm font-medium text-gray-700 block mb-1">Tax filing status?</label>
-            <Select value={filingStatus} onValueChange={v => setFilingStatus(v as FilingStatus)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select value={filingStatus} onValueChange={v => setFilingStatus(v as FilingStatus | "")}>
+              <SelectTrigger><SelectValue placeholder="Select filing status" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="single">Single</SelectItem>
                 <SelectItem value="mfj">Married Filing Jointly</SelectItem>
@@ -154,7 +154,7 @@ export default function IRACalc() {
           <div className="mb-4">
             <label className="text-sm font-medium text-gray-700 block mb-1">Covered by employer retirement plan?</label>
             <Select value={employerPlan} onValueChange={setEmployerPlan}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="yes">Yes (401k, 403b, pension, etc.)</SelectItem>
                 <SelectItem value="no">No</SelectItem>
@@ -166,7 +166,7 @@ export default function IRACalc() {
             <div className="mb-4">
               <label className="text-sm font-medium text-gray-700 block mb-1">Is your spouse covered by an employer plan?</label>
               <Select value={spousePlan} onValueChange={setSpousePlan}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="yes">Yes</SelectItem>
                   <SelectItem value="no">No</SelectItem>

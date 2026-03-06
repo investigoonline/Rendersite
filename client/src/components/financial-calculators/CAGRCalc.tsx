@@ -31,9 +31,9 @@ function Field({ label, value, onChange, tooltip, suffix }: {
 }
 
 export default function CAGRCalc() {
-  const [bv, setBv] = useState("100000");
-  const [ev, setEv] = useState("180000");
-  const [years, setYears] = useState("5");
+  const [bv, setBv] = useState("");
+  const [ev, setEv] = useState("");
+  const [years, setYears] = useState("");
 
   const BV = nv(bv); const EV = nv(ev); const n = nv(years);
 

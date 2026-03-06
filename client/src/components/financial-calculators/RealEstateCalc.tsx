@@ -47,8 +47,8 @@ function ResultRow({ label, value, color }: { label: string; value: string; colo
 
 // Tab 1 — Equity
 function EquityTab() {
-  const [homeValue, setHomeValue] = useState("400000");
-  const [mortgageBalance, setMortgageBalance] = useState("250000");
+  const [homeValue, setHomeValue] = useState("");
+  const [mortgageBalance, setMortgageBalance] = useState("");
   const hv = n(homeValue); const mb = n(mortgageBalance);
   const equity = hv - mb;
   const equityPct = hv > 0 ? (equity / hv) * 100 : 0;
@@ -90,11 +90,11 @@ function EquityTab() {
 
 // Tab 2 — ROI
 function ROITab() {
-  const [purchasePrice, setPurchasePrice] = useState("300000");
-  const [purchaseDate, setPurchaseDate] = useState("2019-01-01");
-  const [currentValue, setCurrentValue] = useState("420000");
-  const [monthlyRent, setMonthlyRent] = useState("0");
-  const [annualExpenses, setAnnualExpenses] = useState("5000");
+  const [purchasePrice, setPurchasePrice] = useState("");
+  const [purchaseDate, setPurchaseDate] = useState("");
+  const [currentValue, setCurrentValue] = useState("");
+  const [monthlyRent, setMonthlyRent] = useState("");
+  const [annualExpenses, setAnnualExpenses] = useState("");
   const pp = n(purchasePrice); const cv = n(currentValue); const mr = n(monthlyRent); const ae = n(annualExpenses);
   const yearsOwned = purchaseDate ? Math.max(0, (Date.now() - new Date(purchaseDate).getTime()) / (365.25 * 24 * 3600 * 1000)) : 0;
   const appreciation = cv - pp;
@@ -151,9 +151,9 @@ function ROITab() {
 
 // Tab 3 — Mortgage EMI
 function MortgageEMITab() {
-  const [loanAmount, setLoanAmount] = useState("300000");
-  const [rate, setRate] = useState("7");
-  const [termYears, setTermYears] = useState("30");
+  const [loanAmount, setLoanAmount] = useState("");
+  const [rate, setRate] = useState("");
+  const [termYears, setTermYears] = useState("");
   const P = n(loanAmount); const annualRate = n(rate); const years = n(termYears);
   const r = annualRate / 100 / 12; const nMonths = years * 12;
   const emi = P > 0 && r > 0 && nMonths > 0
@@ -203,9 +203,9 @@ function MortgageEMITab() {
 
 // Tab 4 — DTI Affordability
 function AffordabilityTab() {
-  const [annualIncome, setAnnualIncome] = useState("80000");
-  const [monthlyDebt, setMonthlyDebt] = useState("500");
-  const [mortgagePayment, setMortgagePayment] = useState("1500");
+  const [annualIncome, setAnnualIncome] = useState("");
+  const [monthlyDebt, setMonthlyDebt] = useState("");
+  const [mortgagePayment, setMortgagePayment] = useState("");
   const ai = n(annualIncome); const md = n(monthlyDebt); const mp = n(mortgagePayment);
   const monthlyIncome = ai / 12;
   const dti = monthlyIncome > 0 ? ((md + mp) / monthlyIncome) * 100 : 0;

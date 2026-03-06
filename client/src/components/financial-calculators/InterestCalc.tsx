@@ -44,9 +44,9 @@ function ResultCard({ label, value, color, sub }: { label: string; value: string
 
 // 1. Simple Interest
 function SimpleInterest() {
-  const [principal, setPrincipal] = useState("100000");
-  const [rate, setRate] = useState("8");
-  const [years, setYears] = useState("3");
+  const [principal, setPrincipal] = useState("");
+  const [rate, setRate] = useState("");
+  const [years, setYears] = useState("");
   const P = nv(principal); const R = nv(rate); const T = nv(years);
   const si = P * (R / 100) * T;
   const total = P + si;
@@ -73,9 +73,9 @@ function SimpleInterest() {
 
 // 2. Compound Interest
 function CompoundInterest() {
-  const [principal, setPrincipal] = useState("100000");
-  const [rate, setRate] = useState("8");
-  const [years, setYears] = useState("3");
+  const [principal, setPrincipal] = useState("");
+  const [rate, setRate] = useState("");
+  const [years, setYears] = useState("");
   const [freq, setFreq] = useState("1");
   const P = nv(principal); const R = nv(rate); const T = nv(years); const N = nv(freq);
   const A = P * Math.pow(1 + (R / 100) / N, N * T);
@@ -131,7 +131,7 @@ function CompoundInterest() {
 
 // 3. Rule of 72
 function RuleOf72() {
-  const [rate, setRate] = useState("9");
+  const [rate, setRate] = useState("");
   const R = nv(rate);
   const years = R > 0 ? 72 / R : 0;
   return (
@@ -163,10 +163,10 @@ function RuleOf72() {
 
 // 4. Fixed vs Floating
 function FixedVsFloating() {
-  const [principal, setPrincipal] = useState("1000000");
-  const [fixedRate, setFixedRate] = useState("8");
-  const [floatRate, setFloatRate] = useState("7");
-  const [years, setYears] = useState("5");
+  const [principal, setPrincipal] = useState("");
+  const [fixedRate, setFixedRate] = useState("");
+  const [floatRate, setFloatRate] = useState("");
+  const [years, setYears] = useState("");
   const P = nv(principal); const rf = nv(fixedRate) / 100; const rfl = nv(floatRate) / 100; const T = nv(years);
   const aFixed = P * Math.pow(1 + rf, T);
   const aFloat = P * Math.pow(1 + rfl, T);
@@ -212,8 +212,8 @@ function FixedVsFloating() {
 
 // 5. Tax Rate Impact
 function TaxRateImpact() {
-  const [interest, setInterest] = useState("50000");
-  const [taxRate, setTaxRate] = useState("30");
+  const [interest, setInterest] = useState("");
+  const [taxRate, setTaxRate] = useState("");
   const I = nv(interest); const TR = nv(taxRate);
   const tax = I * (TR / 100);
   const afterTax = I - tax;
@@ -242,9 +242,9 @@ function TaxRateImpact() {
 
 // 6. Inflation Rate Impact
 function InflationImpact() {
-  const [pv, setPv] = useState("100000");
-  const [inflRate, setInflRate] = useState("6");
-  const [years, setYears] = useState("5");
+  const [pv, setPv] = useState("");
+  const [inflRate, setInflRate] = useState("");
+  const [years, setYears] = useState("");
   const PV = nv(pv); const infl = nv(inflRate) / 100; const T = nv(years);
   const realValue = PV / Math.pow(1 + infl, T);
   const nominalNeeded = PV * Math.pow(1 + infl, T);

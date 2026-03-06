@@ -40,16 +40,16 @@ function SectionTitle({ title }: { title: string }) {
 }
 
 export default function RetirementCalc() {
-  const [age, setAge] = useState("30");
-  const [retireAge, setRetireAge] = useState("65");
-  const [lifeExp, setLifeExp] = useState("85");
-  const [currentIncome, setCurrentIncome] = useState("80000");
-  const [desiredIncome, setDesiredIncome] = useState("60000");
-  const [currentSavings, setCurrentSavings] = useState("50000");
-  const [monthlyContrib, setMonthlyContrib] = useState("1000");
-  const [returnPre, setReturnPre] = useState("7");
-  const [returnPost, setReturnPost] = useState("5");
-  const [inflation, setInflation] = useState("3");
+  const [age, setAge] = useState("");
+  const [retireAge, setRetireAge] = useState("");
+  const [lifeExp, setLifeExp] = useState("");
+  const [currentIncome, setCurrentIncome] = useState("");
+  const [desiredIncome, setDesiredIncome] = useState("");
+  const [currentSavings, setCurrentSavings] = useState("");
+  const [monthlyContrib, setMonthlyContrib] = useState("");
+  const [returnPre, setReturnPre] = useState("");
+  const [returnPost, setReturnPost] = useState("");
+  const [inflation, setInflation] = useState("");
 
   const a = nv(age); const ra = nv(retireAge); const le = nv(lifeExp);
   const ci = nv(currentIncome); const di = nv(desiredIncome);
