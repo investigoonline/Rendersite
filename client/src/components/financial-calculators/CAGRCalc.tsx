@@ -4,6 +4,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { NumericInput } from "@/components/ui/numeric-input";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip, Legend, ResponsiveContainer, ReferenceLine } from "recharts";
 import { HelpCircle, TrendingUp } from "lucide-react";
+import CalculatorCTAs from "./CalculatorCTAs";
 
 function fmt(n: number) { return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
 function fmtPct(n: number) { return n.toFixed(2) + "%"; }
@@ -139,6 +140,7 @@ export default function CAGRCalc() {
             </CardContent>
           </Card>
         )}
+        <CalculatorCTAs />
       </div>
     </div>
   );

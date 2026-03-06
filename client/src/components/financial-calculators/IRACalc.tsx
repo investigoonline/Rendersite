@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { NumericInput } from "@/components/ui/numeric-input";
 import { Badge } from "@/components/ui/badge";
 import { HelpCircle, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import CalculatorCTAs from "./CalculatorCTAs";
 
 function nv(v: string) { return parseFloat(v) || 0; }
 function fmt(n: number) { return "$" + n.toLocaleString("en-US"); }
@@ -238,6 +239,7 @@ export default function IRACalc() {
             </div>
           </CardContent>
         </Card>
+        <CalculatorCTAs />
       </div>
     </div>
   );

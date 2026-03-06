@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { NumericInput } from "@/components/ui/numeric-input";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip, Legend, ResponsiveContainer } from "recharts";
 import { HelpCircle } from "lucide-react";
+import CalculatorCTAs from "./CalculatorCTAs";
 
 function fmt(n: number) { return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function nv(v: string) { return parseFloat(v) || 0; }
@@ -278,21 +279,24 @@ function InflationImpact() {
 
 export default function InterestCalc() {
   return (
-    <Tabs defaultValue="simple">
-      <TabsList className="flex flex-wrap gap-1 h-auto mb-6">
-        <TabsTrigger value="simple" className="text-xs">Simple Interest</TabsTrigger>
-        <TabsTrigger value="compound" className="text-xs">Compound Interest</TabsTrigger>
-        <TabsTrigger value="rule72" className="text-xs">Rule of 72</TabsTrigger>
-        <TabsTrigger value="fixedvsfloat" className="text-xs">Fixed vs Floating</TabsTrigger>
-        <TabsTrigger value="tax" className="text-xs">Tax Impact</TabsTrigger>
-        <TabsTrigger value="inflation" className="text-xs">Inflation Impact</TabsTrigger>
-      </TabsList>
-      <TabsContent value="simple"><SimpleInterest /></TabsContent>
-      <TabsContent value="compound"><CompoundInterest /></TabsContent>
-      <TabsContent value="rule72"><RuleOf72 /></TabsContent>
-      <TabsContent value="fixedvsfloat"><FixedVsFloating /></TabsContent>
-      <TabsContent value="tax"><TaxRateImpact /></TabsContent>
-      <TabsContent value="inflation"><InflationImpact /></TabsContent>
-    </Tabs>
+    <div>
+      <Tabs defaultValue="simple">
+        <TabsList className="flex flex-wrap gap-1 h-auto mb-6">
+          <TabsTrigger value="simple" className="text-xs">Simple Interest</TabsTrigger>
+          <TabsTrigger value="compound" className="text-xs">Compound Interest</TabsTrigger>
+          <TabsTrigger value="rule72" className="text-xs">Rule of 72</TabsTrigger>
+          <TabsTrigger value="fixedvsfloat" className="text-xs">Fixed vs Floating</TabsTrigger>
+          <TabsTrigger value="tax" className="text-xs">Tax Impact</TabsTrigger>
+          <TabsTrigger value="inflation" className="text-xs">Inflation Impact</TabsTrigger>
+        </TabsList>
+        <TabsContent value="simple"><SimpleInterest /></TabsContent>
+        <TabsContent value="compound"><CompoundInterest /></TabsContent>
+        <TabsContent value="rule72"><RuleOf72 /></TabsContent>
+        <TabsContent value="fixedvsfloat"><FixedVsFloating /></TabsContent>
+        <TabsContent value="tax"><TaxRateImpact /></TabsContent>
+        <TabsContent value="inflation"><InflationImpact /></TabsContent>
+      </Tabs>
+      <CalculatorCTAs />
+    </div>
   );
 }

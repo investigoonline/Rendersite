@@ -5,8 +5,8 @@ import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { NumericInput } from "@/components/ui/numeric-input";
 import { PieChart, Pie, Cell, Tooltip as ReTooltip, Legend, ResponsiveContainer } from "recharts";
-import { HelpCircle, ChevronRight, ChevronLeft, Calendar, Phone } from "lucide-react";
-import { Link } from "wouter";
+import { HelpCircle, ChevronRight, ChevronLeft } from "lucide-react";
+import CalculatorCTAs from "./CalculatorCTAs";
 
 const STEPS = ["Assets", "Real Estate", "Other Assets", "Liabilities"];
 
@@ -218,27 +218,7 @@ export default function NetWorthCalc() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-2 gap-3">
-          <Button asChild className="w-full bg-primary hover:bg-primary/90">
-            <Link href="/contact">
-              <Calendar className="h-4 w-4 mr-2" /> Book an Appointment
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-white">
-            <Link href="/contact">
-              <Phone className="h-4 w-4 mr-2" /> Speak to Expert
-            </Link>
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" size="sm" className="text-xs" onClick={() => alert("Save Snapshot: Sign in to save your net worth snapshot and track changes over time.")}>
-            Save Snapshot
-          </Button>
-          <Button variant="outline" size="sm" className="text-xs" onClick={() => alert("Compare to Previous: Sign in to compare your current net worth with past snapshots.")}>
-            Compare to Previous
-          </Button>
-        </div>
+        <CalculatorCTAs />
       </div>
     </div>
   );

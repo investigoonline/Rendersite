@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { NumericInput } from "@/components/ui/numeric-input";
 import { PieChart, Pie, Cell, Tooltip as ReTooltip, ResponsiveContainer, Legend } from "recharts";
 import { HelpCircle, Home, TrendingUp, DollarSign, Shield } from "lucide-react";
+import CalculatorCTAs from "./CalculatorCTAs";
 
 function fmt(n: number) { return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
 function fmtPct(n: number) { return n.toFixed(2) + "%"; }
@@ -268,6 +269,7 @@ export default function RealEstateCalc() {
         <TabsContent value="emi"><MortgageEMITab /></TabsContent>
         <TabsContent value="dti"><AffordabilityTab /></TabsContent>
       </Tabs>
+      <CalculatorCTAs />
     </div>
   );
 }

@@ -6,8 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { NumericInput } from "@/components/ui/numeric-input";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip, Legend, ResponsiveContainer, Cell } from "recharts";
 import { HelpCircle, TrendingUp, AlertTriangle, CheckCircle, BarChart2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import CalculatorCTAs from "./CalculatorCTAs";
 
 function fmt(n: number) { return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
 function fmtPct(n: number) { return n.toFixed(1) + "%"; }
@@ -253,10 +252,7 @@ export default function RetirementCalc() {
           </Card>
         )}
 
-        <div className="grid grid-cols-2 gap-3">
-          <Button asChild className="w-full"><Link href="/contact">Book Appointment</Link></Button>
-          <Button asChild variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-white"><Link href="/contact">Speak to Expert</Link></Button>
-        </div>
+        <CalculatorCTAs />
       </div>
     </div>
   );

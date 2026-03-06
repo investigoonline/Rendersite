@@ -5,7 +5,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { NumericInput } from "@/components/ui/numeric-input";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip, Legend, ResponsiveContainer } from "recharts";
 import { HelpCircle, Download, AlertTriangle, TrendingDown, CheckCircle } from "lucide-react";
-import { Link } from "wouter";
+import CalculatorCTAs from "./CalculatorCTAs";
 
 function fmt(n: number) {
   return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
@@ -246,6 +246,7 @@ export default function LoanPayoffCalc() {
             </CardContent>
           </Card>
         )}
+        <CalculatorCTAs />
       </div>
     </div>
   );
