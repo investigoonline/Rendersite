@@ -7,7 +7,16 @@ interface NumericInputProps extends Omit<React.ComponentProps<"input">, "type"> 
 }
 
 const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
-  ({ className, value, onChange, onFocus, onKeyDown, onPaste, allowDecimal = true, maxDecimals = 2, ...props }, ref) => {
+  ({ className, value, onChange, onFocus, onBlur, onKeyDown, onPaste, allowDecimal = true, maxDecimals = 2, ...props }, ref) => {
+
+    const [isFocused, setIsFocused] = React.useState(false);
+
+    const formatWithCommas = (val: string): string => {
+      if (!val) return val;
+      const parts = val.split(".");
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return parts.join(".");
+    };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (
@@ -83,6 +92,7 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
     };
 
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+      setIsFocused(true);
       const val = String(value ?? "");
       if (val === "0") {
         setTimeout(() => e.target.select(), 0);
@@ -90,11 +100,30 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
       onFocus?.(e);
     };
 
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+      setIsFocused(false);
+      onBlur?.(e);
+    };
+
     const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
       const pasted = e.clipboardData.getData("text");
-      if (/[^0-9.]/.test(pasted) || (pasted.split(".").length > 2)) {
+      const stripped = pasted.replace(/,/g, "");
+      if (/[^0-9.]/.test(stripped) || (stripped.split(".").length > 2)) {
         e.preventDefault();
-        const sanitized = sanitize(pasted);
+        const sanitized = sanitize(stripped);
+        if (sanitized && e.currentTarget) {
+          const input = e.currentTarget;
+          const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+            window.HTMLInputElement.prototype, 'value'
+          )?.set;
+          nativeInputValueSetter?.call(input, sanitized);
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        return;
+      }
+      if (stripped !== pasted) {
+        e.preventDefault();
+        const sanitized = sanitize(stripped);
         if (sanitized && e.currentTarget) {
           const input = e.currentTarget;
           const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
@@ -108,6 +137,9 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
       onPaste?.(e);
     };
 
+    const rawValue = String(value ?? "");
+    const displayValue = isFocused ? rawValue : formatWithCommas(rawValue);
+
     return (
       <input
         {...props}
@@ -117,10 +149,11 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
           className
         )}
         ref={ref}
-        value={value}
+        value={displayValue}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
+        onBlur={handleBlur}
         onPaste={handlePaste}
       />
     )
