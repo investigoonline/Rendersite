@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { NumericInput } from "@/components/ui/numeric-input";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip, Legend, ResponsiveContainer, Cell } from "recharts";
-import { HelpCircle, TrendingUp, AlertTriangle, CheckCircle } from "lucide-react";
+import { HelpCircle, TrendingUp, AlertTriangle, CheckCircle, BarChart2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 
@@ -28,7 +28,7 @@ function Field({ label, value, onChange, tooltip, suffix, placeholder }: {
       <div className="relative">
         {!suffix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm">$</span>}
         <NumericInput value={value} onChange={e => onChange(e.target.value)}
-          className={suffix ? "pr-10" : "pl-7"} placeholder={placeholder || "0"} />
+          className={suffix ? "pr-10" : "pl-7"} placeholder={placeholder || ""} />
         {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm">{suffix}</span>}
       </div>
     </div>
@@ -156,89 +156,102 @@ export default function RetirementCalc() {
 
       {/* Right: Results */}
       <div className="space-y-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-1">
-              <h3 className="font-bold text-gray-900">Retirement Outlook</h3>
-              <Badge className={replacementLabel.cls}>{replacementLabel.text}</Badge>
-            </div>
-            <p className="text-xs text-gray-500 mb-4">Replacement ratio: {fmtPct(replacementRatio)} • {yearsToRetire} yrs to retirement • {retirementYears} yrs in retirement</p>
-
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="bg-red-50 rounded-lg p-3 text-center">
-                <p className="text-xs text-gray-500">Required Nest Egg</p>
-                <p className="text-lg font-bold text-red-700">{fmt(Math.round(nestEgg))}</p>
-              </div>
-              <div className="bg-blue-50 rounded-lg p-3 text-center">
-                <p className="text-xs text-gray-500">Projected Savings</p>
-                <p className="text-lg font-bold text-primary">{fmt(Math.round(totalSavings))}</p>
-              </div>
-            </div>
-
-            <div className="mb-3">
-              <div className="flex justify-between text-xs text-gray-500 mb-1">
-                <span>Progress toward nest egg</span>
-                <span>{fmtPct(progressPct)}</span>
-              </div>
-              <Progress value={progressPct} className="h-3" />
-            </div>
-
-            <div className={`p-3 rounded-lg border ${isOnTrack ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"}`}>
-              <div className="flex items-start gap-2">
-                {isOnTrack
-                  ? <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                  : <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />}
-                <div>
-                  <p className={`text-sm font-semibold ${isOnTrack ? "text-green-800" : "text-red-800"}`}>
-                    {isOnTrack ? `Surplus: ${fmt(Math.round(gap))}` : `Shortfall: ${fmt(Math.round(Math.abs(gap)))}`}
-                  </p>
-                  <p className={`text-xs mt-0.5 ${isOnTrack ? "text-green-700" : "text-red-700"}`}>
-                    {isOnTrack
-                      ? "You are on track for a comfortable retirement. Keep it up!"
-                      : "Consider increasing your monthly contribution or adjusting your retirement age to close the gap."}
-                  </p>
+        {[age, currentIncome, currentSavings].some(v => v !== "") ? (
+          <>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="font-bold text-gray-900">Retirement Outlook</h3>
+                  <Badge className={replacementLabel.cls}>{replacementLabel.text}</Badge>
                 </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                <p className="text-xs text-gray-500 mb-4">Replacement ratio: {fmtPct(replacementRatio)} • {yearsToRetire} yrs to retirement • {retirementYears} yrs in retirement</p>
 
-        <Card>
-          <CardContent className="pt-4">
-            <p className="text-xs font-medium text-gray-600 mb-3">Savings Breakdown vs Required Corpus</p>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={chartData} margin={{ top: 5, right: 10, bottom: 5, left: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                <YAxis tick={{ fontSize: 10 }} tickFormatter={v => "$" + (v / 1000000 >= 1 ? (v / 1000000).toFixed(1) + "M" : (v / 1000).toFixed(0) + "k")} />
-                <ReTooltip formatter={(v: number) => fmt(v)} />
-                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                  {chartData.map((entry, i) => (
-                    <Cell key={i} fill={entry.fill} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="bg-red-50 rounded-lg p-3 text-center">
+                    <p className="text-xs text-gray-500">Required Nest Egg</p>
+                    <p className="text-lg font-bold text-red-700">{fmt(Math.round(nestEgg))}</p>
+                  </div>
+                  <div className="bg-blue-50 rounded-lg p-3 text-center">
+                    <p className="text-xs text-gray-500">Projected Savings</p>
+                    <p className="text-lg font-bold text-primary">{fmt(Math.round(totalSavings))}</p>
+                  </div>
+                </div>
 
-        <Card>
-          <CardContent className="pt-4">
-            <p className="text-xs font-medium text-gray-600 mb-3">Detailed Summary</p>
-            {[
-              ["Inflation-Adjusted Income Needed", fmt(Math.round(futureIncome)) + "/yr"],
-              ["FV of Current Savings", fmt(Math.round(fvSavings))],
-              ["FV of Monthly Contributions", fmt(Math.round(fvContrib))],
-              ["Total Projected Savings", fmt(Math.round(totalSavings))],
-              ["Required Nest Egg", fmt(Math.round(nestEgg))],
-            ].map(([label, val]) => (
-              <div key={label} className="flex justify-between items-center py-1.5 border-b last:border-0 text-xs">
-                <span className="text-gray-600">{label}</span>
-                <span className="font-semibold">{val}</span>
+                <div className="mb-3">
+                  <div className="flex justify-between text-xs text-gray-500 mb-1">
+                    <span>Progress toward nest egg</span>
+                    <span>{fmtPct(progressPct)}</span>
+                  </div>
+                  <Progress value={progressPct} className="h-3" />
+                </div>
+
+                <div className={`p-3 rounded-lg border ${isOnTrack ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"}`}>
+                  <div className="flex items-start gap-2">
+                    {isOnTrack
+                      ? <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      : <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />}
+                    <div>
+                      <p className={`text-sm font-semibold ${isOnTrack ? "text-green-800" : "text-red-800"}`}>
+                        {isOnTrack ? `Surplus: ${fmt(Math.round(gap))}` : `Shortfall: ${fmt(Math.round(Math.abs(gap)))}`}
+                      </p>
+                      <p className={`text-xs mt-0.5 ${isOnTrack ? "text-green-700" : "text-red-700"}`}>
+                        {isOnTrack
+                          ? "You are on track for a comfortable retirement. Keep it up!"
+                          : "Consider increasing your monthly contribution or adjusting your retirement age to close the gap."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-4">
+                <p className="text-xs font-medium text-gray-600 mb-3">Savings Breakdown vs Required Corpus</p>
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={chartData} margin={{ top: 5, right: 10, bottom: 5, left: 10 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                    <YAxis tick={{ fontSize: 10 }} tickFormatter={v => "$" + (v / 1000000 >= 1 ? (v / 1000000).toFixed(1) + "M" : (v / 1000).toFixed(0) + "k")} />
+                    <ReTooltip formatter={(v: number) => fmt(v)} />
+                    <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                      {chartData.map((entry, i) => (
+                        <Cell key={i} fill={entry.fill} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-4">
+                <p className="text-xs font-medium text-gray-600 mb-3">Detailed Summary</p>
+                {[
+                  ["Inflation-Adjusted Income Needed", fmt(Math.round(futureIncome)) + "/yr"],
+                  ["FV of Current Savings", fmt(Math.round(fvSavings))],
+                  ["FV of Monthly Contributions", fmt(Math.round(fvContrib))],
+                  ["Total Projected Savings", fmt(Math.round(totalSavings))],
+                  ["Required Nest Egg", fmt(Math.round(nestEgg))],
+                ].map(([label, val]) => (
+                  <div key={label} className="flex justify-between items-center py-1.5 border-b last:border-0 text-xs">
+                    <span className="text-gray-600">{label}</span>
+                    <span className="font-semibold">{val}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </>
+        ) : (
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex flex-col items-center justify-center py-10 text-center text-gray-400">
+                <BarChart2 className="h-10 w-10 mb-3 opacity-30" />
+                <p className="text-sm">Fill in your details on the left to see your retirement outlook.</p>
               </div>
-            ))}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="grid grid-cols-2 gap-3">
           <Button asChild className="w-full"><Link href="/contact">Book Appointment</Link></Button>

@@ -57,7 +57,7 @@ function FieldRow({ label, field, value, onChange, tooltip, suffix }: {
 }
 
 export default function LoanPayoffCalc() {
-  const [form, setForm] = useState({ balance: "10000", rate: "6", months: "60", payment: "200", extra: "0" });
+  const [form, setForm] = useState({ balance: "", rate: "", months: "", payment: "", extra: "" });
   const [showTable, setShowTable] = useState(false);
   const update = (field: string, val: string) => setForm(p => ({ ...p, [field]: val }));
 

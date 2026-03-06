@@ -29,7 +29,7 @@ function FieldRow({ label, value, onChange, tooltip, suffix, placeholder }: {
         {!suffix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm">$</span>}
         <NumericInput value={value} onChange={e => onChange(e.target.value)}
           className={suffix ? "pr-10" : "pl-7"}
-          placeholder={placeholder || "0"} />
+          placeholder={placeholder || ""} />
         {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm">{suffix}</span>}
       </div>
     </div>
@@ -212,6 +212,7 @@ function AffordabilityTab() {
   const risk = dti <= 36 ? { label: "Safe", color: "text-green-600", bg: "bg-green-50 border-green-200", badgeClass: "bg-green-100 text-green-800", msg: "Your debt-to-income ratio is within the safe range. Lenders will generally approve your mortgage application." }
     : dti <= 43 ? { label: "Moderate Risk", color: "text-amber-600", bg: "bg-amber-50 border-amber-200", badgeClass: "bg-amber-100 text-amber-800", msg: "Your DTI is moderate. Most lenders will accept this, but you have limited financial flexibility." }
     : { label: "High Risk", color: "text-red-600", bg: "bg-red-50 border-red-200", badgeClass: "bg-red-100 text-red-800", msg: "Your DTI exceeds 43%. Many lenders may decline your application. Consider reducing existing debts first." };
+  const hasData = !!(annualIncome || monthlyDebt || mortgagePayment);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -223,21 +224,30 @@ function AffordabilityTab() {
       </CardContent></Card>
       <Card><CardContent className="pt-6">
         <h3 className="font-bold text-gray-900 mb-4">Affordability Analysis</h3>
-        <ResultRow label="Monthly Income" value={fmt(Math.round(monthlyIncome))} />
-        <ResultRow label="Total Monthly Debt" value={fmt(md + mp)} />
-        <div className="mt-4 text-center">
-          <p className="text-xs text-gray-500 mb-1">Debt-to-Income Ratio</p>
-          <p className={`text-5xl font-bold ${risk.color}`}>{dti.toFixed(1)}%</p>
-          <Badge className={`mt-2 ${risk.badgeClass}`}>{risk.label}</Badge>
-        </div>
-        <Progress value={Math.min(100, dti)} className="h-3 mt-4" />
-        <div className="flex justify-between text-xs text-gray-400 mt-1">
-          <span>0%</span><span className="text-green-600">36%</span><span className="text-amber-600">43%</span><span>100%+</span>
-        </div>
-        <div className={`mt-4 p-3 rounded-lg border ${risk.bg}`}>
-          <p className={`text-sm font-medium ${risk.color}`}>{risk.label}</p>
-          <p className="text-xs text-gray-600 mt-1">{risk.msg}</p>
-        </div>
+        {hasData ? (
+          <>
+            <ResultRow label="Monthly Income" value={fmt(Math.round(monthlyIncome))} />
+            <ResultRow label="Total Monthly Debt" value={fmt(md + mp)} />
+            <div className="mt-4 text-center">
+              <p className="text-xs text-gray-500 mb-1">Debt-to-Income Ratio</p>
+              <p className={`text-5xl font-bold ${risk.color}`}>{dti.toFixed(1)}%</p>
+              <Badge className={`mt-2 ${risk.badgeClass}`}>{risk.label}</Badge>
+            </div>
+            <Progress value={Math.min(100, dti)} className="h-3 mt-4" />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0%</span><span className="text-green-600">36%</span><span className="text-amber-600">43%</span><span>100%+</span>
+            </div>
+            <div className={`mt-4 p-3 rounded-lg border ${risk.bg}`}>
+              <p className={`text-sm font-medium ${risk.color}`}>{risk.label}</p>
+              <p className="text-xs text-gray-600 mt-1">{risk.msg}</p>
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-10 text-center text-gray-400">
+            <Shield className="h-10 w-10 mb-3 opacity-30" />
+            <p className="text-sm">Enter your income and debt details to see your affordability analysis.</p>
+          </div>
+        )}
       </CardContent></Card>
     </div>
   );

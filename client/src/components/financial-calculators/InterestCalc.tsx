@@ -25,7 +25,7 @@ function Field({ label, value, onChange, tooltip, suffix, placeholder }: {
       <div className="relative">
         {!suffix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>}
         <NumericInput value={value} onChange={e => onChange(e.target.value)}
-          className={suffix ? "pr-10" : "pl-7"} placeholder={placeholder || "0"} />
+          className={suffix ? "pr-10" : "pl-7"} placeholder={placeholder || ""} />
         {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">{suffix}</span>}
       </div>
     </div>
