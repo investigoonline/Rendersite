@@ -63,9 +63,6 @@ function EquityTab() {
         <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2"><Home className="h-4 w-4 text-primary" /> Home Equity</h3>
         <FieldRow label="Current home market value?" value={homeValue} onChange={setHomeValue} tooltip="The current estimated market value of your home." />
         <FieldRow label="Outstanding mortgage balance?" value={mortgageBalance} onChange={setMortgageBalance} tooltip="The remaining balance you owe on your mortgage." />
-        <div className="mt-4 p-3 bg-blue-50 rounded-lg text-xs text-blue-700">
-          <strong>Formula:</strong> Equity = Home Value − Mortgage Balance
-        </div>
       </CardContent></Card>
       <Card><CardContent className="pt-6">
         <h3 className="font-bold text-gray-900 mb-4">Your Home Equity</h3>
@@ -176,9 +173,6 @@ function MortgageEMITab() {
         <FieldRow label="Loan amount?" value={loanAmount} onChange={setLoanAmount} tooltip="The total mortgage loan amount." />
         <FieldRow label="Annual mortgage interest rate (%)?" value={rate} onChange={v => setRate(v)} tooltip="The annual interest rate on your mortgage." suffix="%" />
         <FieldRow label="Loan term (years)?" value={termYears} onChange={setTermYears} tooltip="The total number of years for the mortgage." suffix="yrs" />
-        <div className="mt-4 p-3 bg-blue-50 rounded-lg text-xs text-blue-700">
-          <strong>Formula:</strong> M = P × r(1+r)^n / ((1+r)^n − 1) where r = rate/12/100, n = years × 12
-        </div>
       </CardContent></Card>
       <Card><CardContent className="pt-6">
         <h3 className="font-bold text-gray-900 mb-4">Monthly Payment</h3>
@@ -226,9 +220,6 @@ function AffordabilityTab() {
         <FieldRow label="Annual income?" value={annualIncome} onChange={setAnnualIncome} tooltip="Your total gross annual income before taxes." />
         <FieldRow label="Monthly debt payments (existing loans, credit cards, etc.)?" value={monthlyDebt} onChange={setMonthlyDebt} tooltip="Total of all existing monthly debt obligations excluding the proposed mortgage." />
         <FieldRow label="Proposed mortgage payment?" value={mortgagePayment} onChange={setMortgagePayment} tooltip="The monthly mortgage payment you are applying for." />
-        <div className="mt-4 p-3 bg-blue-50 rounded-lg text-xs text-blue-700">
-          <strong>Formula:</strong> DTI = (Monthly Debt + Mortgage) / Monthly Income × 100
-        </div>
       </CardContent></Card>
       <Card><CardContent className="pt-6">
         <h3 className="font-bold text-gray-900 mb-4">Affordability Analysis</h3>

@@ -58,9 +58,6 @@ function SimpleInterest() {
         <Field label="Principal amount (P)" value={principal} onChange={setPrincipal} tooltip="The initial amount of money." placeholder="100000" />
         <Field label="Annual interest rate (%)" value={rate} onChange={setRate} tooltip="The annual interest rate." suffix="%" placeholder="8" />
         <Field label="Time period (years)" value={years} onChange={setYears} tooltip="Duration in years." suffix="yrs" placeholder="3" />
-        <div className="p-3 bg-blue-50 rounded-lg mt-2 text-xs text-blue-700">
-          <strong>Formula:</strong> SI = P × (R/100) × T &nbsp;|&nbsp; Total = P + SI
-        </div>
       </CardContent></Card>
       <Card><CardContent className="pt-6">
         <h3 className="font-bold text-gray-900 mb-4">Results</h3>
@@ -109,9 +106,6 @@ function CompoundInterest() {
             </SelectContent>
           </Select>
         </div>
-        <div className="p-3 bg-blue-50 rounded-lg text-xs text-blue-700">
-          <strong>Formula:</strong> A = P × (1 + R/N)^(N×T); CI = A − P
-        </div>
       </CardContent></Card>
       <Card><CardContent className="pt-6">
         <h3 className="font-bold text-gray-900 mb-3">Results</h3>
@@ -146,9 +140,6 @@ function RuleOf72() {
         <h3 className="font-semibold text-gray-800 mb-1">Rule of 72</h3>
         <p className="text-xs text-gray-500 mb-4">Quickly estimate how many years it takes to double your investment.</p>
         <Field label="Expected annual interest rate (%)" value={rate} onChange={setRate} tooltip="Your expected annual return rate." suffix="%" placeholder="9" />
-        <div className="p-3 bg-blue-50 rounded-lg mt-2 text-xs text-blue-700">
-          <strong>Formula:</strong> Years to Double ≈ 72 / Rate(%)
-        </div>
       </CardContent></Card>
       <Card><CardContent className="pt-6">
         <h3 className="font-bold text-gray-900 mb-6">Result</h3>
@@ -190,9 +181,6 @@ function FixedVsFloating() {
         <Field label="Fixed nominal annual rate (%)" value={fixedRate} onChange={setFixedRate} tooltip="The fixed interest rate." suffix="%" placeholder="8" />
         <Field label="Floating nominal annual rate (%)" value={floatRate} onChange={setFloatRate} tooltip="The variable interest rate (assumed constant for comparison)." suffix="%" placeholder="7" />
         <Field label="Period (years)" value={years} onChange={setYears} tooltip="Duration of the loan/investment." suffix="yrs" placeholder="5" />
-        <div className="p-3 bg-blue-50 rounded-lg text-xs text-blue-700 mt-1">
-          <strong>Formula:</strong> A = P × (1 + R)^T for each rate
-        </div>
       </CardContent></Card>
       <Card><CardContent className="pt-6">
         <h3 className="font-bold text-gray-900 mb-4">Comparison</h3>
@@ -236,9 +224,6 @@ function TaxRateImpact() {
         <p className="text-xs text-gray-500 mb-4">See how taxes reduce your effective interest income.</p>
         <Field label="Interest earned" value={interest} onChange={setInterest} tooltip="Total interest income earned." placeholder="50000" />
         <Field label="Applicable tax rate (%)" value={taxRate} onChange={setTaxRate} tooltip="Your marginal tax rate applicable to interest income." suffix="%" placeholder="30" />
-        <div className="p-3 bg-blue-50 rounded-lg mt-2 text-xs text-blue-700">
-          <strong>Formula:</strong> After-Tax = I × (1 − Tax%/100)
-        </div>
       </CardContent></Card>
       <Card><CardContent className="pt-6">
         <h3 className="font-bold text-gray-900 mb-4">Results</h3>
@@ -272,9 +257,6 @@ function InflationImpact() {
         <Field label="Present value / amount today" value={pv} onChange={setPv} tooltip="The current amount in today's dollars." placeholder="100000" />
         <Field label="Expected annual inflation rate (%)" value={inflRate} onChange={setInflRate} tooltip="The expected average annual inflation rate." suffix="%" placeholder="6" />
         <Field label="Years into the future" value={years} onChange={setYears} tooltip="How many years ahead you want to project." suffix="yrs" placeholder="5" />
-        <div className="p-3 bg-blue-50 rounded-lg mt-2 text-xs text-blue-700">
-          <strong>Formula:</strong> Real Value = PV / (1 + Inflation)^T
-        </div>
       </CardContent></Card>
       <Card><CardContent className="pt-6">
         <h3 className="font-bold text-gray-900 mb-4">Results</h3>

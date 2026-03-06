@@ -60,13 +60,6 @@ export default function CAGRCalc() {
             tooltip="The ending or current value of the investment." />
           <Field label="How many years was the investment held?" value={years} onChange={setYears}
             tooltip="The number of years the investment was held." suffix="yrs" />
-          <div className="p-3 bg-blue-50 rounded-lg mt-2 text-xs text-blue-700 space-y-1">
-            <p><strong>CAGR Formula:</strong> (EV/BV)^(1/n) − 1</p>
-            <p><strong>Worked Example:</strong> BV=100,000; EV=180,000; n=5</p>
-            <p>Step 1: 180,000 ÷ 100,000 = 1.8</p>
-            <p>Step 2: 1.8^(1/5) = 1.1247</p>
-            <p>Step 3: 1.1247 − 1 = 0.1247 → <strong>CAGR = 12.47%</strong></p>
-          </div>
         </CardContent>
       </Card>
 

@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { NumericInput } from "@/components/ui/numeric-input";
 import { PieChart, Pie, Cell, Tooltip as ReTooltip, Legend, ResponsiveContainer } from "recharts";
-import { HelpCircle, ChevronRight, ChevronLeft, Calendar, Phone, CheckCircle, AlertTriangle } from "lucide-react";
+import { HelpCircle, ChevronRight, ChevronLeft, Calendar, Phone } from "lucide-react";
 import { Link } from "wouter";
 
 const STEPS = ["Assets", "Real Estate", "Other Assets", "Liabilities"];
@@ -172,28 +172,6 @@ export default function NetWorthCalc() {
           </CardContent>
         </Card>
 
-        {/* Contextual message */}
-        <div className={`mt-4 p-4 rounded-lg border ${isPositive ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"}`}>
-          <div className="flex items-start gap-3">
-            {isPositive
-              ? <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-              : <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />}
-            <div>
-              {isPositive ? (
-                <>
-                  <p className="font-semibold text-green-800">Great job! Your assets exceed your debts.</p>
-                  <p className="text-sm text-green-700 mt-1">Keep investing and planning to grow your wealth.</p>
-                  <p className="text-sm text-green-700">Need more guidance? Speak with our experts for personalized advice. We're here to support you.</p>
-                </>
-              ) : (
-                <>
-                  <p className="font-semibold text-red-800">Your liabilities exceed your assets.</p>
-                  <p className="text-sm text-red-700 mt-1">Prioritize paying down high-interest debt first. Consider speaking with a financial advisor to create a debt reduction plan.</p>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Right: Results */}
