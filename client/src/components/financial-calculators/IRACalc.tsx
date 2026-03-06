@@ -4,7 +4,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { NumericInput } from "@/components/ui/numeric-input";
 import { Badge } from "@/components/ui/badge";
-import { HelpCircle, CheckCircle, XCircle, AlertCircle, Info } from "lucide-react";
+import { HelpCircle, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
 function nv(v: string) { return parseFloat(v) || 0; }
 function fmt(n: number) { return "$" + n.toLocaleString("en-US"); }
@@ -177,12 +177,7 @@ export default function IRACalc() {
           )}
 
           <Field label="How much do you plan to contribute?" value={plannedContrib} onChange={setPlannedContrib}
-            tooltip={`2024 IRA contribution limit is ${fmt(limit)} (${catchUp ? "including $1,000 catch-up" : "under age 50"}).`} />
-
-          <div className="p-3 bg-blue-50 rounded-lg mt-1 text-xs text-blue-700 flex items-start gap-2">
-            <Info className="h-4 w-4 flex-shrink-0 mt-0.5" />
-            <p>Based on 2024 IRS limits. Roth IRA limit: {fmt(limit)}. Catch-up for age 50+: +$1,000.</p>
-          </div>
+            tooltip="Enter the amount you plan to contribute to your IRA this year." />
         </CardContent>
       </Card>
 
