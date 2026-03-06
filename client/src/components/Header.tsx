@@ -32,6 +32,7 @@ const ALL_RESOURCE_ITEMS = [
   { name: "Disclosures", href: "/disclosures", pageId: "Disclosures", calculatorCategory: undefined },
   { name: "Articles", href: "/resources/articles", pageId: "Resources", calculatorCategory: undefined },
   { name: "Calculators", href: "/calculators", pageId: undefined, calculatorCategory: "CALCULATORS" },
+  { name: "Financial Calculators", href: "/financial-calculators", pageId: undefined, calculatorCategory: undefined },
   { name: "Flipbooks", href: "/resources/flipbooks", pageId: "Resources", calculatorCategory: undefined },
   { name: "Newsletters", href: "/resources/newsletters", pageId: "Resources", calculatorCategory: undefined },
 ] as const;

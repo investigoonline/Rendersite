@@ -11,6 +11,7 @@ import Landing from "@/pages/Landing";
 import HomeDesignOptions from "@/pages/HomeDesignOptions";
 import Register from "@/pages/Register";
 import Calculators from "@/pages/Calculators";
+import FinancialCalculators from "@/pages/FinancialCalculators";
 import Resources from "@/pages/Resources";
 import Blog from "@/pages/Blog";
 import About from "@/pages/About";
@@ -44,6 +45,7 @@ function Router() {
         <Route path="/register" component={Register} />
         <Route path="/home-designs" component={HomeDesignOptions} />
         <Route path="/calculators" component={Calculators} />
+        <Route path="/financial-calculators" component={FinancialCalculators} />
         <Route path="/resources" component={Resources} />
         <Route path="/resources/articles" component={Articles} />
         <Route path="/resources/flipbooks" component={Flipbooks} />
