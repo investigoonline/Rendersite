@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { NumericInput } from "@/components/ui/numeric-input";
@@ -16,8 +15,7 @@ import {
 import {
   User, Building2, Globe2, CreditCard, ShieldCheck, ScrollText,
   ChevronRight, ChevronLeft, CheckCircle2, HelpCircle, TrendingUp,
-  Home, Briefcase, Coins, Landmark, FileText, Heart, Users,
-  RefreshCw, Calendar, Phone,
+  Coins, RefreshCw, Calendar, Phone,
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -112,14 +110,14 @@ const GROWTH_RATES: Record<string, number> = {
   "": 0.05,
 };
 
-const COLORS = [
+const PIE_COLORS = [
   "#1e5fad", "#0a7c59", "#2eaad1", "#6366f1", "#f59e0b",
   "#10b981", "#ef4444", "#8b5cf6", "#f97316", "#14b8a6",
 ];
 
-const DOMESTIC_ASSET_COLORS = "#1e5fad";
-const OVERSEAS_ASSET_COLOR = "#0a7c59";
-const LIABILITY_COLOR = "#ef4444";
+const COLOR_DOMESTIC = "#1e5fad";
+const COLOR_OVERSEAS = "#0a7c59";
+const COLOR_LIABILITY = "#ef4444";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -140,7 +138,7 @@ function compound(principal: number, rate: number, years: number) {
   return principal * Math.pow(1 + rate, years);
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+// ─── Shared UI components (defined outside to avoid remount issues) ───────────
 
 function FieldLabel({ label, tooltip }: { label: string; tooltip?: string }) {
   return (
@@ -191,6 +189,7 @@ function YesNoToggle({
         {([true, false] as const).map((bool) => (
           <button
             key={String(bool)}
+            type="button"
             onClick={() => onChange(bool)}
             className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-all ${
               value === bool
@@ -235,30 +234,6 @@ function ResultCard({ label, value, sub, color = "text-gray-900" }: {
       <p className={`text-xl font-bold ${color}`}>{value}</p>
       {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
     </div>
-  );
-}
-
-function RiskButton({ label, desc, selected, onClick, color }: {
-  label: string; desc: string; selected: boolean; onClick: () => void; color: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-        selected ? `border-${color} bg-${color}/5` : "border-gray-200 hover:border-gray-300 bg-white"
-      }`}
-      style={selected ? { borderColor: "var(--color-selected)", backgroundColor: "var(--color-selected-bg)" } : {}}
-    >
-      <div className="flex items-center gap-3">
-        <div className={`h-4 w-4 rounded-full border-2 flex-shrink-0 transition-all ${selected ? "border-primary" : "border-gray-300"}`}>
-          {selected && <div className="h-2 w-2 rounded-full bg-primary m-0.5" />}
-        </div>
-        <div>
-          <p className={`font-semibold text-sm ${selected ? "text-primary" : "text-gray-700"}`}>{label}</p>
-          <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
-        </div>
-      </div>
-    </button>
   );
 }
 
@@ -328,7 +303,6 @@ export default function WealthSnapshot() {
   const projected65 = compound(Math.max(0, netWorth), growthRate, yearsTo65);
   const projected90 = compound(Math.max(0, netWorth), growthRate, yearsTo90);
 
-  // ── Domestic breakdown chart ──
   const domBreakdown = [
     { name: "Cash & Bank", value: n(dom.cashBank) },
     { name: "Fixed Deposits", value: n(dom.fixedDeposits) },
@@ -355,16 +329,13 @@ export default function WealthSnapshot() {
     { age: "Age 90", value: projected90 },
   ] : [];
 
-  // ── Estate checklist score ──
   const estateItems = [form.estate.will, form.estate.trust, form.estate.powerOfAttorney, form.estate.healthcareDirective];
   const estateScore = estateItems.filter((v) => v === true).length;
   const estateTotal = estateItems.length;
 
   // ── Navigation ──
   const canNext = () => {
-    if (step === 0) {
-      return form.personal.currentAge.trim() !== "" && parseInt(form.personal.currentAge) > 0;
-    }
+    if (step === 0) return form.personal.currentAge.trim() !== "" && parseInt(form.personal.currentAge) > 0;
     return true;
   };
 
@@ -384,139 +355,131 @@ export default function WealthSnapshot() {
     setShowResults(false);
   };
 
-  // ─── Step Content ──────────────────────────────────────────────────────────
+  // ─── Step renders (called as functions, NOT as JSX components, to prevent remount) ──
 
-  function StepPersonal() {
-    return (
-      <SectionCard icon={User} title="Personal Details">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="sm:col-span-2">
-            <FieldLabel label="Full Name" />
-            <Input
-              value={form.personal.fullName}
-              onChange={(e) => setPersonal("fullName", e.target.value)}
-              placeholder="e.g. John Smith"
-            />
-          </div>
-          <div>
-            <FieldLabel label="Current Age *" tooltip="Used to auto-calculate retirement projections at ages 65 and 90." />
-            <NumericInput
-              value={form.personal.currentAge}
-              onChange={(e) => setPersonal("currentAge", e.target.value)}
-              placeholder="e.g. 45"
-              allowDecimal={false}
-            />
-            {form.personal.currentAge && parseInt(form.personal.currentAge) > 0 && (
-              <p className="text-xs text-green-600 mt-1">
-                We'll project your wealth at ages 65 and 90.
-              </p>
-            )}
-          </div>
-          <div>
-            <FieldLabel label="Citizenship" />
-            <Select value={form.personal.citizenship} onValueChange={(v) => setPersonal("citizenship", v)}>
-              <SelectTrigger><SelectValue placeholder="Select country" /></SelectTrigger>
-              <SelectContent>
-                {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <FieldLabel label="Country of Residence" />
-            <Select value={form.personal.countryOfResidence} onValueChange={(v) => setPersonal("countryOfResidence", v)}>
-              <SelectTrigger><SelectValue placeholder="Select country" /></SelectTrigger>
-              <SelectContent>
-                {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <FieldLabel label="Country (Tax Domicile)" tooltip="The country where your primary tax obligations are based." />
-            <Select value={form.personal.country} onValueChange={(v) => setPersonal("country", v)}>
-              <SelectTrigger><SelectValue placeholder="Select country" /></SelectTrigger>
-              <SelectContent>
-                {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
+  const renderPersonal = () => (
+    <SectionCard icon={User} title="Personal Details">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="sm:col-span-2">
+          <FieldLabel label="Full Name" />
+          <Input
+            value={form.personal.fullName}
+            onChange={(e) => setPersonal("fullName", e.target.value)}
+            placeholder="e.g. John Smith"
+          />
         </div>
-      </SectionCard>
-    );
-  }
-
-  function StepDomestic() {
-    return (
-      <SectionCard icon={Building2} title="Domestic Assets">
-        <p className="text-xs text-gray-500 mb-4">Enter the current market value of each asset you hold in your home country.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <MoneyField label="Cash & Bank Balance" value={dom.cashBank} onChange={(v) => setDomestic("cashBank", v)} tooltip="Savings, checking, and money market accounts." />
-          <MoneyField label="Fixed Deposits" value={dom.fixedDeposits} onChange={(v) => setDomestic("fixedDeposits", v)} tooltip="CDs, term deposits, and fixed-rate instruments." />
-          <MoneyField label="Stocks" value={dom.stocks} onChange={(v) => setDomestic("stocks", v)} tooltip="Listed equities and shares at current market value." />
-          <MoneyField label="Mutual Funds" value={dom.mutualFunds} onChange={(v) => setDomestic("mutualFunds", v)} tooltip="Total NAV of all mutual fund holdings." />
-          <MoneyField label="Bonds" value={dom.bonds} onChange={(v) => setDomestic("bonds", v)} tooltip="Government and corporate bonds at current value." />
-          <MoneyField label="Residential Real Estate" value={dom.residentialRealEstate} onChange={(v) => setDomestic("residentialRealEstate", v)} tooltip="Current market value of homes, condos, or rental properties." />
-          <MoneyField label="Commercial Real Estate" value={dom.commercialRealEstate} onChange={(v) => setDomestic("commercialRealEstate", v)} tooltip="Office, retail, or industrial property market value." />
-          <MoneyField label="Business Equity" value={dom.businessEquity} onChange={(v) => setDomestic("businessEquity", v)} tooltip="Your ownership stake in private businesses." />
-          <MoneyField label="Gold & Precious Metals" value={dom.goldPreciousMetals} onChange={(v) => setDomestic("goldPreciousMetals", v)} tooltip="Physical gold, silver, platinum, and other precious metals." />
-          <MoneyField label="Alternative Investments" value={dom.alternativeInvestments} onChange={(v) => setDomestic("alternativeInvestments", v)} tooltip="Private equity, hedge funds, collectibles, crypto, etc." />
-          <div className="sm:col-span-2">
-            <MoneyField label="Other Domestic Assets" value={dom.otherAssets} onChange={(v) => setDomestic("otherAssets", v)} tooltip="Any other domestic assets not listed above." />
-          </div>
+        <div>
+          <FieldLabel label="Current Age *" tooltip="Used to auto-calculate retirement projections at ages 65 and 90." />
+          <NumericInput
+            value={form.personal.currentAge}
+            onChange={(e) => setPersonal("currentAge", e.target.value)}
+            placeholder="e.g. 45"
+            allowDecimal={false}
+          />
+          {form.personal.currentAge && parseInt(form.personal.currentAge) > 0 && (
+            <p className="text-xs text-green-600 mt-1">
+              We'll project your wealth at ages 65 and 90.
+            </p>
+          )}
         </div>
-        {totalDomestic > 0 && (
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg flex items-center justify-between">
-            <span className="text-sm text-blue-700 font-medium">Total Domestic Assets</span>
-            <span className="text-base font-bold text-primary">{fmtFull(totalDomestic)}</span>
-          </div>
-        )}
-      </SectionCard>
-    );
-  }
-
-  function StepOverseas() {
-    return (
-      <SectionCard icon={Globe2} title="Overseas Assets">
-        <p className="text-xs text-gray-500 mb-4">Enter the USD equivalent value of assets held outside your home country.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <MoneyField label="Foreign Cash / Bank Balance" value={ov.foreignCashBank} onChange={(v) => setOverseas("foreignCashBank", v)} tooltip="Offshore bank accounts and foreign currency holdings." />
-          <MoneyField label="Foreign Investments" value={ov.foreignInvestments} onChange={(v) => setOverseas("foreignInvestments", v)} tooltip="International stocks, mutual funds, ETFs, and similar." />
-          <div className="sm:col-span-2">
-            <MoneyField label="Other Overseas Assets" value={ov.otherOverseasAssets} onChange={(v) => setOverseas("otherOverseasAssets", v)} tooltip="Foreign real estate, businesses, or any other international assets." />
-          </div>
+        <div>
+          <FieldLabel label="Citizenship" />
+          <Select value={form.personal.citizenship} onValueChange={(v) => setPersonal("citizenship", v)}>
+            <SelectTrigger><SelectValue placeholder="Select country" /></SelectTrigger>
+            <SelectContent>
+              {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
         </div>
-        {totalOverseas > 0 && (
-          <div className="mt-4 p-3 bg-teal-50 rounded-lg flex items-center justify-between">
-            <span className="text-sm text-teal-700 font-medium">Total Overseas Assets</span>
-            <span className="text-base font-bold text-secondary">{fmtFull(totalOverseas)}</span>
-          </div>
-        )}
-      </SectionCard>
-    );
-  }
-
-  function StepLiabilities() {
-    return (
-      <SectionCard icon={CreditCard} title="Liabilities">
-        <p className="text-xs text-gray-500 mb-4">Enter the current outstanding balance of each liability.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <MoneyField label="Mortgage Loans" value={lib.mortgageLoans} onChange={(v) => setLiability("mortgageLoans", v)} tooltip="Outstanding balance on home loans." />
-          <MoneyField label="Personal Loans" value={lib.personalLoans} onChange={(v) => setLiability("personalLoans", v)} tooltip="Unsecured personal loans and consumer credit." />
-          <MoneyField label="Business Loans" value={lib.businessLoans} onChange={(v) => setLiability("businessLoans", v)} tooltip="Outstanding loans tied to your business operations." />
-          <MoneyField label="Credit Lines" value={lib.creditLines} onChange={(v) => setLiability("creditLines", v)} tooltip="Home equity lines, margin accounts, and revolving credit." />
-          <MoneyField label="Other Liabilities" value={lib.otherLiabilities} onChange={(v) => setLiability("otherLiabilities", v)} tooltip="Credit card balances, car loans, and any other debts." />
-          <MoneyField label="Taxes Payable" value={lib.taxesPayable} onChange={(v) => setLiability("taxesPayable", v)} tooltip="Estimated taxes owed but not yet paid." />
+        <div>
+          <FieldLabel label="Country of Residence" />
+          <Select value={form.personal.countryOfResidence} onValueChange={(v) => setPersonal("countryOfResidence", v)}>
+            <SelectTrigger><SelectValue placeholder="Select country" /></SelectTrigger>
+            <SelectContent>
+              {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
         </div>
-        {totalLiabilities > 0 && (
-          <div className="mt-4 p-3 bg-red-50 rounded-lg flex items-center justify-between">
-            <span className="text-sm text-red-700 font-medium">Total Liabilities</span>
-            <span className="text-base font-bold text-red-600">{fmtFull(totalLiabilities)}</span>
-          </div>
-        )}
-      </SectionCard>
-    );
-  }
+        <div>
+          <FieldLabel label="Country (Tax Domicile)" tooltip="The country where your primary tax obligations are based." />
+          <Select value={form.personal.country} onValueChange={(v) => setPersonal("country", v)}>
+            <SelectTrigger><SelectValue placeholder="Select country" /></SelectTrigger>
+            <SelectContent>
+              {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    </SectionCard>
+  );
 
-  function StepRisk() {
+  const renderDomestic = () => (
+    <SectionCard icon={Building2} title="Domestic Assets">
+      <p className="text-xs text-gray-500 mb-4">Enter the current market value of each asset you hold in your home country.</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <MoneyField label="Cash & Bank Balance" value={dom.cashBank} onChange={(v) => setDomestic("cashBank", v)} tooltip="Savings, checking, and money market accounts." />
+        <MoneyField label="Fixed Deposits" value={dom.fixedDeposits} onChange={(v) => setDomestic("fixedDeposits", v)} tooltip="CDs, term deposits, and fixed-rate instruments." />
+        <MoneyField label="Stocks" value={dom.stocks} onChange={(v) => setDomestic("stocks", v)} tooltip="Listed equities and shares at current market value." />
+        <MoneyField label="Mutual Funds" value={dom.mutualFunds} onChange={(v) => setDomestic("mutualFunds", v)} tooltip="Total NAV of all mutual fund holdings." />
+        <MoneyField label="Bonds" value={dom.bonds} onChange={(v) => setDomestic("bonds", v)} tooltip="Government and corporate bonds at current value." />
+        <MoneyField label="Residential Real Estate" value={dom.residentialRealEstate} onChange={(v) => setDomestic("residentialRealEstate", v)} tooltip="Current market value of homes, condos, or rental properties." />
+        <MoneyField label="Commercial Real Estate" value={dom.commercialRealEstate} onChange={(v) => setDomestic("commercialRealEstate", v)} tooltip="Office, retail, or industrial property market value." />
+        <MoneyField label="Business Equity" value={dom.businessEquity} onChange={(v) => setDomestic("businessEquity", v)} tooltip="Your ownership stake in private businesses." />
+        <MoneyField label="Gold & Precious Metals" value={dom.goldPreciousMetals} onChange={(v) => setDomestic("goldPreciousMetals", v)} tooltip="Physical gold, silver, platinum, and other precious metals." />
+        <MoneyField label="Alternative Investments" value={dom.alternativeInvestments} onChange={(v) => setDomestic("alternativeInvestments", v)} tooltip="Private equity, hedge funds, collectibles, crypto, etc." />
+        <div className="sm:col-span-2">
+          <MoneyField label="Other Domestic Assets" value={dom.otherAssets} onChange={(v) => setDomestic("otherAssets", v)} tooltip="Any other domestic assets not listed above." />
+        </div>
+      </div>
+      {totalDomestic > 0 && (
+        <div className="mt-4 p-3 bg-blue-50 rounded-lg flex items-center justify-between">
+          <span className="text-sm text-blue-700 font-medium">Total Domestic Assets</span>
+          <span className="text-base font-bold text-primary">{fmtFull(totalDomestic)}</span>
+        </div>
+      )}
+    </SectionCard>
+  );
+
+  const renderOverseas = () => (
+    <SectionCard icon={Globe2} title="Overseas Assets">
+      <p className="text-xs text-gray-500 mb-4">Enter the USD equivalent value of assets held outside your home country.</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <MoneyField label="Foreign Cash / Bank Balance" value={ov.foreignCashBank} onChange={(v) => setOverseas("foreignCashBank", v)} tooltip="Offshore bank accounts and foreign currency holdings." />
+        <MoneyField label="Foreign Investments" value={ov.foreignInvestments} onChange={(v) => setOverseas("foreignInvestments", v)} tooltip="International stocks, mutual funds, ETFs, and similar." />
+        <div className="sm:col-span-2">
+          <MoneyField label="Other Overseas Assets" value={ov.otherOverseasAssets} onChange={(v) => setOverseas("otherOverseasAssets", v)} tooltip="Foreign real estate, businesses, or any other international assets." />
+        </div>
+      </div>
+      {totalOverseas > 0 && (
+        <div className="mt-4 p-3 bg-teal-50 rounded-lg flex items-center justify-between">
+          <span className="text-sm text-teal-700 font-medium">Total Overseas Assets</span>
+          <span className="text-base font-bold text-secondary">{fmtFull(totalOverseas)}</span>
+        </div>
+      )}
+    </SectionCard>
+  );
+
+  const renderLiabilities = () => (
+    <SectionCard icon={CreditCard} title="Liabilities">
+      <p className="text-xs text-gray-500 mb-4">Enter the current outstanding balance of each liability.</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <MoneyField label="Mortgage Loans" value={lib.mortgageLoans} onChange={(v) => setLiability("mortgageLoans", v)} tooltip="Outstanding balance on home loans." />
+        <MoneyField label="Personal Loans" value={lib.personalLoans} onChange={(v) => setLiability("personalLoans", v)} tooltip="Unsecured personal loans and consumer credit." />
+        <MoneyField label="Business Loans" value={lib.businessLoans} onChange={(v) => setLiability("businessLoans", v)} tooltip="Outstanding loans tied to your business operations." />
+        <MoneyField label="Credit Lines" value={lib.creditLines} onChange={(v) => setLiability("creditLines", v)} tooltip="Home equity lines, margin accounts, and revolving credit." />
+        <MoneyField label="Other Liabilities" value={lib.otherLiabilities} onChange={(v) => setLiability("otherLiabilities", v)} tooltip="Credit card balances, car loans, and any other debts." />
+        <MoneyField label="Taxes Payable" value={lib.taxesPayable} onChange={(v) => setLiability("taxesPayable", v)} tooltip="Estimated taxes owed but not yet paid." />
+      </div>
+      {totalLiabilities > 0 && (
+        <div className="mt-4 p-3 bg-red-50 rounded-lg flex items-center justify-between">
+          <span className="text-sm text-red-700 font-medium">Total Liabilities</span>
+          <span className="text-base font-bold text-red-600">{fmtFull(totalLiabilities)}</span>
+        </div>
+      )}
+    </SectionCard>
+  );
+
+  const renderRisk = () => {
     const appetiteOptions = [
       { value: "conservative", label: "Conservative", desc: "Capital preservation first — lower risk, ~4% projected annual growth", icon: "🛡️" },
       { value: "moderate", label: "Moderate", desc: "Balanced approach — medium risk, ~6% projected annual growth", icon: "⚖️" },
@@ -532,12 +495,13 @@ export default function WealthSnapshot() {
       <SectionCard icon={ShieldCheck} title="Risk Profile">
         <div className="space-y-6">
           <div>
-            <p className="text-sm font-semibold text-gray-700 mb-3">Risk Appetite</p>
+            <p className="text-sm font-semibold text-gray-700 mb-1">Risk Appetite</p>
             <p className="text-xs text-gray-500 mb-3">Your selection sets the growth rate used in retirement projections.</p>
             <div className="space-y-2">
               {appetiteOptions.map((opt) => (
                 <button
                   key={opt.value}
+                  type="button"
                   onClick={() => setRisk("riskAppetite", opt.value)}
                   className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                     form.risk.riskAppetite === opt.value
@@ -549,9 +513,7 @@ export default function WealthSnapshot() {
                     <div className={`mt-0.5 h-4 w-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
                       form.risk.riskAppetite === opt.value ? "border-primary" : "border-gray-300"
                     }`}>
-                      {form.risk.riskAppetite === opt.value && (
-                        <div className="h-2 w-2 rounded-full bg-primary" />
-                      )}
+                      {form.risk.riskAppetite === opt.value && <div className="h-2 w-2 rounded-full bg-primary" />}
                     </div>
                     <div>
                       <p className={`font-semibold text-sm ${form.risk.riskAppetite === opt.value ? "text-primary" : "text-gray-700"}`}>
@@ -564,15 +526,14 @@ export default function WealthSnapshot() {
               ))}
             </div>
           </div>
-
           <Separator />
-
           <div>
             <p className="text-sm font-semibold text-gray-700 mb-3">Investment Style</p>
             <div className="grid grid-cols-2 gap-2">
               {styleOptions.map((opt) => (
                 <button
                   key={opt.value}
+                  type="button"
                   onClick={() => setRisk("investmentStyle", opt.value)}
                   className={`text-left p-3 rounded-xl border-2 transition-all ${
                     form.risk.investmentStyle === opt.value
@@ -591,60 +552,41 @@ export default function WealthSnapshot() {
         </div>
       </SectionCard>
     );
-  }
+  };
 
-  function StepEstate() {
-    const items: { key: keyof EstatePlanning; label: string; tooltip: string }[] = [
-      { key: "will", label: "Will", tooltip: "A legal document directing how your estate is distributed after death." },
-      { key: "trust", label: "Trust", tooltip: "A legal arrangement managing assets during your lifetime and beyond." },
-      { key: "powerOfAttorney", label: "Power of Attorney", tooltip: "Grants someone authority to act on your behalf for financial/legal matters." },
-      { key: "healthcareDirective", label: "Healthcare Directive", tooltip: "Also known as a living will — outlines your medical care wishes." },
-    ];
-    return (
-      <SectionCard icon={ScrollText} title="Estate Planning">
-        <p className="text-xs text-gray-500 mb-4">Indicate which estate planning documents you currently have in place.</p>
-        <div>
-          {items.map(({ key, label, tooltip }) => (
-            <YesNoToggle
-              key={key}
-              label={label}
-              value={form.estate[key] as boolean | null}
-              onChange={(v) => setEstate(key, v)}
-              tooltip={tooltip}
-            />
-          ))}
+  const renderEstate = () => (
+    <SectionCard icon={ScrollText} title="Estate Planning">
+      <p className="text-xs text-gray-500 mb-4">Indicate which estate planning documents you currently have in place.</p>
+      <div>
+        <YesNoToggle label="Will" value={form.estate.will} onChange={(v) => setEstate("will", v)} tooltip="A legal document directing how your estate is distributed after death." />
+        <YesNoToggle label="Trust" value={form.estate.trust} onChange={(v) => setEstate("trust", v)} tooltip="A legal arrangement managing assets during your lifetime and beyond." />
+        <YesNoToggle label="Power of Attorney" value={form.estate.powerOfAttorney} onChange={(v) => setEstate("powerOfAttorney", v)} tooltip="Grants someone authority to act on your behalf for financial/legal matters." />
+        <YesNoToggle label="Healthcare Directive" value={form.estate.healthcareDirective} onChange={(v) => setEstate("healthcareDirective", v)} tooltip="Also known as a living will — outlines your medical care wishes." />
+      </div>
+      <div className="mt-5">
+        <FieldLabel label="Beneficiaries" tooltip="List the names of people or entities who will inherit your estate." />
+        <Input
+          value={form.estate.beneficiaries}
+          onChange={(e) => setEstate("beneficiaries", e.target.value)}
+          placeholder="e.g. Jane Smith (spouse), John Smith Jr. (son)"
+        />
+      </div>
+      {estateScore > 0 && (
+        <div className="mt-4 p-3 bg-amber-50 rounded-lg">
+          <p className="text-xs text-amber-700">
+            <span className="font-semibold">{estateScore} of {estateTotal}</span> key documents in place.{" "}
+            {estateScore < estateTotal && "Consider completing your estate plan with an advisor."}
+          </p>
         </div>
-        <div className="mt-5">
-          <FieldLabel label="Beneficiaries" tooltip="List the names of people or entities who will inherit your estate." />
-          <Input
-            value={form.estate.beneficiaries}
-            onChange={(e) => setEstate("beneficiaries", e.target.value)}
-            placeholder="e.g. Jane Smith (spouse), John Smith Jr. (son)"
-          />
-        </div>
-        {estateScore > 0 && (
-          <div className="mt-4 p-3 bg-amber-50 rounded-lg">
-            <p className="text-xs text-amber-700">
-              <span className="font-semibold">{estateScore} of {estateTotal}</span> key documents in place.{" "}
-              {estateScore < estateTotal && "Consider completing your estate plan with an advisor."}
-            </p>
-          </div>
-        )}
-      </SectionCard>
-    );
-  }
+      )}
+    </SectionCard>
+  );
 
-  // ─── Results Panel ────────────────────────────────────────────────────────
-
-  function Results() {
-    const riskLabel = { conservative: "Conservative", moderate: "Moderate", aggressive: "Aggressive", "": "Not specified" };
-    const styleLabel = { income: "Income", balanced: "Balanced", growth: "Growth", speculative: "Speculative", "": "Not specified" };
+  const renderResults = () => {
     const netColor = netWorth >= 0 ? "text-primary" : "text-red-600";
     const name = form.personal.fullName || "Your";
-
     return (
       <div className="space-y-5">
-        {/* Header */}
         <div className="text-center pb-2">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 font-heading">
             {name !== "Your" ? `${name}'s` : "Your"} Wealth Snapshot
@@ -661,12 +603,7 @@ export default function WealthSnapshot() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <ResultCard label="Total Assets" value={fmt(totalAssets)} color="text-primary" />
           <ResultCard label="Total Liabilities" value={fmt(totalLiabilities)} color="text-red-600" />
-          <ResultCard
-            label="Net Worth"
-            value={fmt(netWorth)}
-            color={netColor}
-            sub={netWorth < 0 ? "Liabilities exceed assets" : undefined}
-          />
+          <ResultCard label="Net Worth" value={fmt(netWorth)} color={netColor} sub={netWorth < 0 ? "Liabilities exceed assets" : undefined} />
           <ResultCard
             label="Asset Coverage"
             value={totalLiabilities > 0 ? `${((totalAssets / totalLiabilities) * 100).toFixed(0)}%` : "—"}
@@ -674,7 +611,7 @@ export default function WealthSnapshot() {
           />
         </div>
 
-        {/* Domestic vs Overseas */}
+        {/* Domestic / Overseas / Liabilities split */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="bg-blue-50 rounded-xl p-4 text-center">
             <Building2 className="h-5 w-5 text-primary mx-auto mb-1" />
@@ -696,7 +633,7 @@ export default function WealthSnapshot() {
           </div>
         </div>
 
-        {/* Overview Pie Chart */}
+        {/* Overview Pie */}
         {overviewChart.length > 0 && (
           <Card className="border-0 shadow-sm">
             <CardHeader className="pb-2 pt-4 px-4">
@@ -705,9 +642,10 @@ export default function WealthSnapshot() {
             <CardContent className="px-2 pb-4">
               <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
-                  <Pie data={overviewChart} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`} labelLine={false}>
+                  <Pie data={overviewChart} cx="50%" cy="50%" outerRadius={80} dataKey="value"
+                    label={({ percent }) => `${(percent * 100).toFixed(0)}%`} labelLine={false}>
                     {overviewChart.map((_, i) => (
-                      <Cell key={i} fill={[DOMESTIC_ASSET_COLORS, OVERSEAS_ASSET_COLOR, LIABILITY_COLOR][i]} />
+                      <Cell key={i} fill={[COLOR_DOMESTIC, COLOR_OVERSEAS, COLOR_LIABILITY][i]} />
                     ))}
                   </Pie>
                   <ReTooltip formatter={(v: number) => fmtFull(v)} />
@@ -718,7 +656,7 @@ export default function WealthSnapshot() {
           </Card>
         )}
 
-        {/* Domestic Breakdown */}
+        {/* Domestic breakdown donut */}
         {domBreakdown.length > 1 && (
           <Card className="border-0 shadow-sm">
             <CardHeader className="pb-2 pt-4 px-4">
@@ -728,7 +666,7 @@ export default function WealthSnapshot() {
               <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
                   <Pie data={domBreakdown} cx="50%" cy="50%" innerRadius={50} outerRadius={85} dataKey="value" paddingAngle={2}>
-                    {domBreakdown.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                    {domBreakdown.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                   </Pie>
                   <ReTooltip formatter={(v: number) => fmtFull(v)} />
                   <Legend wrapperStyle={{ fontSize: "11px" }} />
@@ -738,7 +676,7 @@ export default function WealthSnapshot() {
           </Card>
         )}
 
-        {/* Retirement Projections */}
+        {/* Retirement projections */}
         {currentAge > 0 && netWorth > 0 && (
           <Card className="border-0 shadow-sm">
             <CardHeader className="pb-2 pt-4 px-4">
@@ -751,7 +689,7 @@ export default function WealthSnapshot() {
                 <span className="font-medium text-gray-700">
                   {form.risk.riskAppetite
                     ? `${form.risk.riskAppetite} profile (${(growthRate * 100).toFixed(0)}% p.a.)`
-                    : `estimated 5% p.a.`}
+                    : "estimated 5% p.a."}
                 </span>{" "}
                 compounded annually on current net worth.
               </p>
@@ -760,14 +698,11 @@ export default function WealthSnapshot() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                 <div className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-xl p-4 text-center">
                   <p className="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wide">
-                    Projected at Age 65
-                    {yearsTo65 > 0 ? ` (${yearsTo65} yrs)` : " (Reached)"}
+                    Projected at Age 65 {yearsTo65 > 0 ? `(${yearsTo65} yrs)` : "(Reached)"}
                   </p>
                   <p className="text-2xl font-bold text-primary">{fmt(projected65)}</p>
                   {yearsTo65 > 0 && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      {((projected65 / netWorth - 1) * 100).toFixed(0)}% growth from today
-                    </p>
+                    <p className="text-xs text-gray-500 mt-1">{((projected65 / netWorth - 1) * 100).toFixed(0)}% growth from today</p>
                   )}
                 </div>
                 <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/20 rounded-xl p-4 text-center">
@@ -775,12 +710,9 @@ export default function WealthSnapshot() {
                     Projected at Age 90 ({yearsTo90} yrs)
                   </p>
                   <p className="text-2xl font-bold text-secondary">{fmt(projected90)}</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {((projected90 / netWorth - 1) * 100).toFixed(0)}% growth from today
-                  </p>
+                  <p className="text-xs text-gray-500 mt-1">{((projected90 / netWorth - 1) * 100).toFixed(0)}% growth from today</p>
                 </div>
               </div>
-
               {projectionChart.length > 1 && (
                 <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={projectionChart} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
@@ -790,13 +722,12 @@ export default function WealthSnapshot() {
                     <ReTooltip formatter={(v: number) => [fmtFull(v), "Projected Net Worth"]} />
                     <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                       {projectionChart.map((_, i) => (
-                        <Cell key={i} fill={i === 0 ? "#94a3b8" : i === 1 ? DOMESTIC_ASSET_COLORS : OVERSEAS_ASSET_COLOR} />
+                        <Cell key={i} fill={i === 0 ? "#94a3b8" : i === 1 ? COLOR_DOMESTIC : COLOR_OVERSEAS} />
                       ))}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               )}
-
               <p className="text-xs text-gray-400 mt-3 leading-relaxed">
                 * Projections are illustrative only and assume consistent annual growth. Actual returns will vary. This is not financial advice.
               </p>
@@ -804,13 +735,12 @@ export default function WealthSnapshot() {
           </Card>
         )}
 
-        {/* Risk Profile Summary */}
+        {/* Risk summary */}
         {(form.risk.riskAppetite || form.risk.investmentStyle) && (
           <Card className="border-0 shadow-sm">
             <CardHeader className="pb-2 pt-4 px-4">
               <CardTitle className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-primary" />
-                Risk Profile Summary
+                <ShieldCheck className="h-4 w-4 text-primary" /> Risk Profile Summary
               </CardTitle>
             </CardHeader>
             <CardContent className="px-4 pb-4">
@@ -828,21 +758,17 @@ export default function WealthSnapshot() {
           </Card>
         )}
 
-        {/* Estate Planning Summary */}
+        {/* Estate checklist */}
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-2 pt-4 px-4">
             <CardTitle className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-              <ScrollText className="h-4 w-4 text-primary" />
-              Estate Planning Checklist
+              <ScrollText className="h-4 w-4 text-primary" /> Estate Planning Checklist
             </CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4">
             <div className="flex items-center gap-3 mb-3">
               <div className="flex-1 bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-primary h-2 rounded-full transition-all"
-                  style={{ width: `${(estateScore / estateTotal) * 100}%` }}
-                />
+                <div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${(estateScore / estateTotal) * 100}%` }} />
               </div>
               <span className="text-sm font-semibold text-gray-700">{estateScore}/{estateTotal}</span>
             </div>
@@ -872,14 +798,10 @@ export default function WealthSnapshot() {
         <div className="space-y-3 pt-1">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Button asChild className="w-full bg-primary hover:bg-primary/90">
-              <Link href="/contact">
-                <Calendar className="h-4 w-4 mr-2" /> Book an Appointment
-              </Link>
+              <Link href="/contact"><Calendar className="h-4 w-4 mr-2" /> Book an Appointment</Link>
             </Button>
             <Button asChild variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-white">
-              <Link href="/contact">
-                <Phone className="h-4 w-4 mr-2" /> Speak to an Advisor
-              </Link>
+              <Link href="/contact"><Phone className="h-4 w-4 mr-2" /> Speak to an Advisor</Link>
             </Button>
           </div>
           <Button variant="outline" onClick={handleReset} className="w-full text-gray-600">
@@ -888,20 +810,11 @@ export default function WealthSnapshot() {
         </div>
       </div>
     );
-  }
-
-  // ─── Step Content Map ─────────────────────────────────────────────────────
-
-  const stepContent = [
-    <StepPersonal />,
-    <StepDomestic />,
-    <StepOverseas />,
-    <StepLiabilities />,
-    <StepRisk />,
-    <StepEstate />,
-  ];
+  };
 
   // ─── Render ───────────────────────────────────────────────────────────────
+
+  const stepRenderers = [renderPersonal, renderDomestic, renderOverseas, renderLiabilities, renderRisk, renderEstate];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -926,11 +839,8 @@ export default function WealthSnapshot() {
           <>
             {/* Step Progress */}
             <div className="mb-6">
-              {/* Progress bar */}
               <Progress value={((step + 1) / STEPS.length) * 100} className="h-1.5 mb-4" />
-
-              {/* Step pills — scrollable on mobile */}
-              <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+              <div className="flex gap-1.5 overflow-x-auto pb-1">
                 {STEPS.map((s) => {
                   const Icon = s.icon;
                   const isActive = s.id === step;
@@ -938,20 +848,13 @@ export default function WealthSnapshot() {
                   return (
                     <button
                       key={s.id}
+                      type="button"
                       onClick={() => setStep(s.id)}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all ${
-                        isActive
-                          ? "bg-primary text-white"
-                          : isDone
-                          ? "bg-primary/15 text-primary"
-                          : "bg-gray-100 text-gray-500"
+                        isActive ? "bg-primary text-white" : isDone ? "bg-primary/15 text-primary" : "bg-gray-100 text-gray-500"
                       }`}
                     >
-                      {isDone ? (
-                        <CheckCircle2 className="h-3.5 w-3.5" />
-                      ) : (
-                        <Icon className="h-3.5 w-3.5" />
-                      )}
+                      {isDone ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
                       {s.label}
                     </button>
                   );
@@ -959,10 +862,10 @@ export default function WealthSnapshot() {
               </div>
             </div>
 
-            {/* Step Content */}
-            <div className="mb-6">{stepContent[step]}</div>
+            {/* Active step content — called as a function to avoid remount */}
+            <div className="mb-6">{stepRenderers[step]()}</div>
 
-            {/* Live Summary Bar (steps 1–3) */}
+            {/* Live summary bar (steps 1–3) */}
             {step >= 1 && step <= 3 && (
               <div className="mb-4 p-3 bg-white rounded-xl border border-gray-200 shadow-sm">
                 <div className="grid grid-cols-3 gap-2 text-center">
@@ -985,11 +888,12 @@ export default function WealthSnapshot() {
             {/* Navigation */}
             <div className="flex gap-3">
               {step > 0 && (
-                <Button variant="outline" onClick={handleBack} className="flex-1">
+                <Button type="button" variant="outline" onClick={handleBack} className="flex-1">
                   <ChevronLeft className="h-4 w-4 mr-1" /> Back
                 </Button>
               )}
               <Button
+                type="button"
                 onClick={handleNext}
                 disabled={!canNext()}
                 className="flex-1 bg-primary hover:bg-primary/90"
@@ -1004,9 +908,9 @@ export default function WealthSnapshot() {
           </>
         ) : (
           <>
-            <Results />
+            {renderResults()}
             <div className="mt-4">
-              <Button variant="outline" onClick={handleBack} className="w-full">
+              <Button type="button" variant="outline" onClick={handleBack} className="w-full">
                 <ChevronLeft className="h-4 w-4 mr-1" /> Edit My Profile
               </Button>
             </div>
