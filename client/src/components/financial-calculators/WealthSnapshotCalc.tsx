@@ -63,8 +63,6 @@ interface Form {
   otherRealEstate: string;
   equityInBusiness: string;
   personalProperties: string;
-  alternativeInvestments: string;
-  otherAssets: string;
   annualSavings: string;
   expectedReturnRate: string;
   retirement401k: string;
@@ -96,7 +94,7 @@ const defaultForm: Form = {
   fullName: "", currentAge: "", citizenship: "", taxDomicile: "", countryOfResidence: "", plannedRetirementAge: "",
   cashBank: "0", investments: "0",
   primaryResidential: "0", otherRealEstate: "0", equityInBusiness: "0", personalProperties: "0",
-  alternativeInvestments: "0", otherAssets: "0", annualSavings: "0", expectedReturnRate: "5",
+  annualSavings: "0", expectedReturnRate: "5",
   retirement401k: "0", iraBalance: "0", lifeInsuranceCashValue: "0",
   foreignCashBank: "0", foreignRealEstate: "0", anyOtherAssets: "0",
   mortgageLoans: "0", personalLoans: "0", businessLoans: "0", creditLines: "0", otherLiabilities: "0", taxesPayable: "0",
@@ -178,6 +176,31 @@ function QAField({ question, description, value, onChange, tooltip }: {
       <div className="relative">
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm pointer-events-none">$</span>
         <NumericInput className="pl-7" value={value} onChange={(e) => onChange(e.target.value)} placeholder="0" />
+      </div>
+    </div>
+  );
+}
+
+function QAFieldPercent({ question, description, value, onChange, tooltip }: {
+  question: string; description: string; value: string; onChange: (v: string) => void; tooltip?: string;
+}) {
+  return (
+    <div className="mb-5">
+      <div className="flex items-center gap-2 mb-1">
+        <label className="text-sm font-medium text-gray-700">{question}</label>
+        {tooltip && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <HelpCircle className="h-4 w-4 text-gray-400 cursor-help flex-shrink-0" />
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs text-xs">{tooltip}</TooltipContent>
+          </Tooltip>
+        )}
+      </div>
+      <p className="text-xs text-gray-400 mb-1">{description}</p>
+      <div className="relative">
+        <NumericInput className="pr-8" value={value} onChange={(e) => onChange(e.target.value)} placeholder="0" />
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm pointer-events-none">%</span>
       </div>
     </div>
   );
@@ -277,8 +300,8 @@ export default function WealthSnapshotCalc() {
 
   const totalDomAssets =
     n(form.cashBank) + n(form.investments) + n(form.primaryResidential) + n(form.otherRealEstate) +
-    n(form.equityInBusiness) + n(form.personalProperties) + n(form.alternativeInvestments) +
-    n(form.otherAssets) + n(form.retirement401k) + n(form.iraBalance) + n(form.lifeInsuranceCashValue);
+    n(form.equityInBusiness) + n(form.personalProperties) +
+    n(form.retirement401k) + n(form.iraBalance) + n(form.lifeInsuranceCashValue);
 
   const totalNonDomAssets =
     n(form.foreignCashBank) + n(form.foreignRealEstate) + n(form.anyOtherAssets);
@@ -332,8 +355,6 @@ export default function WealthSnapshotCalc() {
     { name: "401(K)", value: n(form.retirement401k) },
     { name: "IRA", value: n(form.iraBalance) },
     { name: "Life Insurance", value: n(form.lifeInsuranceCashValue) },
-    { name: "Alternatives", value: n(form.alternativeInvestments) },
-    { name: "Other Assets", value: n(form.otherAssets) },
   ].filter((d) => d.value > 0);
 
   const estateItems = [form.will, form.trust, form.powerOfAttorney, form.healthcareDirective];
@@ -406,15 +427,48 @@ export default function WealthSnapshotCalc() {
         onChange={(v) => set("investments", v)}
         tooltip="Listed equities, ETFs, mutual fund NAV, government and corporate bonds at current market value."
       />
-      <Separator className="my-1" />
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <MF label="Primary Residential" value={form.primaryResidential} onChange={(v) => set("primaryResidential", v)} tooltip="Current market value of your primary home." />
-        <MF label="Other Real Estate" value={form.otherRealEstate} onChange={(v) => set("otherRealEstate", v)} tooltip="Investment properties, land, or secondary homes." />
-        <MF label="Equity in the Business" value={form.equityInBusiness} onChange={(v) => set("equityInBusiness", v)} tooltip="Your ownership stake in private businesses." />
-        <MF label="Personal Properties (Gold & Precious Metals)" value={form.personalProperties} onChange={(v) => set("personalProperties", v)} tooltip="Physical gold, silver, jewellery, and precious metals." />
-        <MF label="Alternative Investments" value={form.alternativeInvestments} onChange={(v) => set("alternativeInvestments", v)} tooltip="Private equity, hedge funds, crypto, collectibles, etc." />
-        <MF label="Other Assets" value={form.otherAssets} onChange={(v) => set("otherAssets", v)} tooltip="Any other assets not listed above." />
-      </div>
+      <QAField
+        question="What is the value of your Primary Residential?"
+        description="Current market value of your primary home or residence."
+        value={form.primaryResidential}
+        onChange={(v) => set("primaryResidential", v)}
+        tooltip="Current market value of your primary home."
+      />
+      <QAField
+        question="What is the total value of your other Real Estate?"
+        description="Investment properties, land, vacation homes, or secondary residences."
+        value={form.otherRealEstate}
+        onChange={(v) => set("otherRealEstate", v)}
+        tooltip="Investment properties, land, or secondary homes."
+      />
+      <QAField
+        question="What is your Equity in the Business?"
+        description="Your ownership stake or share value in any private businesses."
+        value={form.equityInBusiness}
+        onChange={(v) => set("equityInBusiness", v)}
+        tooltip="Your ownership stake in private businesses."
+      />
+      <QAField
+        question="What is the value of your Personal Properties (gold & precious metals etc)?"
+        description="Physical gold, silver, jewellery, collectibles, and other tangible personal assets."
+        value={form.personalProperties}
+        onChange={(v) => set("personalProperties", v)}
+        tooltip="Physical gold, silver, jewellery, and precious metals."
+      />
+      <QAField
+        question="What is your annual savings?"
+        description="Amount you save or invest each year. Used in retirement wealth projections."
+        value={form.annualSavings}
+        onChange={(v) => set("annualSavings", v)}
+        tooltip="Amount you save or invest per year. Used in retirement projections."
+      />
+      <QAFieldPercent
+        question="What is your expected rate of return (%) on your savings?"
+        description="Your estimated annual investment return. Used when no risk profile is selected."
+        value={form.expectedReturnRate}
+        onChange={(v) => set("expectedReturnRate", v)}
+        tooltip="Your expected annual investment return. Overridden if a Risk Profile is selected."
+      />
       <Separator className="my-1" />
       <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Retirement & Insurance Accounts</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -423,12 +477,6 @@ export default function WealthSnapshotCalc() {
         <div className="sm:col-span-2">
           <MF label="Cash Value of Life Insurance Policies" value={form.lifeInsuranceCashValue} onChange={(v) => set("lifeInsuranceCashValue", v)} tooltip="Surrender value of whole life or universal life insurance policies." />
         </div>
-      </div>
-      <Separator className="my-1" />
-      <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Savings & Growth</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <MF label="Annual Savings" value={form.annualSavings} onChange={(v) => set("annualSavings", v)} tooltip="Amount you save or invest per year. Used in retirement projections." />
-        <PF label="Expected Rate of Return (%)" value={form.expectedReturnRate} onChange={(v) => set("expectedReturnRate", v)} tooltip="Your expected annual investment return. Used when no risk profile is selected." />
       </div>
       {totalDomAssets > 0 && (
         <div className="p-3 bg-blue-50 rounded-lg flex items-center justify-between">
