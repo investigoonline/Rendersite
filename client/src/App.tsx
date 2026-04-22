@@ -35,7 +35,6 @@ import Articles from "@/pages/Articles";
 import Flipbooks from "@/pages/Flipbooks";
 import Newsletters from "@/pages/Newsletters";
 import BackgroundPreview from "@/pages/BackgroundPreview";
-import WealthSnapshot from "@/pages/WealthSnapshot";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -47,7 +46,6 @@ function Router() {
         <Route path="/home-designs" component={HomeDesignOptions} />
         <Route path="/calculators" component={Calculators} />
         <Route path="/financial-calculators" component={FinancialCalculators} />
-        <Route path="/wealth-snapshot" component={WealthSnapshot} />
         <Route path="/resources" component={Resources} />
         <Route path="/resources/articles" component={Articles} />
         <Route path="/resources/flipbooks" component={Flipbooks} />
