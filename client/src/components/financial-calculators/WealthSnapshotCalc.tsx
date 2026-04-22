@@ -505,16 +505,49 @@ export default function WealthSnapshotCalc() {
   );
 
   const renderLiabilities = () => (
-    <div className="space-y-4">
-      <p className="text-xs text-gray-500">Enter the current outstanding balance of each liability.</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <MF label="Mortgage Loans" value={form.mortgageLoans} onChange={(v) => set("mortgageLoans", v)} tooltip="Outstanding balance on home loans." />
-        <MF label="Personal Loans" value={form.personalLoans} onChange={(v) => set("personalLoans", v)} tooltip="Unsecured personal loans and consumer credit." />
-        <MF label="Business Loans" value={form.businessLoans} onChange={(v) => set("businessLoans", v)} tooltip="Outstanding loans tied to your business." />
-        <MF label="Credit Lines" value={form.creditLines} onChange={(v) => set("creditLines", v)} tooltip="Home equity lines, margin accounts, and revolving credit." />
-        <MF label="Other Liabilities" value={form.otherLiabilities} onChange={(v) => set("otherLiabilities", v)} tooltip="Credit card balances, car loans, and any other debts." />
-        <MF label="Taxes Payable" value={form.taxesPayable} onChange={(v) => set("taxesPayable", v)} tooltip="Estimated taxes owed but not yet paid." />
-      </div>
+    <div>
+      <QAField
+        question="What is your outstanding Mortgage Loan balance?"
+        description="Total remaining balance on all home or property mortgage loans."
+        value={form.mortgageLoans}
+        onChange={(v) => set("mortgageLoans", v)}
+        tooltip="Outstanding balance on all home loans and mortgages."
+      />
+      <QAField
+        question="What are your outstanding Personal Loans?"
+        description="Unsecured personal loans, consumer credit, student loans, and auto loans."
+        value={form.personalLoans}
+        onChange={(v) => set("personalLoans", v)}
+        tooltip="Unsecured personal loans and consumer credit."
+      />
+      <QAField
+        question="What are your outstanding Business Loans?"
+        description="Any loans or financing tied to your business or business operations."
+        value={form.businessLoans}
+        onChange={(v) => set("businessLoans", v)}
+        tooltip="Outstanding loans tied to your business."
+      />
+      <QAField
+        question="What are your outstanding Credit Lines?"
+        description="Home equity lines of credit, margin accounts, and revolving credit balances."
+        value={form.creditLines}
+        onChange={(v) => set("creditLines", v)}
+        tooltip="Home equity lines, margin accounts, and revolving credit."
+      />
+      <QAField
+        question="What are your other Liabilities?"
+        description="Credit card balances, car loans, medical bills, and any remaining debts."
+        value={form.otherLiabilities}
+        onChange={(v) => set("otherLiabilities", v)}
+        tooltip="Credit card balances, car loans, and any other debts."
+      />
+      <QAField
+        question="What is the amount of Taxes Payable?"
+        description="Estimated taxes owed but not yet paid, including income, property, or capital gains tax."
+        value={form.taxesPayable}
+        onChange={(v) => set("taxesPayable", v)}
+        tooltip="Estimated taxes owed but not yet paid."
+      />
       {totalLiabilities > 0 && (
         <div className="p-3 bg-red-50 rounded-lg flex items-center justify-between">
           <span className="text-sm text-red-700 font-medium">Total Liabilities</span>
@@ -539,8 +572,8 @@ export default function WealthSnapshotCalc() {
     return (
       <div className="space-y-5">
         <div>
-          <p className="text-sm font-semibold text-gray-700 mb-1">Risk Appetite</p>
-          <p className="text-xs text-gray-500 mb-3">Overrides the Expected Rate of Return in projections when selected.</p>
+          <p className="text-sm font-semibold text-gray-700 mb-1">What is your Risk Appetite?</p>
+          <p className="text-xs text-gray-500 mb-3">Select how much risk you are comfortable taking. This overrides your Expected Rate of Return in projections.</p>
           <div className="space-y-2">
             {appetiteOpts.map((opt) => (
               <button
@@ -568,7 +601,8 @@ export default function WealthSnapshotCalc() {
         </div>
         <Separator />
         <div>
-          <p className="text-sm font-semibold text-gray-700 mb-3">Investment Style</p>
+          <p className="text-sm font-semibold text-gray-700 mb-1">What is your preferred Investment Style?</p>
+          <p className="text-xs text-gray-500 mb-3">Choose the approach that best reflects how you like to invest your money.</p>
           <div className="grid grid-cols-2 gap-2">
             {styleOpts.map((opt) => (
               <button
