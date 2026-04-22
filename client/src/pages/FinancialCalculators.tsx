@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { CalculatorIcon, Home, TrendingUp, PiggyBank, Percent, BarChart3, Landmark } from "lucide-react";
+import { CalculatorIcon, Home, TrendingUp, PiggyBank, Percent, BarChart3, Landmark, Wallet } from "lucide-react";
 import NetWorthCalc from "@/components/financial-calculators/NetWorthCalc";
 import LoanPayoffCalc from "@/components/financial-calculators/LoanPayoffCalc";
 import RealEstateCalc from "@/components/financial-calculators/RealEstateCalc";
@@ -9,6 +9,7 @@ import RetirementCalc from "@/components/financial-calculators/RetirementCalc";
 import InterestCalc from "@/components/financial-calculators/InterestCalc";
 import CAGRCalc from "@/components/financial-calculators/CAGRCalc";
 import IRACalc from "@/components/financial-calculators/IRACalc";
+import WealthSnapshotCalc from "@/components/financial-calculators/WealthSnapshotCalc";
 import CalculatorDisclaimer from "@/components/calculators/CalculatorDisclaimer";
 
 const SECTIONS = [
@@ -82,6 +83,16 @@ const SECTIONS = [
     description: "Determine your Roth IRA contribution eligibility and Traditional IRA deductibility based on 2024 IRS rules.",
     component: IRACalc,
   },
+  {
+    id: "wealth-snapshot",
+    label: "Wealth Snapshot",
+    icon: Wallet,
+    badge: "Comprehensive Planning",
+    badgeColor: "bg-indigo-100 text-indigo-800",
+    title: "Wealth Snapshot",
+    description: "Your complete financial profile — personal details, domestic & non-domicile assets, liabilities, risk profile, estate planning, and retirement projections at ages 65, 75 & 85.",
+    component: WealthSnapshotCalc,
+  },
 ];
 
 export default function FinancialCalculators() {
@@ -99,7 +110,7 @@ export default function FinancialCalculators() {
               Financial Calculators
             </h1>
             <p className="text-white/80 text-lg max-w-2xl mx-auto">
-              Professional-grade financial planning tools — net worth, loans, real estate, retirement, interest, and more.
+              Professional-grade financial planning tools — net worth, loans, real estate, retirement, interest, and a comprehensive Wealth Snapshot.
             </p>
           </div>
         </div>
