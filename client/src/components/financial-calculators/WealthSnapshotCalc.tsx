@@ -58,10 +58,7 @@ interface Form {
   plannedRetirementAge: string;
   // Assets
   cashBank: string;
-  fixedDeposits: string;
-  stocks: string;
-  mutualFunds: string;
-  bonds: string;
+  investments: string;
   primaryResidential: string;
   otherRealEstate: string;
   equityInBusiness: string;
@@ -97,7 +94,7 @@ interface Form {
 
 const defaultForm: Form = {
   fullName: "", currentAge: "", citizenship: "", taxDomicile: "", countryOfResidence: "", plannedRetirementAge: "",
-  cashBank: "0", fixedDeposits: "0", stocks: "0", mutualFunds: "0", bonds: "0",
+  cashBank: "0", investments: "0",
   primaryResidential: "0", otherRealEstate: "0", equityInBusiness: "0", personalProperties: "0",
   alternativeInvestments: "0", otherAssets: "0", annualSavings: "0", expectedReturnRate: "5",
   retirement401k: "0", iraBalance: "0", lifeInsuranceCashValue: "0",
@@ -155,6 +152,31 @@ function MF({ label, value, onChange, tooltip }: {
       <FL label={label} tooltip={tooltip} />
       <div className="relative">
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium pointer-events-none">$</span>
+        <NumericInput className="pl-7" value={value} onChange={(e) => onChange(e.target.value)} placeholder="0" />
+      </div>
+    </div>
+  );
+}
+
+function QAField({ question, description, value, onChange, tooltip }: {
+  question: string; description: string; value: string; onChange: (v: string) => void; tooltip?: string;
+}) {
+  return (
+    <div className="mb-5">
+      <div className="flex items-center gap-2 mb-1">
+        <label className="text-sm font-medium text-gray-700">{question}</label>
+        {tooltip && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <HelpCircle className="h-4 w-4 text-gray-400 cursor-help flex-shrink-0" />
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs text-xs">{tooltip}</TooltipContent>
+          </Tooltip>
+        )}
+      </div>
+      <p className="text-xs text-gray-400 mb-1">{description}</p>
+      <div className="relative">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm pointer-events-none">$</span>
         <NumericInput className="pl-7" value={value} onChange={(e) => onChange(e.target.value)} placeholder="0" />
       </div>
     </div>
@@ -254,8 +276,7 @@ export default function WealthSnapshotCalc() {
   // ── Calculations ──────────────────────────────────────────────────────────
 
   const totalDomAssets =
-    n(form.cashBank) + n(form.fixedDeposits) + n(form.stocks) + n(form.mutualFunds) +
-    n(form.bonds) + n(form.primaryResidential) + n(form.otherRealEstate) +
+    n(form.cashBank) + n(form.investments) + n(form.primaryResidential) + n(form.otherRealEstate) +
     n(form.equityInBusiness) + n(form.personalProperties) + n(form.alternativeInvestments) +
     n(form.otherAssets) + n(form.retirement401k) + n(form.iraBalance) + n(form.lifeInsuranceCashValue);
 
@@ -303,10 +324,7 @@ export default function WealthSnapshotCalc() {
 
   const domBreakdownPie = [
     { name: "Cash & Bank", value: n(form.cashBank) },
-    { name: "Fixed Deposits", value: n(form.fixedDeposits) },
-    { name: "Stocks", value: n(form.stocks) },
-    { name: "Mutual Funds", value: n(form.mutualFunds) },
-    { name: "Bonds", value: n(form.bonds) },
+    { name: "Investments", value: n(form.investments) },
     { name: "Primary Residential", value: n(form.primaryResidential) },
     { name: "Other Real Estate", value: n(form.otherRealEstate) },
     { name: "Business Equity", value: n(form.equityInBusiness) },
@@ -374,13 +392,22 @@ export default function WealthSnapshotCalc() {
 
   const renderAssets = () => (
     <div className="space-y-3">
-      <p className="text-xs text-gray-500">Enter current market value of each asset.</p>
+      <QAField
+        question="What is the value of your cash & bank balances?"
+        description="Enter cash holdings and balances in checking & savings accounts."
+        value={form.cashBank}
+        onChange={(v) => set("cashBank", v)}
+        tooltip="Include all checking, savings, money market, and CD accounts."
+      />
+      <QAField
+        question="Total market value of investments (stocks, mutual funds, bonds)?"
+        description="Include stocks, mutual funds, bonds, and other investment holdings."
+        value={form.investments}
+        onChange={(v) => set("investments", v)}
+        tooltip="Listed equities, ETFs, mutual fund NAV, government and corporate bonds at current market value."
+      />
+      <Separator className="my-1" />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <MF label="Cash & Bank Balance" value={form.cashBank} onChange={(v) => set("cashBank", v)} tooltip="All checking, savings, and money market accounts." />
-        <MF label="Fixed Deposits" value={form.fixedDeposits} onChange={(v) => set("fixedDeposits", v)} tooltip="CDs, term deposits, and fixed-rate instruments." />
-        <MF label="Stocks" value={form.stocks} onChange={(v) => set("stocks", v)} tooltip="Listed equities at current market value." />
-        <MF label="Mutual Funds" value={form.mutualFunds} onChange={(v) => set("mutualFunds", v)} tooltip="Total NAV of all mutual fund holdings." />
-        <MF label="Bonds" value={form.bonds} onChange={(v) => set("bonds", v)} tooltip="Government and corporate bonds at current value." />
         <MF label="Primary Residential" value={form.primaryResidential} onChange={(v) => set("primaryResidential", v)} tooltip="Current market value of your primary home." />
         <MF label="Other Real Estate" value={form.otherRealEstate} onChange={(v) => set("otherRealEstate", v)} tooltip="Investment properties, land, or secondary homes." />
         <MF label="Equity in the Business" value={form.equityInBusiness} onChange={(v) => set("equityInBusiness", v)} tooltip="Your ownership stake in private businesses." />
