@@ -94,7 +94,7 @@ const defaultForm: Form = {
   fullName: "", currentAge: "", citizenship: "", taxDomicile: "", countryOfResidence: "", plannedRetirementAge: "",
   cashBank: "0", investments: "0",
   primaryResidential: "0", otherRealEstate: "0", equityInBusiness: "0", personalProperties: "0",
-  annualSavings: "0", expectedReturnRate: "5",
+  annualSavings: "0", expectedReturnRate: "0",
   retirement401k: "0", iraBalance: "0", lifeInsuranceCashValue: "0",
   foreignCashBank: "0", foreignRealEstate: "0", anyOtherAssets: "0",
   mortgageLoans: "0", personalLoans: "0", businessLoans: "0", creditLines: "0", otherLiabilities: "0", taxesPayable: "0",
