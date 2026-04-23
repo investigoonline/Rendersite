@@ -8,7 +8,7 @@ import { NumericInput } from "@/components/ui/numeric-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { PieChart, Pie, Cell, Tooltip as ReTooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
-import { HelpCircle, CheckCircle2, TrendingUp, Building2, Globe2, CreditCard, ShieldCheck, ScrollText, User } from "lucide-react";
+import { HelpCircle, CheckCircle2, TrendingUp, Building2, Globe2, CreditCard, ShieldCheck, ScrollText, User, ChevronLeft, ChevronRight } from "lucide-react";
 import CalculatorCTAs from "./CalculatorCTAs";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -667,6 +667,10 @@ export default function WealthSnapshotCalc() {
 
   // ─── Render ───────────────────────────────────────────────────────────────
 
+  const activeTabIndex = TABS.findIndex(t => t.id === activeTab);
+  const goPrev = () => activeTabIndex > 0 && setActiveTab(TABS[activeTabIndex - 1].id);
+  const goNext = () => activeTabIndex < TABS.length - 1 && setActiveTab(TABS[activeTabIndex + 1].id);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* ── Left: Tabbed Input ───────────────────────────────────────────── */}
@@ -689,6 +693,31 @@ export default function WealthSnapshotCalc() {
             {tabRenders[activeTab]()}
           </CardContent>
         </Card>
+
+        {/* Prev / Next navigation */}
+        <div className="flex items-center justify-between mt-3">
+          <button
+            onClick={goPrev}
+            disabled={activeTabIndex === 0}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Previous
+          </button>
+
+          <span className="text-xs text-gray-400 font-medium">
+            {activeTabIndex + 1} / {TABS.length}
+          </span>
+
+          <button
+            onClick={goNext}
+            disabled={activeTabIndex === TABS.length - 1}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-primary text-white hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
+          >
+            Next
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {/* ── Right: Live Results ──────────────────────────────────────────── */}
@@ -699,16 +728,15 @@ export default function WealthSnapshotCalc() {
             <h3 className="font-bold text-gray-900 mb-3 text-sm uppercase tracking-wide text-gray-500">Net Worth Summary</h3>
 
             {overviewPie.length > 0 ? (
-              <ResponsiveContainer width="100%" height={180}>
+              <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
-                  <Pie data={overviewPie} cx="50%" cy="50%" outerRadius={70} dataKey="value"
-                    label={({ percent }) => `${(percent * 100).toFixed(0)}%`} labelLine={false}>
+                  <Pie data={overviewPie} cx="50%" cy="50%" outerRadius={72} dataKey="value">
                     {overviewPie.map((_, i) => (
                       <Cell key={i} fill={[COLOR_DOM, COLOR_NONDOM, COLOR_LIB][i]} />
                     ))}
                   </Pie>
                   <ReTooltip formatter={(v: number) => fmtFull(v)} />
-                  <Legend wrapperStyle={{ fontSize: "11px" }} />
+                  <Legend wrapperStyle={{ fontSize: "11px" }} iconSize={10} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
@@ -749,13 +777,13 @@ export default function WealthSnapshotCalc() {
           <Card>
             <CardContent className="pt-4 px-3 pb-3">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 px-1">Domestic Asset Breakdown</p>
-              <ResponsiveContainer width="100%" height={200}>
+              <ResponsiveContainer width="100%" height={260}>
                 <PieChart>
-                  <Pie data={domBreakdownPie} cx="50%" cy="50%" innerRadius={40} outerRadius={75} dataKey="value" paddingAngle={2}>
+                  <Pie data={domBreakdownPie} cx="50%" cy="45%" innerRadius={42} outerRadius={78} dataKey="value" paddingAngle={2}>
                     {domBreakdownPie.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                   </Pie>
                   <ReTooltip formatter={(v: number) => fmtFull(v)} />
-                  <Legend wrapperStyle={{ fontSize: "10px" }} />
+                  <Legend wrapperStyle={{ fontSize: "10px", lineHeight: "18px" }} iconSize={8} />
                 </PieChart>
               </ResponsiveContainer>
             </CardContent>
