@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,7 +38,14 @@ const GROWTH_RATES: Record<string, number> = {
   conservative: 0.04,
   moderate: 0.06,
   aggressive: 0.08,
-  "": 0.05,
+};
+
+// Investment-style growth rates (used when no Risk Appetite is chosen)
+const STYLE_RATES: Record<string, number> = {
+  income: 0.035,
+  balanced: 0.055,
+  growth: 0.075,
+  speculative: 0.10,
 };
 
 const PIE_COLORS = ["#1e5fad", "#0a7c59", "#2eaad1", "#6366f1", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6", "#f97316", "#14b8a6", "#e11d48", "#0891b2"];
@@ -205,6 +212,60 @@ function QAFieldPercent({ question, description, value, onChange, tooltip }: {
   );
 }
 
+function QAFieldText({ question, description, value, onChange, placeholder, tooltip }: {
+  question: string; description: string; value: string; onChange: (v: string) => void; placeholder?: string; tooltip?: string;
+}) {
+  return (
+    <div className="mb-5">
+      <div className="flex items-center gap-2 mb-1">
+        <label className="text-sm font-medium text-gray-700">{question}</label>
+        {tooltip && (
+          <Tooltip><TooltipTrigger asChild><HelpCircle className="h-4 w-4 text-gray-400 cursor-help flex-shrink-0" /></TooltipTrigger>
+            <TooltipContent className="max-w-xs text-xs">{tooltip}</TooltipContent></Tooltip>
+        )}
+      </div>
+      <p className="text-xs text-gray-400 mb-1">{description}</p>
+      <Input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} />
+    </div>
+  );
+}
+
+function QAFieldNumber({ question, description, value, onChange, placeholder, allowDecimal, tooltip }: {
+  question: string; description: string; value: string; onChange: (v: string) => void; placeholder?: string; allowDecimal?: boolean; tooltip?: string;
+}) {
+  return (
+    <div className="mb-5">
+      <div className="flex items-center gap-2 mb-1">
+        <label className="text-sm font-medium text-gray-700">{question}</label>
+        {tooltip && (
+          <Tooltip><TooltipTrigger asChild><HelpCircle className="h-4 w-4 text-gray-400 cursor-help flex-shrink-0" /></TooltipTrigger>
+            <TooltipContent className="max-w-xs text-xs">{tooltip}</TooltipContent></Tooltip>
+        )}
+      </div>
+      <p className="text-xs text-gray-400 mb-1">{description}</p>
+      <NumericInput value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} allowDecimal={allowDecimal} />
+    </div>
+  );
+}
+
+function QAFieldSelect({ question, description, tooltip, children }: {
+  question: string; description: string; tooltip?: string; children: ReactNode;
+}) {
+  return (
+    <div className="mb-5">
+      <div className="flex items-center gap-2 mb-1">
+        <label className="text-sm font-medium text-gray-700">{question}</label>
+        {tooltip && (
+          <Tooltip><TooltipTrigger asChild><HelpCircle className="h-4 w-4 text-gray-400 cursor-help flex-shrink-0" /></TooltipTrigger>
+            <TooltipContent className="max-w-xs text-xs">{tooltip}</TooltipContent></Tooltip>
+        )}
+      </div>
+      <p className="text-xs text-gray-400 mb-1">{description}</p>
+      {children}
+    </div>
+  );
+}
+
 function PF({ label, value, onChange, tooltip }: {
   label: string; value: string; onChange: (v: string) => void; tooltip?: string;
 }) {
@@ -303,7 +364,7 @@ export default function WealthSnapshotCalc() {
 
   const totalDomAssets =
     n(form.cashBank) + n(form.investments) + n(form.primaryResidential) + n(form.otherRealEstate) +
-    n(form.equityInBusiness) + n(form.personalProperties) +
+    n(form.equityInBusiness) + n(form.personalProperties) + n(form.annualSavings) +
     n(form.retirement401k) + n(form.iraBalance) + n(form.lifeInsuranceCashValue);
 
   const totalNonDomAssets =
@@ -319,8 +380,14 @@ export default function WealthSnapshotCalc() {
   const currentAge = parseInt(form.currentAge) || 0;
   const retirementAge = parseInt(form.plannedRetirementAge) || 0;
   const annualSavings = n(form.annualSavings);
-  const growthRate = GROWTH_RATES[form.riskAppetite] ?? (n(form.expectedReturnRate) / 100 || 0.05);
-  const effectiveRate = form.riskAppetite ? growthRate : (n(form.expectedReturnRate) / 100 || 0.05);
+
+  // Bug 2 fix: Risk Appetite takes priority → Investment Style → custom rate → default 5%
+  const effectiveRate = form.riskAppetite
+    ? GROWTH_RATES[form.riskAppetite]
+    : form.investmentStyle
+    ? STYLE_RATES[form.investmentStyle]
+    : (n(form.expectedReturnRate) / 100 || 0.05);
+  const growthRate = effectiveRate;
 
   const projAt = (age: number) => {
     const yrs = Math.max(0, age - currentAge);
@@ -355,6 +422,7 @@ export default function WealthSnapshotCalc() {
     { name: "Other Real Estate", value: n(form.otherRealEstate) },
     { name: "Business Equity", value: n(form.equityInBusiness) },
     { name: "Personal Properties", value: n(form.personalProperties) },
+    { name: "Annual Savings", value: n(form.annualSavings) },
     { name: "401(K)", value: n(form.retirement401k) },
     { name: "IRA", value: n(form.iraBalance) },
     { name: "Life Insurance", value: n(form.lifeInsuranceCashValue) },
@@ -378,48 +446,67 @@ export default function WealthSnapshotCalc() {
   // ── Tab render functions (called as functions to prevent React remount) ──
 
   const renderPersonal = () => (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="sm:col-span-2">
-          <FL label="Full Name" />
-          <Input value={form.fullName} onChange={(e) => set("fullName", e.target.value)} placeholder="e.g. John Smith" />
-        </div>
-        <div>
-          <FL label="Current Age *" tooltip="Used to calculate years until each retirement milestone." />
-          <NumericInput value={form.currentAge} onChange={(e) => set("currentAge", e.target.value)} placeholder="e.g. 45" allowDecimal={false} />
-        </div>
-        <div>
-          <FL label="Planned Retirement Age" tooltip="The age at which you plan to retire. Used to project your wealth at retirement." />
-          <NumericInput value={form.plannedRetirementAge} onChange={(e) => set("plannedRetirementAge", e.target.value)} placeholder="e.g. 60" allowDecimal={false} />
-        </div>
-        <div>
-          <FL label="Citizenship" tooltip="When selected, Tax Domicile is automatically set to the same country." />
-          <Select value={form.citizenship} onValueChange={setCitizenship}>
-            <SelectTrigger><SelectValue placeholder="Select country" /></SelectTrigger>
-            <SelectContent>{COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-          </Select>
-        </div>
-        <div>
-          <FL label="Tax Domicile" tooltip="Auto-populated from Citizenship. Adjust if your tax domicile differs." />
-          <Select value={form.taxDomicile} onValueChange={(v) => set("taxDomicile", v)}>
-            <SelectTrigger><SelectValue placeholder="Select country" /></SelectTrigger>
-            <SelectContent>{COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-          </Select>
-          {form.citizenship && form.taxDomicile === form.citizenship && (
-            <p className="text-xs text-green-600 mt-1">Auto-matched to Citizenship</p>
-          )}
-        </div>
-        <div className="sm:col-span-2">
-          <FL label="Country of Residence" />
-          <Select value={form.countryOfResidence} onValueChange={(v) => set("countryOfResidence", v)}>
-            <SelectTrigger><SelectValue placeholder="Select country" /></SelectTrigger>
-            <SelectContent>{COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-          </Select>
-        </div>
-      </div>
+    <div className="space-y-1">
+      <QAFieldText
+        question="What is your full name?"
+        description="Enter your legal name as it appears on official documents."
+        value={form.fullName}
+        onChange={(v) => set("fullName", v)}
+        placeholder="e.g. John Smith"
+      />
+      <QAFieldNumber
+        question="How old are you?"
+        description="Your current age in years. Used to calculate years remaining until each retirement milestone."
+        value={form.currentAge}
+        onChange={(v) => set("currentAge", v)}
+        placeholder="e.g. 45"
+        allowDecimal={false}
+        tooltip="Your age determines how many years remain until ages 65, 75 and 85."
+      />
+      <QAFieldNumber
+        question="At what age do you plan to retire?"
+        description="The age at which you plan to fully or partially retire. Adds a personalised milestone to your projections."
+        value={form.plannedRetirementAge}
+        onChange={(v) => set("plannedRetirementAge", v)}
+        placeholder="e.g. 60"
+        allowDecimal={false}
+        tooltip="A custom retirement milestone card will appear in the projections panel."
+      />
+      <QAFieldSelect
+        question="What is your country of citizenship?"
+        description="Selecting citizenship automatically pre-fills your tax domicile. You can adjust it below if they differ."
+        tooltip="Your citizenship determines the initial tax domicile assignment."
+      >
+        <Select value={form.citizenship} onValueChange={setCitizenship}>
+          <SelectTrigger><SelectValue placeholder="Select country" /></SelectTrigger>
+          <SelectContent>{COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+        </Select>
+      </QAFieldSelect>
+      <QAFieldSelect
+        question="What is your tax domicile country?"
+        description="The country where you are primarily taxed. Auto-matched to your citizenship — adjust here if they differ."
+        tooltip="Tax domicile affects how non-domicile assets are treated in your financial plan."
+      >
+        <Select value={form.taxDomicile} onValueChange={(v) => set("taxDomicile", v)}>
+          <SelectTrigger><SelectValue placeholder="Select country" /></SelectTrigger>
+          <SelectContent>{COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+        </Select>
+        {form.citizenship && form.taxDomicile === form.citizenship && (
+          <p className="text-xs text-green-600 mt-1">Auto-matched to Citizenship</p>
+        )}
+      </QAFieldSelect>
+      <QAFieldSelect
+        question="What country do you currently reside in?"
+        description="Your primary country of physical residence for the current tax year."
+      >
+        <Select value={form.countryOfResidence} onValueChange={(v) => set("countryOfResidence", v)}>
+          <SelectTrigger><SelectValue placeholder="Select country" /></SelectTrigger>
+          <SelectContent>{COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+        </Select>
+      </QAFieldSelect>
       {form.currentAge && parseInt(form.currentAge) > 0 && (
         <div className="p-3 bg-blue-50 rounded-lg text-xs text-blue-700">
-          Projections will be shown at ages 65, 75 & 85
+          Projections will be shown at ages 65, 75 &amp; 85
           {form.plannedRetirementAge && parseInt(form.plannedRetirementAge) > 0 && `, plus your planned retirement at age ${form.plannedRetirementAge}`}.
         </div>
       )}
@@ -479,20 +566,37 @@ export default function WealthSnapshotCalc() {
       />
       <QAFieldPercent
         question="What is your expected rate of return (%) on your savings?"
-        description="Your estimated annual investment return. Used when no risk profile is selected."
+        description="Your estimated annual investment return. Used when no risk profile is selected. Maximum 50%."
         value={form.expectedReturnRate}
-        onChange={(v) => set("expectedReturnRate", v)}
-        tooltip="Your expected annual investment return. Overridden if a Risk Profile is selected."
+        onChange={(v) => {
+          const raw = parseFloat(v) || 0;
+          set("expectedReturnRate", String(Math.min(50, Math.max(0, raw))));
+        }}
+        tooltip="Your expected annual investment return, capped at 50%. Overridden if a Risk Profile or Investment Style is selected."
       />
       <Separator className="my-1" />
       <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Retirement & Insurance Accounts</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <MF label="401(K) Balance" value={form.retirement401k} onChange={(v) => set("retirement401k", v)} tooltip="Current balance of your 401(k) retirement account." />
-        <MF label="IRA Balance" value={form.iraBalance} onChange={(v) => set("iraBalance", v)} tooltip="Traditional IRA, Roth IRA, or SEP-IRA balance." />
-        <div className="sm:col-span-2">
-          <MF label="Cash Value of Life Insurance Policies" value={form.lifeInsuranceCashValue} onChange={(v) => set("lifeInsuranceCashValue", v)} tooltip="Surrender value of whole life or universal life insurance policies." />
-        </div>
-      </div>
+      <QAField
+        question="What is your 401(K) Balance?"
+        description="Current balance of your 401(k) employer-sponsored retirement savings account."
+        value={form.retirement401k}
+        onChange={(v) => set("retirement401k", v)}
+        tooltip="The current market value of your 401(k) account, including employer contributions."
+      />
+      <QAField
+        question="What is your IRA Balance?"
+        description="Combined balance across Traditional, Roth, or SEP-IRA accounts at current market value."
+        value={form.iraBalance}
+        onChange={(v) => set("iraBalance", v)}
+        tooltip="Individual Retirement Account balance — includes Traditional, Roth, SIMPLE, and SEP-IRA."
+      />
+      <QAField
+        question="What is the cash value of your Life Insurance policies?"
+        description="Surrender or cash value of whole life, universal life, or variable life insurance policies."
+        value={form.lifeInsuranceCashValue}
+        onChange={(v) => set("lifeInsuranceCashValue", v)}
+        tooltip="The amount you would receive if you surrendered your life insurance policy today."
+      />
       {totalDomAssets > 0 && (
         <div className="p-3 bg-blue-50 rounded-lg flex items-center justify-between">
           <span className="text-sm text-blue-700 font-medium">Total Domestic Assets</span>
@@ -503,13 +607,29 @@ export default function WealthSnapshotCalc() {
   );
 
   const renderNonDom = () => (
-    <div className="space-y-4">
-      <p className="text-xs text-gray-500">Enter the USD-equivalent value of assets held outside your home country.</p>
-      <div className="space-y-3">
-        <MF label="Foreign Cash / Bank Balance" value={form.foreignCashBank} onChange={(v) => set("foreignCashBank", v)} tooltip="Offshore bank accounts and foreign currency holdings." />
-        <MF label="Foreign Real Estate" value={form.foreignRealEstate} onChange={(v) => set("foreignRealEstate", v)} tooltip="Properties and real estate held in foreign countries." />
-        <MF label="Any Other Assets" value={form.anyOtherAssets} onChange={(v) => set("anyOtherAssets", v)} tooltip="Foreign investments, businesses, or any other international assets." />
-      </div>
+    <div className="space-y-1">
+      <p className="text-xs text-gray-500 mb-2">Enter the USD-equivalent value of assets held outside your home country.</p>
+      <QAField
+        question="What is the value of your Foreign Cash & Bank Balances?"
+        description="Offshore bank accounts and foreign currency holdings, in USD equivalent."
+        value={form.foreignCashBank}
+        onChange={(v) => set("foreignCashBank", v)}
+        tooltip="Include all offshore or foreign-held bank accounts, savings, and cash equivalents."
+      />
+      <QAField
+        question="What is the value of your Foreign Real Estate?"
+        description="Properties and real estate held outside your home country, in USD equivalent."
+        value={form.foreignRealEstate}
+        onChange={(v) => set("foreignRealEstate", v)}
+        tooltip="Market value of any property you own in a foreign country."
+      />
+      <QAField
+        question="What is the value of any other Foreign Assets?"
+        description="Foreign investments, businesses, trusts, or any other international assets in USD equivalent."
+        value={form.anyOtherAssets}
+        onChange={(v) => set("anyOtherAssets", v)}
+        tooltip="Any remaining assets held internationally not captured above."
+      />
       {totalNonDomAssets > 0 && (
         <div className="p-3 bg-teal-50 rounded-lg flex items-center justify-between">
           <span className="text-sm text-teal-700 font-medium">Total Non-Domicile Assets</span>
@@ -579,10 +699,10 @@ export default function WealthSnapshotCalc() {
       { value: "aggressive", label: "🚀 Aggressive", desc: "Growth-focused — ~8% projected p.a." },
     ];
     const styleOpts = [
-      { value: "income", label: "Income", desc: "Regular dividends & cash flow" },
-      { value: "balanced", label: "Balanced", desc: "Mix of income & growth" },
-      { value: "growth", label: "Growth", desc: "Long-term capital gains" },
-      { value: "speculative", label: "Speculative", desc: "High-risk, high-reward" },
+      { value: "income", label: "Income", desc: "Regular dividends & cash flow — ~3.5% p.a." },
+      { value: "balanced", label: "Balanced", desc: "Mix of income & capital growth — ~5.5% p.a." },
+      { value: "growth", label: "Growth", desc: "Long-term capital appreciation — ~7.5% p.a." },
+      { value: "speculative", label: "Speculative", desc: "High-risk, high-reward strategies — ~10% p.a." },
     ];
     return (
       <div className="space-y-5">
@@ -807,10 +927,12 @@ export default function WealthSnapshotCalc() {
                 {/* Rate summary */}
                 <div className="text-xs text-gray-400 mb-3">
                   Growth rate: {form.riskAppetite
-                    ? `${form.riskAppetite} profile (${(growthRate * 100).toFixed(0)}% p.a.)`
+                    ? `${form.riskAppetite} risk profile (${(effectiveRate * 100).toFixed(0)}% p.a.)`
+                    : form.investmentStyle
+                    ? `${form.investmentStyle} investment style (${(effectiveRate * 100).toFixed(1)}% p.a.)`
                     : n(form.expectedReturnRate) > 0
                     ? `${n(form.expectedReturnRate).toFixed(1)}% p.a. (custom)`
-                    : "Enter a rate of return or select a Risk Profile"}
+                    : "Enter a rate of return or select a Risk Profile / Investment Style"}
                   {annualSavings > 0 && ` · +${fmtFull(annualSavings)}/yr savings`}
                 </div>
 
@@ -823,8 +945,14 @@ export default function WealthSnapshotCalc() {
                   </div>
                 )}
 
-                {/* Milestone cards — always shown */}
-                <div className="grid grid-cols-3 gap-2 mb-3">
+                {/* Milestone cards — Now + 65Y + 75Y + 85Y */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+                  <ProjectionCard
+                    label={`Now (${currentAge})`}
+                    value={fmt(Math.max(0, netWorth))}
+                    sub="Current net worth"
+                    color="border-green-200 bg-green-50"
+                  />
                   <ProjectionCard
                     label="65Y"
                     value={65 > currentAge ? fmt(proj65) : "—"}
