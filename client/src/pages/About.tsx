@@ -39,8 +39,9 @@ export default function About() {
     return <UnderConstruction />;
   }
 
-  const getContent = (section: string) => {
-    return pageContent?.find((p) => p.section === section)?.content;
+  const getContent = (section: string): Record<string, any> | undefined => {
+    const found = pageContent?.find((p) => p.section === section);
+    return found ? (found.content as Record<string, any>) : undefined;
   };
 
   const header = getContent("about_header");
@@ -103,13 +104,7 @@ export default function About() {
                     className="text-xl font-semibold text-gray-900 mb-3 flex items-center"
                     data-testid="text-mission-title"
                   >
-                    {getIconComponent(missionVision.missionIcon) &&
-                      (() => {
-                        const Icon = getIconComponent(
-                          missionVision.missionIcon,
-                        );
-                        return <Icon className="h-6 w-6 text-primary mr-2" />;
-                      })()}
+                    {(() => { const I = getIconComponent(missionVision.missionIcon); return I ? <I className="h-6 w-6 text-primary mr-2" /> : null; })()}
                     {missionVision.missionTitle}
                   </h3>
                   <p
@@ -126,13 +121,7 @@ export default function About() {
                     className="text-xl font-semibold text-gray-900 mb-3 flex items-center"
                     data-testid="text-approach-title"
                   >
-                    {getIconComponent(missionVision.approachIcon) &&
-                      (() => {
-                        const Icon = getIconComponent(
-                          missionVision.approachIcon,
-                        );
-                        return <Icon className="h-6 w-6 text-accent mr-2" />;
-                      })()}
+                    {(() => { const I = getIconComponent(missionVision.approachIcon); return I ? <I className="h-6 w-6 text-accent mr-2" /> : null; })()}
                     {missionVision.approachTitle}
                   </h3>
                   <p
@@ -149,11 +138,7 @@ export default function About() {
                     className="text-xl font-semibold text-gray-900 mb-3 flex items-center"
                     data-testid="text-philosophy-title"
                   >
-                    {getIconComponent(missionVision.visionIcon) &&
-                      (() => {
-                        const Icon = getIconComponent(missionVision.visionIcon);
-                        return <Icon className="h-6 w-6 text-secondary mr-2" />;
-                      })()}
+                    {(() => { const I = getIconComponent(missionVision.visionIcon); return I ? <I className="h-6 w-6 text-secondary mr-2" /> : null; })()}
                     {missionVision.visionTitle}
                   </h3>
                   <p

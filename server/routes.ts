@@ -1265,9 +1265,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         contentId: content.id,
         page: content.page,
         section: content.section,
-        content: content.content,
+        content: content.content as any,
         published: content.published || false,
-        changedBy: req.session.user.email,
+        changedBy: req.session.user?.email ?? 'system',
         changeType: 'create',
       });
       
@@ -1291,9 +1291,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         contentId: content.id,
         page: content.page,
         section: content.section,
-        content: content.content,
+        content: content.content as any,
         published: content.published || false,
-        changedBy: req.session.user.email,
+        changedBy: req.session.user?.email ?? 'system',
         changeType: 'update',
       });
       
@@ -1318,9 +1318,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           contentId: contentToDelete.id,
           page: contentToDelete.page,
           section: contentToDelete.section,
-          content: contentToDelete.content,
+          content: contentToDelete.content as any,
           published: contentToDelete.published || false,
-          changedBy: req.session.user.email,
+          changedBy: req.session.user?.email ?? 'system',
           changeType: 'delete',
         });
       }
@@ -1362,9 +1362,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         contentId: restored.id,
         page: restored.page,
         section: restored.section,
-        content: restored.content,
+        content: restored.content as any,
         published: restored.published || false,
-        changedBy: req.session.user.email,
+        changedBy: req.session.user?.email ?? 'system',
         changeType: 'update',
       });
       
