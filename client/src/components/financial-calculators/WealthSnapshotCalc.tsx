@@ -245,15 +245,19 @@ function YesNo({ label, value, onChange, tooltip }: {
   );
 }
 
-function TabBtn({ id, label, icon: Icon, active, onClick }: {
-  id: string; label: string; icon: React.ElementType; active: boolean; onClick: () => void;
+function TabBtn({ id, label, icon: Icon, active, completed, onClick }: {
+  id: string; label: string; icon: React.ElementType; active: boolean; completed: boolean; onClick: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
-        active ? "bg-primary text-white shadow-sm" : "text-gray-600 hover:bg-gray-100"
+        active
+          ? "bg-primary text-white shadow-sm"
+          : completed
+          ? "bg-green-600 text-white shadow-sm"
+          : "text-gray-600 hover:bg-gray-100"
       }`}
     >
       <Icon className="h-3.5 w-3.5 flex-shrink-0" />
@@ -358,6 +362,18 @@ export default function WealthSnapshotCalc() {
 
   const estateItems = [form.will, form.trust, form.powerOfAttorney, form.healthcareDirective];
   const estateScore = estateItems.filter((v) => v === true).length;
+
+  const tabCompleted: Record<string, boolean> = {
+    personal: !!(form.fullName || form.currentAge || form.citizenship || form.countryOfResidence || form.plannedRetirementAge),
+    assets: [form.cashBank, form.investments, form.primaryResidential, form.otherRealEstate,
+             form.equityInBusiness, form.personalProperties, form.annualSavings,
+             form.retirement401k, form.iraBalance, form.lifeInsuranceCashValue].some(v => n(v) > 0),
+    nondom: [form.foreignCashBank, form.foreignRealEstate, form.anyOtherAssets].some(v => n(v) > 0),
+    liabilities: [form.mortgageLoans, form.personalLoans, form.businessLoans,
+                  form.creditLines, form.otherLiabilities, form.taxesPayable].some(v => n(v) > 0),
+    risk: !!(form.riskAppetite || form.investmentStyle),
+    estate: estateItems.some(v => v !== null),
+  };
 
   // ── Tab render functions (called as functions to prevent React remount) ──
 
@@ -655,10 +671,10 @@ export default function WealthSnapshotCalc() {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* ── Left: Tabbed Input ───────────────────────────────────────────── */}
       <div className="min-w-0">
-        {/* Tab nav — scrollable on mobile */}
-        <div className="flex gap-1 overflow-x-auto pb-2 mb-4">
+        {/* Tab nav */}
+        <div className="flex flex-wrap gap-1 mb-4">
           {TABS.map((t) => (
-            <TabBtn key={t.id} id={t.id} label={t.label} icon={t.icon} active={activeTab === t.id} onClick={() => setActiveTab(t.id)} />
+            <TabBtn key={t.id} id={t.id} label={t.label} icon={t.icon} active={activeTab === t.id} completed={!!(tabCompleted[t.id] && activeTab !== t.id)} onClick={() => setActiveTab(t.id)} />
           ))}
         </div>
 
