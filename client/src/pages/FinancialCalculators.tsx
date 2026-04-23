@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { CalculatorIcon, Home, TrendingUp, PiggyBank, Percent, BarChart3, Landmark, Wallet } from "lucide-react";
-import NetWorthCalc from "@/components/financial-calculators/NetWorthCalc";
+import { Home, TrendingUp, PiggyBank, Percent, BarChart3, Landmark, Wallet } from "lucide-react";
 import LoanPayoffCalc from "@/components/financial-calculators/LoanPayoffCalc";
 import RealEstateCalc from "@/components/financial-calculators/RealEstateCalc";
 import RetirementCalc from "@/components/financial-calculators/RetirementCalc";
@@ -16,12 +15,12 @@ const SECTIONS = [
   {
     id: "net-worth",
     label: "Net Worth",
-    icon: CalculatorIcon,
-    badge: "Wealth Management",
-    badgeColor: "bg-blue-100 text-blue-800",
+    icon: Wallet,
+    badge: "Comprehensive Planning",
+    badgeColor: "bg-indigo-100 text-indigo-800",
     title: "Net Worth Calculator",
-    description: "Calculate your complete financial position — assets vs liabilities — and track your wealth over time.",
-    component: NetWorthCalc,
+    description: "Your complete financial profile — personal details, domestic & non-domicile assets, liabilities, risk profile, estate planning, and retirement projections at ages 65, 75 & 85.",
+    component: WealthSnapshotCalc,
   },
   {
     id: "loan-payoff",
@@ -83,16 +82,6 @@ const SECTIONS = [
     description: "Determine your Roth IRA contribution eligibility and Traditional IRA deductibility based on 2024 IRS rules.",
     component: IRACalc,
   },
-  {
-    id: "wealth-snapshot",
-    label: "Wealth Snapshot",
-    icon: Wallet,
-    badge: "Comprehensive Planning",
-    badgeColor: "bg-indigo-100 text-indigo-800",
-    title: "Wealth Snapshot",
-    description: "Your complete financial profile — personal details, domestic & non-domicile assets, liabilities, risk profile, estate planning, and retirement projections at ages 65, 75 & 85.",
-    component: WealthSnapshotCalc,
-  },
 ];
 
 export default function FinancialCalculators() {
@@ -110,7 +99,7 @@ export default function FinancialCalculators() {
               Financial Calculators
             </h1>
             <p className="text-white/80 text-lg max-w-2xl mx-auto">
-              Professional-grade financial planning tools — net worth, loans, real estate, retirement, interest, and a comprehensive Wealth Snapshot.
+              Professional-grade financial planning tools — net worth, loans, real estate, retirement, interest, and more.
             </p>
           </div>
         </div>
