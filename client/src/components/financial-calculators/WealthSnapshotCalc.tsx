@@ -87,7 +87,6 @@ interface Form {
   trust: boolean | null;
   powerOfAttorney: boolean | null;
   healthcareDirective: boolean | null;
-  beneficiaries: string;
 }
 
 const defaultForm: Form = {
@@ -99,7 +98,7 @@ const defaultForm: Form = {
   foreignCashBank: "0", foreignRealEstate: "0", anyOtherAssets: "0",
   mortgageLoans: "0", personalLoans: "0", businessLoans: "0", creditLines: "0", otherLiabilities: "0", taxesPayable: "0",
   riskAppetite: "", investmentStyle: "",
-  will: null, trust: null, powerOfAttorney: null, healthcareDirective: null, beneficiaries: "",
+  will: null, trust: null, powerOfAttorney: null, healthcareDirective: null,
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -630,14 +629,6 @@ export default function WealthSnapshotCalc() {
       <YesNo label="Trust" value={form.trust} onChange={(v) => set("trust", v)} tooltip="A legal arrangement managing assets during your lifetime and beyond." />
       <YesNo label="Power of Attorney" value={form.powerOfAttorney} onChange={(v) => set("powerOfAttorney", v)} tooltip="Grants someone authority to act on your behalf for financial/legal matters." />
       <YesNo label="Healthcare Directive" value={form.healthcareDirective} onChange={(v) => set("healthcareDirective", v)} tooltip="Also known as a living will — outlines your medical care wishes." />
-      <div className="pt-2">
-        <FL label="Beneficiaries" tooltip="List the names of people or entities who will inherit your estate." />
-        <Input
-          value={form.beneficiaries}
-          onChange={(e) => set("beneficiaries", e.target.value)}
-          placeholder="e.g. Jane Smith (spouse), John Smith Jr. (son)"
-        />
-      </div>
       {estateScore > 0 && (
         <div className="mt-3 p-3 bg-amber-50 rounded-lg">
           <p className="text-xs text-amber-700">
