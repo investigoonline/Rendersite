@@ -762,72 +762,93 @@ export default function WealthSnapshotCalc() {
           </Card>
         )}
 
-        {/* Retirement Projections */}
-        {currentAge > 0 && netWorth > 0 && (
-          <Card>
-            <CardContent className="pt-4 px-4 pb-4">
-              <div className="flex items-center gap-2 mb-1">
-                <TrendingUp className="h-4 w-4 text-primary" />
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Retirement Projections</p>
-              </div>
-              <p className="text-xs text-gray-400 mb-3">
-                Rate: {form.riskAppetite
-                  ? `${form.riskAppetite} (${(growthRate * 100).toFixed(0)}% p.a.)`
-                  : `${n(form.expectedReturnRate).toFixed(1)}% p.a. (custom)`}
-                {annualSavings > 0 && ` · +${fmtFull(annualSavings)}/yr savings`}
-              </p>
+        {/* Retirement Wealth Projection */}
+        <Card>
+          <CardContent className="pt-4 px-4 pb-4">
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              <h3 className="font-bold text-gray-900 text-base">Retirement Wealth Projection</h3>
+            </div>
+            <p className="text-xs text-gray-500 mb-3">
+              Projected net worth at key retirement milestones — <span className="font-semibold text-gray-700">65Y, 75Y &amp; 85Y</span>
+              {retirementAge > 0 && <> and your planned retirement at <span className="font-semibold text-gray-700">Age {retirementAge}</span></>}.
+            </p>
 
-              {/* Custom retirement age card */}
-              {projRetirement !== null && retirementAge > currentAge && (
-                <div className="mb-3 p-3 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 text-center">
-                  <p className="text-xs text-gray-500 font-medium">At Planned Retirement (Age {retirementAge})</p>
-                  <p className="text-2xl font-bold text-primary">{fmt(projRetirement)}</p>
-                  <p className="text-xs text-gray-400">{Math.max(0, retirementAge - currentAge)} years from now</p>
+            {currentAge > 0 ? (
+              <>
+                {/* Rate summary */}
+                <div className="text-xs text-gray-400 mb-3">
+                  Growth rate: {form.riskAppetite
+                    ? `${form.riskAppetite} profile (${(growthRate * 100).toFixed(0)}% p.a.)`
+                    : n(form.expectedReturnRate) > 0
+                    ? `${n(form.expectedReturnRate).toFixed(1)}% p.a. (custom)`
+                    : "Enter a rate of return or select a Risk Profile"}
+                  {annualSavings > 0 && ` · +${fmtFull(annualSavings)}/yr savings`}
                 </div>
-              )}
 
-              {/* Standard milestone cards */}
+                {/* Custom retirement age card */}
+                {projRetirement !== null && retirementAge > currentAge && (
+                  <div className="mb-3 p-3 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 text-center">
+                    <p className="text-xs text-gray-500 font-medium">At Planned Retirement (Age {retirementAge})</p>
+                    <p className="text-2xl font-bold text-primary">{fmt(projRetirement)}</p>
+                    <p className="text-xs text-gray-400">{Math.max(0, retirementAge - currentAge)} years from now</p>
+                  </div>
+                )}
+
+                {/* Milestone cards — always shown */}
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  <ProjectionCard
+                    label="65Y"
+                    value={65 > currentAge ? fmt(proj65) : "—"}
+                    sub={65 > currentAge ? `${65 - currentAge} yrs away` : "Passed"}
+                    color={65 > currentAge ? "border-blue-200 bg-blue-50" : "border-gray-100 bg-gray-50"}
+                  />
+                  <ProjectionCard
+                    label="75Y"
+                    value={75 > currentAge ? fmt(proj75) : "—"}
+                    sub={75 > currentAge ? `${75 - currentAge} yrs away` : "Passed"}
+                    color={75 > currentAge ? "border-teal-200 bg-teal-50" : "border-gray-100 bg-gray-50"}
+                  />
+                  <ProjectionCard
+                    label="85Y"
+                    value={85 > currentAge ? fmt(proj85) : "—"}
+                    sub={85 > currentAge ? `${85 - currentAge} yrs away` : "Passed"}
+                    color={85 > currentAge ? "border-purple-200 bg-purple-50" : "border-gray-100 bg-gray-50"}
+                  />
+                </div>
+              </>
+            ) : (
+              /* Placeholder when no age entered */
               <div className="grid grid-cols-3 gap-2 mb-3">
-                <ProjectionCard
-                  label="Age 65"
-                  value={65 > currentAge ? fmt(proj65) : "—"}
-                  sub={65 > currentAge ? `${65 - currentAge} yrs` : "Passed"}
-                  color={65 > currentAge ? "border-blue-100 bg-blue-50" : "border-gray-100 bg-gray-50"}
-                />
-                <ProjectionCard
-                  label="Age 75"
-                  value={75 > currentAge ? fmt(proj75) : "—"}
-                  sub={75 > currentAge ? `${75 - currentAge} yrs` : "Passed"}
-                  color={75 > currentAge ? "border-teal-100 bg-teal-50" : "border-gray-100 bg-gray-50"}
-                />
-                <ProjectionCard
-                  label="Age 85"
-                  value={85 > currentAge ? fmt(proj85) : "—"}
-                  sub={85 > currentAge ? `${85 - currentAge} yrs` : "Passed"}
-                  color={85 > currentAge ? "border-purple-100 bg-purple-50" : "border-gray-100 bg-gray-50"}
-                />
+                {["65Y", "75Y", "85Y"].map((label) => (
+                  <div key={label} className="rounded-lg p-3 text-center border border-dashed border-gray-200 bg-gray-50">
+                    <p className="text-xs font-semibold text-gray-400 mb-1">{label}</p>
+                    <p className="text-sm text-gray-300">—</p>
+                    <p className="text-xs text-gray-300 mt-0.5">Enter age</p>
+                  </div>
+                ))}
               </div>
+            )}
 
-              {/* Growth bar chart */}
-              {projectionBars.length > 1 && (
-                <ResponsiveContainer width="100%" height={160}>
-                  <BarChart data={projectionBars} margin={{ top: 4, right: 8, left: 8, bottom: 4 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="label" tick={{ fontSize: 10 }} />
-                    <YAxis tickFormatter={(v) => fmt(v)} tick={{ fontSize: 9 }} width={55} />
-                    <ReTooltip formatter={(v: number) => [fmtFull(v), "Projected Net Worth"]} />
-                    <Bar dataKey="value" radius={[3, 3, 0, 0]}>
-                      {projectionBars.map((_, i) => (
-                        <Cell key={i} fill={i === 0 ? "#94a3b8" : PIE_COLORS[i % PIE_COLORS.length]} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
-              <p className="text-xs text-gray-400 mt-2">* Illustrative only. Not financial advice.</p>
-            </CardContent>
-          </Card>
-        )}
+            {/* Growth bar chart */}
+            {projectionBars.length > 1 && (
+              <ResponsiveContainer width="100%" height={160}>
+                <BarChart data={projectionBars} margin={{ top: 4, right: 8, left: 8, bottom: 4 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="label" tick={{ fontSize: 10 }} />
+                  <YAxis tickFormatter={(v) => fmt(v)} tick={{ fontSize: 9 }} width={55} />
+                  <ReTooltip formatter={(v: number) => [fmtFull(v), "Projected Net Worth"]} />
+                  <Bar dataKey="value" radius={[3, 3, 0, 0]}>
+                    {projectionBars.map((_, i) => (
+                      <Cell key={i} fill={i === 0 ? "#94a3b8" : PIE_COLORS[i % PIE_COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+            <p className="text-xs text-gray-400 mt-2">* Illustrative only. Not financial advice.</p>
+          </CardContent>
+        </Card>
 
         {/* Risk + Estate summary */}
         {(form.riskAppetite || form.investmentStyle || estateScore > 0) && (
