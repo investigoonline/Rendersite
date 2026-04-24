@@ -35,18 +35,20 @@ const COUNTRIES = [
 ];
 
 const GROWTH_RATES: Record<string, number> = {
-  conservative: 0.04,
-  moderate: 0.06,
-  aggressive: 0.08,
+  conservative: 0.05,
+  moderate: 0.07,
+  aggressive: 0.10,
 };
 
-// Investment-style growth rates (used when no Risk Appetite is chosen)
 const STYLE_RATES: Record<string, number> = {
-  income: 0.035,
-  balanced: 0.055,
-  growth: 0.075,
-  speculative: 0.10,
+  income: 0.04,
+  balanced: 0.06,
+  growth: 0.08,
+  speculative: 0.12,
 };
+
+const RISK_WEIGHT = 0.7;
+const STYLE_WEIGHT = 0.3;
 
 const PIE_COLORS = ["#1e5fad", "#0a7c59", "#2eaad1", "#6366f1", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6", "#f97316", "#14b8a6", "#e11d48", "#0891b2"];
 const COLOR_DOM = "#1e5fad";
@@ -381,12 +383,18 @@ export default function WealthSnapshotCalc() {
   const retirementAge = parseInt(form.plannedRetirementAge) || 0;
   const annualSavings = n(form.annualSavings);
 
-  // Bug 2 fix: Risk Appetite takes priority → Investment Style → custom rate → default 5%
-  const effectiveRate = form.riskAppetite
-    ? GROWTH_RATES[form.riskAppetite]
-    : form.investmentStyle
-    ? STYLE_RATES[form.investmentStyle]
-    : (n(form.expectedReturnRate) / 100 || 0.05);
+  // Weighted blend: r = (70% × risk_return) + (30% × style_return)
+  // Falls back gracefully when only one or neither is selected.
+  const riskReturn = GROWTH_RATES[form.riskAppetite] ?? null;
+  const styleReturn = STYLE_RATES[form.investmentStyle] ?? null;
+  const effectiveRate =
+    riskReturn !== null && styleReturn !== null
+      ? RISK_WEIGHT * riskReturn + STYLE_WEIGHT * styleReturn
+      : riskReturn !== null
+      ? riskReturn
+      : styleReturn !== null
+      ? styleReturn
+      : (n(form.expectedReturnRate) / 100 || 0.05);
   const growthRate = effectiveRate;
 
   const projAt = (age: number) => {
@@ -694,15 +702,15 @@ export default function WealthSnapshotCalc() {
 
   const renderRisk = () => {
     const appetiteOpts = [
-      { value: "conservative", label: "🛡️ Conservative", desc: "Capital preservation — ~4% projected p.a." },
-      { value: "moderate", label: "⚖️ Moderate", desc: "Balanced approach — ~6% projected p.a." },
-      { value: "aggressive", label: "🚀 Aggressive", desc: "Growth-focused — ~8% projected p.a." },
+      { value: "conservative", label: "🛡️ Conservative", desc: "Capital preservation — 5% base return p.a." },
+      { value: "moderate", label: "⚖️ Moderate", desc: "Balanced approach — 7% base return p.a." },
+      { value: "aggressive", label: "🚀 Aggressive", desc: "Growth-focused — 10% base return p.a." },
     ];
     const styleOpts = [
-      { value: "income", label: "Income", desc: "Regular dividends & cash flow — ~3.5% p.a." },
-      { value: "balanced", label: "Balanced", desc: "Mix of income & capital growth — ~5.5% p.a." },
-      { value: "growth", label: "Growth", desc: "Long-term capital appreciation — ~7.5% p.a." },
-      { value: "speculative", label: "Speculative", desc: "High-risk, high-reward strategies — ~10% p.a." },
+      { value: "income", label: "Income", desc: "Regular dividends & cash flow — 4% p.a." },
+      { value: "balanced", label: "Balanced", desc: "Mix of income & capital growth — 6% p.a." },
+      { value: "growth", label: "Growth", desc: "Long-term capital appreciation — 8% p.a." },
+      { value: "speculative", label: "Speculative", desc: "High-risk, high-reward strategies — 12% p.a." },
     ];
     return (
       <div className="space-y-5">
@@ -754,6 +762,40 @@ export default function WealthSnapshotCalc() {
             ))}
           </div>
         </div>
+
+        {/* Live blend result */}
+        {(riskReturn !== null || styleReturn !== null) && (
+          <>
+            <Separator />
+            <div className="rounded-xl bg-gradient-to-br from-primary/8 to-secondary/8 border border-primary/20 p-4">
+              <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Projected Growth Rate</p>
+              {riskReturn !== null && styleReturn !== null ? (
+                <>
+                  <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                    <span>Risk Appetite ({form.riskAppetite}) × 70%</span>
+                    <span>{(riskReturn * 100).toFixed(0)}% × 0.7 = {(riskReturn * 70).toFixed(1)}%</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+                    <span>Investment Style ({form.investmentStyle}) × 30%</span>
+                    <span>{(styleReturn * 100).toFixed(0)}% × 0.3 = {(styleReturn * 30).toFixed(1)}%</span>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-primary/20 pt-2">
+                    <span className="text-sm font-semibold text-primary">Blended Return (r)</span>
+                    <span className="text-xl font-bold text-primary">{(effectiveRate * 100).toFixed(2)}% p.a.</span>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">
+                    {riskReturn !== null ? `${form.riskAppetite} risk profile only` : `${form.investmentStyle} style only`}
+                  </span>
+                  <span className="text-xl font-bold text-primary">{(effectiveRate * 100).toFixed(1)}% p.a.</span>
+                </div>
+              )}
+              <p className="text-xs text-gray-400 mt-2">Select both a Risk Appetite and an Investment Style to see the full weighted blend.</p>
+            </div>
+          </>
+        )}
       </div>
     );
   };
@@ -926,13 +968,15 @@ export default function WealthSnapshotCalc() {
               <>
                 {/* Rate summary */}
                 <div className="text-xs text-gray-400 mb-3">
-                  Growth rate: {form.riskAppetite
-                    ? `${form.riskAppetite} risk profile (${(effectiveRate * 100).toFixed(0)}% p.a.)`
+                  Growth rate: {form.riskAppetite && form.investmentStyle
+                    ? `${form.riskAppetite} + ${form.investmentStyle} blend — ${(effectiveRate * 100).toFixed(2)}% p.a. (70% risk / 30% style)`
+                    : form.riskAppetite
+                    ? `${form.riskAppetite} risk profile — ${(effectiveRate * 100).toFixed(0)}% p.a.`
                     : form.investmentStyle
-                    ? `${form.investmentStyle} investment style (${(effectiveRate * 100).toFixed(1)}% p.a.)`
+                    ? `${form.investmentStyle} investment style — ${(effectiveRate * 100).toFixed(0)}% p.a.`
                     : n(form.expectedReturnRate) > 0
                     ? `${n(form.expectedReturnRate).toFixed(1)}% p.a. (custom)`
-                    : "Enter a rate of return or select a Risk Profile / Investment Style"}
+                    : "Select a Risk Appetite or Investment Style to drive projections"}
                   {annualSavings > 0 && ` · +${fmtFull(annualSavings)}/yr savings`}
                 </div>
 
