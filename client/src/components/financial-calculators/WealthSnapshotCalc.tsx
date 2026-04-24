@@ -366,7 +366,7 @@ export default function WealthSnapshotCalc() {
 
   const totalDomAssets =
     n(form.cashBank) + n(form.investments) + n(form.primaryResidential) + n(form.otherRealEstate) +
-    n(form.equityInBusiness) + n(form.personalProperties) +
+    n(form.equityInBusiness) + n(form.personalProperties) + n(form.annualSavings) +
     n(form.retirement401k) + n(form.iraBalance) + n(form.lifeInsuranceCashValue);
 
   const totalNonDomAssets =
@@ -399,7 +399,10 @@ export default function WealthSnapshotCalc() {
 
   const projAt = (age: number) => {
     const yrs = Math.max(0, age - currentAge);
-    return fv(Math.max(0, netWorth), annualSavings, effectiveRate, yrs);
+    // Subtract annualSavings from PV because it is included in netWorth (totalDomAssets)
+    // and also contributed each year as PMT — subtracting here prevents double-counting.
+    const basePV = Math.max(0, netWorth - annualSavings);
+    return fv(basePV, annualSavings, effectiveRate, yrs);
   };
 
   const proj65 = projAt(65);
@@ -430,6 +433,7 @@ export default function WealthSnapshotCalc() {
     { name: "Other Real Estate", value: n(form.otherRealEstate) },
     { name: "Business Equity", value: n(form.equityInBusiness) },
     { name: "Personal Properties", value: n(form.personalProperties) },
+    { name: "Annual Savings", value: n(form.annualSavings) },
     { name: "401(K)", value: n(form.retirement401k) },
     { name: "IRA", value: n(form.iraBalance) },
     { name: "Life Insurance", value: n(form.lifeInsuranceCashValue) },
@@ -581,6 +585,20 @@ export default function WealthSnapshotCalc() {
         }}
         tooltip="Your expected annual investment return, capped at 50%. Overridden if a Risk Profile or Investment Style is selected."
       />
+      {(riskReturn !== null || styleReturn !== null) && (
+        <div className="flex items-start gap-2 -mt-3 mb-4 px-3 py-2 rounded-md bg-amber-50 border border-amber-200">
+          <span className="text-amber-500 mt-0.5 flex-shrink-0">⚠</span>
+          <p className="text-xs text-amber-700">
+            Your custom rate is currently <strong>overridden</strong> by your{" "}
+            {riskReturn !== null && styleReturn !== null
+              ? `Risk + Style blend (${(effectiveRate * 100).toFixed(2)}% p.a.)`
+              : riskReturn !== null
+              ? `risk profile — ${(effectiveRate * 100).toFixed(0)}% p.a.`
+              : `investment style — ${(effectiveRate * 100).toFixed(0)}% p.a.`}.{" "}
+            To use a custom rate, clear your Risk Profile and Investment Style in the <strong>Risk</strong> tab.
+          </p>
+        </div>
+      )}
       <Separator className="my-1" />
       <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Retirement & Insurance Accounts</p>
       <QAField
