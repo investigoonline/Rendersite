@@ -576,7 +576,7 @@ export default function WealthSnapshotCalc() {
         tooltip="Amount you save or invest per year. Used in retirement projections."
       />
       <QAFieldPercent
-        question="What is your expected rate of return (%) on your savings?"
+        question="What is your expected rate of return (%) on annual your savings?"
         description="Your estimated annual investment return. Used when no risk profile is selected. Maximum 50%."
         value={form.expectedReturnRate}
         onChange={(v) => {
