@@ -366,7 +366,7 @@ export default function WealthSnapshotCalc() {
 
   const totalDomAssets =
     n(form.cashBank) + n(form.investments) + n(form.primaryResidential) + n(form.otherRealEstate) +
-    n(form.equityInBusiness) + n(form.personalProperties) + n(form.annualSavings) +
+    n(form.equityInBusiness) + n(form.personalProperties) +
     n(form.retirement401k) + n(form.iraBalance) + n(form.lifeInsuranceCashValue);
 
   const totalNonDomAssets =
@@ -430,7 +430,6 @@ export default function WealthSnapshotCalc() {
     { name: "Other Real Estate", value: n(form.otherRealEstate) },
     { name: "Business Equity", value: n(form.equityInBusiness) },
     { name: "Personal Properties", value: n(form.personalProperties) },
-    { name: "Annual Savings", value: n(form.annualSavings) },
     { name: "401(K)", value: n(form.retirement401k) },
     { name: "IRA", value: n(form.iraBalance) },
     { name: "Life Insurance", value: n(form.lifeInsuranceCashValue) },
