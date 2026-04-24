@@ -786,30 +786,12 @@ export default function WealthSnapshotCalc() {
             <Separator />
             <div className="rounded-xl bg-gradient-to-br from-primary/8 to-secondary/8 border border-primary/20 p-4">
               <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Projected Growth Rate</p>
-              {riskReturn !== null && styleReturn !== null ? (
-                <>
-                  <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-                    <span>Risk Appetite ({form.riskAppetite}) × 70%</span>
-                    <span>{(riskReturn * 100).toFixed(0)}% × 0.7 = {(riskReturn * 70).toFixed(1)}%</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
-                    <span>Investment Style ({form.investmentStyle}) × 30%</span>
-                    <span>{(styleReturn * 100).toFixed(0)}% × 0.3 = {(styleReturn * 30).toFixed(1)}%</span>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-primary/20 pt-2">
-                    <span className="text-sm font-semibold text-primary">Blended Return (r)</span>
-                    <span className="text-xl font-bold text-primary">{(effectiveRate * 100).toFixed(2)}% p.a.</span>
-                  </div>
-                </>
-              ) : (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">
-                    {riskReturn !== null ? `${form.riskAppetite} risk profile only` : `${form.investmentStyle} style only`}
-                  </span>
-                  <span className="text-xl font-bold text-primary">{(effectiveRate * 100).toFixed(1)}% p.a.</span>
-                </div>
-              )}
-              <p className="text-xs text-gray-400 mt-2">Select both a Risk Appetite and an Investment Style to see the full weighted blend.</p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-primary">
+                  {riskReturn !== null && styleReturn !== null ? "Blended Return" : riskReturn !== null ? `${form.riskAppetite} Risk Profile` : `${form.investmentStyle} Investment Style`}
+                </span>
+                <span className="text-xl font-bold text-primary">{(effectiveRate * 100).toFixed(2)}% p.a.</span>
+              </div>
             </div>
           </>
         )}
