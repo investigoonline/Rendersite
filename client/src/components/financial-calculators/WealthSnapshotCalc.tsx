@@ -1475,12 +1475,22 @@ export default function WealthSnapshotCalc() {
                 )}
               </div>
             )}
-            {(customRate > 0 || riskReturn !== null || styleReturn !== null) && (
-              <p className="text-xs text-gray-400 mt-3 pt-3 border-t border-gray-100">
-                Your expected return rate applies to the{" "}
-                <span className="font-medium text-gray-600">Retirement Wealth Projections</span>{" "}
-                below — this summary reflects your current asset snapshot only.
-              </p>
+            {(customRate > 0 || riskReturn !== null || styleReturn !== null) && netWorth > 0 && (
+              <div className="mt-3 pt-3 border-t border-gray-100">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500">
+                    Projected Net Worth (1 yr @ {(effectiveRate * 100).toFixed(1)}%)
+                  </span>
+                  <span className="text-sm font-semibold text-secondary">
+                    {fmt(fv(Math.max(0, netWorth - annualSavings), annualSavings, effectiveRate, 1))}
+                  </span>
+                </div>
+                {annualSavings > 0 && (
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Includes {fmtFull(annualSavings)}/yr savings contribution
+                  </p>
+                )}
+              </div>
             )}
           </CardContent>
         </Card>
