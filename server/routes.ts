@@ -1616,6 +1616,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Catch-all for any unmatched /api/* route — prevents SPA fallback returning 200
+  app.all('/api/*', (_req, res) => {
+    res.status(404).json({ message: "API endpoint not found" });
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
