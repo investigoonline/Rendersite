@@ -739,26 +739,50 @@ export default function WealthSnapshotCalc() {
           error={personalErrors.fullName}
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
-          <QAFieldNumber
-            question="How old are you?"
-            description="Your current age in years."
-            value={form.currentAge}
-            onChange={(v) => { set("currentAge", v); if (personalErrors.currentAge) setPersonalErrors((e) => ({ ...e, currentAge: undefined })); }}
-            placeholder="e.g. 45"
-            allowDecimal={false}
-            tooltip="Your age determines how many years remain until ages 65, 75 and 85."
-            error={personalErrors.currentAge}
-          />
-          <QAFieldNumber
-            question="At what age do you plan to retire?"
-            description="Adds a personalised milestone to your projections."
-            value={form.plannedRetirementAge}
-            onChange={(v) => { set("plannedRetirementAge", v); if (personalErrors.plannedRetirementAge) setPersonalErrors((e) => ({ ...e, plannedRetirementAge: undefined })); }}
-            placeholder="e.g. 60"
-            allowDecimal={false}
-            tooltip="A custom retirement milestone card will appear in the projections panel."
-            error={personalErrors.plannedRetirementAge}
-          />
+          {/* Inline both fields so we can enforce equal label-area height */}
+          {[
+            {
+              question: "How old are you?",
+              description: "Your current age in years.",
+              value: form.currentAge,
+              onChange: (v: string) => { set("currentAge", v); if (personalErrors.currentAge) setPersonalErrors((e) => ({ ...e, currentAge: undefined })); },
+              placeholder: "e.g. 45",
+              tooltip: "Your age determines how many years remain until ages 65, 75 and 85.",
+              error: personalErrors.currentAge,
+            },
+            {
+              question: "At what age do you plan to retire?",
+              description: "Adds a personalised milestone to your projections.",
+              value: form.plannedRetirementAge,
+              onChange: (v: string) => { set("plannedRetirementAge", v); if (personalErrors.plannedRetirementAge) setPersonalErrors((e) => ({ ...e, plannedRetirementAge: undefined })); },
+              placeholder: "e.g. 60",
+              tooltip: "A custom retirement milestone card will appear in the projections panel.",
+              error: personalErrors.plannedRetirementAge,
+            },
+          ].map((field) => (
+            <div key={field.question} className="mb-5">
+              <div className="flex items-start gap-2 mb-1 min-h-[2.5rem]">
+                <label className="text-sm font-medium text-gray-700">{field.question}</label>
+                {field.tooltip && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-gray-400 cursor-help flex-shrink-0 mt-0.5" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs text-xs">{field.tooltip}</TooltipContent>
+                  </Tooltip>
+                )}
+              </div>
+              <p className="text-xs text-gray-400 mb-1">{field.description}</p>
+              <NumericInput
+                value={field.value}
+                onChange={(e) => field.onChange(e.target.value)}
+                placeholder={field.placeholder}
+                allowDecimal={false}
+                className={field.error ? "border-red-500 focus-visible:ring-red-500" : ""}
+              />
+              {field.error && <p className="text-xs text-red-500 mt-1">{field.error}</p>}
+            </div>
+          ))}
         </div>
         <QAFieldSelect
           question="What is your country of citizenship / tax residency?"
