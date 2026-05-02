@@ -760,8 +760,8 @@ export default function WealthSnapshotCalc() {
               error: personalErrors.plannedRetirementAge,
             },
           ].map((field) => (
-            <div key={field.question} className="mb-5">
-              <div className="flex items-start gap-2 mb-1 min-h-[2.5rem]">
+            <div key={field.question} className="mb-5 flex flex-col">
+              <div className="flex items-start gap-2 mb-1 min-h-[3rem]">
                 <label className="text-sm font-medium text-gray-700">{field.question}</label>
                 {field.tooltip && (
                   <Tooltip>
@@ -772,7 +772,7 @@ export default function WealthSnapshotCalc() {
                   </Tooltip>
                 )}
               </div>
-              <p className="text-xs text-gray-400 mb-1">{field.description}</p>
+              <p className="text-xs text-gray-400 mb-1 min-h-[2rem]">{field.description}</p>
               <NumericInput
                 value={field.value}
                 onChange={(e) => field.onChange(e.target.value)}
