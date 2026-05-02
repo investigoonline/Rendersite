@@ -85,7 +85,7 @@ const US_BANKS = [
 
 const ACCOUNT_TYPES = ["Checking", "Savings", "Money Market", "CD/FD", "Other"];
 const INVESTMENT_TYPES = ["Stocks", "Mutual Funds", "Bonds", "Other"];
-const PROPERTY_TYPES = ["Land", "Vacation Home", "Secondary Residence"];
+const PROPERTY_TYPES = ["Land", "Vacation Home", "Secondary Residence", "Other"];
 
 const GROWTH_RATES: Record<string, number> = {
   conservative: 0.05,
