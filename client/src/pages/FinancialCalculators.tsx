@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Home, TrendingUp, PiggyBank, Percent, BarChart3, Landmark, Wallet } from "lucide-react";
+import { Home, TrendingUp, PiggyBank, Percent, Landmark, Wallet } from "lucide-react";
 import LoanPayoffCalc from "@/components/financial-calculators/LoanPayoffCalc";
 import RealEstateCalc from "@/components/financial-calculators/RealEstateCalc";
 import RetirementCalc from "@/components/financial-calculators/RetirementCalc";
 import InterestCalc from "@/components/financial-calculators/InterestCalc";
-import CAGRCalc from "@/components/financial-calculators/CAGRCalc";
 import IRACalc from "@/components/financial-calculators/IRACalc";
 import WealthSnapshotCalc from "@/components/financial-calculators/WealthSnapshotCalc";
 import CalculatorDisclaimer from "@/components/calculators/CalculatorDisclaimer";
@@ -59,18 +58,8 @@ const SECTIONS = [
     badge: "Interest Tools",
     badgeColor: "bg-yellow-100 text-yellow-800",
     title: "Interest Calculators",
-    description: "Six tools in one: simple interest, compound interest, Rule of 72, fixed vs floating rates, tax impact, and inflation impact.",
+    description: "Simple Interest and Compound Interest calculators with Annual Addition support.",
     component: InterestCalc,
-  },
-  {
-    id: "cagr",
-    label: "CAGR",
-    icon: BarChart3,
-    badge: "Investment Growth",
-    badgeColor: "bg-teal-100 text-teal-800",
-    title: "CAGR Calculator",
-    description: "Calculate the Compound Annual Growth Rate of any investment and visualize its growth trajectory.",
-    component: CAGRCalc,
   },
   {
     id: "ira",

@@ -898,13 +898,62 @@ export default function WealthSnapshotCalc() {
 
   const renderAssets = () => (
     <div className="space-y-3">
-      <QAField
-        question="What is the value of your cash & bank balances?"
-        description="Enter cash holdings and balances in checking & savings accounts."
-        value={form.cashBank}
-        onChange={(v) => set("cashBank", v)}
-        tooltip="Include all checking, savings, money market, and CD accounts."
-      />
+      {/* Bank Accounts multi-input */}
+      <div className="mb-5">
+        <div className="flex items-center gap-2 mb-1">
+          <label className="text-sm font-medium text-gray-700">
+            What are your bank account balances?
+          </label>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <HelpCircle className="h-4 w-4 text-gray-400 cursor-help flex-shrink-0" />
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs text-xs">
+              Include all checking, savings, money market, and CD accounts.
+            </TooltipContent>
+          </Tooltip>
+        </div>
+        <p className="text-xs text-gray-400 mb-2">
+          Enter each bank account balance separately. A total will be calculated automatically.
+        </p>
+        <div className="space-y-2">
+          {bankAccounts.map((val, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm pointer-events-none">$</span>
+                <NumericInput
+                  className="pl-7"
+                  value={val}
+                  onChange={(e) => setBankAccount(i, e.target.value)}
+                  placeholder={`Account ${i + 1}`}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => removeBankAccount(i)}
+                className="p-1.5 text-gray-400 hover:text-red-500 transition-colors flex-shrink-0"
+                aria-label="Remove account"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={addBankAccount}
+          className="mt-2 flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 font-medium transition-colors"
+        >
+          <Plus className="h-3.5 w-3.5" />
+          Add another account
+        </button>
+        {totalCashBank > 0 && (
+          <div className="mt-2 flex items-center justify-between px-3 py-1.5 bg-blue-50 rounded-md">
+            <span className="text-xs text-blue-700 font-medium">Total Bank Balances</span>
+            <span className="text-sm font-bold text-primary">{fmtFull(totalCashBank)}</span>
+          </div>
+        )}
+      </div>
       <QAField
         question="Total market value of investments (stocks, mutual funds, bonds)?"
         description="Include stocks, mutual funds, bonds, and other investment holdings."
@@ -913,7 +962,7 @@ export default function WealthSnapshotCalc() {
         tooltip="Listed equities, ETFs, mutual fund NAV, government and corporate bonds at current market value."
       />
       <QAField
-        question="What is the value of your Primary Residential?"
+        question="What is the value of your Primary Residence?"
         description="Current market value of your primary home or residence."
         value={form.primaryResidential}
         onChange={(v) => set("primaryResidential", v)}
@@ -940,38 +989,6 @@ export default function WealthSnapshotCalc() {
         onChange={(v) => set("personalProperties", v)}
         tooltip="Physical gold, silver, jewellery, and precious metals."
       />
-      <QAField
-        question="What is your annual savings?"
-        description="Amount you save or invest each year. Used in retirement wealth projections."
-        value={form.annualSavings}
-        onChange={(v) => set("annualSavings", v)}
-        tooltip="Amount you save or invest per year. Used in retirement projections."
-      />
-      <QAFieldPercent
-        question="What is your expected rate of return (%) on your annual savings?"
-        description="Your estimated annual investment return. Used when no risk profile is selected. Maximum 50%."
-        value={form.expectedReturnRate}
-        onChange={(v) => {
-          const raw = parseFloat(v) || 0;
-          set("expectedReturnRate", String(Math.min(50, Math.max(0, raw))));
-        }}
-        tooltip="Your expected annual investment return, capped at 50%. Overridden if a Risk Profile or Investment Style is selected."
-      />
-      {(riskReturn !== null || styleReturn !== null) && (
-        <div className="flex items-start gap-2 -mt-3 mb-4 px-3 py-2 rounded-md bg-amber-50 border border-amber-200">
-          <span className="text-amber-500 mt-0.5 flex-shrink-0">⚠</span>
-          <p className="text-xs text-amber-700">
-            Your custom rate is currently <strong>overridden</strong> by your{" "}
-            {riskReturn !== null && styleReturn !== null
-              ? `Risk + Style blend (${(effectiveRate * 100).toFixed(2)}% p.a.)`
-              : riskReturn !== null
-                ? `risk profile — ${(effectiveRate * 100).toFixed(0)}% p.a.`
-                : `investment style — ${(effectiveRate * 100).toFixed(0)}% p.a.`}
-            . To use a custom rate, clear your Risk Profile and Investment Style
-            in the <strong>Risk</strong> tab.
-          </p>
-        </div>
-      )}
       <Separator className="my-1" />
       <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
         Retirement & Insurance Accounts
@@ -1148,105 +1165,182 @@ export default function WealthSnapshotCalc() {
     ];
     return (
       <div className="space-y-5">
+        {/* ROI Mode toggle */}
         <div>
           <p className="text-sm font-semibold text-gray-700 mb-1">
-            What is your Risk Appetite?
+            How would you like to set your Rate of Return?
           </p>
           <p className="text-xs text-gray-500 mb-3">
-            Select how much risk you are comfortable taking. This overrides your
-            Expected Rate of Return in projections.
-          </p>
-          <div className="space-y-2">
-            {appetiteOpts.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => set("riskAppetite", opt.value)}
-                className={`w-full text-left p-3 rounded-xl border-2 transition-all ${
-                  form.riskAppetite === opt.value
-                    ? "border-primary bg-primary/5"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <div
-                    className={`mt-0.5 h-4 w-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
-                      form.riskAppetite === opt.value
-                        ? "border-primary"
-                        : "border-gray-300"
-                    }`}
-                  >
-                    {form.riskAppetite === opt.value && (
-                      <div className="h-2 w-2 rounded-full bg-primary" />
-                    )}
-                  </div>
-                  <div>
-                    <p
-                      className={`font-semibold text-sm ${form.riskAppetite === opt.value ? "text-primary" : "text-gray-700"}`}
-                    >
-                      {opt.label}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-0.5">{opt.desc}</p>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-        <Separator />
-        <div>
-          <p className="text-sm font-semibold text-gray-700 mb-1">
-            What is your preferred Investment Style?
-          </p>
-          <p className="text-xs text-gray-500 mb-3">
-            Choose the approach that best reflects how you like to invest your
-            money.
+            Choose whether to use a Risk Profile-based rate or enter a manual ROI.
           </p>
           <div className="grid grid-cols-2 gap-2">
-            {styleOpts.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => set("investmentStyle", opt.value)}
-                className={`text-left p-3 rounded-xl border-2 transition-all ${
-                  form.investmentStyle === opt.value
-                    ? "border-secondary bg-secondary/5"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <p
-                  className={`font-semibold text-sm ${form.investmentStyle === opt.value ? "text-secondary" : "text-gray-700"}`}
-                >
-                  {opt.label}
-                </p>
-                <p className="text-xs text-gray-500 mt-0.5">{opt.desc}</p>
-              </button>
-            ))}
+            <button
+              type="button"
+              onClick={() => setRoiMode("risk")}
+              className={`p-3 rounded-xl border-2 text-left transition-all ${
+                form.roiMode === "risk"
+                  ? "border-primary bg-primary/5"
+                  : "border-gray-200 hover:border-gray-300"
+              }`}
+            >
+              <p className={`font-semibold text-sm ${form.roiMode === "risk" ? "text-primary" : "text-gray-700"}`}>
+                Risk Profile
+              </p>
+              <p className="text-xs text-gray-500 mt-0.5">Based on risk appetite & investment style</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setRoiMode("manual")}
+              className={`p-3 rounded-xl border-2 text-left transition-all ${
+                form.roiMode === "manual"
+                  ? "border-primary bg-primary/5"
+                  : "border-gray-200 hover:border-gray-300"
+              }`}
+            >
+              <p className={`font-semibold text-sm ${form.roiMode === "manual" ? "text-primary" : "text-gray-700"}`}>
+                Manual Rate
+              </p>
+              <p className="text-xs text-gray-500 mt-0.5">Enter your own expected return %</p>
+            </button>
           </div>
         </div>
 
-        {/* Live blend result */}
-        {(riskReturn !== null || styleReturn !== null) && (
+        <Separator />
+
+        {form.roiMode === "risk" ? (
           <>
-            <Separator />
-            <div className="rounded-xl bg-gradient-to-br from-primary/8 to-secondary/8 border border-primary/20 p-4">
-              <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
-                Projected Growth Rate
+            <div>
+              <p className="text-sm font-semibold text-gray-700 mb-1">
+                What is your Risk Appetite?
               </p>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-primary">
-                  {riskReturn !== null && styleReturn !== null
-                    ? "Blended Return"
-                    : riskReturn !== null
-                      ? `${form.riskAppetite} Risk Profile`
-                      : `${form.investmentStyle} Investment Style`}
-                </span>
-                <span className="text-xl font-bold text-primary">
-                  {(effectiveRate * 100).toFixed(2)}% p.a.
-                </span>
+              <p className="text-xs text-gray-500 mb-3">
+                Select how much risk you are comfortable taking.
+              </p>
+              <div className="space-y-2">
+                {appetiteOpts.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => set("riskAppetite", opt.value)}
+                    className={`w-full text-left p-3 rounded-xl border-2 transition-all ${
+                      form.riskAppetite === opt.value
+                        ? "border-primary bg-primary/5"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className={`mt-0.5 h-4 w-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
+                          form.riskAppetite === opt.value
+                            ? "border-primary"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        {form.riskAppetite === opt.value && (
+                          <div className="h-2 w-2 rounded-full bg-primary" />
+                        )}
+                      </div>
+                      <div>
+                        <p className={`font-semibold text-sm ${form.riskAppetite === opt.value ? "text-primary" : "text-gray-700"}`}>
+                          {opt.label}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-0.5">{opt.desc}</p>
+                      </div>
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
+            <Separator />
+            <div>
+              <p className="text-sm font-semibold text-gray-700 mb-1">
+                What is your preferred Investment Style?
+              </p>
+              <p className="text-xs text-gray-500 mb-3">
+                Choose the approach that best reflects how you like to invest your money.
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {styleOpts.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => set("investmentStyle", opt.value)}
+                    className={`text-left p-3 rounded-xl border-2 transition-all ${
+                      form.investmentStyle === opt.value
+                        ? "border-secondary bg-secondary/5"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <p className={`font-semibold text-sm ${form.investmentStyle === opt.value ? "text-secondary" : "text-gray-700"}`}>
+                      {opt.label}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">{opt.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Live blend result */}
+            {(riskReturn !== null || styleReturn !== null) && (
+              <>
+                <Separator />
+                <div className="rounded-xl bg-gradient-to-br from-primary/8 to-secondary/8 border border-primary/20 p-4">
+                  <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                    Projected Growth Rate
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-primary">
+                      {riskReturn !== null && styleReturn !== null
+                        ? "Blended Return"
+                        : riskReturn !== null
+                          ? `${form.riskAppetite} Risk Profile`
+                          : `${form.investmentStyle} Investment Style`}
+                    </span>
+                    <span className="text-xl font-bold text-primary">
+                      {(effectiveRate * 100).toFixed(2)}% p.a.
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
           </>
+        ) : (
+          /* Manual ROI input */
+          <div>
+            <p className="text-sm font-semibold text-gray-700 mb-1">
+              What is your expected Rate of Return?
+            </p>
+            <p className="text-xs text-gray-500 mb-3">
+              Enter your own estimated annual return percentage. Maximum 50%.
+            </p>
+            <div className="relative">
+              <NumericInput
+                className="pr-8"
+                value={form.expectedReturnRate}
+                onChange={(e) => {
+                  const raw = parseFloat(e.target.value) || 0;
+                  set("expectedReturnRate", String(Math.min(50, Math.max(0, raw))));
+                }}
+                placeholder="e.g. 8"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm pointer-events-none">
+                %
+              </span>
+            </div>
+            {customRate > 0 && (
+              <div className="mt-3 rounded-xl bg-gradient-to-br from-primary/8 to-secondary/8 border border-primary/20 p-4">
+                <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
+                  Projected Growth Rate
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-primary">Manual Rate</span>
+                  <span className="text-xl font-bold text-primary">
+                    {(customRate * 100).toFixed(1)}% p.a.
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
     );
@@ -1467,21 +1561,16 @@ export default function WealthSnapshotCalc() {
                 )}
               </div>
             )}
-            {(customRate > 0 || riskReturn !== null || styleReturn !== null) && netWorth > 0 && (
+            {effectiveRate > 0 && netWorth > 0 && (
               <div className="mt-3 pt-3 border-t border-gray-100">
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-gray-500">
                     Projected Net Worth (1 yr @ {(effectiveRate * 100).toFixed(1)}%)
                   </span>
                   <span className="text-sm font-semibold text-secondary">
-                    {fmt(fv(Math.max(0, netWorth - annualSavings), annualSavings, effectiveRate, 1))}
+                    {fmt(fv(Math.max(0, netWorth), 0, effectiveRate, 1))}
                   </span>
                 </div>
-                {annualSavings > 0 && (
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    Includes {fmtFull(annualSavings)}/yr savings contribution
-                  </p>
-                )}
               </div>
             )}
           </CardContent>
@@ -1551,17 +1640,17 @@ export default function WealthSnapshotCalc() {
                 {/* Rate summary */}
                 <div className="text-xs text-gray-400 mb-3">
                   Growth rate:{" "}
-                  {form.riskAppetite && form.investmentStyle
-                    ? `${form.riskAppetite} + ${form.investmentStyle} blend — ${(effectiveRate * 100).toFixed(2)}% p.a. (70% risk / 30% style)`
-                    : form.riskAppetite
-                      ? `${form.riskAppetite} risk profile — ${(effectiveRate * 100).toFixed(0)}% p.a.`
-                      : form.investmentStyle
-                        ? `${form.investmentStyle} investment style — ${(effectiveRate * 100).toFixed(0)}% p.a.`
-                        : customRate > 0
-                          ? `${(customRate * 100).toFixed(1)}% p.a. (custom rate on annual savings)`
-                          : "Enter an expected return rate or select a Risk Profile to see growth projections"}
-                  {annualSavings > 0 &&
-                    ` · +${fmtFull(annualSavings)}/yr savings`}
+                  {form.roiMode === "manual"
+                    ? customRate > 0
+                      ? `${(customRate * 100).toFixed(1)}% p.a. (manual rate)`
+                      : "Enter a manual rate in the Risk Profile tab to see projections"
+                    : form.riskAppetite && form.investmentStyle
+                      ? `${form.riskAppetite} + ${form.investmentStyle} blend — ${(effectiveRate * 100).toFixed(2)}% p.a. (70% risk / 30% style)`
+                      : form.riskAppetite
+                        ? `${form.riskAppetite} risk profile — ${(effectiveRate * 100).toFixed(0)}% p.a.`
+                        : form.investmentStyle
+                          ? `${form.investmentStyle} investment style — ${(effectiveRate * 100).toFixed(0)}% p.a.`
+                          : "Select a Risk Profile or Manual Rate in the Risk Profile tab to see projections"}
                 </div>
 
                 {/* Custom retirement age card */}
@@ -1685,10 +1774,17 @@ export default function WealthSnapshotCalc() {
         </Card>
 
         {/* Risk + Estate summary */}
-        {(form.riskAppetite || form.investmentStyle || estateScore > 0) && (
+        {(form.riskAppetite || form.investmentStyle || (form.roiMode === "manual" && customRate > 0) || estateScore > 0) && (
           <Card>
             <CardContent className="pt-4 px-4 pb-4 space-y-3">
-              {(form.riskAppetite || form.investmentStyle) && (
+              {form.roiMode === "manual" && customRate > 0 ? (
+                <div className="bg-gray-50 rounded-lg p-2 text-center">
+                  <p className="text-xs text-gray-400">Manual Rate of Return</p>
+                  <p className="text-sm font-semibold text-primary">
+                    {(customRate * 100).toFixed(1)}% p.a.
+                  </p>
+                </div>
+              ) : (form.riskAppetite || form.investmentStyle) ? (
                 <div className="grid grid-cols-2 gap-2">
                   <div className="bg-gray-50 rounded-lg p-2 text-center">
                     <p className="text-xs text-gray-400">Risk Appetite</p>
@@ -1703,7 +1799,7 @@ export default function WealthSnapshotCalc() {
                     </p>
                   </div>
                 </div>
-              )}
+              ) : null}
               {estateScore > 0 && (
                 <div>
                   <div className="flex items-center gap-2 mb-2">
