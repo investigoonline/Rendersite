@@ -931,7 +931,7 @@ export default function WealthSnapshotCalc() {
           className="mt-2 flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 font-medium transition-colors"
         >
           <Plus className="h-3.5 w-3.5" />
-          + Add Another Account
+          Add Another Account
         </button>
         {totalCashBank > 0 && (
           <div className="mt-2 flex items-center justify-between px-3 py-1.5 bg-blue-50 rounded-md">
@@ -1004,7 +1004,7 @@ export default function WealthSnapshotCalc() {
           className="mt-2 flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 font-medium transition-colors"
         >
           <Plus className="h-3.5 w-3.5" />
-          + Add Another Investment Type
+          Add Another Investment Type
         </button>
         {totalInvestments > 0 && (
           <div className="mt-2 flex items-center justify-between px-3 py-1.5 bg-blue-50 rounded-md">
@@ -1091,7 +1091,7 @@ export default function WealthSnapshotCalc() {
           className="mt-2 flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 font-medium transition-colors"
         >
           <Plus className="h-3.5 w-3.5" />
-          + Add Another Property
+          Add Another Property
         </button>
         {totalOtherRealEstate > 0 && (
           <div className="mt-2 flex items-center justify-between px-3 py-1.5 bg-blue-50 rounded-md">
@@ -1174,7 +1174,7 @@ export default function WealthSnapshotCalc() {
           className="mt-2 flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 font-medium transition-colors"
         >
           <Plus className="h-3.5 w-3.5" />
-          + Add Another Business
+          Add Another Business
         </button>
         {totalBusinessEquity > 0 && (
           <div className="mt-2 flex items-center justify-between px-3 py-1.5 bg-blue-50 rounded-md">
