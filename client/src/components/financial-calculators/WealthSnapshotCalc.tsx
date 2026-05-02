@@ -541,10 +541,10 @@ export default function WealthSnapshotCalc() {
   const [otherRealEstate, setOtherRealEstate] = useState<RealEstateRow[]>([defaultRealEstate()]);
   const [businessEquity, setBusinessEquity] = useState<BusinessRow[]>([defaultBusiness()]);
 
-  const totalCashBank = bankAccounts.reduce((sum, b) => sum + n(b.amount), 0);
-  const totalInvestments = investments.reduce((sum, i) => sum + n(i.amount), 0);
-  const totalOtherRealEstate = otherRealEstate.reduce((sum, r) => sum + n(r.amount), 0);
-  const totalBusinessEquity = businessEquity.reduce((sum, b) => sum + n(b.equityValue), 0);
+  const totalCashBank = bankAccounts.reduce((sum, b) => sum + (b.bankName && b.accountType ? n(b.amount) : 0), 0);
+  const totalInvestments = investments.reduce((sum, i) => sum + (i.investmentType ? n(i.amount) : 0), 0);
+  const totalOtherRealEstate = otherRealEstate.reduce((sum, r) => sum + (r.propertyType ? n(r.amount) : 0), 0);
+  const totalBusinessEquity = businessEquity.reduce((sum, b) => sum + (b.businessName.trim() ? n(b.equityValue) : 0), 0);
 
   // Bank account helpers
   const addBankAccount = () => setBankAccounts((a) => [...a, defaultBankAccount()]);
