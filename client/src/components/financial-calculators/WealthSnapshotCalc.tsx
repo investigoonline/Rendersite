@@ -541,10 +541,42 @@ export default function WealthSnapshotCalc() {
   const [otherRealEstate, setOtherRealEstate] = useState<RealEstateRow[]>([defaultRealEstate()]);
   const [businessEquity, setBusinessEquity] = useState<BusinessRow[]>([defaultBusiness()]);
 
-  const totalCashBank = bankAccounts.reduce((sum, b) => sum + (b.bankName && b.accountType ? n(b.amount) : 0), 0);
-  const totalInvestments = investments.reduce((sum, i) => sum + (i.investmentType ? n(i.amount) : 0), 0);
-  const totalOtherRealEstate = otherRealEstate.reduce((sum, r) => sum + (r.propertyType ? n(r.amount) : 0), 0);
-  const totalBusinessEquity = businessEquity.reduce((sum, b) => sum + (b.businessName.trim() ? n(b.equityValue) : 0), 0);
+  // Only count rows where BOTH type and amount are filled
+  const totalCashBank = bankAccounts.reduce((sum, b) => sum + (b.bankName && b.accountType && n(b.amount) > 0 ? n(b.amount) : 0), 0);
+  const totalInvestments = investments.reduce((sum, i) => sum + (i.investmentType && n(i.amount) > 0 ? n(i.amount) : 0), 0);
+  const totalOtherRealEstate = otherRealEstate.reduce((sum, r) => sum + (r.propertyType && n(r.amount) > 0 ? n(r.amount) : 0), 0);
+  const totalBusinessEquity = businessEquity.reduce((sum, b) => sum + (b.businessName.trim() && n(b.equityValue) > 0 ? n(b.equityValue) : 0), 0);
+
+  // Per-row validation: a row is invalid if one field is filled but the other isn't
+  const bankRowErrors: (string | null)[] = bankAccounts.map((b) => {
+    const hasType = b.bankName && b.accountType;
+    const hasAmount = n(b.amount) > 0;
+    if (hasType && !hasAmount) return "Please enter an amount";
+    if (!hasType && hasAmount) return "Please select bank name and account type";
+    return null;
+  });
+  const investmentRowErrors: (string | null)[] = investments.map((i) => {
+    const hasType = !!i.investmentType;
+    const hasAmount = n(i.amount) > 0;
+    if (hasType && !hasAmount) return "Please enter an amount";
+    if (!hasType && hasAmount) return "Please select an investment type";
+    return null;
+  });
+  const realEstateRowErrors: (string | null)[] = otherRealEstate.map((r) => {
+    const hasType = !!r.propertyType;
+    const hasAmount = n(r.amount) > 0;
+    if (hasType && !hasAmount) return "Please enter an amount";
+    if (!hasType && hasAmount) return "Please select a property type";
+    return null;
+  });
+  const businessRowErrors: (string | null)[] = businessEquity.map((b) => {
+    const hasName = !!b.businessName.trim();
+    const hasAmount = n(b.equityValue) > 0;
+    if (hasName && !hasAmount) return "Please enter an equity value";
+    if (!hasName && hasAmount) return "Please enter a business name";
+    return null;
+  });
+  const hasAssetsRowErrors = [...bankRowErrors, ...investmentRowErrors, ...realEstateRowErrors, ...businessRowErrors].some(Boolean);
 
   // Bank account helpers
   const addBankAccount = () => setBankAccounts((a) => [...a, defaultBankAccount()]);
@@ -713,6 +745,11 @@ export default function WealthSnapshotCalc() {
       setPersonalErrors({});
     }
 
+    // Hard block if any asset row is partially filled (type without amount or vice versa)
+    if (activeTab === "assets" && hasAssetsRowErrors) {
+      return;
+    }
+
     // Req 6: Soft warning for incomplete sections
     const warnTabs = ["assets", "nondom", "liabilities", "risk"];
     if (warnTabs.includes(activeTab) && !tabCompleted[activeTab]) {
@@ -878,7 +915,7 @@ export default function WealthSnapshotCalc() {
         </p>
         <div className="space-y-3">
           {bankAccounts.map((acct, i) => (
-            <div key={i} className="p-3 border border-gray-200 rounded-lg bg-gray-50 space-y-2">
+            <div key={i} className={`p-3 border rounded-lg bg-gray-50 space-y-2 ${bankRowErrors[i] ? "border-red-400" : "border-gray-200"}`}>
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="text-xs font-medium text-gray-600 mb-1 block">Bank Name</label>
@@ -922,6 +959,7 @@ export default function WealthSnapshotCalc() {
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
+              {bankRowErrors[i] && <p className="text-xs text-red-500">{bankRowErrors[i]}</p>}
             </div>
           ))}
         </div>
@@ -959,7 +997,7 @@ export default function WealthSnapshotCalc() {
         <p className="text-xs text-gray-400 mb-2">Add each investment type separately.</p>
         <div className="space-y-2">
           {investments.map((inv, i) => (
-            <div key={i} className="p-3 border border-gray-200 rounded-lg bg-gray-50 space-y-2">
+            <div key={i} className={`p-3 border rounded-lg bg-gray-50 space-y-2 ${investmentRowErrors[i] ? "border-red-400" : "border-gray-200"}`}>
               <div className="flex items-center gap-2">
                 <div className="flex-1">
                   <label className="text-xs font-medium text-gray-600 mb-1 block">Investment Type</label>
@@ -995,6 +1033,7 @@ export default function WealthSnapshotCalc() {
                   </div>
                 </div>
               </div>
+              {investmentRowErrors[i] && <p className="text-xs text-red-500">{investmentRowErrors[i]}</p>}
             </div>
           ))}
         </div>
@@ -1040,7 +1079,7 @@ export default function WealthSnapshotCalc() {
         <p className="text-xs text-gray-400 mb-2">Add each property separately.</p>
         <div className="space-y-3">
           {otherRealEstate.map((prop, i) => (
-            <div key={i} className="p-3 border border-gray-200 rounded-lg bg-gray-50 space-y-2">
+            <div key={i} className={`p-3 border rounded-lg bg-gray-50 space-y-2 ${realEstateRowErrors[i] ? "border-red-400" : "border-gray-200"}`}>
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="text-xs font-medium text-gray-600 mb-1 block">Property Type</label>
@@ -1082,6 +1121,7 @@ export default function WealthSnapshotCalc() {
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
+              {realEstateRowErrors[i] && <p className="text-xs text-red-500">{realEstateRowErrors[i]}</p>}
             </div>
           ))}
         </div>
@@ -1119,7 +1159,7 @@ export default function WealthSnapshotCalc() {
         <p className="text-xs text-gray-400 mb-2">Add each business separately.</p>
         <div className="space-y-3">
           {businessEquity.map((biz, i) => (
-            <div key={i} className="p-3 border border-gray-200 rounded-lg bg-gray-50 space-y-2">
+            <div key={i} className={`p-3 border rounded-lg bg-gray-50 space-y-2 ${businessRowErrors[i] ? "border-red-400" : "border-gray-200"}`}>
               <div>
                 <label className="text-xs font-medium text-gray-600 mb-1 block">Business Name</label>
                 <Input
@@ -1165,6 +1205,7 @@ export default function WealthSnapshotCalc() {
                   </div>
                 </div>
               </div>
+              {businessRowErrors[i] && <p className="text-xs text-red-500">{businessRowErrors[i]}</p>}
             </div>
           ))}
         </div>
