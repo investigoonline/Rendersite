@@ -157,7 +157,7 @@ export default function Landing() {
           <img
             src={heroImage}
             alt="Family enjoying financial freedom"
-            className="w-full object-contain lg:object-cover lg:object-top h-auto lg:h-[480px]"
+            className="w-full object-cover object-center h-[220px] sm:h-[300px] md:h-[380px] lg:h-[480px]"
           />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 text-center">

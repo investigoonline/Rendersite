@@ -182,6 +182,7 @@ export default function ContactForm() {
                     placeholder={
                       formFields.phonePlaceholder || "Enter your phone number"
                     }
+                    maxLength={14}
                     {...field}
                   />
                 </FormControl>

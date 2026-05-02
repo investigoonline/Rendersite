@@ -133,7 +133,7 @@ export default function FinancialCalculators() {
           </aside>
 
           {/* Main Content */}
-          <main className="flex-1 min-w-0">
+          <main className="flex-1 min-w-0 pb-20 lg:pb-0">
             {/* Section Header */}
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-1 flex-wrap">

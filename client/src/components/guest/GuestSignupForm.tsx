@@ -114,7 +114,8 @@ export default function GuestSignupForm() {
                   <FormControl>
                     <Input
                       type="tel"
-                      placeholder="Phone number (optional for enhanced features)"
+                      placeholder="Phone number (optional)"
+                      maxLength={14}
                       {...field}
                     />
                   </FormControl>

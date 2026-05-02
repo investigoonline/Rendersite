@@ -222,7 +222,8 @@ export default function GuestAccessModal({ open, onOpenChange }: GuestAccessModa
                         <FormControl>
                           <Input
                             type="tel"
-                            placeholder="Phone number for enhanced features"
+                            placeholder="Phone number (optional)"
+                            maxLength={14}
                             {...field}
                             data-testid="input-guest-signup-phone"
                           />

@@ -282,6 +282,7 @@ export default function Profile() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="Enter phone number"
+                    maxLength={14}
                   />
                 </div>
                 <div className="flex gap-3 pt-2">

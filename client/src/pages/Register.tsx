@@ -115,7 +115,7 @@ export default function Register() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="firstName"
@@ -181,6 +181,7 @@ export default function Register() {
                       <Input
                         type="tel"
                         placeholder="(555) 123-4567"
+                        maxLength={14}
                         {...field}
                         data-testid="input-phone"
                       />

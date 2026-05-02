@@ -41,7 +41,7 @@ export default function Footer() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Company Information - Tagline and Social Links */}
           <div className="lg:col-span-1">
             <p className="text-gray-400 text-xs mb-2" data-testid="text-footer-tagline">
