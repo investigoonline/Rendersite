@@ -42,6 +42,8 @@ import {
   User,
   ChevronLeft,
   ChevronRight,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import CalculatorCTAs from "./CalculatorCTAs";
 
@@ -145,17 +147,13 @@ interface Form {
   currentAge: string;
   citizenship: string;
   taxDomicile: string;
-  countryOfResidence: string;
   plannedRetirementAge: string;
   // Assets
-  cashBank: string;
   investments: string;
   primaryResidential: string;
   otherRealEstate: string;
   equityInBusiness: string;
   personalProperties: string;
-  annualSavings: string;
-  expectedReturnRate: string;
   retirement401k: string;
   iraBalance: string;
   lifeInsuranceCashValue: string;
@@ -171,8 +169,10 @@ interface Form {
   otherLiabilities: string;
   taxesPayable: string;
   // Risk
+  roiMode: "risk" | "manual";
   riskAppetite: string;
   investmentStyle: string;
+  expectedReturnRate: string;
   // Estate
   will: boolean | null;
   trust: boolean | null;
@@ -185,16 +185,12 @@ const defaultForm: Form = {
   currentAge: "",
   citizenship: "",
   taxDomicile: "",
-  countryOfResidence: "",
   plannedRetirementAge: "",
-  cashBank: "0",
   investments: "0",
   primaryResidential: "0",
   otherRealEstate: "0",
   equityInBusiness: "0",
   personalProperties: "0",
-  annualSavings: "0",
-  expectedReturnRate: "0",
   retirement401k: "0",
   iraBalance: "0",
   lifeInsuranceCashValue: "0",
@@ -207,8 +203,10 @@ const defaultForm: Form = {
   creditLines: "0",
   otherLiabilities: "0",
   taxesPayable: "0",
+  roiMode: "risk",
   riskAppetite: "",
   investmentStyle: "",
+  expectedReturnRate: "0",
   will: null,
   trust: null,
   powerOfAttorney: null,
@@ -652,16 +650,32 @@ export default function WealthSnapshotCalc() {
   const setCitizenship = (v: string) =>
     setForm((f) => ({ ...f, citizenship: v, taxDomicile: v }));
 
+  const setRoiMode = (mode: "risk" | "manual") =>
+    setForm((f) => ({
+      ...f,
+      roiMode: mode,
+      ...(mode === "manual"
+        ? { riskAppetite: "", investmentStyle: "" }
+        : { expectedReturnRate: "0" }),
+    }));
+
+  const [bankAccounts, setBankAccounts] = useState<string[]>([""]);
+  const totalCashBank = bankAccounts.reduce((sum, v) => sum + n(v), 0);
+  const addBankAccount = () => setBankAccounts((a) => [...a, ""]);
+  const removeBankAccount = (i: number) =>
+    setBankAccounts((a) => (a.length > 1 ? a.filter((_, idx) => idx !== i) : [""]));
+  const setBankAccount = (i: number, v: string) =>
+    setBankAccounts((a) => a.map((x, idx) => (idx === i ? v : x)));
+
   // ── Calculations ──────────────────────────────────────────────────────────
 
   const totalDomAssets =
-    n(form.cashBank) +
+    totalCashBank +
     n(form.investments) +
     n(form.primaryResidential) +
     n(form.otherRealEstate) +
     n(form.equityInBusiness) +
     n(form.personalProperties) +
-    n(form.annualSavings) +
     n(form.retirement401k) +
     n(form.iraBalance) +
     n(form.lifeInsuranceCashValue);
@@ -684,29 +698,25 @@ export default function WealthSnapshotCalc() {
 
   const currentAge = parseInt(form.currentAge) || 0;
   const retirementAge = parseInt(form.plannedRetirementAge) || 0;
-  const annualSavings = n(form.annualSavings);
 
   // Weighted blend: r = (70% × risk_return) + (30% × style_return)
-  // Falls back gracefully when only one or neither is selected.
   const riskReturn = GROWTH_RATES[form.riskAppetite] ?? null;
   const styleReturn = STYLE_RATES[form.investmentStyle] ?? null;
   const customRate = n(form.expectedReturnRate) / 100;
   const effectiveRate =
-    riskReturn !== null && styleReturn !== null
-      ? RISK_WEIGHT * riskReturn + STYLE_WEIGHT * styleReturn
-      : riskReturn !== null
-        ? riskReturn
-        : styleReturn !== null
-          ? styleReturn
-          : customRate;
-  const growthRate = effectiveRate;
+    form.roiMode === "manual"
+      ? customRate
+      : riskReturn !== null && styleReturn !== null
+        ? RISK_WEIGHT * riskReturn + STYLE_WEIGHT * styleReturn
+        : riskReturn !== null
+          ? riskReturn
+          : styleReturn !== null
+            ? styleReturn
+            : 0;
 
   const projAt = (age: number) => {
     const yrs = Math.max(0, age - currentAge);
-    // Subtract annualSavings from PV because it is included in netWorth (totalDomAssets)
-    // and also contributed each year as PMT — subtracting here prevents double-counting.
-    const basePV = Math.max(0, netWorth - annualSavings);
-    return fv(basePV, annualSavings, effectiveRate, yrs);
+    return fv(Math.max(0, netWorth), 0, effectiveRate, yrs);
   };
 
   const proj65 = projAt(65);
@@ -742,13 +752,12 @@ export default function WealthSnapshotCalc() {
   ].filter((d) => d.value > 0);
 
   const domBreakdownPie = [
-    { name: "Cash & Bank", value: n(form.cashBank) },
+    { name: "Cash & Bank", value: totalCashBank },
     { name: "Investments", value: n(form.investments) },
-    { name: "Primary Residential", value: n(form.primaryResidential) },
+    { name: "Primary Residence", value: n(form.primaryResidential) },
     { name: "Other Real Estate", value: n(form.otherRealEstate) },
     { name: "Business Equity", value: n(form.equityInBusiness) },
     { name: "Personal Properties", value: n(form.personalProperties) },
-    { name: "Annual Savings", value: n(form.annualSavings) },
     { name: "401(K)", value: n(form.retirement401k) },
     { name: "IRA", value: n(form.iraBalance) },
     { name: "Life Insurance", value: n(form.lifeInsuranceCashValue) },
@@ -767,17 +776,15 @@ export default function WealthSnapshotCalc() {
       form.fullName ||
       form.currentAge ||
       form.citizenship ||
-      form.countryOfResidence ||
       form.plannedRetirementAge
     ),
     assets: [
-      form.cashBank,
+      ...bankAccounts,
       form.investments,
       form.primaryResidential,
       form.otherRealEstate,
       form.equityInBusiness,
       form.personalProperties,
-      form.annualSavings,
       form.retirement401k,
       form.iraBalance,
       form.lifeInsuranceCashValue,
@@ -795,7 +802,10 @@ export default function WealthSnapshotCalc() {
       form.otherLiabilities,
       form.taxesPayable,
     ].some((v) => n(v) > 0),
-    risk: !!(form.riskAppetite || form.investmentStyle),
+    risk:
+      form.roiMode === "manual"
+        ? n(form.expectedReturnRate) > 0
+        : !!(form.riskAppetite || form.investmentStyle),
     estate: estateItems.some((v) => v !== null),
   };
 
@@ -810,28 +820,30 @@ export default function WealthSnapshotCalc() {
         onChange={(v) => set("fullName", v)}
         placeholder="e.g. John Smith"
       />
-      <QAFieldNumber
-        question="How old are you?"
-        description="Your current age in years. Used to calculate years remaining until each retirement milestone."
-        value={form.currentAge}
-        onChange={(v) => set("currentAge", v)}
-        placeholder="e.g. 45"
-        allowDecimal={false}
-        tooltip="Your age determines how many years remain until ages 65, 75 and 85."
-      />
-      <QAFieldNumber
-        question="At what age do you plan to retire?"
-        description="The age at which you plan to fully or partially retire. Adds a personalised milestone to your projections."
-        value={form.plannedRetirementAge}
-        onChange={(v) => set("plannedRetirementAge", v)}
-        placeholder="e.g. 60"
-        allowDecimal={false}
-        tooltip="A custom retirement milestone card will appear in the projections panel."
-      />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+        <QAFieldNumber
+          question="How old are you?"
+          description="Your current age in years."
+          value={form.currentAge}
+          onChange={(v) => set("currentAge", v)}
+          placeholder="e.g. 45"
+          allowDecimal={false}
+          tooltip="Your age determines how many years remain until ages 65, 75 and 85."
+        />
+        <QAFieldNumber
+          question="At what age do you plan to retire?"
+          description="Adds a personalised milestone to your projections."
+          value={form.plannedRetirementAge}
+          onChange={(v) => set("plannedRetirementAge", v)}
+          placeholder="e.g. 60"
+          allowDecimal={false}
+          tooltip="A custom retirement milestone card will appear in the projections panel."
+        />
+      </div>
       <QAFieldSelect
-        question="What is your country of citizenship?"
-        description="Selecting citizenship automatically pre-fills your tax domicile. You can adjust it below if they differ."
-        tooltip="Your citizenship determines the initial tax domicile assignment."
+        question="What is your country of citizenship / tax residency?"
+        description="US citizens are subject to US taxation on worldwide income regardless of where they live. Selecting your citizenship pre-fills your tax domicile — adjust below if they differ."
+        tooltip="US citizens owe US tax on all worldwide income. Your citizenship determines the initial tax domicile assignment."
       >
         <Select value={form.citizenship} onValueChange={setCitizenship}>
           <SelectTrigger>
@@ -871,26 +883,6 @@ export default function WealthSnapshotCalc() {
             Auto-matched to Citizenship
           </p>
         )}
-      </QAFieldSelect>
-      <QAFieldSelect
-        question="What country do you currently reside in?"
-        description="Your primary country of physical residence for the current tax year."
-      >
-        <Select
-          value={form.countryOfResidence}
-          onValueChange={(v) => set("countryOfResidence", v)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select country" />
-          </SelectTrigger>
-          <SelectContent>
-            {COUNTRIES.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </QAFieldSelect>
       {form.currentAge && parseInt(form.currentAge) > 0 && (
         <div className="p-3 bg-blue-50 rounded-lg text-xs text-blue-700">
