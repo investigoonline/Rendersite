@@ -501,12 +501,15 @@ function ResultRow({ label, value, color = "text-gray-900", bold = false }: { la
   );
 }
 
-function ProjectionCard({ label, value, sub, color }: { label: string; value: string; sub?: string; color: string; }) {
+function ProjectionCard({ label, value, sub, accentColor, muted = false }: { label: string; value: string; sub?: string; accentColor?: string; muted?: boolean; }) {
   return (
-    <div className={`rounded-lg p-3 text-center border ${color}`}>
-      <p className="text-xs text-gray-500 mb-0.5 font-medium">{label}</p>
-      <p className="text-lg font-bold text-gray-900">{value}</p>
-      {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+    <div
+      className="rounded-lg p-3 text-center border border-gray-200 overflow-hidden relative"
+      style={accentColor ? { borderTopColor: accentColor, borderTopWidth: "3px", backgroundColor: `${accentColor}14` } : {}}
+    >
+      <p className={`text-xs mb-0.5 font-medium ${muted ? "text-gray-400" : "text-gray-500"}`}>{label}</p>
+      <p className={`text-lg font-bold ${muted ? "text-gray-400" : "text-gray-900"}`}>{value}</p>
+      {sub && <p className={`text-xs mt-0.5 ${muted ? "text-gray-300" : "text-gray-400"}`}>{sub}</p>}
     </div>
   );
 }
@@ -1808,25 +1811,28 @@ export default function WealthSnapshotCalc() {
                       label={`Now (${currentAge})`}
                       value={fmt(Math.max(0, netWorth))}
                       sub="Current net worth"
-                      color="border-green-200 bg-green-50"
+                      accentColor={BAR_COLOR_NOW}
                     />
                     <ProjectionCard
                       label="65Y"
                       value={65 > currentAge ? fmt(proj65) : "—"}
                       sub={65 > currentAge ? `${65 - currentAge} yrs away` : "Passed"}
-                      color={65 > currentAge ? "border-blue-200 bg-blue-50" : "border-gray-100 bg-gray-50"}
+                      accentColor={65 > currentAge ? BAR_COLOR_65 : undefined}
+                      muted={65 <= currentAge}
                     />
                     <ProjectionCard
                       label="75Y"
                       value={75 > currentAge ? fmt(proj75) : "—"}
                       sub={75 > currentAge ? `${75 - currentAge} yrs away` : "Passed"}
-                      color={75 > currentAge ? "border-teal-200 bg-teal-50" : "border-gray-100 bg-gray-50"}
+                      accentColor={75 > currentAge ? BAR_COLOR_75 : undefined}
+                      muted={75 <= currentAge}
                     />
                     <ProjectionCard
                       label="85Y"
                       value={85 > currentAge ? fmt(proj85) : "—"}
                       sub={85 > currentAge ? `${85 - currentAge} yrs away` : "Passed"}
-                      color={85 > currentAge ? "border-purple-200 bg-purple-50" : "border-gray-100 bg-gray-50"}
+                      accentColor={85 > currentAge ? BAR_COLOR_85 : undefined}
+                      muted={85 <= currentAge}
                     />
                   </div>
                 </>
