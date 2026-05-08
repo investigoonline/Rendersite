@@ -23,6 +23,7 @@ const permissions: Permission[] = [
   { resource: "Contact", type: "page", icon: "📧" },
   { resource: "Services", type: "page", icon: "🛠️" },
   { resource: "FAQ", type: "page", icon: "❓" },
+  { resource: "Financial Calculators", type: "page", icon: "🧮" },
   { resource: "Become Client", type: "page", icon: "👥" },
   { resource: "Location", type: "page", icon: "📍" },
   { resource: "Disclosures", type: "page", icon: "📋" },
@@ -111,7 +112,7 @@ const defaultPermissions: Record<string, string[]> = {
   ],
   "guest_user": [
     "Home (Landing/Dashboard)", "Register", "Resources", "About", "Contact",
-    "Services", "FAQ", "Become Client", "Location", "Disclosures", "Custodian",
+    "Services", "FAQ", "Financial Calculators", "Become Client", "Location", "Disclosures", "Custodian",
     "Privacy Policy", "Terms of Service", "Process",
     "CALCULATORS", "Vehicle Financing", "Lease Payment Calculator", "Car Affordability Calculator",
     "FOOTER LINKS", "Footer - Platform Links", "Financial Calculators", "Guest Access", "Client Login", "Mobile App", "API Documentation",
