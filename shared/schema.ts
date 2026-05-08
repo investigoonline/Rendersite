@@ -321,7 +321,14 @@ export const contentSectionEnum = pgEnum('content_section', [
   'newsletter_article',
   'privacy_policy_header',
   'terms_of_service_header',
-  'font_settings'
+  'font_settings',
+  'financial_calculators_hero',
+  'financial_calc_net_worth',
+  'financial_calc_loan_payoff',
+  'financial_calc_real_estate',
+  'financial_calc_retirement',
+  'financial_calc_interest',
+  'financial_calc_ira',
 ]);
 
 // Content management table
