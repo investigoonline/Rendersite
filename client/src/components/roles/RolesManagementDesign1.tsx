@@ -33,6 +33,12 @@ const permissions: Permission[] = [
   { resource: "Content Management", type: "page", icon: "⚙️" },
   { resource: "Admin Dashboard", type: "page", icon: "🎛️" },
   { resource: "Financial Calculators", type: "page", icon: "🧮" },
+  { resource: "FC: Net Worth Calculator", type: "calculator", parentId: "Financial Calculators" },
+  { resource: "FC: Loan Payoff Calculator", type: "calculator", parentId: "Financial Calculators" },
+  { resource: "FC: Real Estate Calculator", type: "calculator", parentId: "Financial Calculators" },
+  { resource: "FC: Retirement Calculator", type: "calculator", parentId: "Financial Calculators" },
+  { resource: "FC: Interest Calculators", type: "calculator", parentId: "Financial Calculators" },
+  { resource: "FC: IRA Eligibility Calculator", type: "calculator", parentId: "Financial Calculators" },
   { resource: "FOOTER LINKS", type: "category", icon: "🔗" },
   { resource: "Footer - Platform Links", type: "category", parentId: "FOOTER LINKS", icon: "🖥️" },
   { resource: "Financial Calculators", type: "page", parentId: "Footer - Platform Links" },
@@ -105,6 +111,7 @@ const defaultPermissions: Record<string, string[]> = {
     "Home (Landing/Dashboard)", "Register", "Resources", "About", "Contact", 
     "Services", "FAQ", "Become Client", "Location", "Disclosures", "Custodian", 
     "Privacy Policy", "Terms of Service", "Process", "Content Management",
+    "Financial Calculators", "FC: Net Worth Calculator", "FC: Loan Payoff Calculator", "FC: Real Estate Calculator", "FC: Retirement Calculator", "FC: Interest Calculators", "FC: IRA Eligibility Calculator",
     "FOOTER LINKS", "Footer - Platform Links", "Financial Calculators", "Guest Access", "Client Login", "Mobile App", "API Documentation",
     "Footer - Resources Links", "Articles & Insights", "Video Library", "Market Newsletters", "FAQ Database", "Help Center",
     "Footer - Company Links", "About IFS Group", "Leadership Team", "Careers", "Press & Media", "Contact Us",
@@ -112,7 +119,8 @@ const defaultPermissions: Record<string, string[]> = {
   ],
   "guest_user": [
     "Home (Landing/Dashboard)", "Register", "Resources", "About", "Contact",
-    "Services", "FAQ", "Financial Calculators", "Become Client", "Location", "Disclosures", "Custodian",
+    "Services", "FAQ", "Financial Calculators", "FC: Net Worth Calculator", "FC: Loan Payoff Calculator", "FC: Real Estate Calculator", "FC: Retirement Calculator", "FC: Interest Calculators", "FC: IRA Eligibility Calculator",
+    "Become Client", "Location", "Disclosures", "Custodian",
     "Privacy Policy", "Terms of Service", "Process",
     "CALCULATORS", "Vehicle Financing", "Lease Payment Calculator", "Car Affordability Calculator",
     "FOOTER LINKS", "Footer - Platform Links", "Financial Calculators", "Guest Access", "Client Login", "Mobile App", "API Documentation",
@@ -126,7 +134,7 @@ const defaultPermissions: Record<string, string[]> = {
 
 export default function RolesManagementDesign1() {
   const { toast } = useToast();
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["CALCULATORS"]));
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["CALCULATORS", "Financial Calculators"]));
   const [rolePermissions, setRolePermissions] = useState<Record<string, string[]>>({});
 
   // Fetch permissions from database
@@ -264,13 +272,14 @@ export default function RolesManagementDesign1() {
     const isCategory = permission.type === "category";
     const isExpanded = expandedCategories.has(permission.resource);
     const children = permissions.filter(p => p.parentId === permission.resource);
+    const hasChildren = children.length > 0;
 
     return (
       <>
         <tr key={permission.resource} className="border-b hover:bg-gray-50" data-testid={`permission-row-${permission.resource}`}>
           <td className="py-3 px-4" style={{ paddingLeft: `${level * 2 + 1}rem` }}>
             <div className="flex items-center">
-              {isCategory && children.length > 0 && (
+              {hasChildren && (
                 <button
                   onClick={() => toggleCategory(permission.resource)}
                   className="mr-2"
@@ -279,7 +288,7 @@ export default function RolesManagementDesign1() {
                   {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                 </button>
               )}
-              {!isCategory && children.length === 0 && <span className="mr-6"></span>}
+              {!hasChildren && <span className="mr-6"></span>}
               <span className={isCategory ? "font-semibold" : ""}>
                 {permission.icon && <span className="mr-2">{permission.icon}</span>}
                 {permission.resource}
@@ -296,7 +305,7 @@ export default function RolesManagementDesign1() {
             </td>
           ))}
         </tr>
-        {isCategory && isExpanded && children.map(child => renderPermissionRow(child, level + 1))}
+        {hasChildren && isExpanded && children.map(child => renderPermissionRow(child, level + 1))}
       </>
     );
   };
