@@ -1,6 +1,6 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { Home, TrendingUp, PiggyBank, Percent, Landmark, Wallet } from "lucide-react";
 import LoanPayoffCalc from "@/components/financial-calculators/LoanPayoffCalc";
 import RealEstateCalc from "@/components/financial-calculators/RealEstateCalc";
@@ -9,12 +9,14 @@ import InterestCalc from "@/components/financial-calculators/InterestCalc";
 import IRACalc from "@/components/financial-calculators/IRACalc";
 import WealthSnapshotCalc from "@/components/financial-calculators/WealthSnapshotCalc";
 import CalculatorDisclaimer from "@/components/calculators/CalculatorDisclaimer";
+import type { PageContent } from "@shared/schema";
 
-const SECTIONS = [
+const DEFAULT_SECTIONS = [
   {
     id: "net-worth",
-    label: "Net Worth",
+    cmsKey: "financial_calc_net_worth",
     icon: Wallet,
+    label: "Net Worth",
     badge: "Comprehensive Planning",
     badgeColor: "bg-indigo-100 text-indigo-800",
     title: "Net Worth Calculator",
@@ -23,8 +25,9 @@ const SECTIONS = [
   },
   {
     id: "loan-payoff",
-    label: "Loan Payoff",
+    cmsKey: "financial_calc_loan_payoff",
     icon: TrendingUp,
+    label: "Loan Payoff",
     badge: "Loans",
     badgeColor: "bg-orange-100 text-orange-800",
     title: "Loan Payoff & Extra-Payment Calculator",
@@ -33,8 +36,9 @@ const SECTIONS = [
   },
   {
     id: "real-estate",
-    label: "Real Estate",
+    cmsKey: "financial_calc_real_estate",
     icon: Home,
+    label: "Real Estate",
     badge: "Real Estate & Housing",
     badgeColor: "bg-green-100 text-green-800",
     title: "Real Estate & Housing Calculator",
@@ -43,8 +47,9 @@ const SECTIONS = [
   },
   {
     id: "retirement",
-    label: "Retirement",
+    cmsKey: "financial_calc_retirement",
     icon: PiggyBank,
+    label: "Retirement",
     badge: "Retirement Planning",
     badgeColor: "bg-purple-100 text-purple-800",
     title: "Retirement Calculator",
@@ -53,8 +58,9 @@ const SECTIONS = [
   },
   {
     id: "interest",
-    label: "Interest",
+    cmsKey: "financial_calc_interest",
     icon: Percent,
+    label: "Interest",
     badge: "Interest Tools",
     badgeColor: "bg-yellow-100 text-yellow-800",
     title: "Interest Calculators",
@@ -63,8 +69,9 @@ const SECTIONS = [
   },
   {
     id: "ira",
-    label: "IRA Eligibility",
+    cmsKey: "financial_calc_ira",
     icon: Landmark,
+    label: "IRA Eligibility",
     badge: "Retirement Accounts",
     badgeColor: "bg-red-100 text-red-800",
     title: "IRA & Roth IRA Eligibility Calculator",
@@ -75,7 +82,29 @@ const SECTIONS = [
 
 export default function FinancialCalculators() {
   const [activeId, setActiveId] = useState("net-worth");
-  const active = SECTIONS.find(s => s.id === activeId)!;
+
+  const { data: cmsContent } = useQuery<PageContent[]>({
+    queryKey: ['/api/content?page=financial_calculators'],
+  });
+
+  const heroContent = cmsContent?.find(c => c.section === 'financial_calculators_hero')?.content as any;
+
+  const pageTitle = heroContent?.pageTitle || "Financial Calculators";
+  const pageSubtitle = heroContent?.subtitle || "Professional-grade financial planning tools — net worth, loans, real estate, retirement, interest, and more.";
+
+  const sections = DEFAULT_SECTIONS.map(s => {
+    const cms = cmsContent?.find(c => c.section === s.cmsKey)?.content as any;
+    return {
+      ...s,
+      label: cms?.label || s.label,
+      badge: cms?.badge || s.badge,
+      badgeColor: cms?.badgeColor || s.badgeColor,
+      title: cms?.title || s.title,
+      description: cms?.description || s.description,
+    };
+  });
+
+  const active = sections.find(s => s.id === activeId)!;
   const ActiveComponent = active.component;
 
   return (
@@ -85,10 +114,10 @@ export default function FinancialCalculators() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
             <h1 className="text-3xl sm:text-4xl font-bold mb-3" style={{ fontFamily: "var(--font-heading)" }}>
-              Financial Calculators
+              {pageTitle}
             </h1>
             <p className="text-white/80 text-lg max-w-2xl mx-auto">
-              Professional-grade financial planning tools — net worth, loans, real estate, retirement, interest, and more.
+              {pageSubtitle}
             </p>
           </div>
         </div>
@@ -100,7 +129,7 @@ export default function FinancialCalculators() {
           <aside className="lg:w-56 flex-shrink-0">
             <div className="lg:sticky lg:top-20 space-y-1">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-3 mb-3">Calculators</p>
-              {SECTIONS.map(s => {
+              {sections.map(s => {
                 const Icon = s.icon;
                 const isActive = s.id === activeId;
                 return (
@@ -148,7 +177,7 @@ export default function FinancialCalculators() {
 
         {/* Mobile bottom nav */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex overflow-x-auto z-40 shadow-lg">
-          {SECTIONS.map(s => {
+          {sections.map(s => {
             const Icon = s.icon;
             const isActive = s.id === activeId;
             return (

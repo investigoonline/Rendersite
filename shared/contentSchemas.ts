@@ -2138,6 +2138,134 @@ export const contentSchemas: Record<string, SectionSchema> = {
       sortOrder: { label: 'Display Order within Month', control: 'number', min: 1, max: 100 },
     },
   },
+
+  // Financial Calculators Page
+  financial_calculators_hero: {
+    schema: z.object({
+      pageTitle: z.string().min(1).max(100),
+      subtitle: z.string().min(1).max(500),
+    }),
+    label: 'Hero Section',
+    description: 'Main hero banner — page title and subtitle',
+    uiMeta: {
+      pageTitle: { label: 'Page Title', control: 'text', placeholder: 'Financial Calculators' },
+      subtitle: { label: 'Subtitle', control: 'textarea', rows: 3, placeholder: 'Professional-grade financial planning tools — net worth, loans, real estate, retirement, interest, and more.' },
+    },
+  },
+
+  financial_calc_net_worth: {
+    schema: z.object({
+      label: z.string().min(1).max(50),
+      badge: z.string().min(1).max(100),
+      badgeColor: z.string().min(1),
+      title: z.string().min(1).max(150),
+      description: z.string().min(1).max(500),
+    }),
+    label: 'Net Worth Calculator Card',
+    description: 'Sidebar label, badge, title and description for the Net Worth calculator',
+    uiMeta: {
+      label: { label: 'Sidebar Label', control: 'text', placeholder: 'Net Worth' },
+      badge: { label: 'Badge Text', control: 'text', placeholder: 'Comprehensive Planning' },
+      badgeColor: { label: 'Badge Color Classes', control: 'text', placeholder: 'bg-indigo-100 text-indigo-800' },
+      title: { label: 'Section Title', control: 'text', placeholder: 'Net Worth Calculator' },
+      description: { label: 'Description', control: 'textarea', rows: 3, placeholder: 'Your complete financial profile…' },
+    },
+  },
+
+  financial_calc_loan_payoff: {
+    schema: z.object({
+      label: z.string().min(1).max(50),
+      badge: z.string().min(1).max(100),
+      badgeColor: z.string().min(1),
+      title: z.string().min(1).max(150),
+      description: z.string().min(1).max(500),
+    }),
+    label: 'Loan Payoff Calculator Card',
+    description: 'Sidebar label, badge, title and description for the Loan Payoff calculator',
+    uiMeta: {
+      label: { label: 'Sidebar Label', control: 'text', placeholder: 'Loan Payoff' },
+      badge: { label: 'Badge Text', control: 'text', placeholder: 'Loans' },
+      badgeColor: { label: 'Badge Color Classes', control: 'text', placeholder: 'bg-orange-100 text-orange-800' },
+      title: { label: 'Section Title', control: 'text', placeholder: 'Loan Payoff & Extra-Payment Calculator' },
+      description: { label: 'Description', control: 'textarea', rows: 3, placeholder: 'See exactly how much time and interest you save…' },
+    },
+  },
+
+  financial_calc_real_estate: {
+    schema: z.object({
+      label: z.string().min(1).max(50),
+      badge: z.string().min(1).max(100),
+      badgeColor: z.string().min(1),
+      title: z.string().min(1).max(150),
+      description: z.string().min(1).max(500),
+    }),
+    label: 'Real Estate Calculator Card',
+    description: 'Sidebar label, badge, title and description for the Real Estate calculator',
+    uiMeta: {
+      label: { label: 'Sidebar Label', control: 'text', placeholder: 'Real Estate' },
+      badge: { label: 'Badge Text', control: 'text', placeholder: 'Real Estate & Housing' },
+      badgeColor: { label: 'Badge Color Classes', control: 'text', placeholder: 'bg-green-100 text-green-800' },
+      title: { label: 'Section Title', control: 'text', placeholder: 'Real Estate & Housing Calculator' },
+      description: { label: 'Description', control: 'textarea', rows: 3, placeholder: 'Analyze home equity, investment ROI…' },
+    },
+  },
+
+  financial_calc_retirement: {
+    schema: z.object({
+      label: z.string().min(1).max(50),
+      badge: z.string().min(1).max(100),
+      badgeColor: z.string().min(1),
+      title: z.string().min(1).max(150),
+      description: z.string().min(1).max(500),
+    }),
+    label: 'Retirement Calculator Card',
+    description: 'Sidebar label, badge, title and description for the Retirement calculator',
+    uiMeta: {
+      label: { label: 'Sidebar Label', control: 'text', placeholder: 'Retirement' },
+      badge: { label: 'Badge Text', control: 'text', placeholder: 'Retirement Planning' },
+      badgeColor: { label: 'Badge Color Classes', control: 'text', placeholder: 'bg-purple-100 text-purple-800' },
+      title: { label: 'Section Title', control: 'text', placeholder: 'Retirement Calculator' },
+      description: { label: 'Description', control: 'textarea', rows: 3, placeholder: 'Estimate your retirement nest egg…' },
+    },
+  },
+
+  financial_calc_interest: {
+    schema: z.object({
+      label: z.string().min(1).max(50),
+      badge: z.string().min(1).max(100),
+      badgeColor: z.string().min(1),
+      title: z.string().min(1).max(150),
+      description: z.string().min(1).max(500),
+    }),
+    label: 'Interest Calculators Card',
+    description: 'Sidebar label, badge, title and description for the Interest calculator',
+    uiMeta: {
+      label: { label: 'Sidebar Label', control: 'text', placeholder: 'Interest' },
+      badge: { label: 'Badge Text', control: 'text', placeholder: 'Interest Tools' },
+      badgeColor: { label: 'Badge Color Classes', control: 'text', placeholder: 'bg-yellow-100 text-yellow-800' },
+      title: { label: 'Section Title', control: 'text', placeholder: 'Interest Calculators' },
+      description: { label: 'Description', control: 'textarea', rows: 3, placeholder: 'Simple Interest and Compound Interest calculators…' },
+    },
+  },
+
+  financial_calc_ira: {
+    schema: z.object({
+      label: z.string().min(1).max(50),
+      badge: z.string().min(1).max(100),
+      badgeColor: z.string().min(1),
+      title: z.string().min(1).max(150),
+      description: z.string().min(1).max(500),
+    }),
+    label: 'IRA Eligibility Calculator Card',
+    description: 'Sidebar label, badge, title and description for the IRA Eligibility calculator',
+    uiMeta: {
+      label: { label: 'Sidebar Label', control: 'text', placeholder: 'IRA Eligibility' },
+      badge: { label: 'Badge Text', control: 'text', placeholder: 'Retirement Accounts' },
+      badgeColor: { label: 'Badge Color Classes', control: 'text', placeholder: 'bg-red-100 text-red-800' },
+      title: { label: 'Section Title', control: 'text', placeholder: 'IRA & Roth IRA Eligibility Calculator' },
+      description: { label: 'Description', control: 'textarea', rows: 3, placeholder: 'Determine your Roth IRA contribution eligibility…' },
+    },
+  },
 };
 
 // Page to sections mapping
@@ -2202,6 +2330,15 @@ export const pageSections: Record<string, string[]> = {
   ],
   flipbooks: ['flipbook_header', 'flipbook_item'],
   newsletters: ['newsletter_header', 'newsletter_article'],
+  financial_calculators: [
+    'financial_calculators_hero',
+    'financial_calc_net_worth',
+    'financial_calc_loan_payoff',
+    'financial_calc_real_estate',
+    'financial_calc_retirement',
+    'financial_calc_interest',
+    'financial_calc_ira',
+  ],
 };
 
 // Helper to get schema for a section

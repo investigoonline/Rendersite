@@ -671,6 +671,7 @@ export default function ContentManagement() {
                 <TabsTrigger value="privacy_policy" data-testid="tab-privacy">Privacy Policy</TabsTrigger>
                 <TabsTrigger value="terms_of_service" data-testid="tab-terms">Terms of Service</TabsTrigger>
                 <TabsTrigger value="disclosures" data-testid="tab-disclosures">Disclosures</TabsTrigger>
+                <TabsTrigger value="financial_calculators" data-testid="tab-financial-calculators">Financial Calculators</TabsTrigger>
               </TabsList>
 
               {/* Add Section Button */}
