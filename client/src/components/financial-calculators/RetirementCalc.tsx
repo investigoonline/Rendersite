@@ -228,8 +228,8 @@ export default function RetirementCalc() {
                 <p className="text-xs font-medium text-gray-600 mb-3">Detailed Summary</p>
                 {[
                   ["Inflation-Adjusted Income Needed", fmt(Math.round(futureIncome)) + "/yr"],
-                  ["FV of Current Savings", fmt(Math.round(fvSavings))],
-                  ["FV of Monthly Contributions", fmt(Math.round(fvContrib))],
+                  ["Future Value of Current Savings", fmt(Math.round(fvSavings))],
+                  ["Future Value of Monthly Contributions", fmt(Math.round(fvContrib))],
                   ["Total Projected Savings", fmt(Math.round(totalSavings))],
                   ["Required Nest Egg", fmt(Math.round(nestEgg))],
                 ].map(([label, val]) => (

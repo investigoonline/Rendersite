@@ -775,7 +775,7 @@ export default function WealthSnapshotCalc() {
           description="Enter your legal name as it appears on official documents."
           value={form.fullName}
           onChange={(v) => { set("fullName", v); if (personalErrors.fullName) setPersonalErrors((e) => ({ ...e, fullName: undefined })); }}
-          placeholder="e.g. John Smith"
+          placeholder=""
           error={personalErrors.fullName}
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
@@ -786,7 +786,7 @@ export default function WealthSnapshotCalc() {
               description: "Your current age in years.",
               value: form.currentAge,
               onChange: (v: string) => { set("currentAge", v); if (personalErrors.currentAge) setPersonalErrors((e) => ({ ...e, currentAge: undefined })); },
-              placeholder: "e.g. 45",
+              placeholder: "",
               tooltip: "Your age determines how many years remain until ages 65, 75 and 85.",
               error: personalErrors.currentAge,
             },
@@ -795,7 +795,7 @@ export default function WealthSnapshotCalc() {
               description: "Adds a personalised milestone to your projections.",
               value: form.plannedRetirementAge,
               onChange: (v: string) => { set("plannedRetirementAge", v); if (personalErrors.plannedRetirementAge) setPersonalErrors((e) => ({ ...e, plannedRetirementAge: undefined })); },
-              placeholder: "e.g. 60",
+              placeholder: "",
               tooltip: "A custom retirement milestone card will appear in the projections panel.",
               error: personalErrors.plannedRetirementAge,
             },
@@ -1101,7 +1101,7 @@ export default function WealthSnapshotCalc() {
                     className="h-9 text-sm bg-white"
                     value={prop.addressCity}
                     onChange={(e) => updateRealEstate(i, "addressCity", e.target.value)}
-                    placeholder="e.g. Miami, FL"
+                    placeholder=""
                   />
                 </div>
               </div>
@@ -1169,7 +1169,7 @@ export default function WealthSnapshotCalc() {
                   className="h-9 text-sm bg-white"
                   value={biz.businessName}
                   onChange={(e) => updateBusiness(i, "businessName", e.target.value)}
-                  placeholder="e.g. Smith Consulting LLC"
+                  placeholder=""
                 />
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -1393,7 +1393,7 @@ export default function WealthSnapshotCalc() {
               className="pl-7"
               value={form.annualSavings}
               onChange={(e) => set("annualSavings", e.target.value)}
-              placeholder="e.g. 12,000"
+              placeholder=""
             />
           </div>
           {n(form.annualSavings) > 0 && (
@@ -1506,11 +1506,16 @@ export default function WealthSnapshotCalc() {
               <NumericInput
                 className="pr-8"
                 value={form.expectedReturnRate}
+                allowDecimal={true}
                 onChange={(e) => {
                   const raw = parseFloat(e.target.value) || 0;
-                  set("expectedReturnRate", String(Math.min(50, Math.max(0, raw))));
+                  if (!e.target.value.endsWith(".") && !e.target.value.endsWith(".0") && !e.target.value.endsWith(".00")) {
+                    set("expectedReturnRate", String(Math.min(50, Math.max(0, raw))));
+                  } else {
+                    set("expectedReturnRate", e.target.value);
+                  }
                 }}
-                placeholder="e.g. 8"
+                placeholder=""
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm pointer-events-none">%</span>
             </div>

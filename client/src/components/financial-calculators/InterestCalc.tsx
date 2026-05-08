@@ -55,16 +55,16 @@ function SimpleInterest() {
   const T = nv(years);
   const A = nv(annualAddition);
 
-  // Year-by-year SI: each year's interest is on the running balance (principal + prior additions)
-  let balance = P;
-  let totalInterest = 0;
+  // True Simple Interest: interest is only ever on the original principal (I = P × R × T)
+  // Each annual addition also earns simple interest for the remaining years it is held
+  const baseInterest = P * R * T;
+  let additionInterest = 0;
   for (let i = 0; i < Math.floor(T); i++) {
-    const interest = balance * R;
-    totalInterest += interest;
-    balance += interest + A;
+    additionInterest += A * R * Math.max(0, T - i - 1);
   }
+  const totalInterest = baseInterest + additionInterest;
   const totalContributions = P + A * Math.floor(T);
-  const total = balance;
+  const total = totalContributions + totalInterest;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

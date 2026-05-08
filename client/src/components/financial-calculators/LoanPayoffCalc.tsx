@@ -116,8 +116,6 @@ export default function LoanPayoffCalc() {
               tooltip="The current outstanding loan balance you want to pay off." />
             <FieldRow label="Annual interest rate (APR) in %?" field="rate" value={form.rate} onChange={update}
               tooltip="The annual percentage rate (APR) of your loan." suffix="%" />
-            <FieldRow label="Remaining term in months?" field="months" value={form.months} onChange={update}
-              tooltip="How many months remain on your loan." suffix="mo" />
             <FieldRow label="Current monthly payment?" field="payment" value={form.payment} onChange={update}
               tooltip="Your current required monthly payment amount." />
             <FieldRow label="Extra monthly payment (optional)?" field="extra" value={form.extra} onChange={update}
