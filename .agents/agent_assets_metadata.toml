@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "b-Nvki2f7UmRExunvBCqw"
+uri = "file://investigoo_spanel_deploy.tar.gz"
+type = "unspecified"
+title = "InvestigooOnline — SPanel Deployment Package"
