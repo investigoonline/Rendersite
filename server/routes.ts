@@ -20,7 +20,7 @@ import {
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import { objectStorageClient } from "./replit_integrations/object_storage";
+import { objectStorageClient } from "./investigo_integrations/object_storage";
 
 // Configure multer for image uploads (memory storage for processing before upload)
 const multerStorage = multer.memoryStorage();
@@ -591,7 +591,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .toBuffer();
 
       // Upload to object storage
-      const { ObjectStorageService } = await import('./replit_integrations/object_storage');
+      const { ObjectStorageService } = await import('./investigo_integrations/object_storage');
       const objectStorageService = new ObjectStorageService();
       const uploadURL = await objectStorageService.getObjectEntityUploadURL();
       const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);

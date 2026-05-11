@@ -9,17 +9,17 @@ import {
   setObjectAclPolicy,
 } from "./objectAcl";
 
-const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
+const INVESTIGO_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
 
 // The object storage client is used to interact with the object storage service.
 export const objectStorageClient = new Storage({
   credentials: {
-    audience: "replit",
+    audience: "investigo",
     subject_token_type: "access_token",
-    token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
+    token_url: `${INVESTIGO_SIDECAR_ENDPOINT}/token`,
     type: "external_account",
     credential_source: {
-      url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
+      url: `${INVESTIGO_SIDECAR_ENDPOINT}/credential`,
       format: {
         type: "json",
         subject_token_field_name: "access_token",
@@ -278,7 +278,7 @@ async function signObjectURL({
     expires_at: new Date(Date.now() + ttlSec * 1000).toISOString(),
   };
   const response = await fetch(
-    `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
+    `${INVESTIGO_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
     {
       method: "POST",
       headers: {
@@ -290,11 +290,10 @@ async function signObjectURL({
   if (!response.ok) {
     throw new Error(
       `Failed to sign object URL, errorcode: ${response.status}, ` +
-        `make sure you're running on Replit`
+        `make sure the storage service is running`
     );
   }
 
   const { signed_url: signedURL } = await response.json();
   return signedURL;
 }
-

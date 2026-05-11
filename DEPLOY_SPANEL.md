@@ -56,9 +56,9 @@ DATABASE_URL=postgresql://USERNAME:PASSWORD@HOSTNAME:5432/DATABASE_NAME
 SESSION_SECRET=any-long-random-string-here-at-least-32-chars
 
 # Authentication (OpenID Connect)
-REPLIT_DOMAINS=yourdomain.com
-ISSUER_URL=https://replit.com/oidc
-REPL_ID=your-repl-id
+INVESTIGO_DOMAINS=yourdomain.com
+ISSUER_URL=https://auth.yourdomain.com/oidc
+INVESTIGO_APP_ID=your-app-id
 
 # Object Storage (if using file uploads)
 DEFAULT_OBJECT_STORAGE_BUCKET_ID=your-bucket-id
@@ -136,7 +136,7 @@ pm2 stop investigoo     # stop the app
 - The app requires Node.js 18 or higher
 - Do NOT use `npm run dev` in production — use PM2 with `dist/index.js`
 - SSL/HTTPS is handled by SPanel's Nginx — no changes needed in the app
-- File uploads are currently handled via Replit Object Storage (Google Cloud). On SPanel you will need to configure your own storage or use a local path.
+- File uploads use cloud object storage — configure `DEFAULT_OBJECT_STORAGE_BUCKET_ID` with your storage bucket
 
 ---
 
