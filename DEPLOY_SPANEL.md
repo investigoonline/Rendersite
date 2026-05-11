@@ -1,95 +1,129 @@
 # SPanel Deployment Guide — InvestigooOnline
 
-## What's in This Package
+## Overview
 
-- `dist/index.js` — compiled backend server
-- `dist/public/` — compiled frontend (HTML, CSS, JS, images)
-- `package.json` — dependency list
-- `.env.example` — all environment variables you need to set
+InvestigooOnline is a Node.js (Express) + React application with a PostgreSQL database.
+The compiled app lives entirely in the `dist/` folder — the frontend is pre-built static files
+served by the Express backend.
 
----
-
-## Step 1: Create a PostgreSQL Database in SPanel
-
-1. Log into SPanel
-2. Go to **PostgreSQL Databases**
-3. Create a new database, user, and password
-4. Note down: hostname, database name, username, password, port (usually 5432)
-
-Your `DATABASE_URL` will be:
-```
-postgresql://USERNAME:PASSWORD@HOSTNAME:5432/DATABASE_NAME
-```
+**Requirements:**
+- Node.js 20 or higher
+- PostgreSQL 14 or higher
+- PM2 (process manager)
+- SPanel Reverse Proxy or Node.js App feature
 
 ---
 
-## Step 2: Upload Files to Your Server
+## Step 1 — Create a PostgreSQL Database in SPanel
 
-Upload the entire project folder to your server via SPanel's File Manager or FTP.
+1. Log into SPanel → **PostgreSQL Databases**
+2. Create a new database (e.g. `investigoo_db`)
+3. Create a database user (e.g. `investigoo_user`) and set a strong password
+4. Assign the user to the database with **All Privileges**
+5. Note down all four values — you'll need them shortly:
 
-Recommended location: `/home/yourusername/investigoo/`
-
-Files you MUST upload:
-```
-dist/              (entire folder — frontend + backend)
-package.json
-package-lock.json  (if present)
-.env               (you create this — see Step 3)
-```
-
----
-
-## Step 3: Create Your .env File
-
-SSH into your server and create a `.env` file in your project folder:
-
-```bash
-cd /home/yourusername/investigoo
-nano .env
-```
-
-Add these variables (fill in your actual values):
-
-```env
-NODE_ENV=production
-DATABASE_URL=postgresql://USERNAME:PASSWORD@HOSTNAME:5432/DATABASE_NAME
-SESSION_SECRET=any-long-random-string-here-at-least-32-chars
-
-# Authentication (OpenID Connect)
-INVESTIGO_DOMAINS=yourdomain.com
-ISSUER_URL=https://auth.yourdomain.com/oidc
-INVESTIGO_APP_ID=your-app-id
-
-# Object Storage (if using file uploads)
-DEFAULT_OBJECT_STORAGE_BUCKET_ID=your-bucket-id
-PRIVATE_OBJECT_DIR=.private
-PUBLIC_OBJECT_SEARCH_PATHS=public
-```
+| Value | Example |
+|-------|---------|
+| Host | `localhost` or `127.0.0.1` |
+| Port | `5432` |
+| Database name | `investigoo_db` |
+| Username | `investigoo_user` |
+| Password | `your_db_password` |
 
 ---
 
-## Step 4: Install Dependencies
+## Step 2 — Upload the Project Files
+
+Upload the following files/folders to your server (e.g. `/home/yourusername/investigoo/`):
+
+```
+dist/              ← compiled frontend + backend (required)
+package.json       ← dependency manifest (required)
+package-lock.json  ← lockfile (required)
+drizzle.config.ts  ← database schema tool config (required for Step 5)
+shared/            ← shared schema files (required for Step 5)
+ecosystem.config.js ← PM2 config you create in Step 4 (required)
+```
+
+Use SPanel's **File Manager**, **FTP**, or `scp` via SSH.
+
+---
+
+## Step 3 — Install Node.js Dependencies
+
+SSH into your server and run:
 
 ```bash
 cd /home/yourusername/investigoo
 npm install --omit=dev
 ```
 
----
-
-## Step 5: Run Database Migrations
-
-The app uses Drizzle ORM. Push the schema to your new database:
+Also install the schema push tool globally (needed only once):
 
 ```bash
-npm run db:push
+npm install -g drizzle-kit
 ```
 
 ---
 
-## Step 6: Install PM2 (Process Manager)
+## Step 4 — Create the PM2 Ecosystem Config
 
-PM2 keeps your app running in the background and restarts it if it crashes.
+This file sets all environment variables and tells PM2 how to start the app.
+
+Create a file called `ecosystem.config.js` in your project folder:
+
+```bash
+nano /home/yourusername/investigoo/ecosystem.config.js
+```
+
+Paste the following and fill in your real values:
+
+```js
+module.exports = {
+  apps: [
+    {
+      name: "investigoo",
+      script: "dist/index.js",
+      interpreter: "node",
+      env: {
+        NODE_ENV: "production",
+        PORT: "5000",
+
+        // PostgreSQL — replace with your real credentials
+        DATABASE_URL: "postgresql://investigoo_user:your_db_password@localhost:5432/investigoo_db",
+
+        // Session secret — use any long random string (32+ characters)
+        SESSION_SECRET: "replace-this-with-a-long-random-secret-string",
+
+        // Object storage — only needed if using hero image uploads
+        DEFAULT_OBJECT_STORAGE_BUCKET_ID: "your-bucket-id",
+        PRIVATE_OBJECT_DIR: ".private",
+        PUBLIC_OBJECT_SEARCH_PATHS: "public",
+      },
+    },
+  ],
+};
+```
+
+> **Tip:** Generate a secure session secret with:
+> `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`
+
+---
+
+## Step 5 — Push the Database Schema
+
+This creates all required tables in your PostgreSQL database.
+
+```bash
+cd /home/yourusername/investigoo
+DATABASE_URL="postgresql://investigoo_user:your_db_password@localhost:5432/investigoo_db" npx drizzle-kit push
+```
+
+The sessions table is created automatically when the app first starts.
+
+---
+
+## Step 6 — Install PM2
 
 ```bash
 npm install -g pm2
@@ -97,59 +131,126 @@ npm install -g pm2
 
 ---
 
-## Step 7: Start the App with PM2
+## Step 7 — Start the App
 
 ```bash
 cd /home/yourusername/investigoo
-pm2 start dist/index.js --name "investigoo" --interpreter node
+pm2 start ecosystem.config.js
 pm2 save
 pm2 startup
 ```
 
-Your app will now run on **port 5000**.
+Run the `pm2 startup` command it outputs (it will look like `sudo env PATH=... pm2 startup ...`).
+This makes PM2 automatically restart your app after a server reboot.
+
+Verify the app is running:
+
+```bash
+pm2 status
+pm2 logs investigoo --lines 50
+```
+
+The app is now running on **port 5000**.
 
 ---
 
-## Step 8: Point Your Domain with SPanel Reverse Proxy
+## Step 8 — Set Up the Reverse Proxy in SPanel
 
-In SPanel, set up a **Reverse Proxy** to forward your domain to port 5000:
+Point your domain to the running Node.js app:
 
-1. Go to **Nginx Proxy** or **Node.js App** in SPanel
-2. Set proxy target: `http://127.0.0.1:5000`
-3. Point your domain to this proxy
+1. In SPanel go to **Nginx Configuration** or **Proxy Settings**
+2. Add a new proxy rule:
+   - **Domain:** `yourdomain.com`
+   - **Proxy target:** `http://127.0.0.1:5000`
+3. Enable SSL/HTTPS via SPanel's **SSL Manager** (Let's Encrypt is free)
+
+---
+
+## Step 9 — Verify It's Working
+
+Open your browser and visit `https://yourdomain.com`.
+
+Check the health endpoint:
+```bash
+curl https://yourdomain.com/api/health
+# Should return: {"status":"ok"}
+```
 
 ---
 
 ## Useful PM2 Commands
 
 ```bash
-pm2 status              # check if app is running
-pm2 logs investigoo     # view live logs
-pm2 restart investigoo  # restart the app
-pm2 stop investigoo     # stop the app
+pm2 status                    # see all running apps
+pm2 logs investigoo           # live log stream
+pm2 logs investigoo --lines 100  # last 100 log lines
+pm2 restart investigoo        # restart after config changes
+pm2 stop investigoo           # stop the app
+pm2 reload investigoo         # zero-downtime reload
+```
+
+---
+
+## Updating the App
+
+When you deploy new code:
+
+```bash
+cd /home/yourusername/investigoo
+# Upload new dist/ folder via FTP/scp first, then:
+npm install --omit=dev
+pm2 reload investigoo
 ```
 
 ---
 
 ## Important Notes
 
-- The app requires Node.js 18 or higher
-- Do NOT use `npm run dev` in production — use PM2 with `dist/index.js`
-- SSL/HTTPS is handled by SPanel's Nginx — no changes needed in the app
-- File uploads use cloud object storage — configure `DEFAULT_OBJECT_STORAGE_BUCKET_ID` with your storage bucket
+### Authentication
+The app uses email + password authentication with bcrypt. No external OAuth provider
+is required. Users register and log in directly through the app.
+
+### Object Storage (Hero Image Uploads)
+The CMS hero image upload feature uses a cloud storage sidecar service. This service
+is not available on standard SPanel hosting. Hero images uploaded through the CMS
+will not persist unless you configure an alternative storage solution.
+
+For a simple local file alternative, the `uploads/` folder is already served
+statically by the app — contact your developer to redirect image uploads there.
+
+### Sessions
+Sessions are stored in the PostgreSQL `sessions` table and automatically created
+on first startup. Sessions last 7 days.
+
+### HTTPS / SSL
+Always run in production behind HTTPS. The app sets secure cookies in
+`NODE_ENV=production`, so HTTPS is required for login to work correctly.
 
 ---
 
 ## Troubleshooting
 
 **App won't start:**
-- Check `pm2 logs investigoo` for error messages
-- Make sure `.env` file exists and `DATABASE_URL` is correct
+```bash
+pm2 logs investigoo --lines 100
+```
+Most common cause: wrong `DATABASE_URL` in `ecosystem.config.js`.
 
-**Database errors:**
-- Confirm PostgreSQL is running and credentials are correct
-- Run `npm run db:push` again
+**Login doesn't work / session lost immediately:**
+- Confirm HTTPS is active (secure cookies require it)
+- Check `SESSION_SECRET` is set in `ecosystem.config.js`
 
-**Page not found / white screen:**
-- Confirm the reverse proxy is pointing to port 5000
-- Check that `dist/public/` was uploaded correctly
+**Database errors on startup:**
+- Re-run the schema push: `DATABASE_URL="..." npx drizzle-kit push`
+- Confirm the PostgreSQL user has full privileges on the database
+
+**White screen / page not loading:**
+- Confirm `dist/public/` was uploaded correctly
+- Check the reverse proxy is pointing to `http://127.0.0.1:5000`
+- Run `curl http://127.0.0.1:5000` on the server to test direct access
+
+**Port already in use:**
+```bash
+# Change PORT in ecosystem.config.js to another value, e.g. 5001
+# Then update the reverse proxy target to match
+```
