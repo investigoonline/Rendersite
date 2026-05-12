@@ -26,7 +26,7 @@ The application is a monorepo with a React/TypeScript frontend and an Express.js
 - **Session Management**: Express sessions with PostgreSQL store.
 
 ## Authentication System
-- **Primary Auth**: OpenID Connect.
+- **Primary Auth**: Email and password with bcrypt.
 - **Guest Access**: Custom system with email verification.
 - **Session Storage**: PostgreSQL-backed sessions.
 
@@ -55,10 +55,7 @@ The application is a monorepo with a React/TypeScript frontend and an Express.js
 # External Dependencies
 
 ## Database Services
-- **Neon PostgreSQL**: Serverless PostgreSQL hosting.
-
-## Authentication Provider
-- **OpenID Connect**: For secure user authentication.
+- **PostgreSQL**: Primary data store, sessions, and content.
 
 ## UI Dependencies
 - **Radix UI**: Accessible component primitives.

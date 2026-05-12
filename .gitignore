@@ -3,4 +3,15 @@ dist
 .DS_Store
 server/public
 vite.config.ts.*
-*.tar.gzcookies.txt
+*.tar.gz
+cookies.txt
+
+# Platform-specific — excluded from client delivery
+.replit
+replit.md
+.local/
+.cache/
+.config/
+.agents/
+generated-icon.png
+attached_assets/
