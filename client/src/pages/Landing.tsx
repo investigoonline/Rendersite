@@ -156,11 +156,10 @@ export default function Landing() {
 
       {/* Hero Section */}
       <section style={{ display: 'block' }}>
-        <div style={{ display: 'block', width: '100%', overflow: 'hidden', lineHeight: 0 }}>
+        <div className="hero-banner">
           <img
             src={heroImage}
             alt="IFS Wealth Management"
-            className="hero-banner"
           />
         </div>
         {heroContent?.subtitle && (

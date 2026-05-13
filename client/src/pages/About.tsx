@@ -51,11 +51,10 @@ export default function About() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Image - Full Width at Top */}
-      <div className="w-full">
+      <div className="hero-banner">
         <img
           src={heroImage}
           alt="IFS Wealth Management - Family and personal service"
-          className="hero-banner"
         />
       </div>
 

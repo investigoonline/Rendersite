@@ -40,11 +40,10 @@ export default function PrivacyPolicy() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="w-full">
+      <div className="hero-banner">
         <img
           src={heroImage}
           alt="IFS Wealth Management privacy policy"
-          className="hero-banner"
         />
       </div>
 

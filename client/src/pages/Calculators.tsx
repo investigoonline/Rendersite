@@ -359,11 +359,10 @@ export default function Calculators() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Image - Full Width at Top */}
-      <div className="w-full">
+      <div className="hero-banner">
         <img 
           src={heroImage} 
           alt="Financial planning and calculators" 
-          className="hero-banner"
         />
       </div>
 

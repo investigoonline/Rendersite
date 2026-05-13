@@ -119,11 +119,10 @@ export default function FAQ() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Image - Full Width at Top */}
-      <div className="w-full">
+      <div className="hero-banner">
         <img 
           src={heroImage} 
           alt="Frequently Asked Questions" 
-          className="hero-banner"
         />
       </div>
 

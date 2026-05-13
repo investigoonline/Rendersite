@@ -102,11 +102,10 @@ export default function Disclosures() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="w-full">
+      <div className="hero-banner">
         <img
           src={heroImage}
           alt="IFS Wealth Management disclosures and compliance"
-          className="hero-banner"
         />
       </div>
 

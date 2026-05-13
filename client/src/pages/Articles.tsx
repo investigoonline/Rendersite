@@ -87,8 +87,8 @@ export default function Articles() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f5f5f5" }}>
       <section>
-        <div className="w-full">
-          <img src={heroImage} alt="Financial Articles" className="hero-banner" />
+        <div className="hero-banner">
+          <img src={heroImage} alt="Financial Articles" />
         </div>
       </section>
 
