@@ -44,7 +44,7 @@ export default function PrivacyPolicy() {
         <img
           src={heroImage}
           alt="IFS Wealth Management privacy policy"
-          className="w-full object-cover h-[200px] sm:h-[300px] md:h-[400px] lg:h-[480px]"
+          className="hero-banner"
         />
       </div>
 

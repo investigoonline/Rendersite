@@ -1471,24 +1471,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return fs.createReadStream(localPath).pipe(res);
       }
 
-      // Fallback: try object storage (Replit / GCS sidecar)
-      let bucketName = getBucketName();
-      if (bucketName.startsWith('/')) {
-        bucketName = bucketName.slice(1);
-      }
-      const objectPath = `public/hero-images/${fileName}`;
-      const bucket = objectStorageClient.bucket(bucketName);
-      const file = bucket.file(objectPath);
-      const [exists] = await file.exists();
-      if (!exists) {
-        return res.status(404).json({ message: "Image not found" });
-      }
-      const [metadata] = await file.getMetadata();
-      res.set({
-        'Content-Type': metadata.contentType || 'image/webp',
-        'Cache-Control': 'public, max-age=31536000',
-      });
-      file.createReadStream().pipe(res);
+      // Image not found locally — return 404 (no GCS fallback on Railway)
+      return res.status(404).json({ message: "Image not found" });
     } catch (error) {
       console.error("Error serving image:", error);
       res.status(500).json({ message: "Unable to serve image" });

@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useFontSettings } from "@/hooks/useFontSettings";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PageProtectedRoute } from "@/components/PageProtectedRoute";
@@ -128,14 +129,16 @@ function FontSettingsProvider({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <FontSettingsProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </FontSettingsProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <FontSettingsProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </FontSettingsProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
