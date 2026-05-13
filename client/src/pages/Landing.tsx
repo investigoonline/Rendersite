@@ -7,7 +7,7 @@ import GuestSignupForm from "@/components/guest/GuestSignupForm";
 import CalculatorCard from "@/components/calculators/CalculatorCard";
 import NetWorthCalculator from "@/components/calculators/NetWorthCalculator";
 import { HTMLContent } from "@/components/HTMLContent";
-import homeHeroImage from "@assets/Home_(2)_1765299273068.png";
+const homeHeroImage = "/hero-images/hero_1770911242643_Our_NewsLetters__3_.webp";
 import wealthCreationDefault from "@/assets/wealth-creation.png";
 import wealthProtectionDefault from "@/assets/wealth-protection.png";
 import wealthPreservationDefault from "@/assets/wealth-preservation.png";
