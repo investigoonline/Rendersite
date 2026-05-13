@@ -130,6 +130,9 @@ export default function Landing() {
     return homeContent?.find((c) => c.section === sectionName);
   };
 
+  // Hero CMS content
+  const heroContent = getSection("home_hero")?.content as any;
+
   // Wealth pillar content
   const wealthCreation = getSection("home_wealth_creation")?.content as any;
   const wealthProtection = getSection("home_wealth_protection")?.content as any;
@@ -152,24 +155,21 @@ export default function Landing() {
       )}
 
       {/* Hero Section */}
-      <section>
-        <div className="w-full">
+      <section style={{ display: 'block' }}>
+        <div style={{ display: 'block', width: '100%', overflow: 'hidden', lineHeight: 0 }}>
           <img
             src={heroImage}
-            alt="Family enjoying financial freedom"
+            alt="IFS Wealth Management"
             className="hero-banner"
           />
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 text-center">
-          <p className="text-xl sm:text-2xl text-gray-600 mx-auto leading-relaxed text-center">
-            At IFS Wealth Management Inc, we understand that managing wealth is
-            not just about numbers; it's about realizing your dreams, securing
-            your future, and achieving financial freedom. As a leading wealth
-            management firm, we are dedicated to providing personalized
-            solutions and expert guidance to help you navigate the complexities
-            of financial planning and investment management.
-          </p>
-        </div>
+        {heroContent?.subtitle && (
+          <div className="bg-white py-8 text-center">
+            <p className="text-xl sm:text-2xl text-gray-600 max-w-4xl mx-auto px-4 leading-relaxed">
+              {heroContent.subtitle}
+            </p>
+          </div>
+        )}
       </section>
 
       {/* Wealth Pillars Section */}

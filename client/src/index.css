@@ -129,12 +129,13 @@
   
   .hero-banner {
     width: 100%;
-    object-fit: cover;
-    object-position: center;
-    aspect-ratio: 1366 / 480;
+    height: 35.1vw;
     max-height: 480px;
     min-height: 160px;
+    object-fit: cover;
+    object-position: center;
     display: block;
+    flex-shrink: 0;
   }
 
   .glassmorphism {
