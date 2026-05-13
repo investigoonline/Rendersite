@@ -1451,29 +1451,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // This is needed because the bucket has public access prevention enabled
   app.get('/api/storage/hero-images/:fileName', async (req, res) => {
     try {
+      const { fileName } = req.params;
+
+      // First: check for a locally committed static file (works on Railway and any host)
+      const localPath = path.join(process.cwd(), 'public', 'hero-images', fileName);
+      if (fs.existsSync(localPath)) {
+        const ext = path.extname(fileName).toLowerCase();
+        const mimeMap: Record<string, string> = {
+          '.webp': 'image/webp',
+          '.png': 'image/png',
+          '.jpg': 'image/jpeg',
+          '.jpeg': 'image/jpeg',
+          '.gif': 'image/gif',
+        };
+        res.set({
+          'Content-Type': mimeMap[ext] || 'image/webp',
+          'Cache-Control': 'public, max-age=31536000',
+        });
+        return fs.createReadStream(localPath).pipe(res);
+      }
+
+      // Fallback: try object storage (Replit / GCS sidecar)
       let bucketName = getBucketName();
       if (bucketName.startsWith('/')) {
         bucketName = bucketName.slice(1);
       }
-      
-      const { fileName } = req.params;
       const objectPath = `public/hero-images/${fileName}`;
-      
       const bucket = objectStorageClient.bucket(bucketName);
       const file = bucket.file(objectPath);
-      
       const [exists] = await file.exists();
       if (!exists) {
         return res.status(404).json({ message: "Image not found" });
       }
-      
       const [metadata] = await file.getMetadata();
-      
       res.set({
         'Content-Type': metadata.contentType || 'image/webp',
         'Cache-Control': 'public, max-age=31536000',
       });
-      
       file.createReadStream().pipe(res);
     } catch (error) {
       console.error("Error serving image:", error);
