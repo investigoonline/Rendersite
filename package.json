@@ -3,16 +3,21 @@
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
-  "scripts": {
-    "dev": "NODE_ENV=development tsx server/index.ts",
-    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
-    "start": "NODE_ENV=production node dist/index.js",
-    "check": "tsc",
-    "db:push": "drizzle-kit push",
-    "db:seed": "tsx db/seed.ts",
-    "db:setup": "npm run db:push && npm run db:seed",
-    "start:railway": "npm run db:setup && npm run start"
-  },
+  "engines": {
+  "node": "20.x",
+  "npm": "10.x"
+},
+ "scripts": {
+  "dev": "NODE_ENV=development tsx server/index.ts",
+  "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+  "start": "NODE_ENV=production node dist/index.js",
+  "check": "tsc",
+  "db:push": "drizzle-kit push",
+  "db:seed": "tsx db/seed.ts",
+  "db:setup": "npm run db:push && npm run db:seed",
+  "start:railway": "npm run db:setup && npm run start",
+  "start:render": "npm run db:push && npm run start"
+},
   "dependencies": {
     "@anthropic-ai/sdk": "^0.37.0",
     "@google-cloud/storage": "^7.18.0",
