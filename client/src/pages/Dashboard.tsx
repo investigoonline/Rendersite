@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Users, UserCheck, Calculator, FileText, Shield, Settings, Save } from "lucide-react";
+import { Users, UserCheck, Calculator, FileText, Shield, Settings, Save, Send } from "lucide-react";
 import type { PageContent, LoginHistory, User, SiteSetting } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -62,6 +62,18 @@ export default function Dashboard() {
     },
     onError: (error: any) => {
       toast({ title: "Error", description: error.message || "Failed to save setting.", variant: "destructive" });
+    },
+  });
+
+  const testEmailMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest('/api/admin/test-email', 'POST', {});
+    },
+    onSuccess: (data: any) => {
+      toast({ title: "Email Sent", description: data?.message || "Test email sent successfully." });
+    },
+    onError: (error: any) => {
+      toast({ title: "Email Failed", description: error.message || "Failed to send test email.", variant: "destructive" });
     },
   });
 
@@ -286,13 +298,27 @@ export default function Dashboard() {
           <TabsContent value="settings" className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Settings className="h-5 w-5 mr-2 text-primary" />
-                  System Settings
-                </CardTitle>
-                <CardDescription>
-                  Configure global platform parameters. Changes take effect immediately.
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center">
+                      <Settings className="h-5 w-5 mr-2 text-primary" />
+                      System Settings
+                    </CardTitle>
+                    <CardDescription className="mt-1">
+                      Configure global platform parameters. Changes take effect immediately.
+                    </CardDescription>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => testEmailMutation.mutate()}
+                    disabled={testEmailMutation.isPending}
+                    data-testid="btn-test-email"
+                  >
+                    <Send className="h-4 w-4 mr-2" />
+                    {testEmailMutation.isPending ? "Sending…" : "Send Test Email"}
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 {settingsLoading ? (

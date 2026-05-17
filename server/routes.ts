@@ -1494,6 +1494,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test email endpoint - sends a test message using current SMTP settings
+  app.post('/api/admin/test-email', async (req, res) => {
+    try {
+      const authorized = requireRole(req, res, ['super_admin', 'admin']);
+      if (!authorized) return;
+
+      const [hostSetting, portSetting, userSetting, passSetting, fromSetting, contactSetting] = await Promise.all([
+        storage.getSiteSetting('smtp_host'),
+        storage.getSiteSetting('smtp_port'),
+        storage.getSiteSetting('smtp_user'),
+        storage.getSiteSetting('smtp_pass'),
+        storage.getSiteSetting('smtp_from'),
+        storage.getSiteSetting('contact_email'),
+      ]);
+
+      const smtpHost = hostSetting?.settingValue?.trim();
+      const smtpPort = parseInt(portSetting?.settingValue?.trim() || "587");
+      const smtpUser = userSetting?.settingValue?.trim();
+      const smtpPass = passSetting?.settingValue?.trim();
+      const smtpFrom = fromSetting?.settingValue?.trim() || smtpUser;
+      const toEmail = contactSetting?.settingValue?.trim();
+
+      if (!smtpHost || !smtpUser || !smtpPass) {
+        return res.status(400).json({ message: "SMTP is not fully configured. Please set SMTP Host, SMTP User, and SMTP Password." });
+      }
+      if (!toEmail) {
+        return res.status(400).json({ message: "Contact Email is not configured. Please set it in System Settings." });
+      }
+
+      const transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465,
+        auth: { user: smtpUser, pass: smtpPass },
+      });
+
+      await transporter.verify();
+      await transporter.sendMail({
+        from: `"${smtpFrom}"`,
+        to: toEmail,
+        subject: "Test Email — InvestigooOnline System Settings",
+        html: `<h3>Test Email</h3><p>Your SMTP configuration is working correctly.</p><p><strong>Host:</strong> ${smtpHost}:${smtpPort}<br/><strong>User:</strong> ${smtpUser}<br/><strong>Delivered to:</strong> ${toEmail}</p>`,
+        text: `Test Email\n\nYour SMTP configuration is working correctly.\nHost: ${smtpHost}:${smtpPort}\nUser: ${smtpUser}\nDelivered to: ${toEmail}`,
+      });
+
+      res.json({ message: `Test email sent successfully to ${toEmail}` });
+    } catch (error: any) {
+      console.error("[Test Email] Failed:", error.message);
+      res.status(500).json({ message: `Email test failed: ${error.message}` });
+    }
+  });
+
   // Batch update site settings
   app.put('/api/admin/site-settings', async (req, res) => {
     try {
