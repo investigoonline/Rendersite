@@ -687,9 +687,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Calculator routes
   app.post('/api/calculations', async (req, res) => {
+    if (!req.session?.user?.id) {
+      return res.status(401).json({ message: "You must be logged in to access this resource" });
+    }
     try {
       const calculationData = insertCalculationSchema.parse(req.body);
-      
+      calculationData.userId = req.session.user.id;
       const calculation = await storage.saveCalculation(calculationData);
       res.json(calculation);
     } catch (error) {
@@ -699,9 +702,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get('/api/calculations', async (req, res) => {
+    if (!req.session?.user?.id) {
+      return res.status(401).json({ message: "You must be logged in to access this resource" });
+    }
     try {
-      const { userId } = req.query;
-      const calculations = await storage.getCalculations(userId as string);
+      const calculations = await storage.getCalculations(req.session.user.id);
       res.json(calculations);
     } catch (error) {
       console.error("Error fetching calculations:", error);
@@ -710,10 +715,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get('/api/calculations/:id', async (req, res) => {
+    if (!req.session?.user?.id) {
+      return res.status(401).json({ message: "You must be logged in to access this resource" });
+    }
     try {
       const calculation = await storage.getCalculation(req.params.id);
       if (!calculation) {
         return res.status(404).json({ message: "The calculation you're looking for could not be found" });
+      }
+      if (calculation.userId !== req.session.user.id) {
+        return res.status(403).json({ message: "You do not have permission to access this resource" });
       }
       res.json(calculation);
     } catch (error) {
@@ -833,8 +844,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Net worth routes
   app.post('/api/networth', async (req, res) => {
+    if (!req.session?.user?.id) {
+      return res.status(401).json({ message: "You must be logged in to access this resource" });
+    }
     try {
       const snapshotData = insertNetWorthSnapshotSchema.parse(req.body);
+      snapshotData.userId = req.session.user.id;
       const snapshot = await storage.saveNetWorthSnapshot(snapshotData);
       res.json(snapshot);
     } catch (error) {
@@ -844,9 +859,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get('/api/networth/history', async (req, res) => {
+    if (!req.session?.user?.id) {
+      return res.status(401).json({ message: "You must be logged in to access this resource" });
+    }
     try {
-      const { userId } = req.query;
-      const history = await storage.getNetWorthHistory(userId as string);
+      const history = await storage.getNetWorthHistory(req.session.user.id);
       res.json(history);
     } catch (error) {
       console.error("Error fetching net worth history:", error);
