@@ -41,55 +41,51 @@ export default function Footer() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Company Information - Tagline and Social Links */}
-          <div>
-            <p className="text-gray-400 text-xs mb-2" data-testid="text-footer-tagline">
-              {companyDetails?.tagline || 'Professional financial planning platform powered by 40+ years of IFS Group expertise.'}
-            </p>
-            <div className="flex space-x-3">
-              {hasPageAccess('LinkedIn') && companyDetails?.linkedinUrl && (
-                <a href={companyDetails.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-linkedin">
-                  <Linkedin className="h-4 w-4" />
-                </a>
-              )}
-              {hasPageAccess('Twitter/X') && companyDetails?.twitterUrl && (
-                <a href={companyDetails.twitterUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-twitter">
-                  <Twitter className="h-4 w-4" />
-                </a>
-              )}
-              {hasPageAccess('Facebook') && companyDetails?.facebookUrl && (
-                <a href={companyDetails.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-facebook">
-                  <Facebook className="h-4 w-4" />
-                </a>
-              )}
-            </div>
+        {/* Company tagline + social */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+          <p className="text-gray-400 text-xs mb-2 sm:mb-0" data-testid="text-footer-tagline">
+            {companyDetails?.tagline || 'Professional financial planning platform powered by 40+ years of IFS Group expertise.'}
+          </p>
+          <div className="flex space-x-3">
+            {hasPageAccess('LinkedIn') && companyDetails?.linkedinUrl && (
+              <a href={companyDetails.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-linkedin">
+                <Linkedin className="h-4 w-4" />
+              </a>
+            )}
+            {hasPageAccess('Twitter/X') && companyDetails?.twitterUrl && (
+              <a href={companyDetails.twitterUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-twitter">
+                <Twitter className="h-4 w-4" />
+              </a>
+            )}
+            {hasPageAccess('Facebook') && companyDetails?.facebookUrl && (
+              <a href={companyDetails.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-facebook">
+                <Facebook className="h-4 w-4" />
+              </a>
+            )}
           </div>
+        </div>
 
-          {/* All Links - combined flat list, no section headers */}
-          <div>
-            <ul className="space-y-1 text-xs">
-              {[
-                ...(resourcesLinks?.links || []),
-                ...(platformLinks?.links || []),
-                ...(companyLinks?.links || []),
-              ]
-                .filter((link: any) => hasPageAccess(link.label))
-                .map((link: any, index: number) => (
-                  <li key={index}>
-                    {link.href.startsWith('/') ? (
-                      <Link href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-${index}`}>
-                        {link.label}
-                      </Link>
-                    ) : (
-                      <a href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-${index}`}>
-                        {link.label}
-                      </a>
-                    )}
-                  </li>
-                ))}
-            </ul>
-          </div>
+        {/* 4-column link grid — no section headers */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-1">
+          {[
+            ...(resourcesLinks?.links || []),
+            ...(platformLinks?.links || []),
+            ...(companyLinks?.links || []),
+          ]
+            .filter((link: any) => hasPageAccess(link.label))
+            .map((link: any, index: number) => (
+              <div key={index}>
+                {link.href.startsWith('/') ? (
+                  <Link href={link.href} className="text-gray-400 hover:text-white transition-colors text-xs" data-testid={`link-footer-${index}`}>
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a href={link.href} className="text-gray-400 hover:text-white transition-colors text-xs" data-testid={`link-footer-${index}`}>
+                    {link.label}
+                  </a>
+                )}
+              </div>
+            ))}
         </div>
 
         {/* Bottom Section */}
