@@ -18,14 +18,23 @@ async function sendContactEmail(opts: {
   message: string;
   preferredContact: string;
 }) {
-  const smtpHost = process.env.SMTP_HOST;
-  const smtpPort = parseInt(process.env.SMTP_PORT || "587");
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
-  const smtpFrom = process.env.SMTP_FROM || smtpUser;
+  // Read all SMTP config from the site_settings DB table
+  const [hostSetting, portSetting, userSetting, passSetting, fromSetting] = await Promise.all([
+    storage.getSiteSetting('smtp_host'),
+    storage.getSiteSetting('smtp_port'),
+    storage.getSiteSetting('smtp_user'),
+    storage.getSiteSetting('smtp_pass'),
+    storage.getSiteSetting('smtp_from'),
+  ]);
+
+  const smtpHost = hostSetting?.settingValue?.trim();
+  const smtpPort = parseInt(portSetting?.settingValue?.trim() || "587");
+  const smtpUser = userSetting?.settingValue?.trim();
+  const smtpPass = passSetting?.settingValue?.trim();
+  const smtpFrom = fromSetting?.settingValue?.trim() || smtpUser;
 
   if (!smtpHost || !smtpUser || !smtpPass) {
-    console.log("[Contact Email] SMTP not configured. Would have sent to:", opts.toEmail, "| From:", opts.fromEmail, "| Subject:", opts.subject);
+    console.log("[Contact Email] SMTP not fully configured in System Settings. Would have sent to:", opts.toEmail, "| Subject:", opts.subject);
     return;
   }
 
@@ -37,7 +46,7 @@ async function sendContactEmail(opts: {
   });
 
   await transporter.sendMail({
-    from: `"${opts.fromName}" <${smtpFrom}>`,
+    from: `"${smtpFrom}"`,
     replyTo: opts.fromEmail,
     to: opts.toEmail,
     subject: `Contact Form: ${opts.subject.replace(/_/g, " ")}`,

@@ -300,43 +300,77 @@ export default function Dashboard() {
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                   </div>
                 ) : (
-                  <div className="space-y-6 max-w-lg">
-                    {(systemSettings || []).map((setting) => {
-                      const draftValue = settingDrafts[setting.settingKey] ?? setting.settingValue;
-                      return (
-                        <div key={setting.settingKey} className="space-y-2">
-                          <Label htmlFor={setting.settingKey} className="text-sm font-medium">
-                            {setting.label || setting.settingKey}
-                          </Label>
-                          {setting.description && (
-                            <p className="text-xs text-muted-foreground">{setting.description}</p>
-                          )}
-                          <div className="flex gap-2">
-                            <Input
-                              id={setting.settingKey}
-                              value={draftValue}
-                              onChange={(e) =>
-                                setSettingDrafts((prev) => ({ ...prev, [setting.settingKey]: e.target.value }))
-                              }
-                              placeholder={`Enter ${setting.label || setting.settingKey}`}
-                              className="flex-1"
-                              data-testid={`input-setting-${setting.settingKey}`}
-                            />
-                            <Button
-                              size="sm"
-                              onClick={() =>
-                                saveSettingMutation.mutate({ key: setting.settingKey, value: draftValue })
-                              }
-                              disabled={saveSettingMutation.isPending}
-                              data-testid={`btn-save-setting-${setting.settingKey}`}
-                            >
-                              <Save className="h-4 w-4 mr-1" />
-                              Save
-                            </Button>
+                  <div className="space-y-8 max-w-lg">
+                    {/* Contact Email - shown first */}
+                    {(() => {
+                      const SETTING_ORDER = ['contact_email', 'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from'];
+                      const SMTP_KEYS = new Set(['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from']);
+                      const sorted = [...(systemSettings || [])].sort((a, b) => {
+                        const ai = SETTING_ORDER.indexOf(a.settingKey);
+                        const bi = SETTING_ORDER.indexOf(b.settingKey);
+                        return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+                      });
+                      const contactSetting = sorted.find(s => s.settingKey === 'contact_email');
+                      const smtpSettings = sorted.filter(s => SMTP_KEYS.has(s.settingKey));
+                      const otherSettings = sorted.filter(s => s.settingKey !== 'contact_email' && !SMTP_KEYS.has(s.settingKey));
+
+                      const renderField = (setting: SiteSetting) => {
+                        const isPassword = setting.settingKey === 'smtp_pass';
+                        const draftValue = settingDrafts[setting.settingKey] ?? setting.settingValue;
+                        return (
+                          <div key={setting.settingKey} className="space-y-1">
+                            <Label htmlFor={setting.settingKey} className="text-sm font-medium">
+                              {setting.label || setting.settingKey}
+                            </Label>
+                            {setting.description && (
+                              <p className="text-xs text-muted-foreground">{setting.description}</p>
+                            )}
+                            <div className="flex gap-2">
+                              <Input
+                                id={setting.settingKey}
+                                type={isPassword ? "password" : "text"}
+                                value={draftValue}
+                                onChange={(e) =>
+                                  setSettingDrafts((prev) => ({ ...prev, [setting.settingKey]: e.target.value }))
+                                }
+                                placeholder={`Enter ${setting.label || setting.settingKey}`}
+                                className="flex-1"
+                                data-testid={`input-setting-${setting.settingKey}`}
+                              />
+                              <Button
+                                size="sm"
+                                onClick={() =>
+                                  saveSettingMutation.mutate({ key: setting.settingKey, value: draftValue })
+                                }
+                                disabled={saveSettingMutation.isPending}
+                                data-testid={`btn-save-setting-${setting.settingKey}`}
+                              >
+                                <Save className="h-4 w-4 mr-1" />
+                                Save
+                              </Button>
+                            </div>
                           </div>
-                        </div>
+                        );
+                      };
+
+                      return (
+                        <>
+                          {contactSetting && (
+                            <div className="space-y-3">
+                              <h3 className="text-sm font-semibold text-gray-700 border-b pb-1">Contact</h3>
+                              {renderField(contactSetting)}
+                            </div>
+                          )}
+                          {smtpSettings.length > 0 && (
+                            <div className="space-y-3">
+                              <h3 className="text-sm font-semibold text-gray-700 border-b pb-1">Email / SMTP</h3>
+                              {smtpSettings.map(renderField)}
+                            </div>
+                          )}
+                          {otherSettings.map(renderField)}
+                        </>
                       );
-                    })}
+                    })()}
                     {(!systemSettings || systemSettings.length === 0) && (
                       <p className="text-muted-foreground text-sm text-center py-4">No system settings found.</p>
                     )}
