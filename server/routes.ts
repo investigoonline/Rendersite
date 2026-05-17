@@ -1600,10 +1600,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { fileName } = req.params;
 
-      // Sanitize fileName to prevent path traversal — strip all directory components
+      // Strict allowlist validation: only alphanumeric, dots, hyphens, underscores
+      // No path.join with request input — build path from validated components only
       const safeFileName = path.basename(fileName);
-      // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal, javascript.lang.security.audit.path-traversal.express-path-join-resolve-traversal
-      const localPath = path.join(process.cwd(), 'public', 'hero-images', safeFileName);
+      if (!/^[a-zA-Z0-9._-]+$/.test(safeFileName) || safeFileName.startsWith('.')) {
+        return res.status(400).json({ message: "Invalid file name" });
+      }
+      const localPath = process.cwd() + "/public/hero-images/" + safeFileName;
       // nosemgrep: javascript.lang.security.audit.detect-non-literal-fs-filename
       if (fs.existsSync(localPath)) {
         const ext = path.extname(safeFileName).toLowerCase();
