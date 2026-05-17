@@ -7,6 +7,55 @@ import multer from "multer";
 import sharp from "sharp";
 import path from "path";
 import fs from "fs";
+import nodemailer from "nodemailer";
+
+async function sendContactEmail(opts: {
+  toEmail: string;
+  fromName: string;
+  fromEmail: string;
+  phone?: string;
+  subject: string;
+  message: string;
+  preferredContact: string;
+}) {
+  const smtpHost = process.env.SMTP_HOST;
+  const smtpPort = parseInt(process.env.SMTP_PORT || "587");
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+  const smtpFrom = process.env.SMTP_FROM || smtpUser;
+
+  if (!smtpHost || !smtpUser || !smtpPass) {
+    console.log("[Contact Email] SMTP not configured. Would have sent to:", opts.toEmail, "| From:", opts.fromEmail, "| Subject:", opts.subject);
+    return;
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpPort === 465,
+    auth: { user: smtpUser, pass: smtpPass },
+  });
+
+  await transporter.sendMail({
+    from: `"${opts.fromName}" <${smtpFrom}>`,
+    replyTo: opts.fromEmail,
+    to: opts.toEmail,
+    subject: `Contact Form: ${opts.subject.replace(/_/g, " ")}`,
+    html: `
+      <h3>New Contact Form Submission</h3>
+      <p><strong>Name:</strong> ${opts.fromName}</p>
+      <p><strong>Email:</strong> ${opts.fromEmail}</p>
+      ${opts.phone ? `<p><strong>Phone:</strong> ${opts.phone}</p>` : ""}
+      <p><strong>Subject:</strong> ${opts.subject.replace(/_/g, " ")}</p>
+      <p><strong>Preferred Contact:</strong> ${opts.preferredContact}</p>
+      <hr/>
+      <p><strong>Message:</strong></p>
+      <p>${opts.message.replace(/\n/g, "<br/>")}</p>
+    `,
+    text: `Name: ${opts.fromName}\nEmail: ${opts.fromEmail}${opts.phone ? `\nPhone: ${opts.phone}` : ""}\nSubject: ${opts.subject}\nPreferred Contact: ${opts.preferredContact}\n\nMessage:\n${opts.message}`,
+  });
+  console.log("[Contact Email] Sent to:", opts.toEmail);
+}
 import { 
   insertUserRegistrationSchema,
   insertUserBackendSchema,
@@ -741,9 +790,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const messageData = insertContactMessageSchema.parse(req.body);
       const message = await storage.createContactMessage(messageData);
-      
-      // TODO: Send notification email to admin
-      
+
+      // Send notification email to the configured Contact Email address
+      try {
+        const contactEmailSetting = await storage.getSiteSetting('contact_email');
+        const toEmail = contactEmailSetting?.settingValue?.trim();
+        if (toEmail) {
+          await sendContactEmail({
+            toEmail,
+            fromName: messageData.name,
+            fromEmail: messageData.email,
+            phone: messageData.phone || undefined,
+            subject: messageData.subject,
+            message: messageData.message,
+            preferredContact: messageData.preferredContact,
+          });
+        } else {
+          console.log("[Contact Email] No Contact Email configured in System Settings — skipping email.");
+        }
+      } catch (emailErr) {
+        console.error("[Contact Email] Failed to send notification email:", emailErr);
+      }
+
       res.json({ message: "Your message has been sent successfully. We'll get back to you soon" });
     } catch (error) {
       console.error("Error sending contact message:", error);

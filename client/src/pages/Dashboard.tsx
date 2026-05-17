@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Users, UserCheck, Calculator, FileText, Shield, Settings } from "lucide-react";
-import type { PageContent, LoginHistory, User } from "@shared/schema";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Users, UserCheck, Calculator, FileText, Shield, Settings, Save } from "lucide-react";
+import type { PageContent, LoginHistory, User, SiteSetting } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import RolesManagementDesign1 from "@/components/roles/RolesManagementDesign1";
@@ -41,6 +43,26 @@ export default function Dashboard() {
 
   const { data: allUsers, isLoading: usersLoading } = useQuery<UserWithRoles[]>({
     queryKey: ['/api/admin/users'],
+  });
+
+  const { data: systemSettings, isLoading: settingsLoading } = useQuery<SiteSetting[]>({
+    queryKey: ['/api/site-settings', 'system'],
+    queryFn: () => fetch('/api/site-settings?type=system').then(r => r.json()),
+  });
+
+  const [settingDrafts, setSettingDrafts] = useState<Record<string, string>>({});
+
+  const saveSettingMutation = useMutation({
+    mutationFn: async ({ key, value }: { key: string; value: string }) => {
+      return apiRequest(`/api/admin/site-settings/${key}`, 'PUT', { value });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/site-settings', 'system'] });
+      toast({ title: "Saved", description: "Setting updated successfully." });
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to save setting.", variant: "destructive" });
+    },
   });
 
   const updateRoleMutation = useMutation({
@@ -150,7 +172,7 @@ export default function Dashboard() {
 
         {/* Management Tabs */}
         <Tabs defaultValue="users" className="mb-8">
-          <TabsList className="grid w-full grid-cols-3 max-w-[600px]">
+          <TabsList className="grid w-full grid-cols-4 max-w-[800px]">
             <TabsTrigger value="users" data-testid="tab-user-management">
               <Users className="h-4 w-4 mr-2" />
               User Management
@@ -162,6 +184,10 @@ export default function Dashboard() {
             <TabsTrigger value="restore" data-testid="tab-system-restore">
               <Shield className="h-4 w-4 mr-2" />
               System Restore
+            </TabsTrigger>
+            <TabsTrigger value="settings" data-testid="tab-system-settings">
+              <Settings className="h-4 w-4 mr-2" />
+              System Settings
             </TabsTrigger>
           </TabsList>
 
@@ -254,6 +280,70 @@ export default function Dashboard() {
           {/* System Restore Tab */}
           <TabsContent value="restore" className="mt-6">
             <SystemRestore />
+          </TabsContent>
+
+          {/* System Settings Tab */}
+          <TabsContent value="settings" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Settings className="h-5 w-5 mr-2 text-primary" />
+                  System Settings
+                </CardTitle>
+                <CardDescription>
+                  Configure global platform parameters. Changes take effect immediately.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {settingsLoading ? (
+                  <div className="flex justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                ) : (
+                  <div className="space-y-6 max-w-lg">
+                    {(systemSettings || []).map((setting) => {
+                      const draftValue = settingDrafts[setting.settingKey] ?? setting.settingValue;
+                      return (
+                        <div key={setting.settingKey} className="space-y-2">
+                          <Label htmlFor={setting.settingKey} className="text-sm font-medium">
+                            {setting.label || setting.settingKey}
+                          </Label>
+                          {setting.description && (
+                            <p className="text-xs text-muted-foreground">{setting.description}</p>
+                          )}
+                          <div className="flex gap-2">
+                            <Input
+                              id={setting.settingKey}
+                              value={draftValue}
+                              onChange={(e) =>
+                                setSettingDrafts((prev) => ({ ...prev, [setting.settingKey]: e.target.value }))
+                              }
+                              placeholder={`Enter ${setting.label || setting.settingKey}`}
+                              className="flex-1"
+                              data-testid={`input-setting-${setting.settingKey}`}
+                            />
+                            <Button
+                              size="sm"
+                              onClick={() =>
+                                saveSettingMutation.mutate({ key: setting.settingKey, value: draftValue })
+                              }
+                              disabled={saveSettingMutation.isPending}
+                              data-testid={`btn-save-setting-${setting.settingKey}`}
+                            >
+                              <Save className="h-4 w-4 mr-1" />
+                              Save
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {(!systemSettings || systemSettings.length === 0) && (
+                      <p className="text-muted-foreground text-sm text-center py-4">No system settings found.</p>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
 
