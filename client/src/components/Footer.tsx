@@ -41,9 +41,9 @@ export default function Footer() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Company Information - Tagline and Social Links */}
-          <div className="lg:col-span-1">
+          <div>
             <p className="text-gray-400 text-xs mb-2" data-testid="text-footer-tagline">
               {companyDetails?.tagline || 'Professional financial planning platform powered by 40+ years of IFS Group expertise.'}
             </p>
@@ -66,69 +66,28 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Platform Links */}
+          {/* All Links - combined flat list, no section headers */}
           <div>
-            <h4 className="text-sm font-semibold mb-2" data-testid="text-footer-platform-title">
-              {platformLinks?.title || 'Platform'}
-            </h4>
             <ul className="space-y-1 text-xs">
-              {platformLinks?.links?.filter((link: any) => hasPageAccess(link.label)).map((link: any, index: number) => (
-                <li key={index}>
-                  {link.href.startsWith('/') ? (
-                    <Link href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-platform-${index}`}>
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <a href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-platform-${index}`}>
-                      {link.label}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h4 className="text-sm font-semibold mb-2" data-testid="text-footer-resources-title">
-              {resourcesLinks?.title || 'Resources'}
-            </h4>
-            <ul className="space-y-1 text-xs">
-              {resourcesLinks?.links?.filter((link: any) => hasPageAccess(link.label)).map((link: any, index: number) => (
-                <li key={index}>
-                  {link.href.startsWith('/') ? (
-                    <Link href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-resources-${index}`}>
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <a href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-resources-${index}`}>
-                      {link.label}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h4 className="text-sm font-semibold mb-2" data-testid="text-footer-company-title">
-              {companyLinks?.title || 'Company'}
-            </h4>
-            <ul className="space-y-1 text-xs">
-              {companyLinks?.links?.filter((link: any) => hasPageAccess(link.label)).map((link: any, index: number) => (
-                <li key={index}>
-                  {link.href.startsWith('/') ? (
-                    <Link href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-company-${index}`}>
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <a href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-company-${index}`}>
-                      {link.label}
-                    </a>
-                  )}
-                </li>
-              ))}
+              {[
+                ...(resourcesLinks?.links || []),
+                ...(platformLinks?.links || []),
+                ...(companyLinks?.links || []),
+              ]
+                .filter((link: any) => hasPageAccess(link.label))
+                .map((link: any, index: number) => (
+                  <li key={index}>
+                    {link.href.startsWith('/') ? (
+                      <Link href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-${index}`}>
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a href={link.href} className="text-gray-400 hover:text-white transition-colors" data-testid={`link-footer-${index}`}>
+                        {link.label}
+                      </a>
+                    )}
+                  </li>
+                ))}
             </ul>
           </div>
         </div>
