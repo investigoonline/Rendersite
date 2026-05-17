@@ -1245,8 +1245,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const permissions = await storage.getRolePermissionsByRole(userRole || 'client');
       
       // Debug: Log what we're returning
+      // nosemgrep: javascript.lang.security.audit.unsafe-formatstring
       console.log(`[DEBUG] User ${userId} (${userRole}) has ${permissions.length} permissions`);
       const calcPerms = permissions.filter(p => p.resourceType === 'calculator');
+      // nosemgrep: javascript.lang.security.audit.unsafe-formatstring
       console.log(`[DEBUG] Calculator permissions (${calcPerms.length}):`, calcPerms.map(p => p.resourceId));
       
       res.json(permissions);

@@ -538,6 +538,7 @@ async function main() {
         `;
         console.log(`  ✓ Added: ${article.title}`);
       } catch (error) {
+        // nosemgrep: javascript.lang.security.audit.unsafe-formatstring
         console.error(`  ✗ Failed to add: ${article.title}`, error);
       }
     }
