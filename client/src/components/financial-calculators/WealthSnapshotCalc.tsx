@@ -1631,6 +1631,7 @@ export default function WealthSnapshotCalc() {
               </CardTitle>
             </CardHeader>
             <CardContent className="px-4 pb-5">
+              {/* nosemgrep: javascript.lang.security.audit.unsafe-dynamic-method — tabRenders is a fixed record keyed by TABS ids */}
               {tabRenders[activeTab]()}
             </CardContent>
           </Card>
