@@ -1,4 +1,5 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
+import { useEffect } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -38,9 +39,18 @@ import Newsletters from "@/pages/Newsletters";
 import BackgroundPreview from "@/pages/BackgroundPreview";
 import NotFound from "@/pages/not-found";
 
+function ScrollToTop() {
+  const [location] = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [location]);
+  return null;
+}
+
 function Router() {
   return (
     <Layout>
+      <ScrollToTop />
       <Switch>
         {/* Public routes available to everyone */}
         <Route path="/register" component={Register} />
@@ -53,8 +63,11 @@ function Router() {
         </Route>
         <Route path="/resources" component={Resources} />
         <Route path="/resources/articles" component={Articles} />
+        <Route path="/articles" component={Articles} />
         <Route path="/resources/flipbooks" component={Flipbooks} />
+        <Route path="/flipbooks" component={Flipbooks} />
         <Route path="/resources/newsletters" component={Newsletters} />
+        <Route path="/newsletters" component={Newsletters} />
         <Route path="/blog" component={Blog} />
         <Route path="/about" component={About} />
         <Route path="/about/process" component={Process} />
@@ -68,7 +81,7 @@ function Router() {
         <Route path="/become-client" component={BecomeClient} />
         <Route path="/location" component={Location} />
         <Route path="/custodian" component={Custodian} />
-        
+
         {/* Legal pages with CMS content */}
         <Route path="/privacy-policy" component={PrivacyPolicy} />
         <Route path="/terms-of-service" component={TermsOfService} />
@@ -76,10 +89,10 @@ function Router() {
         <Route path="/background-preview">
           {() => <BackgroundPreview onSelect={(opt) => alert(`You selected Option ${opt}. Tell me which one you want!`)} />}
         </Route>
-        
+
         {/* Profile page */}
         <Route path="/profile" component={Profile} />
-        
+
         {/* Under Construction pages */}
         <Route path="/auth/login" component={UnderConstruction} />
         <Route path="/guest-access" component={UnderConstruction} />
@@ -90,32 +103,32 @@ function Router() {
         <Route path="/leadership" component={UnderConstruction} />
         <Route path="/careers" component={UnderConstruction} />
         <Route path="/press" component={UnderConstruction} />
-        
+
         {/* Protected routes - Super Admin only */}
         <Route path="/admin-dashboard">
           <ProtectedRoute allowedRoles={['super_admin']}>
             <Dashboard />
           </ProtectedRoute>
         </Route>
-        
+
         {/* Protected routes - Super Admin and Content Manager */}
         <Route path="/content-management">
           <ProtectedRoute allowedRoles={['super_admin', 'content_manager']}>
             <ContentManagement />
           </ProtectedRoute>
         </Route>
-        
+
         <Route path="/resource-management">
           <ProtectedRoute allowedRoles={['super_admin', 'content_manager']}>
             <ResourceManagement />
           </ProtectedRoute>
         </Route>
-        
+
         {/* Home route - Landing page for all users */}
         <Route path="/">
           <Landing />
         </Route>
-        
+
         <Route component={NotFound} />
       </Switch>
     </Layout>
