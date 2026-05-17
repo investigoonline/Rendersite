@@ -34,7 +34,7 @@ async function sendContactEmail(opts: {
   const smtpFrom = fromSetting?.settingValue?.trim() || smtpUser;
 
   if (!smtpHost || !smtpUser || !smtpPass) {
-    console.log("[Contact Email] SMTP not fully configured in System Settings. Would have sent to:", opts.toEmail, "| Subject:", opts.subject);
+    console.log("[Contact Email] SMTP not fully configured in System Settings — skipping email delivery.");
     return;
   }
 
@@ -45,6 +45,9 @@ async function sendContactEmail(opts: {
     auth: { user: smtpUser, pass: smtpPass },
   });
 
+  // HTML-encode user-supplied values to prevent injection in the email body
+  const esc = (s: string) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
   await transporter.sendMail({
     from: `"${smtpFrom}"`,
     replyTo: opts.fromEmail,
@@ -52,18 +55,18 @@ async function sendContactEmail(opts: {
     subject: `Contact Form: ${opts.subject.replace(/_/g, " ")}`,
     html: `
       <h3>New Contact Form Submission</h3>
-      <p><strong>Name:</strong> ${opts.fromName}</p>
-      <p><strong>Email:</strong> ${opts.fromEmail}</p>
-      ${opts.phone ? `<p><strong>Phone:</strong> ${opts.phone}</p>` : ""}
-      <p><strong>Subject:</strong> ${opts.subject.replace(/_/g, " ")}</p>
-      <p><strong>Preferred Contact:</strong> ${opts.preferredContact}</p>
+      <p><strong>Name:</strong> ${esc(opts.fromName)}</p>
+      <p><strong>Email:</strong> ${esc(opts.fromEmail)}</p>
+      ${opts.phone ? `<p><strong>Phone:</strong> ${esc(opts.phone)}</p>` : ""}
+      <p><strong>Subject:</strong> ${esc(opts.subject.replace(/_/g, " "))}</p>
+      <p><strong>Preferred Contact:</strong> ${esc(opts.preferredContact)}</p>
       <hr/>
       <p><strong>Message:</strong></p>
-      <p>${opts.message.replace(/\n/g, "<br/>")}</p>
+      <p>${esc(opts.message).replace(/\n/g, "<br/>")}</p>
     `,
     text: `Name: ${opts.fromName}\nEmail: ${opts.fromEmail}${opts.phone ? `\nPhone: ${opts.phone}` : ""}\nSubject: ${opts.subject}\nPreferred Contact: ${opts.preferredContact}\n\nMessage:\n${opts.message}`,
   });
-  console.log("[Contact Email] Sent to:", opts.toEmail);
+  console.log("[Contact Email] Sent successfully.");
 }
 import { 
   insertUserRegistrationSchema,
@@ -1582,10 +1585,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { fileName } = req.params;
 
-      // First: check for a locally committed static file (works on Railway and any host)
-      const localPath = path.join(process.cwd(), 'public', 'hero-images', fileName);
+      // Sanitize fileName to prevent path traversal — strip all directory components
+      const safeFileName = path.basename(fileName);
+      const localPath = path.join(process.cwd(), 'public', 'hero-images', safeFileName);
       if (fs.existsSync(localPath)) {
-        const ext = path.extname(fileName).toLowerCase();
+        const ext = path.extname(safeFileName).toLowerCase();
         const mimeMap: Record<string, string> = {
           '.webp': 'image/webp',
           '.png': 'image/png',
