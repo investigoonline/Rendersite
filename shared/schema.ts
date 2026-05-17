@@ -429,6 +429,7 @@ export const insertUserBackendSchema = createInsertSchema(users).omit({
 export const insertCalculationSchema = createInsertSchema(calculations).omit({
   id: true,
   createdAt: true,
+  userId: true,
 });
 export const insertResourceSchema = createInsertSchema(resources).omit({
   id: true,
@@ -442,6 +443,7 @@ export const insertContactMessageSchema = createInsertSchema(contactMessages).om
 export const insertNetWorthSnapshotSchema = createInsertSchema(netWorthSnapshots).omit({
   id: true,
   createdAt: true,
+  userId: true,
 });
 export const insertRoleSchema = createInsertSchema(roles).omit({
   id: true,
@@ -487,13 +489,13 @@ export type InsertUserRegistration = z.infer<typeof insertUserRegistrationSchema
 export type InsertUserBackend = z.infer<typeof insertUserBackendSchema>;
 export type User = typeof users.$inferSelect;
 export type Calculation = typeof calculations.$inferSelect;
-export type InsertCalculation = z.infer<typeof insertCalculationSchema>;
+export type InsertCalculation = z.infer<typeof insertCalculationSchema> & { userId: string };
 export type Resource = typeof resources.$inferSelect;
 export type InsertResource = z.infer<typeof insertResourceSchema>;
 export type ContactMessage = typeof contactMessages.$inferSelect;
 export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
 export type NetWorthSnapshot = typeof netWorthSnapshots.$inferSelect;
-export type InsertNetWorthSnapshot = z.infer<typeof insertNetWorthSnapshotSchema>;
+export type InsertNetWorthSnapshot = z.infer<typeof insertNetWorthSnapshotSchema> & { userId: string };
 export type Role = typeof roles.$inferSelect;
 export type InsertRole = z.infer<typeof insertRoleSchema>;
 export type UserRole = typeof userRoles.$inferSelect;

@@ -622,8 +622,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     try {
       const calculationData = insertCalculationSchema.parse(req.body);
-      calculationData.userId = req.session.user.id;
-      const calculation = await storage.saveCalculation(calculationData);
+      const calculation = await storage.saveCalculation({ ...calculationData, userId: req.session.user.id });
       res.json(calculation);
     } catch (error) {
       console.error("Error saving calculation:", error);
@@ -776,8 +775,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     try {
       const snapshotData = insertNetWorthSnapshotSchema.parse(req.body);
-      snapshotData.userId = req.session.user.id;
-      const snapshot = await storage.saveNetWorthSnapshot(snapshotData);
+      const snapshot = await storage.saveNetWorthSnapshot({ ...snapshotData, userId: req.session.user.id });
       res.json(snapshot);
     } catch (error) {
       console.error("Error saving net worth snapshot:", error);
