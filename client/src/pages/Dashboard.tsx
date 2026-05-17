@@ -46,8 +46,8 @@ export default function Dashboard() {
   });
 
   const { data: systemSettings, isLoading: settingsLoading } = useQuery<SiteSetting[]>({
-    queryKey: ['/api/site-settings', 'system'],
-    queryFn: () => fetch('/api/site-settings?type=system').then(r => r.json()),
+    queryKey: ['/api/admin/site-settings', 'system'],
+    queryFn: () => fetch('/api/admin/site-settings?type=system', { credentials: 'include' }).then(r => r.json()),
   });
 
   const [settingDrafts, setSettingDrafts] = useState<Record<string, string>>({});
@@ -57,7 +57,7 @@ export default function Dashboard() {
       return apiRequest(`/api/admin/site-settings/${key}`, 'PUT', { value });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/site-settings', 'system'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/site-settings', 'system'] });
       toast({ title: "Saved", description: "Setting updated successfully." });
     },
     onError: (error: any) => {

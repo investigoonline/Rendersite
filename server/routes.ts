@@ -1008,6 +1008,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "The specified role is not valid" });
       }
 
+      const callerRole = req.session?.user?.role;
+      const callerId = req.session?.user?.id;
+
+      // Prevent self-promotion: no one may change their own role
+      if (callerId === userId) {
+        return res.status(403).json({ message: "You cannot change your own role" });
+      }
+
+      // Only super_admin may assign the super_admin role
+      if (role === 'super_admin' && callerRole !== 'super_admin') {
+        return res.status(403).json({ message: "Only a super admin can assign the super_admin role" });
+      }
+
       const updatedUser = await storage.updateUserRole(userId, role);
       
       res.json({
@@ -1455,14 +1468,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Site settings routes - font settings are public for CSS application
+  // Keys that are security-sensitive and must never be exposed publicly or
+  // mutated by content_manager accounts.
+  const SENSITIVE_SETTING_KEYS = ['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from', 'contact_email'];
+
+  // Setting types that are safe to expose to unauthenticated callers (e.g. for
+  // CSS application). Any type not in this allowlist is rejected to prevent
+  // future secret-bearing settings from leaking by default.
+  const PUBLIC_SETTING_TYPES = ['font'];
+
+  // Site settings routes - only allowlisted setting types are public
   app.get('/api/site-settings', async (req, res) => {
     try {
       const settingType = req.query.type as string | undefined;
+
+      // Enforce the allowlist: callers must request an explicitly permitted type.
+      // Omitting the type parameter (which would return all rows) is also rejected.
+      if (!settingType || !PUBLIC_SETTING_TYPES.includes(settingType)) {
+        return res.status(403).json({ message: "You do not have permission to access this resource" });
+      }
+
       const settings = await storage.getSiteSettings(settingType);
       res.json(settings);
     } catch (error) {
       console.error("Error fetching site settings:", error);
+      res.status(500).json({ message: "Unable to fetch site settings" });
+    }
+  });
+
+  // Read site settings (authenticated) - super_admin and admin only
+  app.get('/api/admin/site-settings', async (req, res) => {
+    try {
+      const authorized = requireRole(req, res, ['super_admin', 'admin']);
+      if (!authorized) return;
+
+      const settingType = req.query.type as string | undefined;
+      const settings = await storage.getSiteSettings(settingType);
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching admin site settings:", error);
       res.status(500).json({ message: "Unable to fetch site settings" });
     }
   });
@@ -1478,6 +1522,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (value === undefined) {
         return res.status(400).json({ message: "Value is required" });
+      }
+
+      // content_manager accounts must not be able to modify sensitive operational
+      // settings such as SMTP credentials or the contact-form destination address.
+      const callerRole = req.session?.user?.role;
+      if (callerRole === 'content_manager' && SENSITIVE_SETTING_KEYS.includes(settingKey)) {
+        return res.status(403).json({ message: "You do not have permission to modify this setting" });
       }
 
       const updatedSetting = await storage.updateSiteSetting(
@@ -1558,6 +1609,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { settings } = req.body;
       if (!settings || !Array.isArray(settings)) {
         return res.status(400).json({ message: "Settings array is required" });
+      }
+
+      // content_manager accounts must not be able to modify sensitive operational
+      // settings such as SMTP credentials or the contact-form destination address.
+      const callerRole = req.session?.user?.role;
+      if (callerRole === 'content_manager') {
+        const hasSensitiveKey = settings.some((s: any) => s.key && SENSITIVE_SETTING_KEYS.includes(s.key));
+        if (hasSensitiveKey) {
+          return res.status(403).json({ message: "You do not have permission to modify system settings" });
+        }
       }
 
       const results = [];
