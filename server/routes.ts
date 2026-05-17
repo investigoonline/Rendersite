@@ -204,122 +204,49 @@ async function deleteFromObjectStorage(filePath: string): Promise<void> {
   }
 }
 
-// Middleware to check if user has required role (using session data for consistency)
-function requireRole(req: any, res: any, roles: string[]): boolean {
-  const userRole = req.session?.user?.role;
-  
+// Middleware to check if user has required role, re-validating status from DB on every call.
+// On success, stores the fresh DB user on req.dbUser for downstream use.
+async function requireRole(req: any, res: any, roles: string[]): Promise<boolean> {
   if (!req.session?.user?.id) {
     res.status(401).json({ message: "You must be logged in to access this resource" });
     return false;
   }
 
-  if (!userRole || !roles.includes(userRole)) {
+  const user = await storage.getUser(req.session.user.id);
+  if (!user || user.isActive === false) {
+    req.session.destroy(() => {});
+    res.status(401).json({ message: "Your session is no longer valid. Please log in again." });
+    return false;
+  }
+
+  if (!user.role || !roles.includes(user.role)) {
     res.status(403).json({ message: "You do not have permission to access this resource" });
     return false;
   }
 
+  req.dbUser = user;
   return true;
 }
 
-// Safe arithmetic expression parser for captcha
-function evaluateMathExpression(expression: string): number | null {
-  // Remove all whitespace
-  const cleaned = expression.replace(/\s/g, '');
-  
-  // Only allow digits, +, -, *, /, and parentheses
-  if (!/^[\d+\-*/()]+$/.test(cleaned)) {
-    return null;
+// Helper to verify an authenticated session is still active (for non-role-gated routes).
+// On success, stores the fresh DB user on req.dbUser for downstream use.
+async function verifyActiveSession(req: any, res: any): Promise<boolean> {
+  if (!req.session?.user?.id) {
+    res.status(401).json({ message: "Please log in to access this resource" });
+    return false;
   }
-  
-  try {
-    return safeArithmeticEvaluator(cleaned);
-  } catch {
-    return null;
+
+  const user = await storage.getUser(req.session.user.id);
+  if (!user || user.isActive === false) {
+    req.session.destroy(() => {});
+    res.status(401).json({ message: "Your session is no longer valid. Please log in again." });
+    return false;
   }
+
+  req.dbUser = user;
+  return true;
 }
 
-// Safe arithmetic evaluator using recursive descent parser
-function safeArithmeticEvaluator(expression: string): number {
-  let index = 0;
-  
-  function parseNumber(): number {
-    let num = '';
-    while (index < expression.length && /\d/.test(expression[index])) {
-      num += expression[index];
-      index++;
-    }
-    return parseInt(num, 10);
-  }
-  
-  function parseFactor(): number {
-    if (expression[index] === '(') {
-      index++; // skip '('
-      const result = parseExpression();
-      index++; // skip ')'
-      return result;
-    }
-    
-    if (expression[index] === '-') {
-      index++; // skip '-'
-      return -parseFactor();
-    }
-    
-    if (expression[index] === '+') {
-      index++; // skip '+'
-      return parseFactor();
-    }
-    
-    return parseNumber();
-  }
-  
-  function parseTerm(): number {
-    let result = parseFactor();
-    
-    while (index < expression.length && (expression[index] === '*' || expression[index] === '/')) {
-      const operator = expression[index];
-      index++;
-      const rightOperand = parseFactor();
-      
-      if (operator === '*') {
-        result *= rightOperand;
-      } else {
-        if (rightOperand === 0) {
-          throw new Error('Division by zero');
-        }
-        result /= rightOperand;
-      }
-    }
-    
-    return result;
-  }
-  
-  function parseExpression(): number {
-    let result = parseTerm();
-    
-    while (index < expression.length && (expression[index] === '+' || expression[index] === '-')) {
-      const operator = expression[index];
-      index++;
-      const rightOperand = parseTerm();
-      
-      if (operator === '+') {
-        result += rightOperand;
-      } else {
-        result -= rightOperand;
-      }
-    }
-    
-    return result;
-  }
-  
-  const result = parseExpression();
-  
-  // Ensure we've consumed the entire expression
-  if (index !== expression.length) {
-    throw new Error('Invalid expression');
-  }
-  
-  return Math.round(result);
-}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Trust proxy - required for production deployments
@@ -351,14 +278,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     },
   }));
 
+  // Issue a server-side captcha challenge (stores expected answer in session)
+  app.get('/api/auth/captcha', (req: any, res) => {
+    const operations = ['+', '-'];
+    const operation = operations[Math.floor(Math.random() * operations.length)];
+    let num1: number, num2: number;
+    if (operation === '+') {
+      num1 = Math.floor(Math.random() * 20) + 1;
+      num2 = Math.floor(Math.random() * 20) + 1;
+    } else {
+      num1 = Math.floor(Math.random() * 30) + 10;
+      num2 = Math.floor(Math.random() * num1);
+    }
+    const question = `${num1} ${operation} ${num2}`;
+    const expectedAnswer = operation === '+' ? num1 + num2 : num1 - num2;
+    req.session.captchaAnswer = expectedAnswer;
+    req.session.save(() => {});
+    res.json({ question });
+  });
+
   // Auth routes
   app.get('/api/auth/user', async (req: any, res) => {
     try {
       if (req.session?.user) {
         const user = await storage.getUser(req.session.user.id);
-        if (user) {
+        if (user && user.isActive !== false) {
           return res.json({ ...user, authType: "traditional" });
         }
+        // User not found or has been deactivated — invalidate the session
+        req.session.destroy(() => {});
       }
       
       res.status(401).json({ message: "Please log in to access this resource" });
@@ -389,17 +337,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User registration routes
-  app.post('/api/auth/register', async (req, res) => {
+  app.post('/api/auth/register', async (req: any, res) => {
     try {
       const { captcha, confirmPassword, ...userFields } = req.body;
       const userData = insertUserBackendSchema.parse(userFields);
       
-      // Server-side captcha validation
-      const { question, answer } = captcha;
-      const expectedAnswer = evaluateMathExpression(question);
-      if (expectedAnswer === null || parseInt(answer) !== expectedAnswer) {
+      // Server-side captcha validation against session-stored challenge
+      const { answer } = captcha || {};
+      const storedAnswer = req.session.captchaAnswer;
+      if (storedAnswer === undefined || parseInt(answer) !== storedAnswer) {
         return res.status(400).json({ message: "Security verification failed. Please try again" });
       }
+      // Consume the challenge so it cannot be reused
+      delete req.session.captchaAnswer;
       
       // Check if email already exists
       const existingUser = await storage.getUserByEmail(userData.email!);
@@ -430,16 +380,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Traditional user login
-  app.post('/api/auth/login', async (req, res) => {
+  app.post('/api/auth/login', async (req: any, res) => {
     try {
       const { email, password, captcha } = req.body;
       
-      // Server-side captcha validation
-      const { question, answer } = captcha;
-      const expectedAnswer = evaluateMathExpression(question);
-      if (expectedAnswer === null || parseInt(answer) !== expectedAnswer) {
+      // Server-side captcha validation against session-stored challenge
+      const { answer } = captcha || {};
+      const storedAnswer = req.session.captchaAnswer;
+      if (storedAnswer === undefined || parseInt(answer) !== storedAnswer) {
         return res.status(400).json({ message: "Security verification failed. Please try again" });
       }
+      // Consume the challenge so it cannot be reused
+      delete req.session.captchaAnswer;
       
       // Find user by email
       const user = await storage.getUserByEmail(email);
@@ -492,7 +444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get password hint
+  // Get password hint — always returns the same structure to prevent account enumeration
   app.post('/api/auth/password-hint', async (req, res) => {
     try {
       const { email } = req.body;
@@ -501,15 +453,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email address is required" });
       }
       
-      const user = await storage.getUserByEmail(email);
-      if (!user) {
-        return res.status(404).json({ message: "No account found with this email address" });
-      }
-      
-      res.json({ 
-        hint: user.passwordHint || null,
-        hasHint: !!user.passwordHint
-      });
+      // Always return the same 200 response regardless of whether the account exists
+      // to prevent email enumeration. The hint is not returned over an unauthenticated
+      // endpoint to avoid leaking account existence or hint content.
+      await storage.getUserByEmail(email);
+      res.json({ hint: null, hasHint: false });
     } catch (error) {
       console.error("Error getting password hint:", error);
       res.status(500).json({ message: "Unable to retrieve password hint at this time" });
@@ -517,23 +465,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Forgot password (placeholder for future email integration)
-  app.post('/api/auth/forgot-password', async (req, res) => {
+  // Always returns the same 200 response to prevent account enumeration.
+  app.post('/api/auth/forgot-password', async (_req, res) => {
     try {
-      const { email } = req.body;
-      
-      if (!email) {
-        return res.status(400).json({ message: "Email address is required" });
-      }
-      
-      const user = await storage.getUserByEmail(email);
-      if (!user) {
-        return res.status(404).json({ message: "No account found with this email address" });
-      }
-      
-      // TODO: Implement email sending when email integration is ready
-      // For now, just acknowledge the request
       res.json({ 
-        message: "Password reset via email is not yet available. Please use your password hint or contact support.",
+        message: "If an account exists for that address, password reset instructions will be sent.",
         emailSent: false 
       });
     } catch (error) {
@@ -545,9 +481,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Profile routes
   app.get('/api/profile', async (req: any, res) => {
     try {
-      if (!req.session?.user?.id) {
-        return res.status(401).json({ message: "Please log in to view your profile" });
-      }
+      if (!await verifyActiveSession(req, res)) return;
 
       const user = await storage.getUser(req.session.user.id);
       if (!user) {
@@ -580,9 +514,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/profile', async (req: any, res) => {
     try {
-      if (!req.session?.user?.id) {
-        return res.status(401).json({ message: "Please log in to update your profile" });
-      }
+      if (!await verifyActiveSession(req, res)) return;
 
       const validation = updateProfileSchema.safeParse(req.body);
       if (!validation.success) {
@@ -627,9 +559,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/profile/image', upload.single('image'), async (req: any, res) => {
     try {
-      if (!req.session?.user?.id) {
-        return res.status(401).json({ message: "Please log in to upload a profile image" });
-      }
+      if (!await verifyActiveSession(req, res)) return;
 
       if (!req.file) {
         return res.status(400).json({ message: "No image file provided" });
@@ -765,7 +695,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/resources', async (req, res) => {
     try {
       // Only super_admin and content_manager can create resources
-      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
+      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
       if (!authorized) return;
 
       const resourceData = insertResourceSchema.parse(req.body);
@@ -780,7 +710,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/resources/:id', async (req, res) => {
     try {
       // Only super_admin and content_manager can update resources
-      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
+      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
       if (!authorized) return;
 
       const resource = await storage.updateResource(req.params.id, req.body);
@@ -794,7 +724,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/resources/:id', async (req, res) => {
     try {
       // Only super_admin and content_manager can delete resources
-      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
+      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
       if (!authorized) return;
 
       await storage.deleteResource(req.params.id);
@@ -1022,8 +952,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "The specified role is not valid" });
       }
 
-      const callerRole = req.session?.user?.role;
-      const callerId = req.session?.user?.id;
+      const callerRole = (req as any).dbUser?.role;
+      const callerId = (req as any).dbUser?.id;
 
       // Prevent self-promotion: no one may change their own role
       if (callerId === userId) {
@@ -1294,15 +1224,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get current user's permissions
-  app.get('/api/user/permissions', async (req, res) => {
+  app.get('/api/user/permissions', async (req: any, res) => {
     try {
       const userId = req.session?.user?.id;
-      const userRole = req.session?.user?.role;
 
       // If user is not logged in, return empty permissions (guest access)
       if (!userId) {
         return res.json([]);
       }
+
+      // Re-fetch from DB to get the current role, not the cached session role
+      const dbUser = await storage.getUser(userId);
+      if (!dbUser || dbUser.isActive === false) {
+        req.session.destroy(() => {});
+        return res.json([]);
+      }
+
+      const userRole = dbUser.role;
 
       // Get permissions for the user's role
       const permissions = await storage.getRolePermissionsByRole(userRole || 'client');
@@ -1361,7 +1299,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/content', async (req, res) => {
     try {
       // Only super_admin and content_manager can create content
-      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
+      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
       if (!authorized) return;
 
       const contentData = insertPageContentSchema.parse(req.body);
@@ -1388,7 +1326,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/content/:id', async (req, res) => {
     try {
       // Only super_admin and content_manager can update content
-      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
+      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
       if (!authorized) return;
 
       const content = await storage.updatePageContent(req.params.id, req.body);
@@ -1414,7 +1352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/content/:id', async (req, res) => {
     try {
       // Only super_admin and content_manager can delete content
-      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
+      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
       if (!authorized) return;
 
       // Get content before deleting for history
@@ -1443,7 +1381,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Page content history routes (super admin and admin only)
   app.get('/api/admin/content-history', async (req, res) => {
     try {
-      const authorized = requireRole(req, res, ['super_admin', 'admin']);
+      const authorized = await requireRole(req, res, ['super_admin', 'admin']);
       if (!authorized) return;
 
       const contentId = req.query.contentId as string | undefined;
@@ -1459,7 +1397,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/admin/content-history/:historyId/restore', async (req, res) => {
     try {
-      const authorized = requireRole(req, res, ['super_admin', 'admin']);
+      const authorized = await requireRole(req, res, ['super_admin', 'admin']);
       if (!authorized) return;
 
       const restored = await storage.restorePageContentFromHistory(req.params.historyId);
@@ -1513,7 +1451,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Read site settings (authenticated) - super_admin and admin only
   app.get('/api/admin/site-settings', async (req, res) => {
     try {
-      const authorized = requireRole(req, res, ['super_admin', 'admin']);
+      const authorized = await requireRole(req, res, ['super_admin', 'admin']);
       if (!authorized) return;
 
       const settingType = req.query.type as string | undefined;
@@ -1528,7 +1466,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update site settings - requires admin or content manager role
   app.put('/api/admin/site-settings/:settingKey', async (req, res) => {
     try {
-      const authorized = requireRole(req, res, ['super_admin', 'admin', 'content_manager']);
+      const authorized = await requireRole(req, res, ['super_admin', 'admin', 'content_manager']);
       if (!authorized) return;
 
       const { settingKey } = req.params;
@@ -1540,7 +1478,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // content_manager accounts must not be able to modify sensitive operational
       // settings such as SMTP credentials or the contact-form destination address.
-      const callerRole = req.session?.user?.role;
+      const callerRole = (req as any).dbUser?.role;
       if (callerRole === 'content_manager' && SENSITIVE_SETTING_KEYS.includes(settingKey)) {
         return res.status(403).json({ message: "You do not have permission to modify this setting" });
       }
@@ -1565,7 +1503,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Test email endpoint - sends a test message using current SMTP settings
   app.post('/api/admin/test-email', async (req, res) => {
     try {
-      const authorized = requireRole(req, res, ['super_admin', 'admin']);
+      const authorized = await requireRole(req, res, ['super_admin', 'admin']);
       if (!authorized) return;
 
       const [hostSetting, portSetting, userSetting, passSetting, fromSetting, contactSetting] = await Promise.all([
@@ -1617,7 +1555,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Batch update site settings
   app.put('/api/admin/site-settings', async (req, res) => {
     try {
-      const authorized = requireRole(req, res, ['super_admin', 'admin', 'content_manager']);
+      const authorized = await requireRole(req, res, ['super_admin', 'admin', 'content_manager']);
       if (!authorized) return;
 
       const { settings } = req.body;
@@ -1627,7 +1565,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // content_manager accounts must not be able to modify sensitive operational
       // settings such as SMTP credentials or the contact-form destination address.
-      const callerRole = req.session?.user?.role;
+      const callerRole = (req as any).dbUser?.role;
       if (callerRole === 'content_manager') {
         const hasSensitiveKey = settings.some((s: any) => s.key && SENSITIVE_SETTING_KEYS.includes(s.key));
         if (hasSensitiveKey) {
@@ -1740,7 +1678,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/images/upload', upload.single('image'), async (req: any, res) => {
     try {
-      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
+      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
       if (!authorized) return;
 
       if (!req.file) {
@@ -1803,7 +1741,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete('/api/images/:id', async (req, res) => {
     try {
-      const authorized = requireRole(req, res, ['super_admin', 'content_manager']);
+      const authorized = await requireRole(req, res, ['super_admin', 'content_manager']);
       if (!authorized) return;
 
       const image = await storage.getImageAsset(req.params.id);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,28 +13,22 @@ interface CaptchaProps {
 export function Captcha({ value, onChange, error }: CaptchaProps) {
   const [question, setQuestion] = useState("");
 
-  const generateQuestion = () => {
-    // Generate simple math questions (addition and subtraction)
-    const operations = ['+', '-'];
-    const operation = operations[Math.floor(Math.random() * operations.length)];
-    
-    let num1, num2;
-    if (operation === '+') {
-      num1 = Math.floor(Math.random() * 20) + 1; // 1-20
-      num2 = Math.floor(Math.random() * 20) + 1; // 1-20
-    } else { // subtraction
-      num1 = Math.floor(Math.random() * 30) + 10; // 10-39
-      num2 = Math.floor(Math.random() * num1); // 0 to num1-1 (ensures positive result)
+  const fetchQuestion = useCallback(async () => {
+    try {
+      const response = await fetch('/api/auth/captcha');
+      if (response.ok) {
+        const data = await response.json();
+        setQuestion(data.question);
+        onChange({ question: data.question, answer: "" });
+      }
+    } catch {
+      // silently ignore network errors — the server will reject a missing answer
     }
-    
-    const newQuestion = `${num1} ${operation} ${num2}`;
-    setQuestion(newQuestion);
-    onChange({ question: newQuestion, answer: value.answer });
-  };
+  }, [onChange]);
 
   useEffect(() => {
-    generateQuestion();
-  }, []);
+    fetchQuestion();
+  }, [fetchQuestion]);
 
   const handleAnswerChange = (newAnswer: string) => {
     onChange({ question, answer: newAnswer });
@@ -42,7 +36,7 @@ export function Captcha({ value, onChange, error }: CaptchaProps) {
 
   const handleRefresh = () => {
     onChange({ question: "", answer: "" });
-    generateQuestion();
+    fetchQuestion();
   };
 
   return (
