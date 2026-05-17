@@ -68,8 +68,8 @@ export interface IStorage {
   
   // Calculation operations
   saveCalculation(calculation: InsertCalculation): Promise<Calculation>;
-  getCalculations(userId?: string): Promise<Calculation[]>;
-  getCalculation(id: string): Promise<Calculation | undefined>;
+  getCalculations(userId: string): Promise<Calculation[]>;
+  getCalculation(id: string, userId: string): Promise<Calculation | undefined>;
   
   // Resource operations
   getResources(type?: string, category?: string): Promise<Resource[]>;
@@ -85,7 +85,7 @@ export interface IStorage {
   
   // Net worth operations
   saveNetWorthSnapshot(snapshot: InsertNetWorthSnapshot): Promise<NetWorthSnapshot>;
-  getNetWorthHistory(userId?: string): Promise<NetWorthSnapshot[]>;
+  getNetWorthHistory(userId: string): Promise<NetWorthSnapshot[]>;
   
   // Role operations
   getRoles(): Promise<Role[]>;
@@ -273,26 +273,19 @@ export class DatabaseStorage implements IStorage {
     return saved;
   }
 
-  async getCalculations(userId?: string): Promise<Calculation[]> {
-    if (userId) {
-      return db
-        .select()
-        .from(calculations)
-        .where(eq(calculations.userId, userId))
-        .orderBy(desc(calculations.createdAt));
-    }
-    
+  async getCalculations(userId: string): Promise<Calculation[]> {
     return db
       .select()
       .from(calculations)
+      .where(eq(calculations.userId, userId))
       .orderBy(desc(calculations.createdAt));
   }
 
-  async getCalculation(id: string): Promise<Calculation | undefined> {
+  async getCalculation(id: string, userId: string): Promise<Calculation | undefined> {
     const [calculation] = await db
       .select()
       .from(calculations)
-      .where(eq(calculations.id, id));
+      .where(and(eq(calculations.id, id), eq(calculations.userId, userId)));
     return calculation;
   }
 
@@ -376,18 +369,11 @@ export class DatabaseStorage implements IStorage {
     return saved;
   }
 
-  async getNetWorthHistory(userId?: string): Promise<NetWorthSnapshot[]> {
-    if (userId) {
-      return db
-        .select()
-        .from(netWorthSnapshots)
-        .where(eq(netWorthSnapshots.userId, userId))
-        .orderBy(desc(netWorthSnapshots.createdAt));
-    }
-    
+  async getNetWorthHistory(userId: string): Promise<NetWorthSnapshot[]> {
     return db
       .select()
       .from(netWorthSnapshots)
+      .where(eq(netWorthSnapshots.userId, userId))
       .orderBy(desc(netWorthSnapshots.createdAt));
   }
 

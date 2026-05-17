@@ -719,12 +719,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(401).json({ message: "You must be logged in to access this resource" });
     }
     try {
-      const calculation = await storage.getCalculation(req.params.id);
+      const calculation = await storage.getCalculation(req.params.id, req.session.user.id);
       if (!calculation) {
         return res.status(404).json({ message: "The calculation you're looking for could not be found" });
-      }
-      if (calculation.userId !== req.session.user.id) {
-        return res.status(403).json({ message: "You do not have permission to access this resource" });
       }
       res.json(calculation);
     } catch (error) {
