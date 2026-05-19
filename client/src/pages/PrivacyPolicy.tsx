@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shield } from "lucide-react";
@@ -9,6 +10,7 @@ import privacyHeroDefault from "@assets/PrivacyPolicy_hero.png";
 import type { PageContent } from "@shared/schema";
 
 export default function PrivacyPolicy() {
+  usePageTitle("Privacy Policy");
   const heroImage = useDynamicImage("privacy_policy", "hero", privacyHeroDefault);
 
   const { data: pageContent, isLoading } = useQuery<PageContent[]>({

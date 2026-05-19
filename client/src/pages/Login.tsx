@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
@@ -22,6 +23,7 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
+  usePageTitle("Client Portal Login");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [captcha, setCaptcha] = useState<{ question: string; answer: string }>({ question: "", answer: "" });

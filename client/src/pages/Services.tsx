@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ interface ServiceContent {
 }
 
 export default function Services() {
+  usePageTitle("Services");
   const heroImage = useDynamicImage("services", "hero", servicesImage);
 
   // Fetch services content with proper query parameter

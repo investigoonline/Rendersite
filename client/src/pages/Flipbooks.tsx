@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen } from "lucide-react";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
@@ -65,6 +66,7 @@ const flipbookDataFallback = [
 ];
 
 export default function Flipbooks() {
+  usePageTitle("Flipbooks");
   const resourcesHeroImage = useDynamicImage("resources", "hero", resourcesHeroDefault);
   const flipbooksHeroImage = useDynamicImage("flipbooks", "hero", "");
   const heroImage = flipbooksHeroImage || resourcesHeroImage;

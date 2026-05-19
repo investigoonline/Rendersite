@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText } from "lucide-react";
@@ -9,6 +10,7 @@ import termsHeroDefault from "@assets/TermsOfService_hero.png";
 import type { PageContent } from "@shared/schema";
 
 export default function TermsOfService() {
+  usePageTitle("Terms of Service");
   const heroImage = useDynamicImage("terms_of_service", "hero", termsHeroDefault);
 
   const { data: pageContent, isLoading } = useQuery<PageContent[]>({

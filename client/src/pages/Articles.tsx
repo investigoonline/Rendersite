@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ import resourcesHeroDefault from "@assets/image_1765301156968.png";
 import type { PageContent } from "@shared/schema";
 
 export default function Articles() {
+  usePageTitle("Articles & Insights");
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [viewingResource, setViewingResource] = useState<any | null>(null);

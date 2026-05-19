@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { useDynamicImage } from "@/hooks/useDynamicImage";
 import { getFieldFontStyle } from "@/hooks/useFieldFontStyles";
 
 export default function About() {
+  usePageTitle("About Us");
   const heroImage = useDynamicImage("about", "hero", aboutImage);
 
   const { data: pageContent, isLoading } = useQuery<PageContent[]>({

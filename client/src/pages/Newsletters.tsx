@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import resourcesHeroDefault from "@assets/image_1765301156968.png";
 import type { PageContent } from "@shared/schema";
 
 export default function Newsletters() {
+  usePageTitle("Newsletters");
   const { toast } = useToast();
   const resourcesHeroImage = useDynamicImage("resources", "hero", resourcesHeroDefault);
   const newslettersHeroImage = useDynamicImage("newsletters", "hero", "");

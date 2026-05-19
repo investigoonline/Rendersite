@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { HelpCircle, Search, ChevronDown, ChevronUp } from "lucide-react";
 import faqImage from "@assets/image_1765300607561.png";
 import { useDynamicImage } from "@/hooks/useDynamicImage";
@@ -90,6 +91,7 @@ const faqData = [
 ];
 
 export default function FAQ() {
+  usePageTitle("Frequently Asked Questions");
   const heroImage = useDynamicImage('faq', 'hero', faqImage);
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());

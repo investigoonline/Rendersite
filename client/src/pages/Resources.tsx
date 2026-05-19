@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -53,6 +54,7 @@ const resourcePages = [
 ];
 
 export default function Resources() {
+  usePageTitle("Resources");
   const heroImage = useDynamicImage("resources", "hero", resourcesHeroDefault);
 
   const { data: resourceTypesContent } = useQuery<PageContent[]>({

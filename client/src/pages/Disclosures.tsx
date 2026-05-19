@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Download, ExternalLink } from "lucide-react";
@@ -82,6 +83,7 @@ const importantNotices = [
 ];
 
 export default function Disclosures() {
+  usePageTitle("Disclosures");
   const heroImage = useDynamicImage("disclosures", "hero", disclosuresHeroDefault);
 
   const { data: pageContent } = useQuery<PageContent[]>({

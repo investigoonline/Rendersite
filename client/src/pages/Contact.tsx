@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ import { useDynamicImage } from "@/hooks/useDynamicImage";
 import { getFieldFontStyle } from "@/hooks/useFieldFontStyles";
 
 export default function Contact() {
+  usePageTitle("Contact Us");
   const heroImage = useDynamicImage("contact", "hero", contactImage);
 
   // Fetch contact content with proper query parameter

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { Badge } from "@/components/ui/badge";
 import { Home, TrendingUp, PiggyBank, Percent, Landmark, Wallet } from "lucide-react";
 import LoanPayoffCalc from "@/components/financial-calculators/LoanPayoffCalc";
@@ -81,6 +82,7 @@ const DEFAULT_SECTIONS = [
 ];
 
 export default function FinancialCalculators() {
+  usePageTitle("Financial Calculators");
   const [activeId, setActiveId] = useState("net-worth");
 
   const { data: cmsContent } = useQuery<PageContent[]>({
