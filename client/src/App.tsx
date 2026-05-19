@@ -29,6 +29,7 @@ import LegalPage from "@/pages/LegalPage";
 import ResourceManagement from "@/pages/admin/ResourceManagement";
 import Dashboard from "@/pages/Dashboard";
 import UnderConstruction from "@/pages/UnderConstruction";
+import Login from "@/pages/Login";
 import Profile from "@/pages/Profile";
 import Disclosures from "@/pages/Disclosures";
 import TermsOfService from "@/pages/TermsOfService";
@@ -57,7 +58,7 @@ function Router() {
         <Route path="/home-designs" component={HomeDesignOptions} />
         <Route path="/calculators" component={Calculators} />
         <Route path="/financial-calculators" component={FinancialCalculators} />
-        <Route path="/login" component={UnderConstruction} />
+        <Route path="/login" component={Login} />
         <Route path="/resources" component={Resources} />
         <Route path="/resources/articles" component={Articles} />
         <Route path="/articles" component={Articles} />
