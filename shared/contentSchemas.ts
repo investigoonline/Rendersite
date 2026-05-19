@@ -111,6 +111,7 @@ const contactMethodSchema = z.object({
   title: z.string().min(1).max(100),
   content: z.array(z.string()).min(1).max(5),
   color: z.string().min(1),
+  href: z.string().optional(),
 });
 
 const contactFormHeaderSchema = z.object({
@@ -121,6 +122,7 @@ const contactFormHeaderSchema = z.object({
 const quickActionSchema = z.object({
   icon: z.string().min(1),
   label: z.string().min(1).max(100),
+  href: z.string().optional(),
 });
 
 const contactQuickActionsSchema = z.object({
@@ -163,6 +165,7 @@ const clientSectionSchema = z.object({
   description: z.string().min(1),
   benefits: z.array(z.string()).min(1).max(10),
   buttonText: z.string().min(1).max(50),
+  buttonHref: z.string().optional(),
 });
 
 // Resources Page Schemas
@@ -820,6 +823,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
       title: { label: 'Title', control: 'text', placeholder: 'Phone Contact' },
       content: { label: 'Content Lines', control: 'text' },
       color: { label: 'Color Theme', control: 'select', options: colorOptions },
+      href: { label: 'Phone Link (tel:)', control: 'text', placeholder: 'tel:+15129236479' },
     },
   },
   contact_email: {
@@ -831,6 +835,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
       title: { label: 'Title', control: 'text', placeholder: 'Email Contact' },
       content: { label: 'Content Lines', control: 'text' },
       color: { label: 'Color Theme', control: 'select', options: colorOptions },
+      href: { label: 'Email Link (mailto:)', control: 'text', placeholder: 'mailto:clientservices@investigoonline.com' },
     },
   },
   contact_form_header: {
@@ -910,6 +915,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
       description: { label: 'Description', control: 'richtext' },
       benefits: { label: 'Benefits List', control: 'text' },
       buttonText: { label: 'Button Text', control: 'text', placeholder: 'Schedule Free Consultation' },
+      buttonHref: { label: 'Button Link', control: 'text', placeholder: '/become-client' },
     },
   },
   contact_current_clients: {
@@ -921,6 +927,7 @@ export const contentSchemas: Record<string, SectionSchema> = {
       description: { label: 'Description', control: 'richtext' },
       benefits: { label: 'Benefits List', control: 'text' },
       buttonText: { label: 'Button Text', control: 'text', placeholder: 'Access Client Portal' },
+      buttonHref: { label: 'Button Link', control: 'text', placeholder: '/login' },
     },
   },
   resources_articles: {
