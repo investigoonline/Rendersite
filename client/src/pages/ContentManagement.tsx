@@ -859,6 +859,7 @@ export default function ContentManagement() {
                           }
                           return (
                             <FormRenderer
+                              key={section.id + '_' + section.section}
                               schema={sectionSchema}
                               defaultValues={formData}
                               onSubmit={(data) => {
