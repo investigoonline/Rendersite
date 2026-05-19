@@ -48,18 +48,18 @@ export default function Footer() {
           </p>
           <div className="flex space-x-3">
             {hasPageAccess('LinkedIn') && companyDetails?.linkedinUrl && (
-              <a href={companyDetails.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-linkedin">
-                <Linkedin className="h-4 w-4" />
+              <a href={companyDetails.linkedinUrl} target="_blank" rel="noopener noreferrer" aria-label="Follow us on LinkedIn" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-linkedin">
+                <Linkedin className="h-4 w-4" aria-hidden="true" />
               </a>
             )}
             {hasPageAccess('Twitter/X') && companyDetails?.twitterUrl && (
-              <a href={companyDetails.twitterUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-twitter">
-                <Twitter className="h-4 w-4" />
+              <a href={companyDetails.twitterUrl} target="_blank" rel="noopener noreferrer" aria-label="Follow us on Twitter/X" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-twitter">
+                <Twitter className="h-4 w-4" aria-hidden="true" />
               </a>
             )}
             {hasPageAccess('Facebook') && companyDetails?.facebookUrl && (
-              <a href={companyDetails.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-facebook">
-                <Facebook className="h-4 w-4" />
+              <a href={companyDetails.facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Follow us on Facebook" className="text-gray-400 hover:text-white transition-colors" data-testid="link-footer-facebook">
+                <Facebook className="h-4 w-4" aria-hidden="true" />
               </a>
             )}
           </div>
