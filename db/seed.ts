@@ -295,9 +295,15 @@ async function seed() {
   await db.execute(sql`
     INSERT INTO site_settings (setting_key, setting_value, setting_type, label, description)
     VALUES
-      ('font_size_h1',   '22.5', 'font', 'Heading 1 Size',  'Font size for main headings (in pixels)'),
-      ('font_size_h2',   '16.5', 'font', 'Heading 2 Size',  'Font size for subheadings (in pixels)'),
-      ('font_size_content', '13','font', 'Content Size',     'Font size for body content (in pixels)')
+      ('font_size_h1',      '22.5',                          'font',   'Heading 1 Size',  'Font size for main headings (in pixels)'),
+      ('font_size_h2',      '16.5',                          'font',   'Heading 2 Size',  'Font size for subheadings (in pixels)'),
+      ('font_size_content', '13',                            'font',   'Content Size',     'Font size for body content (in pixels)'),
+      ('contact_email',     'clientservices@investigoonline.com', 'system', 'Contact Email',   'Email address where contact form submissions are sent'),
+      ('smtp_host',         'mail.investigoonline.com',      'system', 'SMTP Host',       'Mail server hostname, e.g. mail.yourdomain.com'),
+      ('smtp_port',         '587',                           'system', 'SMTP Port',       'Mail server port (usually 587 or 465)'),
+      ('smtp_user',         'clientservices@investigoonline.com', 'system', 'SMTP User',  'Email account username / login'),
+      ('smtp_pass',         '',                              'system', 'SMTP Password',   'Email account password or app password'),
+      ('smtp_from',         'clientservices@investigoonline.com', 'system', 'SMTP From',  'Sender display name or address (defaults to SMTP User if blank)')
     ON CONFLICT (setting_key) DO UPDATE
       SET setting_value = EXCLUDED.setting_value
   `);
