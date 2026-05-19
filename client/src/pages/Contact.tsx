@@ -130,7 +130,13 @@ export default function Contact() {
                               : "text-sm text-muted-foreground"
                           }
                         >
-                          {line}
+                          {lineIndex === 0 && data.href ? (
+                            <a href={data.href} className="hover:underline">
+                              {line}
+                            </a>
+                          ) : (
+                            line
+                          )}
                         </p>
                       ))}
                     </div>
@@ -176,12 +182,8 @@ export default function Contact() {
                 <CardContent className="space-y-3">
                   {quickActions.actions?.map((action: any, index: number) => {
                     const IconComponent = getIcon(action.icon);
-                    return (
-                      <div
-                        key={index}
-                        className="flex items-start space-x-3 p-3 rounded-lg border hover:shadow-sm transition-shadow"
-                        data-testid={`card-quick-action-${index}`}
-                      >
+                    const inner = (
+                      <>
                         <IconComponent className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <h4 className="font-medium text-gray-900 text-sm mb-1">
@@ -193,6 +195,25 @@ export default function Contact() {
                             </p>
                           )}
                         </div>
+                      </>
+                    );
+                    const classes = "flex items-start space-x-3 p-3 rounded-lg border hover:shadow-sm transition-shadow";
+                    return action.href ? (
+                      <a
+                        key={index}
+                        href={action.href}
+                        className={classes}
+                        data-testid={`card-quick-action-${index}`}
+                      >
+                        {inner}
+                      </a>
+                    ) : (
+                      <div
+                        key={index}
+                        className={classes}
+                        data-testid={`card-quick-action-${index}`}
+                      >
+                        {inner}
                       </div>
                     );
                   })}
@@ -329,12 +350,23 @@ export default function Contact() {
                     ),
                   )}
                 </ul>
-                <Button
-                  className="w-full"
-                  data-testid="button-prospective-action"
-                >
-                  {prospectiveClients.buttonText}
-                </Button>
+                {prospectiveClients.buttonHref ? (
+                  <Link href={prospectiveClients.buttonHref}>
+                    <Button
+                      className="w-full"
+                      data-testid="button-prospective-action"
+                    >
+                      {prospectiveClients.buttonText}
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    className="w-full"
+                    data-testid="button-prospective-action"
+                  >
+                    {prospectiveClients.buttonText}
+                  </Button>
+                )}
               </CardContent>
             </Card>
           )}
@@ -365,7 +397,17 @@ export default function Contact() {
                     ),
                   )}
                 </ul>
-                <Link href="/login">
+                {currentClients.buttonHref ? (
+                  <Link href={currentClients.buttonHref}>
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      data-testid="button-current-action"
+                    >
+                      {currentClients.buttonText}
+                    </Button>
+                  </Link>
+                ) : (
                   <Button
                     variant="outline"
                     className="w-full"
@@ -373,7 +415,7 @@ export default function Contact() {
                   >
                     {currentClients.buttonText}
                   </Button>
-                </Link>
+                )}
               </CardContent>
             </Card>
           )}
