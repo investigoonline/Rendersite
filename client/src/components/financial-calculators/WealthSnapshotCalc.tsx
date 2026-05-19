@@ -818,6 +818,7 @@ export default function WealthSnapshotCalc() {
                 onChange={(e) => field.onChange(e.target.value)}
                 placeholder={field.placeholder}
                 allowDecimal={false}
+                max={100}
                 className={field.error ? "border-red-500 focus-visible:ring-red-500" : ""}
               />
               {field.error && <p className="text-xs text-red-500 mt-1">{field.error}</p>}
