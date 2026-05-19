@@ -441,6 +441,7 @@ export default function TaxCalculator({
                               <NumericInput
                                 placeholder="30"
                                 className="font-mono"
+                                max={100}
                                 {...field}
                               />
                             </FormControl>
@@ -600,7 +601,7 @@ export default function TaxCalculator({
                       <FormItem>
                         <FormLabel>Your Age</FormLabel>
                         <FormControl>
-                          <NumericInput placeholder="30" className="font-mono" {...field} />
+                          <NumericInput placeholder="30" className="font-mono" max={100} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -289,6 +289,7 @@ export default function RetirementCalculator({
                             <NumericInput
                               placeholder="30"
                               className="font-mono"
+                              max={100}
                               {...field}
                             />
                           </FormControl>
@@ -517,7 +518,7 @@ export default function RetirementCalculator({
                     <FormField control={form.control} name="currentAge" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Your Age</FormLabel>
-                        <FormControl><NumericInput placeholder="72" className="font-mono" {...field} /></FormControl>
+                        <FormControl><NumericInput placeholder="72" className="font-mono" max={100} {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
@@ -566,7 +567,7 @@ export default function RetirementCalculator({
                     <FormField control={form.control} name="currentAge" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Your Current Age</FormLabel>
-                        <FormControl><NumericInput placeholder="45" className="font-mono" {...field} /></FormControl>
+                        <FormControl><NumericInput placeholder="45" className="font-mono" max={100} {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />

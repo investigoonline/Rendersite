@@ -286,7 +286,7 @@ export default function Landing() {
             Explore Our Complete Suite Of Financial Tools
           </p>
           <div className="flex flex-col items-center">
-            <Link href="/calculators">
+            <Link href="/financial-calculators">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:scale-105 transition-transform">
                 Access Financial Calculators
               </Button>

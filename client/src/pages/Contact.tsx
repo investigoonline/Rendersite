@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -362,13 +363,15 @@ export default function Contact() {
                     ),
                   )}
                 </ul>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  data-testid="button-current-action"
-                >
-                  {currentClients.buttonText}
-                </Button>
+                <Link href="/login">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    data-testid="button-current-action"
+                  >
+                    {currentClients.buttonText}
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           )}
