@@ -56,11 +56,8 @@ function Router() {
         <Route path="/register" component={Register} />
         <Route path="/home-designs" component={HomeDesignOptions} />
         <Route path="/calculators" component={Calculators} />
-        <Route path="/financial-calculators">
-          <PageProtectedRoute pageId="Financial Calculators">
-            <FinancialCalculators />
-          </PageProtectedRoute>
-        </Route>
+        <Route path="/financial-calculators" component={FinancialCalculators} />
+        <Route path="/login" component={UnderConstruction} />
         <Route path="/resources" component={Resources} />
         <Route path="/resources/articles" component={Articles} />
         <Route path="/articles" component={Articles} />
