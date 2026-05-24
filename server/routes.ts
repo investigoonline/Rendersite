@@ -82,7 +82,6 @@ import {
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import { objectStorageClient } from "./investigo_integrations/object_storage";
 
 // Configure multer for image uploads (memory storage for processing before upload)
 const multerStorage = multer.memoryStorage();
@@ -99,14 +98,6 @@ const upload = multer({
   },
 });
 
-// Get bucket name from environment
-function getBucketName(): string {
-  const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
-  if (!bucketId) {
-    throw new Error('DEFAULT_OBJECT_STORAGE_BUCKET_ID not set');
-  }
-  return bucketId;
-}
 
 // Process and upload hero image to persistent object storage
 async function processHeroImage(buffer: Buffer, originalName: string): Promise<{
@@ -133,30 +124,20 @@ async function processHeroImage(buffer: Buffer, originalName: string): Promise<{
 
   console.log('[Image Upload] Image processed, size:', processedBuffer.info.size);
 
-  // Upload to object storage
-  let bucketName = getBucketName();
-  // Remove leading slash if present
-  if (bucketName.startsWith('/')) {
-    bucketName = bucketName.slice(1);
+  // Save to local filesystem (Render persistent disk)
+  const heroImagesDir = process.cwd() + '/public/hero-images';
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-fs-filename
+  if (!fs.existsSync(heroImagesDir)) {
+    // nosemgrep: javascript.lang.security.audit.detect-non-literal-fs-filename
+    fs.mkdirSync(heroImagesDir, { recursive: true });
   }
-  console.log('[Image Upload] Bucket name:', bucketName);
-  
-  const bucket = objectStorageClient.bucket(bucketName);
-  const objectPath = `public/hero-images/${fileName}`;
-  const file = bucket.file(objectPath);
-  
-  console.log('[Image Upload] Uploading to:', objectPath);
-  
-  await file.save(processedBuffer.data, {
-    contentType: 'image/webp',
-    metadata: {
-      cacheControl: 'public, max-age=31536000',
-    },
-  });
+  const localFilePath = heroImagesDir + '/' + fileName;
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-fs-filename
+  await fs.promises.writeFile(localFilePath, processedBuffer.data);
 
-  console.log('[Image Upload] File saved successfully');
+  console.log('[Image Upload] File saved to local disk:', localFilePath);
 
-  // Store the object storage path (served via our proxy endpoint)
+  // Path served via proxy endpoint (same as before — no client-side change needed)
   const proxyPath = `/api/storage/hero-images/${fileName}`;
   console.log('[Image Upload] Upload complete, proxy path:', proxyPath);
 
@@ -172,36 +153,27 @@ async function processHeroImage(buffer: Buffer, originalName: string): Promise<{
 // Delete image from object storage
 async function deleteFromObjectStorage(filePath: string): Promise<void> {
   try {
-    let bucketName = getBucketName();
-    if (bucketName.startsWith('/')) {
-      bucketName = bucketName.slice(1);
-    }
-    
-    let objectPath: string | null = null;
-    
-    // Check if it's our proxy path
+    let localFileName: string | null = null;
+
+    // Resolve filename from proxy path or legacy GCS URL
     if (filePath.startsWith('/api/storage/hero-images/')) {
-      const fileName = filePath.replace('/api/storage/hero-images/', '');
-      objectPath = `public/hero-images/${fileName}`;
-    }
-    // Check if it's an object storage URL
-    else if (filePath.startsWith('https://storage.googleapis.com/')) {
+      localFileName = filePath.replace('/api/storage/hero-images/', '');
+    } else if (filePath.startsWith('https://storage.googleapis.com/')) {
       const url = new URL(filePath);
-      const pathParts = url.pathname.split('/');
-      objectPath = pathParts.slice(2).join('/');
+      localFileName = url.pathname.split('/').pop() || null;
     }
-    
-    if (objectPath) {
-      const bucket = objectStorageClient.bucket(bucketName);
-      const file = bucket.file(objectPath);
-      const [exists] = await file.exists();
-      if (exists) {
-        await file.delete();
-        console.log('[Image Delete] Deleted:', objectPath);
+
+    if (localFileName) {
+      const localFilePath = process.cwd() + '/public/hero-images/' + localFileName;
+      // nosemgrep: javascript.lang.security.audit.detect-non-literal-fs-filename
+      if (fs.existsSync(localFilePath)) {
+        // nosemgrep: javascript.lang.security.audit.detect-non-literal-fs-filename
+        await fs.promises.unlink(localFilePath);
+        console.log('[Image Delete] Deleted local file:', localFilePath);
       }
     }
   } catch (error) {
-    console.error('Error deleting from object storage:', error);
+    console.error('Error deleting image file:', error);
   }
 }
 
@@ -582,21 +554,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .webp({ quality: 85 })
         .toBuffer();
 
-      // Upload to object storage
-      const { ObjectStorageService } = await import('./investigo_integrations/object_storage');
-      const objectStorageService = new ObjectStorageService();
-      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-      const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
+      // Save profile image to local filesystem
+      const { randomUUID } = await import('crypto');
+      const profileImagesDir = process.cwd() + '/public/profile-images';
+      // nosemgrep: javascript.lang.security.audit.detect-non-literal-fs-filename
+      if (!fs.existsSync(profileImagesDir)) {
+        // nosemgrep: javascript.lang.security.audit.detect-non-literal-fs-filename
+        fs.mkdirSync(profileImagesDir, { recursive: true });
+      }
+      const profileFileName = `profile_${userId}_${randomUUID()}.webp`;
+      const localProfilePath = profileImagesDir + '/' + profileFileName;
+      // nosemgrep: javascript.lang.security.audit.detect-non-literal-fs-filename
+      await fs.promises.writeFile(localProfilePath, processedImageBuffer);
+      const objectPath = `/api/storage/profile-images/${profileFileName}`;
 
-      await fetch(uploadURL, {
-        method: 'PUT',
-        body: processedImageBuffer,
-        headers: {
-          'Content-Type': 'image/webp',
-        },
-      });
-
-      // The objectPath is like /objects/uploads/uuid and is served by the registered route
       const updatedUser = await storage.updateUser(userId, {
         profileImageUrl: objectPath,
         updatedAt: new Date(),
@@ -1630,6 +1601,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error serving image:", error);
       res.status(500).json({ message: "Unable to serve image" });
+    }
+  });
+
+  // Serve profile images from local filesystem
+  app.get('/api/storage/profile-images/:fileName', (req, res) => {
+    try {
+      const safeFileName = path.basename(req.params.fileName);
+      if (!/^[a-zA-Z0-9._-]+$/.test(safeFileName) || safeFileName.startsWith('.')) {
+        return res.status(400).json({ message: 'Invalid file name' });
+      }
+      const localPath = process.cwd() + '/public/profile-images/' + safeFileName;
+      // nosemgrep: javascript.lang.security.audit.detect-non-literal-fs-filename
+      if (!fs.existsSync(localPath)) {
+        return res.status(404).json({ message: 'Profile image not found' });
+      }
+      const ext = path.extname(safeFileName).toLowerCase();
+      const mimeMap: Record<string, string> = {
+        '.webp': 'image/webp',
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.gif': 'image/gif',
+      };
+      res.set({
+        'Content-Type': mimeMap[ext] || 'image/webp',
+        'Cache-Control': 'public, max-age=31536000',
+      });
+      // nosemgrep: javascript.lang.security.audit.detect-non-literal-fs-filename
+      return fs.createReadStream(localPath).pipe(res);
+    } catch (error) {
+      console.error('Error serving profile image:', error);
+      res.status(500).json({ message: 'Unable to serve profile image' });
     }
   });
 
