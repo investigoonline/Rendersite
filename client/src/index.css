@@ -129,9 +129,6 @@
   
   .hero-banner {
     width: 100%;
-    height: 35.1vw;
-    max-height: 480px;
-    overflow: hidden;
     display: block;
     line-height: 0;
   }
