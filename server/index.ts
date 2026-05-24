@@ -10,9 +10,6 @@ app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 // Serve uploaded images statically
 app.use('/uploads', express.static(nodePath.join(process.cwd(), 'uploads')));
 
-// Serve runtime-uploaded images from persistent disk (hero-images, profile-images)
-// Must come before registerRoutes so static files are found before the proxy route fires
-app.use(express.static(nodePath.join(process.cwd(), 'public')));
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -71,6 +68,8 @@ app.get("/api/login", (_req, res) => {
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
+    // Serve runtime-uploaded images from persistent disk before the SPA catch-all
+    app.use(express.static(nodePath.join(process.cwd(), 'public')));
     serveStatic(app);
   }
 
