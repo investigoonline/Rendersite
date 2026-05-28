@@ -14,8 +14,8 @@ function fmt(n: number) { return "$" + n.toLocaleString("en-US", { minimumFracti
 function fmtPct(n: number) { return n.toFixed(2) + "%"; }
 function n(v: string) { return parseFloat(v) || 0; }
 
-function FieldRow({ label, value, onChange, tooltip, suffix, placeholder, maxDecimals }: {
-  label: string; value: string; onChange: (v: string) => void; tooltip: string; suffix?: string; placeholder?: string; maxDecimals?: number;
+function FieldRow({ label, value, onChange, tooltip, suffix, placeholder, maxDecimals, max }: {
+  label: string; value: string; onChange: (v: string) => void; tooltip: string; suffix?: string; placeholder?: string; maxDecimals?: number; max?: number;
 }) {
   return (
     <div className="mb-4">
@@ -31,7 +31,8 @@ function FieldRow({ label, value, onChange, tooltip, suffix, placeholder, maxDec
         <NumericInput value={value} onChange={e => onChange(e.target.value)}
           className={suffix ? "pr-10" : "pl-7"}
           placeholder={placeholder || ""}
-          maxDecimals={maxDecimals ?? 2} />
+          maxDecimals={maxDecimals ?? 2}
+          max={max} />
         {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm">{suffix}</span>}
       </div>
     </div>
@@ -173,7 +174,7 @@ function MortgageEMITab() {
       <Card><CardContent className="pt-6">
         <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2"><DollarSign className="h-4 w-4 text-primary" /> Mortgage EMI</h3>
         <FieldRow label="Loan amount?" value={loanAmount} onChange={setLoanAmount} tooltip="The total mortgage loan amount." />
-        <FieldRow label="Annual mortgage interest rate (%)?" value={rate} onChange={v => setRate(v)} tooltip="The annual interest rate on your mortgage." suffix="%" maxDecimals={2} />
+        <FieldRow label="Annual mortgage interest rate (%)?" value={rate} onChange={v => setRate(v)} tooltip="The annual interest rate on your mortgage." suffix="%" maxDecimals={2} max={100} />
         <FieldRow label="Loan term (years)?" value={termYears} onChange={setTermYears} tooltip="The total number of years for the mortgage." suffix="yrs" />
       </CardContent></Card>
       <Card><CardContent className="pt-6">

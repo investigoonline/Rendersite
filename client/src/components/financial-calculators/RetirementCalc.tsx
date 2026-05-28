@@ -131,7 +131,7 @@ export default function RetirementCalc() {
                 <Tooltip><TooltipTrigger><HelpCircle className="h-3 w-3 text-gray-400" /></TooltipTrigger>
                   <TooltipContent><p className="text-xs">Expected annual investment return before retirement.</p></TooltipContent></Tooltip>
               </div>
-              <div className="relative"><NumericInput value={returnPre} onChange={e => setReturnPre(e.target.value)} className="pr-6" maxDecimals={2} /><span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">%</span></div>
+              <div className="relative"><NumericInput value={returnPre} onChange={e => setReturnPre(e.target.value)} className="pr-6" maxDecimals={2} max={100} /><span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">%</span></div>
             </div>
             <div>
               <div className="flex items-center gap-1 mb-1">
@@ -139,7 +139,7 @@ export default function RetirementCalc() {
                 <Tooltip><TooltipTrigger><HelpCircle className="h-3 w-3 text-gray-400" /></TooltipTrigger>
                   <TooltipContent><p className="text-xs">Expected annual return after retiring (usually lower, more conservative).</p></TooltipContent></Tooltip>
               </div>
-              <div className="relative"><NumericInput value={returnPost} onChange={e => setReturnPost(e.target.value)} className="pr-6" maxDecimals={2} /><span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">%</span></div>
+              <div className="relative"><NumericInput value={returnPost} onChange={e => setReturnPost(e.target.value)} className="pr-6" maxDecimals={2} max={100} /><span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">%</span></div>
             </div>
             <div>
               <div className="flex items-center gap-1 mb-1">
@@ -147,7 +147,7 @@ export default function RetirementCalc() {
                 <Tooltip><TooltipTrigger><HelpCircle className="h-3 w-3 text-gray-400" /></TooltipTrigger>
                   <TooltipContent><p className="text-xs">Expected annual inflation rate.</p></TooltipContent></Tooltip>
               </div>
-              <div className="relative"><NumericInput value={inflation} onChange={e => setInflation(e.target.value)} className="pr-6" maxDecimals={2} /><span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">%</span></div>
+              <div className="relative"><NumericInput value={inflation} onChange={e => setInflation(e.target.value)} className="pr-6" maxDecimals={2} max={100} /><span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">%</span></div>
             </div>
           </div>
         </CardContent>

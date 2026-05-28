@@ -30,9 +30,9 @@ function amortize(balance: number, r: number, payment: number, extra: number): A
   return rows;
 }
 
-function FieldRow({ label, field, value, onChange, tooltip, suffix, maxDecimals }: {
+function FieldRow({ label, field, value, onChange, tooltip, suffix, maxDecimals, max }: {
   label: string; field: string; value: string; onChange: (f: string, v: string) => void;
-  tooltip: string; suffix?: string; maxDecimals?: number;
+  tooltip: string; suffix?: string; maxDecimals?: number; max?: number;
 }) {
   return (
     <div className="mb-4">
@@ -50,6 +50,7 @@ function FieldRow({ label, field, value, onChange, tooltip, suffix, maxDecimals 
           onChange={(e) => onChange(field, e.target.value)}
           className={suffix ? "pr-8" : "pl-7"}
           maxDecimals={maxDecimals ?? 2}
+          max={max}
         />
         {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm">{suffix}</span>}
       </div>
@@ -116,7 +117,7 @@ export default function LoanPayoffCalc() {
             <FieldRow label="What is your loan principal (current outstanding balance)?" field="balance" value={form.balance} onChange={update}
               tooltip="The current outstanding loan balance you want to pay off." />
             <FieldRow label="Annual interest rate (APR) in %?" field="rate" value={form.rate} onChange={update}
-              tooltip="The annual percentage rate (APR) of your loan." suffix="%" maxDecimals={2} />
+              tooltip="The annual percentage rate (APR) of your loan." suffix="%" maxDecimals={2} max={100} />
             <FieldRow label="Current monthly payment?" field="payment" value={form.payment} onChange={update}
               tooltip="Your current required monthly payment amount." />
             <FieldRow label="Extra monthly payment (optional)?" field="extra" value={form.extra} onChange={update}
