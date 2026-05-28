@@ -834,7 +834,7 @@ export default function WealthSnapshotCalc() {
           question="What is your full name?"
           description="Enter your legal name as it appears on official documents."
           value={form.fullName}
-          onChange={(v) => { set("fullName", v); if (personalErrors.fullName) setPersonalErrors((e) => ({ ...e, fullName: undefined })); }}
+          onChange={(v) => { const filtered = v.replace(/[^a-zA-Z\s'.,-]/g, ""); set("fullName", filtered); if (personalErrors.fullName) setPersonalErrors((e) => ({ ...e, fullName: undefined })); }}
           placeholder=""
           error={personalErrors.fullName}
         />
@@ -878,7 +878,7 @@ export default function WealthSnapshotCalc() {
                 onChange={(e) => field.onChange(e.target.value)}
                 placeholder={field.placeholder}
                 allowDecimal={false}
-                max={100}
+                max={999}
                 className={field.error ? "border-red-500 focus-visible:ring-red-500" : ""}
               />
               {field.error && <p className="text-xs text-red-500 mt-1">{field.error}</p>}
@@ -1229,7 +1229,7 @@ export default function WealthSnapshotCalc() {
                 <Input
                   className="h-9 text-sm bg-white"
                   value={biz.businessName}
-                  onChange={(e) => updateBusiness(i, "businessName", e.target.value)}
+                  onChange={(e) => updateBusiness(i, "businessName", e.target.value.replace(/[^a-zA-Z\s'.&,-]/g, ""))}
                   placeholder=""
                 />
               </div>

@@ -71,10 +71,10 @@ function SimpleInterest() {
       <Card><CardContent className="pt-6">
         <h3 className="font-semibold text-gray-800 mb-1">Simple Interest Calculator</h3>
         <p className="text-xs text-gray-500 mb-4">Interest is calculated on the running balance including annual additions.</p>
-        <Field label="Principal amount (P)" value={principal} onChange={setPrincipal} tooltip="The initial amount of money." placeholder="100000" />
-        <Field label="Annual interest rate (%)" value={rate} onChange={setRate} tooltip="The annual interest rate." suffix="%" placeholder="8" />
-        <Field label="Time period (years)" value={years} onChange={setYears} tooltip="Duration in years." suffix="yrs" placeholder="3" />
-        <Field label="Annual Addition" value={annualAddition} onChange={setAnnualAddition} tooltip="Amount added to the balance each year." placeholder="0" />
+        <Field label="Principal amount (P)" value={principal} onChange={setPrincipal} tooltip="The initial amount of money." />
+        <Field label="Annual interest rate (%)" value={rate} onChange={setRate} tooltip="The annual interest rate." suffix="%" />
+        <Field label="Time period (years)" value={years} onChange={setYears} tooltip="Duration in years." suffix="yrs" />
+        <Field label="Annual Addition" value={annualAddition} onChange={setAnnualAddition} tooltip="Amount added to the balance each year." />
       </CardContent></Card>
       <Card><CardContent className="pt-6">
         <h3 className="font-bold text-gray-900 mb-4">Results</h3>
@@ -130,10 +130,10 @@ function CompoundInterest() {
       <Card><CardContent className="pt-6">
         <h3 className="font-semibold text-gray-800 mb-1">Compound Interest Calculator</h3>
         <p className="text-xs text-gray-500 mb-4">Interest is earned on both principal and accumulated interest, with optional annual additions.</p>
-        <Field label="Principal amount (P)" value={principal} onChange={setPrincipal} tooltip="The initial investment amount." placeholder="100000" />
-        <Field label="Annual nominal rate (R %)" value={rate} onChange={setRate} tooltip="Annual interest rate." suffix="%" placeholder="8" />
-        <Field label="Years (T)" value={years} onChange={setYears} tooltip="Investment duration." suffix="yrs" placeholder="3" />
-        <Field label="Annual Addition" value={annualAddition} onChange={setAnnualAddition} tooltip="Amount added to the investment each year." placeholder="0" />
+        <Field label="Principal amount (P)" value={principal} onChange={setPrincipal} tooltip="The initial investment amount." />
+        <Field label="Annual nominal rate (R %)" value={rate} onChange={setRate} tooltip="Annual interest rate." suffix="%" />
+        <Field label="Years (T)" value={years} onChange={setYears} tooltip="Investment duration." suffix="yrs" />
+        <Field label="Annual Addition" value={annualAddition} onChange={setAnnualAddition} tooltip="Amount added to the investment each year." />
         <div className="mb-4">
           <label className="text-sm font-medium text-gray-700 block mb-1">Compounds per year (N)</label>
           <Select value={freq} onValueChange={setFreq}>

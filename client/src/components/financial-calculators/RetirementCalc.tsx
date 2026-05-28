@@ -102,15 +102,15 @@ export default function RetirementCalc() {
           <div className="grid grid-cols-3 gap-2">
             <div>
               <label className="text-xs font-medium text-gray-700 block mb-1">Current Age</label>
-              <NumericInput value={age} onChange={e => setAge(e.target.value)} allowDecimal={false} />
+              <NumericInput value={age} onChange={e => setAge(e.target.value)} allowDecimal={false} max={999} />
             </div>
             <div>
               <label className="text-xs font-medium text-gray-700 block mb-1">Retire Age</label>
-              <NumericInput value={retireAge} onChange={e => setRetireAge(e.target.value)} allowDecimal={false} />
+              <NumericInput value={retireAge} onChange={e => setRetireAge(e.target.value)} allowDecimal={false} max={999} />
             </div>
             <div>
               <label className="text-xs font-medium text-gray-700 block mb-1">Life Expectancy</label>
-              <NumericInput value={lifeExp} onChange={e => setLifeExp(e.target.value)} allowDecimal={false} />
+              <NumericInput value={lifeExp} onChange={e => setLifeExp(e.target.value)} allowDecimal={false} max={999} />
             </div>
           </div>
           <SectionTitle title="Income" />
