@@ -73,7 +73,7 @@ function SimpleInterest() {
         <p className="text-xs text-gray-500 mb-4">Interest is calculated on the running balance including annual additions.</p>
         <Field label="Principal amount (P)" value={principal} onChange={setPrincipal} tooltip="The initial amount of money." />
         <Field label="Annual interest rate (%)" value={rate} onChange={setRate} tooltip="The annual interest rate." suffix="%" maxDecimals={2} max={100} />
-        <Field label="Time period (years)" value={years} onChange={setYears} tooltip="Duration in years." suffix="yrs" />
+        <Field label="Time period (years)" value={years} onChange={setYears} tooltip="Duration in years." suffix="yrs" max={100} />
         <Field label="Annual Addition" value={annualAddition} onChange={setAnnualAddition} tooltip="Amount added to the balance each year." />
       </CardContent></Card>
       <Card><CardContent className="pt-6">
@@ -132,7 +132,7 @@ function CompoundInterest() {
         <p className="text-xs text-gray-500 mb-4">Interest is earned on both principal and accumulated interest, with optional annual additions.</p>
         <Field label="Principal amount (P)" value={principal} onChange={setPrincipal} tooltip="The initial investment amount." />
         <Field label="Annual nominal rate (R %)" value={rate} onChange={setRate} tooltip="Annual interest rate." suffix="%" maxDecimals={2} max={100} />
-        <Field label="Years (T)" value={years} onChange={setYears} tooltip="Investment duration." suffix="yrs" />
+        <Field label="Years (T)" value={years} onChange={setYears} tooltip="Investment duration." suffix="yrs" max={100} />
         <Field label="Annual Addition" value={annualAddition} onChange={setAnnualAddition} tooltip="Amount added to the investment each year." />
         <div className="mb-4">
           <label className="text-sm font-medium text-gray-700 block mb-1">Compounds per year (N)</label>

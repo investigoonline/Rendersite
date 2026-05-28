@@ -175,7 +175,7 @@ function MortgageEMITab() {
         <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2"><DollarSign className="h-4 w-4 text-primary" /> Mortgage EMI</h3>
         <FieldRow label="Loan amount?" value={loanAmount} onChange={setLoanAmount} tooltip="The total mortgage loan amount." />
         <FieldRow label="Annual mortgage interest rate (%)?" value={rate} onChange={v => setRate(v)} tooltip="The annual interest rate on your mortgage." suffix="%" maxDecimals={2} max={100} />
-        <FieldRow label="Loan term (years)?" value={termYears} onChange={setTermYears} tooltip="The total number of years for the mortgage." suffix="yrs" />
+        <FieldRow label="Loan term (years)?" value={termYears} onChange={setTermYears} tooltip="The total number of years for the mortgage." suffix="yrs" max={100} />
       </CardContent></Card>
       <Card><CardContent className="pt-6">
         <h3 className="font-bold text-gray-900 mb-4">Monthly Payment</h3>

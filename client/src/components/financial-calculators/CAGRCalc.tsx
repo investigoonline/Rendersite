@@ -10,8 +10,8 @@ function fmt(n: number) { return "$" + n.toLocaleString("en-US", { minimumFracti
 function fmtPct(n: number) { return n.toFixed(2) + "%"; }
 function nv(v: string) { return parseFloat(v) || 0; }
 
-function Field({ label, value, onChange, tooltip, suffix }: {
-  label: string; value: string; onChange: (v: string) => void; tooltip: string; suffix?: string;
+function Field({ label, value, onChange, tooltip, suffix, max }: {
+  label: string; value: string; onChange: (v: string) => void; tooltip: string; suffix?: string; max?: number;
 }) {
   return (
     <div className="mb-4">
@@ -24,7 +24,7 @@ function Field({ label, value, onChange, tooltip, suffix }: {
       </div>
       <div className="relative">
         {!suffix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>}
-        <NumericInput value={value} onChange={e => onChange(e.target.value)} className={suffix ? "pr-10" : "pl-7"} />
+        <NumericInput value={value} onChange={e => onChange(e.target.value)} className={suffix ? "pr-10" : "pl-7"} max={max} />
         {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">{suffix}</span>}
       </div>
     </div>
@@ -60,7 +60,7 @@ export default function CAGRCalc() {
           <Field label="What is the current or final value?" value={ev} onChange={setEv}
             tooltip="The ending or current value of the investment." />
           <Field label="How many years was the investment held?" value={years} onChange={setYears}
-            tooltip="The number of years the investment was held." suffix="yrs" />
+            tooltip="The number of years the investment was held." suffix="yrs" max={100} />
         </CardContent>
       </Card>
 
