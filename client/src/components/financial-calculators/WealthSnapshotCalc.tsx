@@ -1254,7 +1254,9 @@ export default function WealthSnapshotCalc() {
                         className="pr-8 h-9 text-sm bg-white"
                         value={biz.equityPercent}
                         onChange={(e) => updateBusiness(i, "equityPercent", e.target.value)}
-                        placeholder="0"
+                        placeholder=""
+                        maxDecimals={2}
+                        max={100}
                       />
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm pointer-events-none">%</span>
                     </div>
@@ -1562,20 +1564,15 @@ export default function WealthSnapshotCalc() {
         ) : (
           <div>
             <p className="text-sm font-semibold text-gray-700 mb-1">What is your expected Rate of Return?</p>
-            <p className="text-xs text-gray-500 mb-3">Enter your own estimated annual return percentage. Maximum 50%.</p>
+            <p className="text-xs text-gray-500 mb-3">Enter your own estimated annual return percentage. Maximum 100%.</p>
             <div className="relative">
               <NumericInput
                 className="pr-8"
                 value={form.expectedReturnRate}
                 allowDecimal={true}
-                onChange={(e) => {
-                  const raw = parseFloat(e.target.value) || 0;
-                  if (!e.target.value.endsWith(".") && !e.target.value.endsWith(".0") && !e.target.value.endsWith(".00")) {
-                    set("expectedReturnRate", String(Math.min(50, Math.max(0, raw))));
-                  } else {
-                    set("expectedReturnRate", e.target.value);
-                  }
-                }}
+                maxDecimals={2}
+                max={100}
+                onChange={(e) => set("expectedReturnRate", e.target.value)}
                 placeholder=""
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm pointer-events-none">%</span>
