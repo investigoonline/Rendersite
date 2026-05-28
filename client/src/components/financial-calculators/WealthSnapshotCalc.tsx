@@ -1,4 +1,7 @@
 import { useState, type ReactNode } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -52,6 +55,7 @@ import {
   ChevronRight,
   Plus,
   Trash2,
+  Save,
 } from "lucide-react";
 import CalculatorCTAs from "./CalculatorCTAs";
 
@@ -517,11 +521,13 @@ function ProjectionCard({ label, value, sub, accentColor, muted = false }: { lab
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function WealthSnapshotCalc() {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("personal");
   const [form, setForm] = useState<Form>(defaultForm);
   const [personalErrors, setPersonalErrors] = useState<PersonalErrors>({});
   const [incompleteDialog, setIncompleteDialog] = useState(false);
   const [pendingTabIndex, setPendingTabIndex] = useState<number | null>(null);
+  const [submitted, setSubmitted] = useState(false);
 
   const set = (k: keyof Form, v: string | boolean | null) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -763,6 +769,51 @@ export default function WealthSnapshotCalc() {
 
     setActiveTab(TABS[nextIndex].id);
   };
+
+  const submitMutation = useMutation({
+    mutationFn: () =>
+      apiRequest("POST", "/api/networth", {
+        totalAssets: String(totalAssets),
+        totalLiabilities: String(totalLiabilities),
+        netWorth: String(netWorth),
+        assetBreakdown: {
+          cashBank: totalCashBank,
+          investments: totalInvestments,
+          primaryResidence: n(form.primaryResidential),
+          otherRealEstate: totalOtherRealEstate,
+          businessEquity: totalBusinessEquity,
+          personalProperties: n(form.personalProperties),
+          retirement401k: n(form.retirement401k),
+          iraBalance: n(form.iraBalance),
+          lifeInsurance: n(form.lifeInsuranceCashValue),
+          foreignCashBank: n(form.foreignCashBank),
+          foreignRealEstate: n(form.foreignRealEstate),
+          otherAssets: n(form.anyOtherAssets),
+        },
+        liabilityBreakdown: {
+          mortgageLoans: n(form.mortgageLoans),
+          personalLoans: n(form.personalLoans),
+          businessLoans: n(form.businessLoans),
+          creditLines: n(form.creditLines),
+          otherLiabilities: n(form.otherLiabilities),
+          taxesPayable: n(form.taxesPayable),
+        },
+      }),
+    onSuccess: () => {
+      setSubmitted(true);
+      toast({
+        title: "Net worth snapshot saved!",
+        description: "Your financial snapshot has been recorded successfully.",
+      });
+    },
+    onError: (err: any) => {
+      toast({
+        title: "Could not save snapshot",
+        description: err?.message || "Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   // ── Tab render functions (called as functions to prevent React remount) ──
 
@@ -1650,14 +1701,24 @@ export default function WealthSnapshotCalc() {
             <span className="text-xs text-gray-400 font-medium">
               {activeTabIndex + 1} / {TABS.length}
             </span>
-            <button
-              onClick={goNext}
-              disabled={activeTabIndex === TABS.length - 1}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-primary text-white hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
-            >
-              Next
-              <ChevronRight className="h-4 w-4" />
-            </button>
+            {activeTabIndex === TABS.length - 1 ? (
+              <button
+                onClick={() => submitMutation.mutate()}
+                disabled={submitMutation.isPending || submitted}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+              >
+                <Save className="h-4 w-4" />
+                {submitMutation.isPending ? "Saving…" : submitted ? "Saved!" : "Submit"}
+              </button>
+            ) : (
+              <button
+                onClick={goNext}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-primary text-white hover:bg-primary/90 transition-all shadow-sm"
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            )}
           </div>
         </div>
 
