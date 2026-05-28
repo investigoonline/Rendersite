@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -528,9 +528,10 @@ export default function WealthSnapshotCalc() {
   const [incompleteDialog, setIncompleteDialog] = useState(false);
   const [pendingTabIndex, setPendingTabIndex] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const topRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [activeTab]);
 
   const set = (k: keyof Form, v: string | boolean | null) =>
@@ -1661,7 +1662,7 @@ export default function WealthSnapshotCalc() {
         </DialogContent>
       </Dialog>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div ref={topRef} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* ── Left: Tabbed Input ───────────────────────────────────────────── */}
         <div className="min-w-0">
           {/* Tab nav */}
