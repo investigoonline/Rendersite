@@ -772,7 +772,7 @@ export default function WealthSnapshotCalc() {
 
   const submitMutation = useMutation({
     mutationFn: () =>
-      apiRequest("POST", "/api/networth", {
+      apiRequest("/api/networth", "POST", {
         totalAssets: String(totalAssets),
         totalLiabilities: String(totalLiabilities),
         netWorth: String(netWorth),
