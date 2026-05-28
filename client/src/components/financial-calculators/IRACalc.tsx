@@ -130,7 +130,7 @@ export default function IRACalc() {
               <Tooltip><TooltipTrigger><HelpCircle className="h-4 w-4 text-gray-400" /></TooltipTrigger>
                 <TooltipContent><p className="text-xs">Age determines catch-up contribution eligibility (50+).</p></TooltipContent></Tooltip>
             </div>
-            <NumericInput value={age} onChange={e => setAge(e.target.value)} allowDecimal={false} max={999} />
+            <NumericInput value={age} onChange={e => setAge(e.target.value)} allowDecimal={false} max={100} />
             {catchUp && <p className="text-xs text-green-700 mt-1 flex items-center gap-1"><CheckCircle className="h-3 w-3" /> You qualify for catch-up contributions (+$1,000)</p>}
           </div>
 

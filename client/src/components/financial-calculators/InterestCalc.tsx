@@ -11,8 +11,8 @@ import CalculatorCTAs from "./CalculatorCTAs";
 function fmt(n: number) { return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function nv(v: string) { return parseFloat(v) || 0; }
 
-function Field({ label, value, onChange, tooltip, suffix, placeholder }: {
-  label: string; value: string; onChange: (v: string) => void; tooltip: string; suffix?: string; placeholder?: string;
+function Field({ label, value, onChange, tooltip, suffix, placeholder, maxDecimals }: {
+  label: string; value: string; onChange: (v: string) => void; tooltip: string; suffix?: string; placeholder?: string; maxDecimals?: number;
 }) {
   return (
     <div className="mb-4">
@@ -26,7 +26,7 @@ function Field({ label, value, onChange, tooltip, suffix, placeholder }: {
       <div className="relative">
         {!suffix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>}
         <NumericInput value={value} onChange={e => onChange(e.target.value)}
-          className={suffix ? "pr-10" : "pl-7"} placeholder={placeholder || ""} />
+          className={suffix ? "pr-10" : "pl-7"} placeholder={placeholder || ""} maxDecimals={maxDecimals ?? 2} />
         {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">{suffix}</span>}
       </div>
     </div>
@@ -72,7 +72,7 @@ function SimpleInterest() {
         <h3 className="font-semibold text-gray-800 mb-1">Simple Interest Calculator</h3>
         <p className="text-xs text-gray-500 mb-4">Interest is calculated on the running balance including annual additions.</p>
         <Field label="Principal amount (P)" value={principal} onChange={setPrincipal} tooltip="The initial amount of money." />
-        <Field label="Annual interest rate (%)" value={rate} onChange={setRate} tooltip="The annual interest rate." suffix="%" />
+        <Field label="Annual interest rate (%)" value={rate} onChange={setRate} tooltip="The annual interest rate." suffix="%" maxDecimals={2} />
         <Field label="Time period (years)" value={years} onChange={setYears} tooltip="Duration in years." suffix="yrs" />
         <Field label="Annual Addition" value={annualAddition} onChange={setAnnualAddition} tooltip="Amount added to the balance each year." />
       </CardContent></Card>
@@ -131,7 +131,7 @@ function CompoundInterest() {
         <h3 className="font-semibold text-gray-800 mb-1">Compound Interest Calculator</h3>
         <p className="text-xs text-gray-500 mb-4">Interest is earned on both principal and accumulated interest, with optional annual additions.</p>
         <Field label="Principal amount (P)" value={principal} onChange={setPrincipal} tooltip="The initial investment amount." />
-        <Field label="Annual nominal rate (R %)" value={rate} onChange={setRate} tooltip="Annual interest rate." suffix="%" />
+        <Field label="Annual nominal rate (R %)" value={rate} onChange={setRate} tooltip="Annual interest rate." suffix="%" maxDecimals={2} />
         <Field label="Years (T)" value={years} onChange={setYears} tooltip="Investment duration." suffix="yrs" />
         <Field label="Annual Addition" value={annualAddition} onChange={setAnnualAddition} tooltip="Amount added to the investment each year." />
         <div className="mb-4">
