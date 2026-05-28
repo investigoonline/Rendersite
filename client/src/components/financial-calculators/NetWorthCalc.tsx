@@ -23,8 +23,8 @@ interface FormData {
 }
 
 const defaults: FormData = {
-  cash: "0", investments: "0", real_estate_value: "0", real_estate_equity: "0",
-  other_assets: "0", mortgage_balance: "0", other_loans: "0", credit_debt: "0", other_liabilities: "0",
+  cash: "", investments: "", real_estate_value: "", real_estate_equity: "",
+  other_assets: "", mortgage_balance: "", other_loans: "", credit_debt: "", other_liabilities: "",
 };
 
 function fmt(n: number) {
