@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -529,6 +529,10 @@ export default function WealthSnapshotCalc() {
   const [pendingTabIndex, setPendingTabIndex] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [activeTab]);
+
   const set = (k: keyof Form, v: string | boolean | null) =>
     setForm((f) => ({ ...f, [k]: v }));
 
@@ -807,9 +811,13 @@ export default function WealthSnapshotCalc() {
       });
     },
     onError: (err: any) => {
+      const raw = err?.message || "";
+      const isUnauth = raw.includes("401") || raw.toLowerCase().includes("log in") || raw.toLowerCase().includes("unauthorized");
       toast({
         title: "Could not save snapshot",
-        description: err?.message || "Please try again.",
+        description: isUnauth
+          ? "Please log in to save your net worth snapshot."
+          : "Something went wrong — please try again.",
         variant: "destructive",
       });
     },
