@@ -69,6 +69,50 @@ async function sendContactEmail(opts: {
   });
   console.log("[Contact Email] Sent successfully.");
 }
+async function sendAutoResponseEmail(opts: {
+  toEmail: string;
+  toName: string;
+  autoResponseText: string;
+}) {
+  const [hostSetting, portSetting, userSetting, passSetting, fromSetting] = await Promise.all([
+    storage.getSiteSetting('smtp_host'),
+    storage.getSiteSetting('smtp_port'),
+    storage.getSiteSetting('smtp_user'),
+    storage.getSiteSetting('smtp_pass'),
+    storage.getSiteSetting('smtp_from'),
+  ]);
+
+  const smtpHost = hostSetting?.settingValue?.trim();
+  const smtpPort = parseInt(portSetting?.settingValue?.trim() || "587");
+  const smtpUser = userSetting?.settingValue?.trim();
+  const smtpPass = passSetting?.settingValue?.trim();
+  const smtpFrom = fromSetting?.settingValue?.trim() || smtpUser;
+
+  if (!smtpHost || !smtpUser || !smtpPass) {
+    console.log("[Auto Response] SMTP not configured — skipping auto-response.");
+    return;
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpPort === 465,
+    auth: { user: smtpUser, pass: smtpPass },
+  });
+
+  const esc = (s: string) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+  await transporter.sendMail({
+    from: `"${smtpFrom}"`,
+    to: opts.toEmail,
+    subject: "Thank you for contacting us",
+    // nosemgrep: javascript.lang.security.html-in-template-string
+    html: `<p>${esc(opts.autoResponseText).replace(/\n/g, "<br/>")}</p>`,
+    text: opts.autoResponseText,
+  });
+  console.log("[Auto Response] Sent successfully to", opts.toEmail);
+}
+
 import { 
   insertUserRegistrationSchema,
   insertUserBackendSchema,
@@ -712,28 +756,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const messageData = insertContactMessageSchema.parse(req.body);
       const message = await storage.createContactMessage(messageData);
 
-      // Send notification email to the configured Contact Email address
-      try {
-        const contactEmailSetting = await storage.getSiteSetting('contact_email');
-        const toEmail = contactEmailSetting?.settingValue?.trim();
-        if (toEmail) {
-          await sendContactEmail({
-            toEmail,
-            fromName: messageData.name,
-            fromEmail: messageData.email,
-            phone: messageData.phone || undefined,
-            subject: messageData.subject,
-            message: messageData.message,
-            preferredContact: messageData.preferredContact,
-          });
-        } else {
-          console.log("[Contact Email] No Contact Email configured in System Settings — skipping email.");
-        }
-      } catch (emailErr) {
-        console.error("[Contact Email] Failed to send notification email:", emailErr);
-      }
-
+      // Respond immediately so the user isn't blocked by email delivery time
       res.json({ message: "Your message has been sent successfully. We'll get back to you soon" });
+
+      // Fire emails in the background (non-blocking)
+      setImmediate(async () => {
+        try {
+          const contactEmailSetting = await storage.getSiteSetting('contact_email');
+          const toEmail = contactEmailSetting?.settingValue?.trim();
+          if (toEmail) {
+            await sendContactEmail({
+              toEmail,
+              fromName: messageData.name,
+              fromEmail: messageData.email,
+              phone: messageData.phone || undefined,
+              subject: messageData.subject,
+              message: messageData.message,
+              preferredContact: messageData.preferredContact,
+            });
+          } else {
+            console.log("[Contact Email] No Contact Email configured in System Settings — skipping email.");
+          }
+        } catch (emailErr) {
+          console.error("[Contact Email] Failed to send notification email:", emailErr);
+        }
+
+        try {
+          const autoResponseSetting = await storage.getSiteSetting('contact_auto_response');
+          const autoResponseText = autoResponseSetting?.settingValue?.trim();
+          if (autoResponseText) {
+            await sendAutoResponseEmail({
+              toEmail: messageData.email,
+              toName: messageData.name,
+              autoResponseText,
+            });
+          }
+        } catch (autoErr) {
+          console.error("[Auto Response] Failed to send auto-response:", autoErr);
+        }
+      });
     } catch (error) {
       console.error("Error sending contact message:", error);
       res.status(500).json({ message: "We're unable to send your message at this time. Please try again later" });
