@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "wouter";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { useQuery } from "@tanstack/react-query";
@@ -7,17 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import ContactForm from "@/components/contact/ContactForm";
 import { HTMLContent } from "@/components/HTMLContent";
-import {
-  MapPin,
-  Phone,
-  Mail,
-  Clock,
-  Calendar,
-  MessageCircle,
-  Building,
-  Globe,
-  Shield,
-} from "lucide-react";
+import { Mail, Clock } from "lucide-react";
 import * as Icons from "lucide-react";
 import type { PageContent } from "@shared/schema";
 import contactImage from "@assets/Contact_Us_1765299919540.png";
@@ -63,13 +52,8 @@ export default function Contact() {
       ["contact_office", "contact_phone", "contact_email"].includes(c.section),
     ) || [];
 
-  const pageHeader = getSection("contact_header")?.content as any;
   const formHeader = getSection("contact_form_header")?.content as any;
-  const quickActions = getSection("contact_quick_actions")?.content as any;
-  const supportFeatures = getSection("contact_support_features")
-    ?.content as any;
   const businessHours = getSection("contact_business_hours")?.content as any;
-  const officeInfo = getSection("contact_office_info")?.content as any;
   const prospectiveClients = getSection("contact_prospective_clients")
     ?.content as any;
   const currentClients = getSection("contact_current_clients")?.content as any;
@@ -101,226 +85,131 @@ export default function Contact() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-        {/* Contact Methods */}
-        {contactMethods.length > 0 && (
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            {contactMethods.map((method, index) => {
-              const data = method.content as any;
-              const IconComponent = getIcon(data.icon);
-              return (
-                <Card
-                  key={index}
-                  className="text-center hover:shadow-lg transition-shadow"
-                  data-testid={`card-contact-method-${index}`}
+        {/* Contact Method Tiles — 4 columns including Business Hours */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {contactMethods.map((method, index) => {
+            const data = method.content as any;
+            const IconComponent = getIcon(data.icon);
+            const isPhone = method.section === "contact_phone";
+            const lines: string[] = isPhone
+              ? (data.content || []).slice(0, 2)
+              : data.content || [];
+            return (
+              <Card
+                key={index}
+                className="text-center hover:shadow-lg transition-shadow"
+                data-testid={`card-contact-method-${index}`}
+              >
+                <CardContent className="p-6">
+                  <IconComponent
+                    className={`h-12 w-12 ${data.color} mx-auto mb-4`}
+                  />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    {data.title}
+                  </h3>
+                  <div className="space-y-1">
+                    {lines.map((line: string, lineIndex: number) => (
+                      <p
+                        key={lineIndex}
+                        className={
+                          lineIndex === 0
+                            ? "font-medium text-gray-900"
+                            : "text-sm text-muted-foreground"
+                        }
+                      >
+                        {lineIndex === 0 && data.href ? (
+                          <a href={data.href} className="hover:underline">
+                            {line}
+                          </a>
+                        ) : (
+                          line
+                        )}
+                      </p>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+
+          {/* Business Hours tile */}
+          {businessHours && (
+            <Card
+              className="text-center hover:shadow-lg transition-shadow"
+              data-testid="card-business-hours"
+            >
+              <CardContent className="p-6">
+                <Clock className="h-12 w-12 text-purple-500 mx-auto mb-4" />
+                <h3
+                  className="text-lg font-semibold text-gray-900 mb-4"
+                  data-testid="text-business-hours-title"
                 >
-                  <CardContent className="p-6">
-                    <IconComponent
-                      className={`h-12 w-12 ${data.color} mx-auto mb-4`}
-                    />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                      {data.title}
-                    </h3>
-                    <div className="space-y-1">
-                      {data.content?.map((line: string, lineIndex: number) => (
-                        <p
-                          key={lineIndex}
-                          className={
-                            lineIndex === 0
-                              ? "font-medium text-gray-900"
-                              : "text-sm text-muted-foreground"
-                          }
-                        >
-                          {lineIndex === 0 && data.href ? (
-                            <a href={data.href} className="hover:underline">
-                              {line}
-                            </a>
-                          ) : (
-                            line
-                          )}
-                        </p>
-                      ))}
+                  {businessHours.title || "Business Hours"}
+                </h3>
+                <div className="space-y-2 text-sm text-left">
+                  <div className="flex justify-between gap-2">
+                    <span className="text-muted-foreground">Mon – Fri</span>
+                    <span
+                      className="font-medium text-right"
+                      data-testid="text-hours-weekday"
+                    >
+                      {businessHours.monday_friday}
+                    </span>
+                  </div>
+                  <div className="flex justify-between gap-2">
+                    <span className="text-muted-foreground">Saturday</span>
+                    <span
+                      className="font-medium text-right"
+                      data-testid="text-hours-saturday"
+                    >
+                      {businessHours.saturday}
+                    </span>
+                  </div>
+                  <div className="flex justify-between gap-2">
+                    <span className="text-muted-foreground">Sunday</span>
+                    <span
+                      className="font-medium text-right"
+                      data-testid="text-hours-sunday"
+                    >
+                      {businessHours.sunday}
+                    </span>
+                  </div>
+                  {businessHours.emergency && (
+                    <div className="pt-2 border-t flex justify-between gap-2">
+                      <span className="text-muted-foreground">Emergency</span>
+                      <Badge
+                        variant="secondary"
+                        data-testid="text-hours-emergency"
+                      >
+                        {businessHours.emergency}
+                      </Badge>
                     </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        )}
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Contact Form */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl" data-testid="text-form-title" style={getFieldFontStyle(formHeader, 'title')}>
-                  {formHeader?.title || "Send us a Message"}
-                </CardTitle>
-                <p
-                  className="text-muted-foreground"
-                  data-testid="text-form-description"
-                  style={getFieldFontStyle(formHeader, 'description')}
-                >
-                  {formHeader?.description ||
-                    "Fill out the form below and we'll get back to you within 24 hours."}
-                </p>
-              </CardHeader>
-              <CardContent>
-                <ContactForm />
+                  )}
+                </div>
               </CardContent>
             </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Actions */}
-            {quickActions && (
-              <Card>
-                <CardHeader>
-                  <CardTitle data-testid="text-quick-actions-title">
-                    {quickActions.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {quickActions.actions?.map((action: any, index: number) => {
-                    const IconComponent = getIcon(action.icon);
-                    const inner = (
-                      <>
-                        <IconComponent className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-gray-900 text-sm mb-1">
-                            {action.label}
-                          </h4>
-                          {action.info && (
-                            <p className="text-sm text-muted-foreground break-words">
-                              {action.info}
-                            </p>
-                          )}
-                        </div>
-                      </>
-                    );
-                    const classes = "flex items-start space-x-3 p-3 rounded-lg border hover:shadow-sm transition-shadow";
-                    return action.href ? (
-                      <a
-                        key={index}
-                        href={action.href}
-                        className={classes}
-                        data-testid={`card-quick-action-${index}`}
-                      >
-                        {inner}
-                      </a>
-                    ) : (
-                      <div
-                        key={index}
-                        className={classes}
-                        data-testid={`card-quick-action-${index}`}
-                      >
-                        {inner}
-                      </div>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Support Features */}
-            {supportFeatures && (
-              <Card>
-                <CardHeader>
-                  <CardTitle data-testid="text-support-features-title">
-                    {supportFeatures.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {supportFeatures.features?.map(
-                      (feature: any, index: number) => {
-                        const IconComponent = getIcon(feature.icon);
-                        return (
-                          <div
-                            key={index}
-                            className="flex items-start space-x-3"
-                            data-testid={`card-support-feature-${index}`}
-                          >
-                            <IconComponent className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                            <div>
-                              <h4 className="font-medium text-gray-900 text-sm">
-                                {feature.title}
-                              </h4>
-                              <HTMLContent
-                                content={feature.description}
-                                className="text-xs text-muted-foreground"
-                              />
-                            </div>
-                          </div>
-                        );
-                      },
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Business Hours */}
-            {businessHours && (
-              <Card>
-                <CardHeader>
-                  <CardTitle data-testid="text-business-hours-title">
-                    {businessHours.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">
-                        Monday - Friday
-                      </span>
-                      <span
-                        className="font-medium"
-                        data-testid="text-hours-weekday"
-                      >
-                        {businessHours.monday_friday}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Saturday</span>
-                      <span
-                        className="font-medium"
-                        data-testid="text-hours-saturday"
-                      >
-                        {businessHours.saturday}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Sunday</span>
-                      <span
-                        className="font-medium"
-                        data-testid="text-hours-sunday"
-                      >
-                        {businessHours.sunday}
-                      </span>
-                    </div>
-                    <div className="pt-3 border-t">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">
-                          Emergency Support
-                        </span>
-                        <Badge
-                          variant="secondary"
-                          data-testid="text-hours-emergency"
-                        >
-                          {businessHours.emergency}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Office Information */}
-
-            <Card></Card>
-          </div>
+          )}
         </div>
+
+        {/* Contact Form — full width */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-2xl" data-testid="text-form-title" style={getFieldFontStyle(formHeader, 'title')}>
+              {formHeader?.title || "Send us a Message"}
+            </CardTitle>
+            <p
+              className="text-muted-foreground"
+              data-testid="text-form-description"
+              style={getFieldFontStyle(formHeader, 'description')}
+            >
+              {formHeader?.description ||
+                "Fill out the form below and we'll get back to you within 24 hours."}
+            </p>
+          </CardHeader>
+          <CardContent>
+            <ContactForm />
+          </CardContent>
+        </Card>
 
         {/* Additional Information */}
         <div className="mt-12 grid md:grid-cols-2 gap-8">

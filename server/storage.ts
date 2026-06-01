@@ -140,6 +140,7 @@ export interface IStorage {
   getSiteSettings(settingType?: string): Promise<SiteSetting[]>;
   getSiteSetting(settingKey: string): Promise<SiteSetting | undefined>;
   updateSiteSetting(settingKey: string, settingValue: string, updatedBy?: string): Promise<SiteSetting>;
+  upsertSiteSetting(settingKey: string, settingValue: string, settingType?: string, label?: string, updatedBy?: string): Promise<SiteSetting>;
   
   // User status management
   updateUserActiveStatus(userId: string, isActive: boolean, performedBy?: string): Promise<User>;
@@ -793,6 +794,17 @@ export class DatabaseStorage implements IStorage {
       .where(eq(siteSettings.settingKey, settingKey))
       .returning();
     return updatedSetting;
+  }
+
+  async upsertSiteSetting(settingKey: string, settingValue: string, settingType: string = 'system', label?: string, updatedBy?: string): Promise<SiteSetting> {
+    const [setting] = await db.insert(siteSettings)
+      .values({ settingKey, settingValue, settingType, label: label || settingKey, updatedBy, updatedAt: new Date() })
+      .onConflictDoUpdate({
+        target: siteSettings.settingKey,
+        set: { settingValue, updatedBy, updatedAt: new Date() },
+      })
+      .returning();
+    return setting;
   }
 
   // User status management
