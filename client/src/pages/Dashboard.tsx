@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Users, UserCheck, Calculator, FileText, Shield, Settings, Save, Send } from "lucide-react";
 import type { PageContent, LoginHistory, User, SiteSetting } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -337,8 +338,9 @@ export default function Dashboard() {
                         return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
                       });
                       const contactSetting = sorted.find(s => s.settingKey === 'contact_email');
+                      const autoResponseSetting = sorted.find(s => s.settingKey === 'contact_auto_response');
                       const smtpSettings = sorted.filter(s => SMTP_KEYS.has(s.settingKey));
-                      const otherSettings = sorted.filter(s => s.settingKey !== 'contact_email' && !SMTP_KEYS.has(s.settingKey));
+                      const otherSettings = sorted.filter(s => s.settingKey !== 'contact_email' && s.settingKey !== 'contact_auto_response' && !SMTP_KEYS.has(s.settingKey));
 
                       const renderField = (setting: SiteSetting) => {
                         const isPassword = setting.settingKey === 'smtp_pass';
@@ -379,12 +381,44 @@ export default function Dashboard() {
                         );
                       };
 
+                      const autoResponseDraft = settingDrafts['contact_auto_response'] ?? (autoResponseSetting?.settingValue || '');
+
                       return (
                         <>
-                          {contactSetting && (
+                          {(contactSetting || true) && (
                             <div className="space-y-3">
                               <h3 className="text-sm font-semibold text-gray-700 border-b pb-1">Contact</h3>
-                              {renderField(contactSetting)}
+                              {contactSetting && renderField(contactSetting)}
+                              <div className="space-y-1">
+                                <Label htmlFor="contact_auto_response" className="text-sm font-medium">
+                                  Contact Auto Response
+                                </Label>
+                                <p className="text-xs text-muted-foreground">
+                                  Message sent automatically to visitors who submit the contact form. Leave blank to disable auto-reply.
+                                </p>
+                                <Textarea
+                                  id="contact_auto_response"
+                                  value={autoResponseDraft}
+                                  onChange={(e) =>
+                                    setSettingDrafts((prev) => ({ ...prev, contact_auto_response: e.target.value }))
+                                  }
+                                  placeholder="e.g. Thank you for reaching out! We'll get back to you within 1–2 business days."
+                                  rows={4}
+                                  className="resize-y"
+                                  data-testid="input-setting-contact_auto_response"
+                                />
+                                <Button
+                                  size="sm"
+                                  onClick={() =>
+                                    saveSettingMutation.mutate({ key: 'contact_auto_response', value: autoResponseDraft })
+                                  }
+                                  disabled={saveSettingMutation.isPending}
+                                  data-testid="btn-save-setting-contact_auto_response"
+                                >
+                                  <Save className="h-4 w-4 mr-1" />
+                                  Save
+                                </Button>
+                              </div>
                             </div>
                           )}
                           {smtpSettings.length > 0 && (
