@@ -24,8 +24,6 @@ import { Captcha } from "@/components/Captcha";
 import { User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import ForgotPasswordModal from "./ForgotPasswordModal";
-
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(1, "Password is required"),
@@ -36,13 +34,13 @@ type LoginForm = z.infer<typeof loginSchema>;
 interface ClientLoginModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onForgotPassword?: () => void;
 }
 
-export default function ClientLoginModal({ open, onOpenChange }: ClientLoginModalProps) {
+export default function ClientLoginModal({ open, onOpenChange, onForgotPassword }: ClientLoginModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [captcha, setCaptcha] = useState({ question: "", answer: "" });
-  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -180,7 +178,7 @@ export default function ClientLoginModal({ open, onOpenChange }: ClientLoginModa
                 className="p-0 text-primary"
                 onClick={() => {
                   onOpenChange(false);
-                  setForgotPasswordOpen(true);
+                  onForgotPassword?.();
                 }}
                 data-testid="link-forgot-password"
               >
@@ -203,11 +201,6 @@ export default function ClientLoginModal({ open, onOpenChange }: ClientLoginModa
           </div>
         </div>
       </DialogContent>
-      
-      <ForgotPasswordModal 
-        open={forgotPasswordOpen} 
-        onOpenChange={setForgotPasswordOpen} 
-      />
     </Dialog>
   );
 }

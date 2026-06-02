@@ -13,6 +13,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ChartLine, ChevronDown, Menu, User } from "lucide-react";
 import ClientLoginModal from "./modals/ClientLoginModal";
+import ForgotPasswordModal from "./modals/ForgotPasswordModal";
 import defaultLogo from "@assets/image_1763735441524.jpeg";
 
 // Static navigation items - defined outside component to avoid recreating on each render
@@ -42,6 +43,7 @@ export default function Header() {
   const { isAuthenticated, user, isGuestUser, isRegisteredUser, logout } = useAuth();
   const [clientModalOpen, setClientModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   
   // Dynamic logo from CMS with fallback to bundled asset
   const logoSrc = useDynamicImage('global', 'logo', defaultLogo);
@@ -370,7 +372,12 @@ export default function Header() {
         </nav>
       </header>
 
-      <ClientLoginModal open={clientModalOpen} onOpenChange={setClientModalOpen} />
+      <ClientLoginModal
+        open={clientModalOpen}
+        onOpenChange={setClientModalOpen}
+        onForgotPassword={() => setForgotPasswordOpen(true)}
+      />
+      <ForgotPasswordModal open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen} />
     </>
   );
 }
