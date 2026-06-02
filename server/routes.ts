@@ -1501,15 +1501,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "You do not have permission to modify this setting" });
       }
 
-      const updatedSetting = await storage.updateSiteSetting(
+      const updatedSetting = await storage.upsertSiteSetting(
         settingKey,
         String(value),
+        'system',
+        undefined,
         req.session.user?.email
       );
-
-      if (!updatedSetting) {
-        return res.status(404).json({ message: "Setting not found" });
-      }
 
       res.json(updatedSetting);
     } catch (error) {
