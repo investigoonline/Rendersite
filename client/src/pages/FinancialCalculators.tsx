@@ -2,12 +2,11 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { Badge } from "@/components/ui/badge";
-import { Home, TrendingUp, PiggyBank, Percent, Landmark, Wallet } from "lucide-react";
+import { Home, TrendingUp, PiggyBank, Percent, Wallet } from "lucide-react";
 import LoanPayoffCalc from "@/components/financial-calculators/LoanPayoffCalc";
 import RealEstateCalc from "@/components/financial-calculators/RealEstateCalc";
 import RetirementCalc from "@/components/financial-calculators/RetirementCalc";
 import InterestCalc from "@/components/financial-calculators/InterestCalc";
-import IRACalc from "@/components/financial-calculators/IRACalc";
 import WealthSnapshotCalc from "@/components/financial-calculators/WealthSnapshotCalc";
 import CalculatorDisclaimer from "@/components/calculators/CalculatorDisclaimer";
 import type { PageContent } from "@shared/schema";
@@ -67,17 +66,6 @@ const DEFAULT_SECTIONS = [
     title: "Interest Calculators",
     description: "Simple Interest and Compound Interest calculators with Annual Addition support.",
     component: InterestCalc,
-  },
-  {
-    id: "ira",
-    cmsKey: "financial_calc_ira",
-    icon: Landmark,
-    label: "IRA Eligibility",
-    badge: "Retirement Accounts",
-    badgeColor: "bg-red-100 text-red-800",
-    title: "IRA & Roth IRA Eligibility Calculator",
-    description: "Determine your Roth IRA contribution eligibility and Traditional IRA deductibility based on 2024 IRS rules.",
-    component: IRACalc,
   },
 ];
 
