@@ -7,7 +7,34 @@ import multer from "multer";
 import sharp from "sharp";
 import path from "path";
 import fs from "fs";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+const esc = (s: string) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+async function sendResendEmail(payload: {
+  from: string;
+  to: string;
+  reply_to?: string;
+  subject: string;
+  html: string;
+  text: string;
+}) {
+  const { data, error } = await resend.emails.send({
+    from: payload.from,
+    to: payload.to,
+    replyTo: payload.reply_to,
+    subject: payload.subject,
+    html: payload.html,
+    text: payload.text,
+  });
+  if (error) {
+    throw new Error(`Resend API error: ${JSON.stringify(error)}`);
+  }
+  return data;
+}
 
 async function sendContactEmail(opts: {
   toEmail: string;
@@ -18,39 +45,17 @@ async function sendContactEmail(opts: {
   message: string;
   preferredContact: string;
 }) {
-  // Read all SMTP config from the site_settings DB table
-  const [hostSetting, portSetting, userSetting, passSetting, fromSetting] = await Promise.all([
-    storage.getSiteSetting('smtp_host'),
-    storage.getSiteSetting('smtp_port'),
-    storage.getSiteSetting('smtp_user'),
-    storage.getSiteSetting('smtp_pass'),
-    storage.getSiteSetting('smtp_from'),
-  ]);
+  const fromSetting = await storage.getSiteSetting('resend_from');
+  const fromAddress = fromSetting?.settingValue?.trim() || "no-reply@investigoonline.com";
 
-  const smtpHost = hostSetting?.settingValue?.trim();
-  const smtpPort = parseInt(portSetting?.settingValue?.trim() || "587");
-  const smtpUser = userSetting?.settingValue?.trim();
-  const smtpPass = passSetting?.settingValue?.trim();
-  const smtpFrom = fromSetting?.settingValue?.trim() || smtpUser;
-
-  if (!smtpHost || !smtpUser || !smtpPass) {
-    console.log("[Contact Email] SMTP not fully configured in System Settings — skipping email delivery.");
+  if (!process.env.RESEND_API_KEY) {
+    console.log("[Contact Email] RESEND_API_KEY not set — skipping email delivery.");
     return;
   }
 
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpPort === 465,
-    auth: { user: smtpUser, pass: smtpPass },
-  });
-
-  // HTML-encode user-supplied values to prevent injection in the email body
-  const esc = (s: string) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-
-  await transporter.sendMail({
-    from: `"${smtpFrom}"`,
-    replyTo: opts.fromEmail,
+  await sendResendEmail({
+    from: fromAddress,
+    reply_to: opts.fromEmail,
     to: opts.toEmail,
     subject: `Contact Form: ${opts.subject.replace(/_/g, " ")}`,
     // nosemgrep: javascript.lang.security.html-in-template-string
@@ -67,50 +72,30 @@ async function sendContactEmail(opts: {
     `,
     text: `Name: ${opts.fromName}\nEmail: ${opts.fromEmail}${opts.phone ? `\nPhone: ${opts.phone}` : ""}\nSubject: ${opts.subject}\nPreferred Contact: ${opts.preferredContact}\n\nMessage:\n${opts.message}`,
   });
-  console.log("[Contact Email] Sent successfully.");
+  console.log("[Contact Email] Sent via Resend successfully.");
 }
 async function sendAutoResponseEmail(opts: {
   toEmail: string;
   toName: string;
   autoResponseText: string;
 }) {
-  const [hostSetting, portSetting, userSetting, passSetting, fromSetting] = await Promise.all([
-    storage.getSiteSetting('smtp_host'),
-    storage.getSiteSetting('smtp_port'),
-    storage.getSiteSetting('smtp_user'),
-    storage.getSiteSetting('smtp_pass'),
-    storage.getSiteSetting('smtp_from'),
-  ]);
+  const fromSetting = await storage.getSiteSetting('resend_from');
+  const fromAddress = fromSetting?.settingValue?.trim() || "no-reply@investigoonline.com";
 
-  const smtpHost = hostSetting?.settingValue?.trim();
-  const smtpPort = parseInt(portSetting?.settingValue?.trim() || "587");
-  const smtpUser = userSetting?.settingValue?.trim();
-  const smtpPass = passSetting?.settingValue?.trim();
-  const smtpFrom = fromSetting?.settingValue?.trim() || smtpUser;
-
-  if (!smtpHost || !smtpUser || !smtpPass) {
-    console.log("[Auto Response] SMTP not configured — skipping auto-response.");
+  if (!process.env.RESEND_API_KEY) {
+    console.log("[Auto Response] RESEND_API_KEY not set — skipping auto-response.");
     return;
   }
 
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpPort === 465,
-    auth: { user: smtpUser, pass: smtpPass },
-  });
-
-  const esc = (s: string) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-
-  await transporter.sendMail({
-    from: `"${smtpFrom}"`,
+  await sendResendEmail({
+    from: fromAddress,
     to: opts.toEmail,
     subject: "Thank you for contacting us",
     // nosemgrep: javascript.lang.security.html-in-template-string
     html: `<p>${esc(opts.autoResponseText).replace(/\n/g, "<br/>")}</p>`,
     text: opts.autoResponseText,
   });
-  console.log("[Auto Response] Sent successfully to", opts.toEmail);
+  console.log("[Auto Response] Sent via Resend to", opts.toEmail);
 }
 
 import { 

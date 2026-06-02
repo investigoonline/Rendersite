@@ -330,17 +330,13 @@ export default function Dashboard() {
                   <div className="space-y-8 max-w-lg">
                     {/* Contact Email - shown first */}
                     {(() => {
-                      const SETTING_ORDER = ['contact_email', 'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from'];
+                      const KNOWN_KEYS = new Set(['contact_email', 'resend_from', 'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from', 'contact_auto_response']);
                       const SMTP_KEYS = new Set(['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from']);
-                      const sorted = [...(systemSettings || [])].sort((a, b) => {
-                        const ai = SETTING_ORDER.indexOf(a.settingKey);
-                        const bi = SETTING_ORDER.indexOf(b.settingKey);
-                        return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
-                      });
+                      const sorted = [...(systemSettings || [])];
                       const contactSetting = sorted.find(s => s.settingKey === 'contact_email');
+                      const resendFromSetting = sorted.find(s => s.settingKey === 'resend_from');
                       const autoResponseSetting = sorted.find(s => s.settingKey === 'contact_auto_response');
-                      const smtpSettings = sorted.filter(s => SMTP_KEYS.has(s.settingKey));
-                      const otherSettings = sorted.filter(s => s.settingKey !== 'contact_email' && s.settingKey !== 'contact_auto_response' && !SMTP_KEYS.has(s.settingKey));
+                      const otherSettings = sorted.filter(s => !KNOWN_KEYS.has(s.settingKey));
 
                       const renderField = (setting: SiteSetting) => {
                         const isPassword = setting.settingKey === 'smtp_pass';
@@ -421,12 +417,38 @@ export default function Dashboard() {
                               </div>
                             </div>
                           )}
-                          {smtpSettings.length > 0 && (
-                            <div className="space-y-3">
-                              <h3 className="text-sm font-semibold text-gray-700 border-b pb-1">Email / SMTP</h3>
-                              {smtpSettings.map(renderField)}
-                            </div>
-                          )}
+                          <div className="space-y-3">
+                            <h3 className="text-sm font-semibold text-gray-700 border-b pb-1">Email (Resend)</h3>
+                            <p className="text-xs text-muted-foreground">
+                              Emails are sent via Resend. Set the "From" address below — it must be a verified domain in your Resend account.
+                            </p>
+                            {resendFromSetting ? renderField(resendFromSetting) : (
+                              <div className="space-y-1">
+                                <Label htmlFor="resend_from" className="text-sm font-medium">From Address</Label>
+                                <p className="text-xs text-muted-foreground">The verified sender address that will appear in outgoing emails.</p>
+                                <div className="flex gap-2">
+                                  <Input
+                                    id="resend_from"
+                                    type="text"
+                                    value={settingDrafts['resend_from'] ?? ''}
+                                    onChange={(e) => setSettingDrafts(prev => ({ ...prev, resend_from: e.target.value }))}
+                                    placeholder="e.g. noreply@investigoonline.com"
+                                    className="flex-1"
+                                    data-testid="input-setting-resend_from"
+                                  />
+                                  <Button
+                                    size="sm"
+                                    onClick={() => saveSettingMutation.mutate({ key: 'resend_from', value: settingDrafts['resend_from'] ?? '' })}
+                                    disabled={saveSettingMutation.isPending}
+                                    data-testid="btn-save-setting-resend_from"
+                                  >
+                                    <Save className="h-4 w-4 mr-1" />
+                                    Save
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
                           {otherSettings.map(renderField)}
                         </>
                       );
