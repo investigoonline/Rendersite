@@ -450,16 +450,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/auth/password-hint', async (req, res) => {
     try {
       const { email } = req.body;
-      
-      if (!email) {
-        return res.status(400).json({ message: "Email address is required" });
-      }
-      
-      // Always return the same 200 response regardless of whether the account exists
-      // to prevent email enumeration. The hint is not returned over an unauthenticated
-      // endpoint to avoid leaking account existence or hint content.
-      await storage.getUserByEmail(email);
-      res.json({ hint: null, hasHint: false });
+      if (!email) return res.status(400).json({ message: "Email address is required" });
+
+      // Always respond 200 to prevent account enumeration
+      res.json({ sent: true });
+
+      // Capture host before entering async background task
+      const appBaseUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+
+      // Send hint + reset link in background
+      setImmediate(async () => {
+        try {
+          const user = await storage.getUserByEmail(email);
+          if (!user) return;
+
+          const crypto = await import('crypto');
+          const token = crypto.randomBytes(32).toString('hex');
+          const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+          await storage.updateUser(user.id, { resetPasswordToken: token, resetPasswordExpires: expires });
+
+          const fromSetting = await storage.getSiteSetting('resend_from');
+          const fromAddress = fromSetting?.settingValue?.trim() || "no-reply@investigoonline.com";
+          const resetUrl = `${appBaseUrl}/reset-password?token=${token}`;
+
+          const hint = user.passwordHint ? esc(user.passwordHint) : null;
+          const hintBlock = hint
+            ? `<p><strong>Your password hint:</strong> ${hint}</p>`
+            : `<p>No password hint was set on your account.</p>`;
+
+          await sendResendEmail({
+            from: fromAddress,
+            to: email,
+            subject: "Your Password Hint & Reset Link",
+            html: `
+              <h2>Password Help</h2>
+              ${hintBlock}
+              <p>If you still can't remember your password, click the link below to reset it. This link expires in 1 hour.</p>
+              <p><a href="${resetUrl}" style="background:#1a56db;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;display:inline-block;">Reset My Password</a></p>
+              <p style="color:#888;font-size:12px;">If you did not request this, you can ignore this email.</p>
+            `,
+            text: `Password Help\n\n${user.passwordHint ? `Your password hint: ${user.passwordHint}\n\n` : 'No password hint was set on your account.\n\n'}Reset your password here (link expires in 1 hour): ${resetUrl}`,
+          });
+        } catch (err) {
+          console.error("[Password Hint] Failed to send hint email:", err);
+        }
+      });
     } catch (error) {
       console.error("Error getting password hint:", error);
       res.status(500).json({ message: "Unable to retrieve password hint at this time" });
