@@ -185,17 +185,6 @@ export default function Contact() {
                       {businessHours.sunday}
                     </span>
                   </div>
-                  {businessHours.emergency && (
-                    <div className="pt-2 border-t flex justify-between gap-2">
-                      <span className="text-muted-foreground">Emergency</span>
-                      <Badge
-                        variant="secondary"
-                        data-testid="text-hours-emergency"
-                      >
-                        {businessHours.emergency}
-                      </Badge>
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>
