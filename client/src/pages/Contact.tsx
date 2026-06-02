@@ -52,6 +52,7 @@ export default function Contact() {
       ["contact_office", "contact_phone", "contact_email"].includes(c.section),
     ) || [];
 
+  const pageHeader = getSection("contact_header")?.content as any;
   const formHeader = getSection("contact_form_header")?.content as any;
   const businessHours = getSection("contact_business_hours")?.content as any;
   const prospectiveClients = getSection("contact_prospective_clients")
@@ -78,9 +79,18 @@ export default function Contact() {
 
       {/* Tagline Below Hero */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <p className="text-base sm:text-xl lg:text-2xl text-center text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-          Ready to take control? Begin with a free consultation or connect with our expert team for personalized guidance
-        </p>
+        {pageHeader?.description ? (
+          <div
+            className="text-base sm:text-xl lg:text-2xl text-center text-muted-foreground max-w-4xl mx-auto leading-relaxed"
+            style={getFieldFontStyle(pageHeader, 'description')}
+          >
+            <HTMLContent content={pageHeader.description} />
+          </div>
+        ) : (
+          <p className="text-base sm:text-xl lg:text-2xl text-center text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+            Ready to take control? Begin with a free consultation or connect with our expert team for personalized guidance
+          </p>
+        )}
       </div>
 
       {/* Content */}
@@ -143,6 +153,7 @@ export default function Contact() {
                 <h3
                   className="text-lg font-semibold text-gray-900 mb-4"
                   data-testid="text-business-hours-title"
+                  style={getFieldFontStyle(businessHours, 'title')}
                 >
                   {businessHours.title || "Business Hours"}
                 </h3>
@@ -217,7 +228,7 @@ export default function Contact() {
           {prospectiveClients && (
             <Card>
               <CardHeader>
-                <CardTitle data-testid="text-prospective-title">
+                <CardTitle data-testid="text-prospective-title" style={getFieldFontStyle(prospectiveClients, 'title')}>
                   {prospectiveClients.title}
                 </CardTitle>
               </CardHeader>
@@ -226,6 +237,7 @@ export default function Contact() {
                   content={prospectiveClients.description}
                   className="text-muted-foreground mb-4"
                   data-testid="text-prospective-description"
+                  style={getFieldFontStyle(prospectiveClients, 'description')}
                 />
                 <ul className="space-y-2 text-sm text-muted-foreground mb-4">
                   {prospectiveClients.benefits?.map(
@@ -264,7 +276,7 @@ export default function Contact() {
           {currentClients && (
             <Card>
               <CardHeader>
-                <CardTitle data-testid="text-current-title">
+                <CardTitle data-testid="text-current-title" style={getFieldFontStyle(currentClients, 'title')}>
                   {currentClients.title}
                 </CardTitle>
               </CardHeader>
@@ -273,6 +285,7 @@ export default function Contact() {
                   content={currentClients.description}
                   className="text-muted-foreground mb-4"
                   data-testid="text-current-description"
+                  style={getFieldFontStyle(currentClients, 'description')}
                 />
                 <ul className="space-y-2 text-sm text-muted-foreground mb-4">
                   {currentClients.benefits?.map(

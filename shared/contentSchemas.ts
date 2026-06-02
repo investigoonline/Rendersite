@@ -1023,10 +1023,10 @@ export const contentSchemas: Record<string, SectionSchema> = {
   contact_header: {
     schema: pageHeaderSchema,
     label: 'Contact Page Header',
-    description: 'Contact page title and description',
+    description: 'Contact page title and tagline shown below the hero image',
     uiMeta: {
       title: { label: 'Page Title', control: 'text', placeholder: 'Get in Touch' },
-      description: { label: 'Page Description', control: 'richtext' },
+      description: { label: 'Tagline (shown below hero image)', control: 'richtext', placeholder: 'Ready to take control? Begin with a free consultation or connect with our expert team for personalized guidance' },
     },
   },
   services_header: {

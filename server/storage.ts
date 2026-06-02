@@ -216,15 +216,15 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     
-    // Assign default guest_user role to new users
-    const guestRole = await db
+    // Assign default client role to new registered users
+    const clientRole = await db
       .select()
       .from(roles)
-      .where(eq(roles.name, 'guest_user'))
+      .where(eq(roles.name, 'client'))
       .limit(1);
     
-    if (guestRole.length > 0) {
-      await this.assignRoleToUser(newUser.id, guestRole[0].id);
+    if (clientRole.length > 0) {
+      await this.assignRoleToUser(newUser.id, clientRole[0].id);
     }
     
     return newUser;

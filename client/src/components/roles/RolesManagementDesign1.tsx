@@ -327,22 +327,27 @@ export default function RolesManagementDesign1() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>Design 1: Hierarchical Matrix View</span>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Role Permissions</CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              Check the box under each role to grant access to that resource. Click "Save Changes" when done.
+            </p>
+          </div>
           <Button onClick={handleSave} disabled={saveMutation.isPending} data-testid="button-save-design1">
             <Save className="h-4 w-4 mr-2" />
             {saveMutation.isPending ? "Saving..." : "Save Changes"}
           </Button>
-        </CardTitle>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead>
+            <thead className="sticky top-0 z-10">
               <tr className="border-b bg-gray-100">
-                <th className="text-left py-3 px-4 font-medium text-gray-700">Resource</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 bg-gray-100 min-w-[200px]">Resource / Page</th>
                 {roles.map(role => (
-                  <th key={role.id} className="text-center py-3 px-4 font-medium text-gray-700 min-w-[100px]" data-testid={`header-${role.id}`}>
+                  <th key={role.id} className="text-center py-3 px-4 font-medium text-gray-700 bg-gray-100 min-w-[110px]" data-testid={`header-${role.id}`}>
                     {role.name}
                   </th>
                 ))}
@@ -353,10 +358,7 @@ export default function RolesManagementDesign1() {
             </tbody>
           </table>
         </div>
-        <div className="mt-6 flex gap-4">
-          <Button variant="outline" data-testid="button-bulk-actions">
-            Bulk Actions
-          </Button>
+        <div className="mt-6 flex justify-end">
           <Button onClick={handleSave} disabled={saveMutation.isPending} data-testid="button-save-changes">
             <Save className="h-4 w-4 mr-2" />
             {saveMutation.isPending ? "Saving..." : "Save All Changes"}
