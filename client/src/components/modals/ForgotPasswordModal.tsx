@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { KeyRound, Mail, Lightbulb, AlertCircle } from "lucide-react";
+import { KeyRound, Mail, Lightbulb, CheckCircle } from "lucide-react";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -38,68 +38,48 @@ interface ForgotPasswordModalProps {
 
 export default function ForgotPasswordModal({ open, onOpenChange }: ForgotPasswordModalProps) {
   const { toast } = useToast();
-  const [passwordHint, setPasswordHint] = useState<string | null>(null);
-  const [hintRequested, setHintRequested] = useState(false);
+  const [hintSent, setHintSent] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   const form = useForm<ForgotPasswordForm>({
     resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: {
-      email: "",
-    },
+    defaultValues: { email: "" },
   });
 
   const getHintMutation = useMutation({
-    mutationFn: async (data: ForgotPasswordForm) => {
-      return apiRequest("/api/auth/password-hint", "POST", data);
-    },
-    onSuccess: (data: any) => {
-      setHintRequested(true);
-      if (data.hint) {
-        setPasswordHint(data.hint);
-      } else {
-        setPasswordHint(null);
-      }
+    mutationFn: async (data: ForgotPasswordForm) =>
+      apiRequest("/api/auth/password-hint", "POST", data),
+    onSuccess: () => {
+      setHintSent(true);
     },
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Unable to retrieve password hint.",
+        description: error.message || "Unable to send password hint.",
         variant: "destructive",
       });
     },
   });
 
   const resetPasswordMutation = useMutation({
-    mutationFn: async (data: ForgotPasswordForm) => {
-      return apiRequest("/api/auth/forgot-password", "POST", data);
-    },
+    mutationFn: async (data: ForgotPasswordForm) =>
+      apiRequest("/api/auth/forgot-password", "POST", data),
     onSuccess: () => {
-      toast({
-        title: "Coming Soon",
-        description: "Password reset via email is not yet available. Please contact support for assistance.",
-      });
+      setResetSent(true);
     },
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to process request.",
+        description: error.message || "Failed to send reset email.",
         variant: "destructive",
       });
     },
   });
 
-  const onGetHint = (data: ForgotPasswordForm) => {
-    getHintMutation.mutate(data);
-  };
-
-  const onResetPassword = (data: ForgotPasswordForm) => {
-    resetPasswordMutation.mutate(data);
-  };
-
   const handleClose = () => {
     form.reset();
-    setPasswordHint(null);
-    setHintRequested(false);
+    setHintSent(false);
+    setResetSent(false);
     onOpenChange(false);
   };
 
@@ -112,7 +92,7 @@ export default function ForgotPasswordModal({ open, onOpenChange }: ForgotPasswo
             <span>Forgot Password</span>
           </DialogTitle>
           <DialogDescription>
-            Enter your email to get your password hint or request a password reset.
+            Enter your email to receive your password hint or a reset link.
           </DialogDescription>
         </DialogHeader>
 
@@ -138,14 +118,22 @@ export default function ForgotPasswordModal({ open, onOpenChange }: ForgotPasswo
                 )}
               />
 
-              {hintRequested && (
-                <Alert className={passwordHint ? "border-primary bg-primary/5" : "border-muted"}>
-                  <Lightbulb className="h-4 w-4" />
-                  <AlertTitle>Password Hint</AlertTitle>
-                  <AlertDescription>
-                    {passwordHint 
-                      ? passwordHint 
-                      : "No password hint was set for this account."}
+              {hintSent && (
+                <Alert className="border-green-200 bg-green-50">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <AlertTitle className="text-green-800">Email Sent</AlertTitle>
+                  <AlertDescription className="text-green-700">
+                    If an account exists for that email, we've sent your password hint and a reset link. Please check your inbox.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {resetSent && (
+                <Alert className="border-green-200 bg-green-50">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <AlertTitle className="text-green-800">Reset Link Sent</AlertTitle>
+                  <AlertDescription className="text-green-700">
+                    If an account exists for that email, a password reset link has been sent. It expires in 1 hour.
                   </AlertDescription>
                 </Alert>
               )}
@@ -155,12 +143,12 @@ export default function ForgotPasswordModal({ open, onOpenChange }: ForgotPasswo
                   type="button"
                   variant="outline"
                   className="w-full"
-                  onClick={form.handleSubmit(onGetHint)}
-                  disabled={getHintMutation.isPending}
+                  onClick={form.handleSubmit((d) => getHintMutation.mutate(d))}
+                  disabled={getHintMutation.isPending || hintSent}
                   data-testid="button-get-hint"
                 >
                   <Lightbulb className="h-4 w-4 mr-2" />
-                  {getHintMutation.isPending ? "Getting Hint..." : "Get Password Hint"}
+                  {getHintMutation.isPending ? "Sending…" : "Get Password Hint via Email"}
                 </Button>
 
                 <div className="relative">
@@ -175,24 +163,16 @@ export default function ForgotPasswordModal({ open, onOpenChange }: ForgotPasswo
                 <Button
                   type="button"
                   className="w-full"
-                  onClick={form.handleSubmit(onResetPassword)}
-                  disabled={resetPasswordMutation.isPending}
+                  onClick={form.handleSubmit((d) => resetPasswordMutation.mutate(d))}
+                  disabled={resetPasswordMutation.isPending || resetSent}
                   data-testid="button-reset-password"
                 >
                   <Mail className="h-4 w-4 mr-2" />
-                  {resetPasswordMutation.isPending ? "Processing..." : "Reset Password via Email"}
+                  {resetPasswordMutation.isPending ? "Sending…" : "Reset Password via Email"}
                 </Button>
               </div>
             </form>
           </Form>
-
-          <Alert variant="default" className="border-amber-200 bg-amber-50">
-            <AlertCircle className="h-4 w-4 text-amber-600" />
-            <AlertTitle className="text-amber-800">Email Reset Coming Soon</AlertTitle>
-            <AlertDescription className="text-amber-700">
-              Password reset via email is not yet available. Please use your password hint or contact our support team for assistance.
-            </AlertDescription>
-          </Alert>
         </div>
       </DialogContent>
     </Dialog>

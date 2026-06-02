@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -22,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { Captcha } from "@/components/Captcha";
 import { Send, Loader2 } from "lucide-react";
 import type { PageContent } from "@shared/schema";
 
@@ -64,8 +66,8 @@ const contactMethodOptions = [
 
 export default function ContactForm() {
   const { toast } = useToast();
+  const [captcha, setCaptcha] = useState({ question: "", answer: "" });
 
-  // Fetch form fields content from CMS
   const { data: formFieldsContent } = useQuery<PageContent[]>({
     queryKey: ["/api/content", "contact"],
     queryFn: async () => {
@@ -95,7 +97,10 @@ export default function ContactForm() {
 
   const submitContactMutation = useMutation({
     mutationFn: async (data: ContactForm) => {
-      const response = await apiRequest("/api/contact", "POST", data);
+      const response = await apiRequest("/api/contact", "POST", {
+        ...data,
+        captcha,
+      });
       return response.json();
     },
     onSuccess: () => {
@@ -106,6 +111,7 @@ export default function ContactForm() {
           "Thank you for contacting us. We'll get back to you within 24 hours.",
       });
       form.reset();
+      setCaptcha({ question: "", answer: "" });
     },
     onError: (error: Error) => {
       toast({
@@ -118,6 +124,14 @@ export default function ContactForm() {
   });
 
   const onSubmit = (data: ContactForm) => {
+    if (!captcha.question || !captcha.answer) {
+      toast({
+        title: "Security Check Required",
+        description: "Please complete the security check before sending.",
+        variant: "destructive",
+      });
+      return;
+    }
     submitContactMutation.mutate(data);
   };
 
@@ -269,6 +283,8 @@ export default function ContactForm() {
             </FormItem>
           )}
         />
+
+        <Captcha value={captcha} onChange={setCaptcha} />
 
         <div className="bg-gray-50 p-4 rounded-lg text-sm text-muted-foreground">
           <p className="mb-2">

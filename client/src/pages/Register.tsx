@@ -23,7 +23,7 @@ const registrationFormSchema = z.object({
   phone: z.string().optional(),
   password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
-  passwordHint: z.string().max(255, "Password hint must be less than 255 characters").optional(),
+  passwordHint: z.string().min(1, "Password hint is required").max(255, "Password hint must be less than 255 characters"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -236,7 +236,7 @@ export default function Register() {
                 name="passwordHint"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password Hint (Optional)</FormLabel>
+                    <FormLabel>Password Hint *</FormLabel>
                     <FormControl>
                       <Input
                         type="text"

@@ -38,6 +38,7 @@ import Articles from "@/pages/Articles";
 import Flipbooks from "@/pages/Flipbooks";
 import Newsletters from "@/pages/Newsletters";
 import BackgroundPreview from "@/pages/BackgroundPreview";
+import ResetPassword from "@/pages/ResetPassword";
 import NotFound from "@/pages/not-found";
 
 function ScrollToTop() {
@@ -55,6 +56,7 @@ function Router() {
       <Switch>
         {/* Public routes available to everyone */}
         <Route path="/register" component={Register} />
+        <Route path="/reset-password" component={ResetPassword} />
         <Route path="/home-designs" component={HomeDesignOptions} />
         <Route path="/calculators" component={Calculators} />
         <Route path="/financial-calculators" component={FinancialCalculators} />
