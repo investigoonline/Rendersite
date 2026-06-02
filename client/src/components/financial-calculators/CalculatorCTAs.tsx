@@ -17,14 +17,6 @@ export default function CalculatorCTAs() {
           </Link>
         </Button>
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => alert("Sign in to save a snapshot of your results and track changes over time.")}>
-          Save Snapshot
-        </Button>
-        <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => alert("Sign in to compare your current results with previous snapshots.")}>
-          Compare to Previous
-        </Button>
-      </div>
     </div>
   );
 }
