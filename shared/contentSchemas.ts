@@ -270,6 +270,9 @@ const contactFormFieldsSchema = z.object({
   submitButtonText: z.string().min(1).max(50),
   successTitle: z.string().min(1).max(100),
   successMessage: z.string().min(1).max(200),
+  immediateAssistanceText: z.string().max(100).optional().or(z.literal('')),
+  immediateAssistancePhone: z.string().max(50).optional().or(z.literal('')),
+  immediateAssistancePhoneHref: z.string().max(100).optional().or(z.literal('')),
 });
 
 // Resources Additional Section Schemas
@@ -865,6 +868,9 @@ export const contentSchemas: Record<string, SectionSchema> = {
       submitButtonText: { label: 'Submit Button Text', control: 'text', placeholder: 'Send Message' },
       successTitle: { label: 'Success Message Title', control: 'text', placeholder: 'Message Sent Successfully' },
       successMessage: { label: 'Success Message Text', control: 'text', placeholder: 'Thank you for contacting us. We\'ll get back to you within 24 hours.' },
+      immediateAssistanceText: { label: 'Immediate Assistance Text', control: 'text', placeholder: 'Need immediate assistance? Call us at', help: 'Label shown below the Send button. Leave blank to hide.' },
+      immediateAssistancePhone: { label: 'Immediate Assistance Phone (display)', control: 'text', placeholder: '+1 (512) 923-6479', help: 'Phone number shown as a clickable link.' },
+      immediateAssistancePhoneHref: { label: 'Immediate Assistance Phone (tel: link)', control: 'text', placeholder: 'tel:+15129236479', help: 'The tel: href for the phone link.' },
     },
   },
   contact_quick_actions: {

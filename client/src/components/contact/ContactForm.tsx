@@ -300,15 +300,29 @@ export default function ContactForm() {
           )}
         </Button>
 
-        <div className="text-center text-sm text-muted-foreground">
-          Need immediate assistance? Call us at{" "}
-          <a
-            href="tel:+1 (512) 923-6479"
-            className="text-primary hover:underline"
-          >
-            +1 (512) 923-6479
-          </a>
-        </div>
+        {(formFields.immediateAssistanceText || formFields.immediateAssistancePhone) ? (
+          <div className="text-center text-sm text-muted-foreground">
+            {formFields.immediateAssistanceText || "Need immediate assistance? Call us at"}{" "}
+            {formFields.immediateAssistancePhone && (
+              <a
+                href={formFields.immediateAssistancePhoneHref || `tel:${formFields.immediateAssistancePhone}`}
+                className="text-primary hover:underline"
+              >
+                {formFields.immediateAssistancePhone}
+              </a>
+            )}
+          </div>
+        ) : (
+          <div className="text-center text-sm text-muted-foreground">
+            Need immediate assistance? Call us at{" "}
+            <a
+              href="tel:+15129236479"
+              className="text-primary hover:underline"
+            >
+              +1 (512) 923-6479
+            </a>
+          </div>
+        )}
       </form>
     </Form>
   );
