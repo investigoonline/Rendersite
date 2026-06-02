@@ -240,23 +240,6 @@ export default function Contact() {
                     ),
                   )}
                 </ul>
-                {prospectiveClients.buttonHref ? (
-                  <Link href={prospectiveClients.buttonHref}>
-                    <Button
-                      className="w-full"
-                      data-testid="button-prospective-action"
-                    >
-                      {prospectiveClients.buttonText}
-                    </Button>
-                  </Link>
-                ) : (
-                  <Button
-                    className="w-full"
-                    data-testid="button-prospective-action"
-                  >
-                    {prospectiveClients.buttonText}
-                  </Button>
-                )}
               </CardContent>
             </Card>
           )}
@@ -288,25 +271,6 @@ export default function Contact() {
                     ),
                   )}
                 </ul>
-                {currentClients.buttonHref ? (
-                  <Link href={currentClients.buttonHref}>
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      data-testid="button-current-action"
-                    >
-                      {currentClients.buttonText}
-                    </Button>
-                  </Link>
-                ) : (
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    data-testid="button-current-action"
-                  >
-                    {currentClients.buttonText}
-                  </Button>
-                )}
               </CardContent>
             </Card>
           )}
