@@ -468,11 +468,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Forgot password (placeholder for future email integration)
   // Always returns the same 200 response to prevent account enumeration.
-  app.post('/api/auth/forgot-password', async (_req, res) => {
+  app.post('/api/auth/forgot-password', async (req, res) => {
     try {
-      res.json({ 
-        message: "If an account exists for that address, password reset instructions will be sent.",
-        emailSent: false 
+      const { email } = req.body;
+      if (!email) return res.status(400).json({ message: "Email address is required" });
+
+      // Always respond 200 to prevent account enumeration
+      res.json({ sent: true });
+
+      const appBaseUrl2 = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+
+      setImmediate(async () => {
+        try {
+          const user = await storage.getUserByEmail(email);
+          if (!user) return;
+
+          const crypto = await import('crypto');
+          const token = crypto.randomBytes(32).toString('hex');
+          const expires = new Date(Date.now() + 60 * 60 * 1000);
+          await storage.updateUser(user.id, { resetPasswordToken: token, resetPasswordExpires: expires });
+
+          const fromSetting = await storage.getSiteSetting('resend_from');
+          const fromAddress = fromSetting?.settingValue?.trim() || "no-reply@investigoonline.com";
+          const resetUrl = `${appBaseUrl2}/reset-password?token=${token}`;
+
+          await sendResendEmail({
+            from: fromAddress,
+            to: email,
+            subject: "Reset Your Password",
+            html: `
+              <h2>Password Reset Request</h2>
+              <p>Click the link below to set a new password. This link expires in 1 hour.</p>
+              <p><a href="${resetUrl}" style="background:#1a56db;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;display:inline-block;">Reset My Password</a></p>
+              <p style="color:#888;font-size:12px;">If you did not request this, you can safely ignore this email.</p>
+            `,
+            text: `Password Reset Request\n\nReset your password here (expires in 1 hour): ${resetUrl}\n\nIf you did not request this, ignore this email.`,
+          });
+        } catch (err) {
+          console.error("[Forgot Password] Failed to send reset email:", err);
+        }
       });
     } catch (error) {
       console.error("Error processing forgot password:", error);
@@ -480,7 +514,131 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Verify reset token — used by the reset password page to check validity
+  });
+
   // Profile routes
+  app.get('/api/auth/reset-password', async (req, res) => {
+    try {
+      const { token } = req.query as { token: string };
+      if (!token) return res.status(400).json({ message: "Token is required" });
+      const user = await storage.getUserByResetToken(token);
+      if (!user) return res.status(400).json({ message: "This reset link is invalid or has expired." });
+      res.json({ valid: true, email: user.email });
+    } catch (error) {
+      console.error("Error verifying reset token:", error);
+      res.status(500).json({ message: "Unable to verify token at this time" });
+    }
+  });
+
+  // Reset password — validates token and updates password + hint
+  app.post('/api/auth/reset-password', async (req, res) => {
+    try {
+      const { token, password, passwordHint } = req.body;
+      if (!token || !password) return res.status(400).json({ message: "Token and new password are required" });
+      if (password.length < 8) return res.status(400).json({ message: "Password must be at least 8 characters" });
+
+      const user = await storage.getUserByResetToken(token);
+      if (!user) return res.status(400).json({ message: "This reset link is invalid or has expired." });
+
+      const hashedPassword = await bcrypt.hash(password, 12);
+      await storage.updateUser(user.id, {
+        password: hashedPassword,
+        passwordHint: passwordHint || user.passwordHint,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+        updatedAt: new Date(),
+      });
+
+      res.json({ message: "Your password has been reset successfully. You can now log in." });
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      res.status(500).json({ message: "Unable to reset your password at this time" });
+    }
+  });
+
+  // Profile routes
+  app.get('/api/profile', async (req: any, res) => {
+    try {
+      if (!await verifyActiveSession(req, res)) return;
+
+      const user = await storage.getUser(req.session.user.id);
+      if (!user) {
+        return res.status(404).json({ message: "Profile not found" });
+      }
+
+      res.json({
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        profileImageUrl: user.profileImageUrl,
+        role: user.role,
+        authType: user.authType,
+        isEmailVerified: user.isEmailVerified,
+        passwordHint: user.passwordHint || null,
+        createdAt: user.createdAt,
+      });
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      res.status(500).json({ message: "Unable to retrieve profile at this time" });
+    }
+  });
+
+  const updateProfileSchema = z.object({
+    firstName: z.string().max(100).optional().nullable(),
+    lastName: z.string().max(100).optional().nullable(),
+    phone: z.string().max(20).optional().nullable(),
+  });
+
+  app.patch('/api/profile', async (req: any, res) => {
+    try {
+      if (!await verifyActiveSession(req, res)) return;
+
+      const validation = updateProfileSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: "Invalid profile data", errors: validation.error.errors });
+      }
+
+      const { firstName, lastName, phone } = validation.data;
+      const userId = req.session.user.id;
+
+      const updatedUser = await storage.updateUser(userId, {
+        firstName: firstName || null,
+        lastName: lastName || null,
+        phone: phone || null,
+        updatedAt: new Date(),
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: "Profile not found" });
+      }
+
+      // Update session data
+      req.session.user.firstName = updatedUser.firstName;
+      req.session.user.lastName = updatedUser.lastName;
+
+      res.json({
+        id: updatedUser.id,
+        email: updatedUser.email,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        phone: updatedUser.phone,
+        profileImageUrl: updatedUser.profileImageUrl,
+        role: updatedUser.role,
+        authType: updatedUser.authType,
+        isEmailVerified: updatedUser.isEmailVerified,
+        createdAt: updatedUser.createdAt,
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ message: "Unable to update profile at this time" });
+    }
+  });
+
+  // Change password from profile (requires current password)
+
   app.get('/api/profile', async (req: any, res) => {
     try {
       if (!await verifyActiveSession(req, res)) return;
@@ -615,6 +773,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Unable to upload profile image at this time", error: error?.message });
     }
   });
+
+  app.post('/api/profile/change-password', async (req: any, res) => {
+    try {
+      if (!await verifyActiveSession(req, res)) return;
+
+      const { currentPassword, newPassword, passwordHint } = req.body;
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: "Current password and new password are required" });
+      }
+      if (newPassword.length < 8) {
+        return res.status(400).json({ message: "New password must be at least 8 characters" });
+      }
+
+      const user = await storage.getUser(req.session.user.id);
+      if (!user || !user.password) {
+        return res.status(400).json({ message: "Password change is not available for this account type" });
+      }
+
+      const currentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      if (!currentPasswordValid) {
+        return res.status(400).json({ message: "Current password is incorrect" });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
+      await storage.updateUser(user.id, {
+        password: hashedPassword,
+        passwordHint: passwordHint || user.passwordHint,
+        updatedAt: new Date(),
+      });
 
   // Calculator routes
   app.post('/api/calculations', async (req, res) => {
