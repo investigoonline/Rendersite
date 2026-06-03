@@ -280,7 +280,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     },
   }));
 
-  // Issue a server-side captcha challenge (stores expected answer in session)
+  // Issue a server-side captcha challenge.
+  // Returns the question plus a short-lived signed token so the contact form
+  // can validate without relying on session persistence (which is unreliable
+  // for anonymous visitors in production).
   app.get('/api/auth/captcha', (req: any, res) => {
     const operations = ['+', '-'];
     const operation = operations[Math.floor(Math.random() * operations.length)];
@@ -294,9 +297,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     const question = `${num1} ${operation} ${num2}`;
     const expectedAnswer = operation === '+' ? num1 + num2 : num1 - num2;
+
+    // Signed token used by /api/contact (stateless, no session dependency)
+    const expiresAt = Date.now() + 15 * 60 * 1000; // 15 minutes
+    const captchaSecret = process.env.SESSION_SECRET || 'your-secret-key-change-in-production';
+    const token = crypto
+      .createHmac('sha256', captchaSecret)
+      .update(`${expectedAnswer}|${expiresAt}`)
+      .digest('hex');
+
+    // Session-based answer kept for register / login flows
     req.session.captchaAnswer = expectedAnswer;
     req.session.save(() => {});
-    res.json({ question });
+
+    res.json({ question, token, expiresAt });
   });
 
   // Auth routes
@@ -828,6 +842,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Contact routes
   app.post('/api/contact', async (req, res) => {
     try {
+      // Captcha validation via signed HMAC token (stateless — no session dependency)
+      const { captcha } = req.body;
+      const { answer, token, expiresAt } = captcha || {};
+
+      if (!answer || !token || !expiresAt) {
+        return res.status(400).json({ message: "Security check failed. Please refresh the captcha and try again." });
+      }
+
+      if (Date.now() > Number(expiresAt)) {
+        return res.status(400).json({ message: "Security check expired. Please refresh the captcha and try again." });
+      }
+
+      const captchaSecret = process.env.SESSION_SECRET || 'your-secret-key-change-in-production';
+      const expectedToken = crypto
+        .createHmac('sha256', captchaSecret)
+        .update(`${String(answer).trim()}|${expiresAt}`)
+        .digest('hex');
+
+      let captchaValid = false;
+      try {
+        captchaValid = crypto.timingSafeEqual(
+          Buffer.from(expectedToken, 'hex'),
+          Buffer.from(String(token), 'hex'),
+        );
+      } catch {
+        captchaValid = false;
+      }
+
+      if (!captchaValid) {
+        return res.status(400).json({ message: "Security check failed. Please refresh the captcha and try again." });
+      }
+
       const messageData = insertContactMessageSchema.parse(req.body);
       const message = await storage.createContactMessage(messageData);
 
