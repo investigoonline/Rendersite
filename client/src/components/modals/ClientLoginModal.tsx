@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Captcha } from "@/components/Captcha";
+import { Captcha, type CaptchaValue } from "@/components/Captcha";
 import { User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -40,7 +40,7 @@ interface ClientLoginModalProps {
 export default function ClientLoginModal({ open, onOpenChange, onForgotPassword }: ClientLoginModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [captcha, setCaptcha] = useState({ question: "", answer: "" });
+  const [captcha, setCaptcha] = useState<CaptchaValue>({ question: "", answer: "", token: "", expiresAt: 0 });
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -64,7 +64,7 @@ export default function ClientLoginModal({ open, onOpenChange, onForgotPassword 
       });
       onOpenChange(false);
       form.reset();
-      setCaptcha({ question: "", answer: "" });
+      setCaptcha({ question: "", answer: "", token: "", expiresAt: 0 });
       
       // Invalidate and refetch user data before redirecting
       await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });

@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Captcha } from "@/components/Captcha";
+import { Captcha, type CaptchaValue } from "@/components/Captcha";
 import { Send, Loader2 } from "lucide-react";
 import type { PageContent } from "@shared/schema";
 
@@ -66,7 +66,7 @@ const contactMethodOptions = [
 
 export default function ContactForm() {
   const { toast } = useToast();
-  const [captcha, setCaptcha] = useState({ question: "", answer: "" });
+  const [captcha, setCaptcha] = useState<CaptchaValue>({ question: "", answer: "", token: "", expiresAt: 0 });
 
   const { data: formFieldsContent } = useQuery<PageContent[]>({
     queryKey: ["/api/content", "contact"],
@@ -111,7 +111,7 @@ export default function ContactForm() {
           "Thank you for contacting us. We'll get back to you within 24 hours.",
       });
       form.reset();
-      setCaptcha({ question: "", answer: "" });
+      setCaptcha({ question: "", answer: "", token: "", expiresAt: 0 });
     },
     onError: (error: Error) => {
       toast({

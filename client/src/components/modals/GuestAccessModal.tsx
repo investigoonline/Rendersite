@@ -20,7 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Captcha } from "@/components/Captcha";
+import { Captcha, type CaptchaValue } from "@/components/Captcha";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Watch, LogIn } from "lucide-react";
@@ -46,7 +46,7 @@ export default function GuestAccessModal({ open, onOpenChange }: GuestAccessModa
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
   const [activeTab, setActiveTab] = useState("signup");
-  const [captcha, setCaptcha] = useState({ question: "", answer: "" });
+  const [captcha, setCaptcha] = useState<CaptchaValue>({ question: "", answer: "", token: "", expiresAt: 0 });
 
   const signupForm = useForm<GuestSignupForm>({
     resolver: zodResolver(guestSignupSchema),
@@ -100,7 +100,7 @@ export default function GuestAccessModal({ open, onOpenChange }: GuestAccessModa
       localStorage.setItem("guestAccount", JSON.stringify(data));
       onOpenChange(false);
       loginForm.reset();
-      setCaptcha({ question: "", answer: "" });
+      setCaptcha({ question: "", answer: "", token: "", expiresAt: 0 });
       // Redirect to home page
       window.location.href = "/";
     },
@@ -134,7 +134,7 @@ export default function GuestAccessModal({ open, onOpenChange }: GuestAccessModa
     setActiveTab("signup");
     signupForm.reset();
     loginForm.reset();
-    setCaptcha({ question: "", answer: "" });
+    setCaptcha({ question: "", answer: "", token: "", expiresAt: 0 });
     onOpenChange(false);
   };
 

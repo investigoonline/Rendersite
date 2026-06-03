@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Captcha } from "@/components/Captcha";
+import { Captcha, type CaptchaValue } from "@/components/Captcha";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertUserRegistrationSchema } from "@shared/schema";
@@ -37,7 +37,7 @@ export default function Register() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isGuestUser, guestAccount } = useAuth();
-  const [captcha, setCaptcha] = useState({ question: "", answer: "" });
+  const [captcha, setCaptcha] = useState<CaptchaValue>({ question: "", answer: "", token: "", expiresAt: 0 });
 
   const form = useForm<RegistrationForm>({
     resolver: zodResolver(registrationFormSchema),

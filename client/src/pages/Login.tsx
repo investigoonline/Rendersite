@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Captcha } from "@/components/Captcha";
+import { Captcha, type CaptchaValue } from "@/components/Captcha";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { User } from "lucide-react";
@@ -26,7 +26,7 @@ export default function Login() {
   usePageTitle("Client Portal Login");
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [captcha, setCaptcha] = useState<{ question: string; answer: string }>({ question: "", answer: "" });
+  const [captcha, setCaptcha] = useState<CaptchaValue>({ question: "", answer: "", token: "", expiresAt: 0 });
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
 
   const form = useForm<LoginForm>({
@@ -40,7 +40,7 @@ export default function Login() {
     onSuccess: async () => {
       toast({ title: "Login Successful", description: "Welcome back to your account!" });
       form.reset();
-      setCaptcha({ question: "", answer: "" });
+      setCaptcha({ question: "", answer: "", token: "", expiresAt: 0 });
       await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       await queryClient.refetchQueries({ queryKey: ["/api/auth/user"] });
       setTimeout(() => { window.location.href = "/"; }, 100);

@@ -4,9 +4,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RefreshCw } from "lucide-react";
 
+export interface CaptchaValue {
+  question: string;
+  answer: string;
+  token: string;
+  expiresAt: number;
+}
+
 interface CaptchaProps {
-  value: { question: string; answer: string };
-  onChange: (value: { question: string; answer: string }) => void;
+  value: CaptchaValue;
+  onChange: (value: CaptchaValue) => void;
   error?: string;
 }
 
@@ -19,10 +26,15 @@ export function Captcha({ value, onChange, error }: CaptchaProps) {
       if (response.ok) {
         const data = await response.json();
         setQuestion(data.question);
-        onChange({ question: data.question, answer: "" });
+        onChange({
+          question: data.question,
+          answer: "",
+          token: data.token ?? "",
+          expiresAt: data.expiresAt ?? 0,
+        });
       }
     } catch {
-      // silently ignore network errors — the server will reject a missing answer
+      // silently ignore network errors — the server will reject a missing token
     }
   }, [onChange]);
 
@@ -31,11 +43,11 @@ export function Captcha({ value, onChange, error }: CaptchaProps) {
   }, [fetchQuestion]);
 
   const handleAnswerChange = (newAnswer: string) => {
-    onChange({ question, answer: newAnswer });
+    onChange({ ...value, question, answer: newAnswer });
   };
 
   const handleRefresh = () => {
-    onChange({ question: "", answer: "" });
+    onChange({ question: "", answer: "", token: "", expiresAt: 0 });
     fetchQuestion();
   };
 
